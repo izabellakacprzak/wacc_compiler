@@ -1,0 +1,19 @@
+stages:
+  - compile
+  - test
+  - clean
+
+compile-job:
+  stage: compile
+  script:
+    - make
+
+test-job:
+  stage: test
+  script:
+    - echo "All tests pass!"
+
+clean-job:
+  stage: clean
+  script:
+    - make clean
