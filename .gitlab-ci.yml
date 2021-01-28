@@ -6,6 +6,7 @@ stages:
 compile-job:
   stage: compile
   script:
+    - apt-get -y install make
     - make
 
 test-job:
