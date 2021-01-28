@@ -9,7 +9,7 @@ stages:
 precompile-job:
   stage: precompile
   script:
-    - apt-get update && apt-get -y install make
+    - sudo apt-get update && sudo apt-get -y install make
 
 compile-job:
   stage: compile
