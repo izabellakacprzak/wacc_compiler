@@ -42,7 +42,7 @@
                     <assembleDirectory>target</assembleDirectory>
                     <programs>
                         <program>
-                            <mainClass>compiler.DummyClass</mainClass>
+                            <mainClass>DummyClass</mainClass>
                             <name>wacc_30</name>
                         </program>
                     </programs>
