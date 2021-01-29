@@ -1,27 +1,19 @@
-image: gcc
+image: maven:3-jdk-11
 
 stages:
-  - precompile
   - compile
   - test
-  - clean
-
-precompile-job:
-  stage: precompile
-  script:
-    - sudo apt-get update && sudo apt-get -y install make
 
 compile-job:
   stage: compile
   script:
-    - make
+    - mvn install -B
+    - mvn compile
 
 test-job:
   stage: test
   script:
-    - echo "All tests pass!"
+    - mvn test
 
-clean-job:
-  stage: clean
-  script:
-    - make clean
+
+
