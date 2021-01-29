@@ -1,4 +1,4 @@
-
+package ic.doc;
 
 public class DummyClass {
 

@@ -1,5 +1,6 @@
-
+package ic.doc;
 import org.junit.Test;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 

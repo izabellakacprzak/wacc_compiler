@@ -1,3 +1,5 @@
+package ic.doc;
+
 public class DummyMain {
 
   public static void main() {
