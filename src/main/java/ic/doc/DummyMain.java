@@ -1,4 +1,4 @@
-package ic.doc;
+package java.ic.doc;
 
 public class DummyMain {
 
