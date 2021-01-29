@@ -16,6 +16,4 @@ test-job:
     - mvn test
 
 
-clean-job:
-  stage: clean
 
