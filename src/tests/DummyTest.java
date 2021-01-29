@@ -10,7 +10,7 @@ public class DummyTest {
 
   @Test
   public void printsHello() {
-  assertThat(dummyObj.hello(), containsString("Hello"));
+  assertThat(dummyObj.hello(), containsString("Apple"));
 }
 
 }
