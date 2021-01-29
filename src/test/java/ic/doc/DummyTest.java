@@ -11,7 +11,7 @@ public class DummyTest {
 
   @Test
   public void printsHello() {
-  assertThat(dummyObj.hello(), containsString("Apple"));
+  assertThat(dummyObj.hello(), containsString("Hello"));
 }
 
 }
