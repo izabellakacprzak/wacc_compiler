@@ -1,4 +1,4 @@
-package java.ic.doc;
+package ic.doc;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
