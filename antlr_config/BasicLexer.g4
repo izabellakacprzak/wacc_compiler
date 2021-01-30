@@ -81,3 +81,5 @@ ESCAPED_CHARACTER: '0' | 'b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\' ;
 
 CHARACTER: ~('\\' | '\'' | '"')
 | '\\' ESCAPED_CHARACTER ;
+
+LETTER: 'a'..'z' | 'A'..'Z' ;

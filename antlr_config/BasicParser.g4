@@ -65,9 +65,9 @@ pair_elem_type: base_type
 | PAIR ;
 
 expr: INT_LITER
-| BOOL
-| CHAR
-| STRING
+| BOOL_LITER
+| CHAR_LITER
+| STR_LITER
 | pair_liter
 | ident
 | array_elem
@@ -95,7 +95,7 @@ binary_oper: MULT
 | AND
 | OR ;
 
-ident: (UNDERSCORE | CHAR) (UNDERSCORE | CHAR | DIGIT)* ;
+ident: (UNDERSCORE | LETTER) (UNDERSCORE | LETTER | DIGIT)* ;
 
 array_elem: ident (OPEN_SQUARE_BRACKET expr CLOSE_SQUARE_BRACKET)+ ;
 
