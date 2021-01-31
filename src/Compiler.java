@@ -30,6 +30,5 @@ public class Compiler {
 
     // check if error listener encountered any errors and if so exit with an error code
     // otherwise continue with semantics checking
-
   }
 }
