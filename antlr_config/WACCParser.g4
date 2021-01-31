@@ -1,24 +1,22 @@
-parser grammar BasicParser;
+parser grammar WACCParser;
 
 options {
-  tokenVocab=BasicLexer;
+  tokenVocab=WACCLexer;
 }
 
 // program
 program: BEGIN (func)* stat END EOF ;
 
-// function
-func: type ident OPEN_PARENTHESES (param_list)? CLOSE_PARENTHESES IS stat END ;
 
-// list of parameters
+// function and parameters
+func: type IDENT OPEN_PARENTHESES (param_list)? CLOSE_PARENTHESES IS stat END ;
+param: type IDENT ;
 param_list: param (COMMA param)* ;
 
-// parameter
-param: type ident ;
 
 // statement
-stat: SKIP_A
-| type ident ASSIGN assign_rhs
+stat: SKP
+| type IDENT ASSIGN assign_rhs
 | assign_lhs ASSIGN assign_rhs
 | READ assign_lhs
 | FREE expr
@@ -31,7 +29,9 @@ stat: SKIP_A
 | BEGIN stat END
 | stat SEMICOLON stat ;
 
-assign_lhs: ident
+
+// assignents
+assign_lhs: IDENT
 | array_elem
 | pair_elem ;
 
@@ -39,12 +39,12 @@ assign_rhs: expr
 | array_liter
 | NEWPAIR OPEN_PARENTHESES expr COMMA expr CLOSE_PARENTHESES
 | pair_elem
-| CALL ident OPEN_PARENTHESES (arg_list)? CLOSE_PARENTHESES ;
+| CALL IDENT OPEN_PARENTHESES (arg_list)? CLOSE_PARENTHESES ;
 
 arg_list: expr (COMMA expr)* ;
 
-pair_elem: (FST | SND) expr ;
 
+// types
 type: base_type
 | array_type
 | pair_type ;
@@ -58,47 +58,30 @@ array_type: base_type OPEN_SQUARE_BRACKET CLOSE_SQUARE_BRACKET
 | array_type OPEN_SQUARE_BRACKET CLOSE_SQUARE_BRACKET
 | pair_type OPEN_SQUARE_BRACKET CLOSE_SQUARE_BRACKET ;
 
+array_elem: IDENT (OPEN_SQUARE_BRACKET expr CLOSE_SQUARE_BRACKET)+ ;
+
+array_liter: OPEN_SQUARE_BRACKET (expr (COMMA expr)* )? CLOSE_SQUARE_BRACKET ;
+
 pair_type: PAIR OPEN_PARENTHESES pair_elem_type COMMA pair_elem_type CLOSE_PARENTHESES ;
 
 pair_elem_type: base_type
 | array_type
 | PAIR ;
 
+pair_elem: (FST | SND) expr ;
+pair_liter: NULL ;
+
+
+// expressions
 expr: INT_LITER
 | BOOL_LITER
 | CHAR_LITER
 | STR_LITER
 | pair_liter
-| ident
+| IDENT
 | array_elem
-| unary_oper expr
-| expr binary_oper expr
+| (NEGATION | MINUS | LENGTH | ORD | CHR) expr  // unary expressions
+| expr (MULT | DIV | MOD | PLUS | MINUS) expr   // arithmetic expressions
+| expr (GT | GTE | LT | LTE | EQ | NEQ) expr    // comparison expressions
+| expr (AND | OR) expr                          // logical expressions
 | OPEN_PARENTHESES expr CLOSE_PARENTHESES ;
-
-unary_oper: EXCLAMATION_MARK
-| MINUS
-| LENGTH
-| ORD
-| CHR ;
-
-binary_oper: MULT
-| DIV
-| PERCENTAGE
-| PLUS
-| MINUS
-| GT
-| GTE
-| LT
-| LTE
-| EQ
-| NEQ
-| AND
-| OR ;
-
-ident: (UNDERSCORE | LETTER) (UNDERSCORE | LETTER | DIGIT)* ;
-
-array_elem: ident (OPEN_SQUARE_BRACKET expr CLOSE_SQUARE_BRACKET)+ ;
-
-array_liter: OPEN_SQUARE_BRACKET (expr (COMMA expr)* )? CLOSE_SQUARE_BRACKET ;
-
-pair_liter: NULL ;
