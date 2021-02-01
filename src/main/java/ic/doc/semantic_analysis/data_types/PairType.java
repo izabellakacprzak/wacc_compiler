@@ -1,23 +1,23 @@
 package ic.doc.semantic_analysis.data_types;
 
-import ic.doc.semantic_analysis.DataType;
+import ic.doc.semantic_analysis.DataTypeId;
 
-public class PairType extends DataType {
+public class PairType extends DataTypeId {
 
-    private final DataType fstType;
-    private final DataType sndType;
+    private final DataTypeId fstType;
+    private final DataTypeId sndType;
 
-    public PairType(DataType fstType, DataType sndType) {
+    public PairType(DataTypeId fstType, DataTypeId sndType) {
         super();
         this.fstType = fstType;
         this.sndType = sndType;
     }
 
-    public DataType getFstType() {
+    public DataTypeId getFstType() {
         return fstType;
     }
 
-    public DataType getSndType() {
+    public DataTypeId getSndType() {
         return sndType;
     }
 

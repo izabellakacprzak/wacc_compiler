@@ -1,13 +1,13 @@
 package ic.doc.semantic_analysis.data_types;
 
-import ic.doc.semantic_analysis.DataType;
+import ic.doc.semantic_analysis.DataTypeId;
 
-public class ArrayType extends DataType {
+public class ArrayType extends DataTypeId {
 
     private final int size;
-    private final DataType arrayType;
+    private final DataTypeId arrayType;
 
-    public ArrayType(int size, DataType arrayType){
+    public ArrayType(int size, DataTypeId arrayType) {
         super();
         this.size = size;
         this.arrayType = arrayType;

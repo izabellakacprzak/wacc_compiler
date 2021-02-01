@@ -1,9 +1,11 @@
 package ic.doc.semantic_analysis.data_types;
 
-public class StringType extends ArrayType {
+import ic.doc.semantic_analysis.DataTypeId;
 
-    public StringType(int size) {
-        super(size, new CharType());
+public class StringType extends DataTypeId {
+
+    public StringType() {
+        super();
     }
 
     @Override

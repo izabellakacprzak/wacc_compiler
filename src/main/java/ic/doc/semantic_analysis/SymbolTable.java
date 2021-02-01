@@ -25,7 +25,7 @@ public class SymbolTable {
 
     /* Get an identifier object from the symbol table or
         its enclosing symbol tables */
-    private Identifier lookupAll(String name) {
+    public Identifier lookupAll(String name) {
         Identifier currentObject = this.lookup(name);
 
         if (currentObject == null && this.parentSymTable != null) {
