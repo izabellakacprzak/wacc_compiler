@@ -1,0 +1,11 @@
+public class FuncCallNode implements AssignRHSNode {
+    private IdentifierNode identifier;
+    private FunctionNode function;
+    private List<ExpressionNode> arguments;
+
+    public FuncCallNode(IdentifierNode identifier, FunctionNode function, List<ExpressionNode> arguments) {
+        this.identifier = identifier;
+        this.function = function;
+        this.arguments = arguments;
+    }
+}
