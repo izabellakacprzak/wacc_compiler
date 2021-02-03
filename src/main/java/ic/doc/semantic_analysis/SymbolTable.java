@@ -6,7 +6,7 @@ import java.util.Map;
 public class SymbolTable {
 
     private final SymbolTable parentSymTable;
-    private Map<String, Identifier> dictionary;
+    private final Map<String, Identifier> dictionary;
 
     public SymbolTable(SymbolTable parentSymTable) {
         this.parentSymTable = parentSymTable;

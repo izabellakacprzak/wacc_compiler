@@ -40,6 +40,8 @@ public class FunctionId extends Identifier {
       }
     }
 
+    string.append(")");
+
     return string.toString();
   }
 }

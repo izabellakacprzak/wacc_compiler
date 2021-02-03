@@ -2,28 +2,28 @@ package ic.doc.semantic_analysis.data_types;
 
 import ic.doc.semantic_analysis.DataTypeId;
 
-public class BasicType extends DataTypeId {
+public class BaseType extends DataTypeId {
 
-  private enum Basic {INT, BOOL, CHAR}
+  public enum Type {INT, BOOL, CHAR}
 
-  private final Basic type;
+  private final Type type;
 
-  public BasicType(Basic type) {
+  public BaseType(Type type) {
     this.type = type;
   }
 
-  public Basic getType() {
+  public Type getType() {
     return type;
   }
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof BasicType)) {
+    if (!(o instanceof BaseType)) {
       return false;
     }
 
-    BasicType basicType = (BasicType) o;
-    return basicType.getType() == type;
+    BaseType baseType = (BaseType) o;
+    return baseType.getType() == type;
   }
 
   @Override
