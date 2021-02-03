@@ -1,4 +1,4 @@
-package ic.doc.semantic_analysis;
+package SemanticAnalysis;
 
 public abstract class Identifier {
 

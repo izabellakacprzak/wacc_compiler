@@ -1,4 +1,4 @@
-package ic.doc.semantic_analysis;
+package SemanticAnalysis;
 
 import java.util.HashMap;
 import java.util.Map;

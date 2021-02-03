@@ -1,6 +1,6 @@
-package ic.doc.semantic_analysis.data_types;
+package SemanticAnalysis.DataTypes;
 
-import ic.doc.semantic_analysis.DataTypeId;
+import SemanticAnalysis.DataTypeId;
 
 public class StringType extends DataTypeId {
 
