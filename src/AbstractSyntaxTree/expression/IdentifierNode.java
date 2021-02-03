@@ -1,7 +1,9 @@
-public class IdentfierNode extends ExpressionNode {
-    private final String identifier;
+package AbstractSyntaxTree.expression;
 
-    public IdentfierNode(String identifier){
-      this.identifier = identifier;
-    }
+public class IdentifierNode extends ExpressionNode {
+  private final String identifier;
+
+  public IdentifierNode(String identifier){
+    this.identifier = identifier;
+  }
 }

@@ -1,7 +1,11 @@
+package AbstractSyntaxTree.statement;
+
+import AbstractSyntaxTree.expression.ExpressionNode;
+
 public class PrintStatementNode extends StatementNode {
   private final ExpressionNode expression;
 
-  public PrintLineStatementNode(ExpressionNode expression){
+  public PrintStatementNode(ExpressionNode expression){
     this.expression = expression;
   }
 }

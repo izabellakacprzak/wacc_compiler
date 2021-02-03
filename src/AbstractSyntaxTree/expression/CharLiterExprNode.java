@@ -1,3 +1,5 @@
+package AbstractSyntaxTree.expression;
+
 public class CharLiterExprNode extends ExpressionNode {
     private final char value;
 

@@ -1,3 +1,5 @@
+package AbstractSyntaxTree.type;
+
 public class ArrayTypeNode extends TypeNode {
     private TypeNode type;
 

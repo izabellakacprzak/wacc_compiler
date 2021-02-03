@@ -1,3 +1,7 @@
+package AbstractSyntaxTree.statement;
+
+import AbstractSyntaxTree.expression.ExpressionNode;
+
 public class IfStatementNode extends StatementNode {
     private ExpressionNode condition;
     private StatementNode thenStatement;

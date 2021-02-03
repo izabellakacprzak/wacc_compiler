@@ -1,3 +1,5 @@
+package AbstractSyntaxTree.type;
+
 public class PairTypeNode extends TypeNode {
     private TypeNode fstType;
     private TypeNode sndType;

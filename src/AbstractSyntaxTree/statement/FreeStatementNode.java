@@ -1,7 +1,10 @@
-public class FreeStatement extends StatementNode {
-    private ExpressionNode expr;
+package AbstractSyntaxTree.statement;
 
-    public FreeStatement(ExpressionNode expr) {
-        this.expr = expr;
-    }
+import AbstractSyntaxTree.expression.ExpressionNode;
+
+public class FreeStatementNode {
+  private ExpressionNode expr;
+  public FreeStatementNode(ExpressionNode expr) {
+    this.expr = expr;
+  }
 }

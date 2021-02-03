@@ -1,3 +1,5 @@
+package AbstractSyntaxTree.expression;
+
 public class BinaryOpExprNode extends ExpressionNode {
   private final ExpressionNode lhs;
   private final ExpressionNode rhs;

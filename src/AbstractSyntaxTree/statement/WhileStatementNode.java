@@ -1,3 +1,7 @@
+package AbstractSyntaxTree.statement;
+
+import AbstractSyntaxTree.expression.ExpressionNode;
+
 public class WhileStatementNode extends StatementNode {
     private final ExpressionNode condition;
     private final StatementNode statement;

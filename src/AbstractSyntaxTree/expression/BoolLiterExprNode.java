@@ -1,3 +1,5 @@
+package AbstractSyntaxTree.expression;
+
 public class BoolLiterExprNode extends ExpressionNode {
     private final boolean value;
 

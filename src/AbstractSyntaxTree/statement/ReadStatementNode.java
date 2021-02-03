@@ -1,7 +1,11 @@
-public class ReadStatementNode extends StatementNode {
-    private final AssingLHSNode lhs;
+package AbstractSyntaxTree.statement;
 
-    public ReadStatementNode(AssingLHSNode lhs){
+import AbstractSyntaxTree.assignment.AssignLHSNode;
+
+public class ReadStatementNode extends StatementNode {
+    private final AssignLHSNode lhs;
+
+    public ReadStatementNode(AssignLHSNode lhs){
       this.lhs = lhs;
     }
 }

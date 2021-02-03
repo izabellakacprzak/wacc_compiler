@@ -1,3 +1,7 @@
+package AbstractSyntaxTree.assignment;
+
+import AbstractSyntaxTree.expression.ExpressionNode;
+
 public class NewPairNode implements AssignRHSNode {
     private ExpressionNode leftExpr;
     private ExpressionNode rightExpr;

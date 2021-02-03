@@ -1,3 +1,5 @@
-public interface AssignRHSNode extends AssignmentNode {
+package AbstractSyntaxTree.assignment;
+
+public interface AssignRHSNode {
     
 }
