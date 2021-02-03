@@ -1,14 +1,18 @@
 package SemanticAnalysis;
 
+import AbstractSyntaxTree.ASTNode;
+
 public abstract class Identifier {
 
-    // ADD REFERENCE TO AST NODE !!!
+  private final ASTNode node;
 
-    // pass in reference to ast node
-    public Identifier(/* ASTNode node */) {
-        // assign ast node to this.ast_node
-    }
+  public Identifier(ASTNode node) {
+    this.node = node;
+  }
 
-    //getter for the ast node
-    public abstract String toString();
+  public ASTNode getNode() {
+    return node;
+  }
+
+  public abstract String toString();
 }

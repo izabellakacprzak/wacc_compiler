@@ -1,13 +1,16 @@
 package SemanticAnalysis;
 
+import AbstractSyntaxTree.ASTNode;
+
 public class FunctionId extends Identifier {
 
   private final DataTypeId returnType;
   private final ParameterId[] params;
   private final SymbolTable parentTable;
 
-  public FunctionId(DataTypeId returnType, ParameterId[] params, SymbolTable parentTable) {
-    super();
+  public FunctionId(ASTNode node, DataTypeId returnType, ParameterId[] params,
+      SymbolTable parentTable) {
+    super(node);
     this.returnType = returnType;
     this.params = params;
     this.parentTable = parentTable;

@@ -1,14 +1,14 @@
 package SemanticAnalysis.DataTypes;
 
+import AbstractSyntaxTree.ASTNode;
 import SemanticAnalysis.DataTypeId;
 
 public class BaseType extends DataTypeId {
 
-  public enum Type {INT, BOOL, CHAR}
-
   private final Type type;
 
-  public BaseType(Type type) {
+  public BaseType(ASTNode node, Type type) {
+    super(node);
     this.type = type;
   }
 
@@ -30,4 +30,6 @@ public class BaseType extends DataTypeId {
   public String toString() {
     return type.toString().toLowerCase();
   }
+
+  public enum Type {INT, BOOL, CHAR}
 }
