@@ -1,5 +1,7 @@
 package AbstractSyntaxTree.type;
 
-public class TypeNode {
+import AbstractSyntaxTree.ASTNode;
+
+public class TypeNode implements ASTNode {
     
 }

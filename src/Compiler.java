@@ -1,4 +1,6 @@
 import java.io.IOException;
+
+import AbstractSyntaxTree.ASTNode;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import antlr.*;
@@ -27,7 +29,8 @@ public class Compiler {
     parser.removeErrorListeners();
     // add our own error listener
     ParseTree tree = parser.program();
-
+    ASTVisitor visitor = new ASTVisitor();
+    ASTNode prog = visitor.visit(tree);
     System.out.println(tree.toStringTree(parser));
 
     // check if error listener encountered any errors and if so exit with an error code

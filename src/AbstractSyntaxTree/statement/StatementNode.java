@@ -1,5 +1,7 @@
 package AbstractSyntaxTree.statement;
 
-public class StatementNode {
+import AbstractSyntaxTree.ASTNode;
+
+public class StatementNode implements ASTNode {
 
 }

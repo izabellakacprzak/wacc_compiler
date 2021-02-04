@@ -45,9 +45,9 @@ assign_rhs: expr                                                  #ExprRHS
 
 
 // types
-type: base_type #BaseType
-| array_type    #ArrayType
-| pair_type     #PairType
+type: base_type                                     #BaseType
+| type OPEN_SQUARE_BRACKET CLOSE_SQUARE_BRACKET     #ArrayType
+| pair_type                                         #PairType
 ;
 
 base_type: INT
@@ -55,16 +55,14 @@ base_type: INT
 | CHAR
 | STRING ;
 
-array_type: base_type OPEN_SQUARE_BRACKET CLOSE_SQUARE_BRACKET
-| array_type OPEN_SQUARE_BRACKET CLOSE_SQUARE_BRACKET
-| pair_type OPEN_SQUARE_BRACKET CLOSE_SQUARE_BRACKET ;
+
 
 array_elem: IDENT (OPEN_SQUARE_BRACKET expr CLOSE_SQUARE_BRACKET)+ ;
 
 pair_type: PAIR OPEN_PARENTHESES pair_elem_type COMMA pair_elem_type CLOSE_PARENTHESES ;
 
 pair_elem_type: base_type
-| array_type
+| type
 | PAIR ;
 
 pair_elem: FST expr #FstPairExpr
