@@ -5,18 +5,20 @@ import SemanticAnalysis.DataTypeId;
 
 public class ArrayType extends DataTypeId {
 
-  private final int size;
+  private int size = -1;
   private final DataTypeId arrayType;
 
-  public ArrayType(ASTNode node, int size, DataTypeId arrayType) {
+  public ArrayType(ASTNode node, DataTypeId arrayType) {
     super(node);
-    this.size = size;
     this.arrayType = arrayType;
   }
 
   public int getSize() {
     return size;
   }
+
+  public void setSize(int size) { this.size = size;}
+
 
   @Override
   public String toString() {

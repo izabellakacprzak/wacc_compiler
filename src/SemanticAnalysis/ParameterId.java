@@ -13,6 +13,7 @@ public class ParameterId extends Identifier {
 
   @Override
   public String toString() {
-    return type.toString()/* + ASTNode.identifier()*/;
+    return type.toString() + super.getNode().toString();
   }
 }
+

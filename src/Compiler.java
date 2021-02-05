@@ -1,9 +1,10 @@
-import java.io.IOException;
-
 import AbstractSyntaxTree.ASTNode;
+import antlr.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
-import antlr.*;
+
+import java.io.IOException;
+
 public class Compiler {
   private static final int SYNTAX_ERROR_CODE = 100;
   public static void main(String[] args){

@@ -4,6 +4,7 @@ import AbstractSyntaxTree.assignment.*;
 import AbstractSyntaxTree.expression.*;
 import AbstractSyntaxTree.statement.*;
 import AbstractSyntaxTree.type.*;
+import SemanticAnalysis.DataTypes.BaseType;
 import antlr.WACCParser.*;
 import antlr.WACCParserBaseVisitor;
 
@@ -273,7 +274,24 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   //TODO
   @Override
   public ASTNode visitBaseType(BaseTypeContext ctx) {
-    return new BaseTypeNode(ctx.toString());
+    BaseType.Type baseType;
+    switch (ctx.base_type().toString()) {
+      case "int":
+        baseType = BaseType.Type.INT;
+        break;
+      case "bool":
+        baseType = BaseType.Type.BOOL;
+        break;
+      case "char":
+        baseType = BaseType.Type.CHAR;
+        break;
+      case "string":
+        baseType = BaseType.Type.STRING;
+        break;
+      default:
+        throw new IllegalArgumentException("Invalid Base Type");
+    }
+    return new BaseTypeNode(baseType, ctx.toString());
   }
 
 
