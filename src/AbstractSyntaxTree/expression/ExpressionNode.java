@@ -1,7 +1,8 @@
 package AbstractSyntaxTree.expression;
 
 import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.assignment.AssignRHSNode;
 
-public class ExpressionNode implements ASTNode {
+public class ExpressionNode implements AssignRHSNode {
     
 }
