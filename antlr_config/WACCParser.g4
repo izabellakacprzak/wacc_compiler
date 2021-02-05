@@ -10,8 +10,7 @@ program: BEGIN (func)* stat END EOF ;
 
 // function and parameters
 func: type IDENT OPEN_PARENTHESES (param_list)? CLOSE_PARENTHESES IS stat END ;
-param: type IDENT ;
-param_list: param (COMMA param)* ;
+param_list: type type IDENT (COMMA type IDENT)* ;
 
 
 // statement
@@ -45,9 +44,9 @@ assign_rhs: expr                                                  #ExprRHS
 
 
 // types
-type: base_type                                     #BaseType
-| type OPEN_SQUARE_BRACKET CLOSE_SQUARE_BRACKET     #ArrayType
-| pair_type                                         #PairType
+type: base_type                                                                 #BaseType
+| type OPEN_SQUARE_BRACKET CLOSE_SQUARE_BRACKET                                 #ArrayType
+| PAIR OPEN_PARENTHESES pair_elem_type COMMA pair_elem_type CLOSE_PARENTHESES   #PairType
 ;
 
 base_type: INT
@@ -58,8 +57,6 @@ base_type: INT
 
 
 array_elem: IDENT (OPEN_SQUARE_BRACKET expr CLOSE_SQUARE_BRACKET)+ ;
-
-pair_type: PAIR OPEN_PARENTHESES pair_elem_type COMMA pair_elem_type CLOSE_PARENTHESES ;
 
 pair_elem_type: base_type
 | type

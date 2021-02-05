@@ -12,6 +12,7 @@ import java.util.List;
 
 public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
+  /* PROGRAM NODE */
   @Override
   public ASTNode visitProgram(ProgramContext ctx) {
     StatementNode statementNode = (StatementNode) visit(ctx.stat());
@@ -22,6 +23,36 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new ProgramNode(statementNode, functionNodes);
   }
 
+  /* FUNCTION AND FUNCTION PARAMETERS NODES */
+  @Override
+  public ASTNode visitFunc(FuncContext ctx) {
+    TypeNode type = (TypeNode) visit(ctx.type());
+    IdentifierNode identifier = new IdentifierNode(ctx.IDENT().toString());
+    StatementNode body = (StatementNode) visit(ctx.stat());
+    ParamListNode params = new ParamListNode(new ArrayList<>(), new ArrayList<>());
+
+    if(ctx.param_list() != null) {
+      params = (ParamListNode) visit(ctx.param_list());
+    }
+    return new FunctionNode(type, identifier, params, body);
+  }
+
+  @Override
+  public ASTNode visitParam_list(Param_listContext ctx) {
+    List<IdentifierNode> names = new ArrayList<>();
+    List<TypeNode> types = new ArrayList<>();
+
+    if(ctx.IDENT() != null) {
+      for(int i = 0; i < ctx.IDENT().size(); i++) {
+        names.add(new IdentifierNode(ctx.IDENT(i).toString()));
+        types.add((TypeNode) visit(ctx.type(i)));
+      }
+    }
+
+    return super.visitParam_list(ctx);
+  }
+
+  /* RHS ASSIGNMENT NODES */
   @Override
   public ASTNode visitExprRHS(ExprRHSContext ctx) {
     return visit(ctx.expr());
@@ -72,6 +103,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new FuncCallNode(identifierNode, arguments);
   }
 
+  /* LHS ASSIGNMENT NODES */
   @Override
   public ASTNode visitIdentLHS(IdentLHSContext ctx) {
     return new IdentifierNode(ctx.IDENT().toString());
@@ -97,9 +129,17 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return visit(ctx.pair_elem());
   }
 
+  /* EXPRESSION NODES */
   @Override
   public ASTNode visitArrayElemExpr(ArrayElemExprContext ctx) {
     return visit(ctx.array_elem());
+  }
+
+  // TODO: add a operator to class
+  @Override
+  public ASTNode visitUnaryExpr(UnaryExprContext ctx) {
+    ExpressionNode operand = (ExpressionNode) visit(ctx.expr());
+    return new UnaryOpExprNode(operand);
   }
 
   @Override
@@ -160,21 +200,13 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new IdentifierNode(ctx.IDENT().toString());
   }
 
-
-  // TODO: add a operator to class
-  @Override
-  public ASTNode visitUnaryExpr(UnaryExprContext ctx) {
-    ExpressionNode operand = (ExpressionNode) visit(ctx.expr());
-    return new UnaryOpExprNode(operand);
-  }
-
   @Override
   public ASTNode visitBracketExpr(BracketExprContext ctx) {
     ExpressionNode expressionNode = (ExpressionNode) visit(ctx.expr());
     return new ParenthesisExprNode(expressionNode);
   }
 
-
+  /* STATEMENT NODES */
   //TODO: toString method of node to return "skip" or store skip in a field??
   @Override
   public ASTNode visitSkipStat(SkipStatContext ctx) {
@@ -269,13 +301,12 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new StatementsListNode(statements);
   }
 
-
+  /* TYPE NODES */
   //TODO
   @Override
   public ASTNode visitBaseType(BaseTypeContext ctx) {
     return new BaseTypeNode(ctx.toString());
   }
-
 
   @Override
   public ASTNode visitArrayType(ArrayTypeContext ctx) {
@@ -284,8 +315,8 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
   @Override
   public ASTNode visitPairType(PairTypeContext ctx) {
-    TypeNode fst = (TypeNode) visit(ctx.pair_type().pair_elem_type(0));
-    TypeNode snd = (TypeNode) visit(ctx.pair_type().pair_elem_type(1));
+    TypeNode fst = (TypeNode) visit(ctx.pair_elem_type(0));
+    TypeNode snd = (TypeNode) visit(ctx.pair_elem_type(1));
     return new PairTypeNode(fst, snd);
   }
 
