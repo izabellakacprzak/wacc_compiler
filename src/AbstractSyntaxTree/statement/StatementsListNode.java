@@ -1,11 +1,18 @@
 package AbstractSyntaxTree.statement;
 
+import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
-public class StatementsListNode extends StatementNode {
-    private final List<StatementNode> statements;
+public class StatementsListNode implements StatementNode {
 
-    public StatementsListNode(List<StatementNode> statements){
-      this.statements = statements;
-    }
+  private final List<StatementNode> statements;
+
+  public StatementsListNode(List<StatementNode> statements) {
+    this.statements = statements;
+  }
+
+  @Override
+  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+
+  }
 }

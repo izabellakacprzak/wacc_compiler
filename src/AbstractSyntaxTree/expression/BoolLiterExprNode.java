@@ -1,9 +1,18 @@
 package AbstractSyntaxTree.expression;
 
-public class BoolLiterExprNode extends ExpressionNode {
-    private final boolean value;
+import SemanticAnalysis.SymbolTable;
+import java.util.List;
 
-    public BoolLiterExprNode(boolean value){
-      this.value = value;
-    }
+public class BoolLiterExprNode implements ExpressionNode {
+
+  private final boolean value;
+
+  public BoolLiterExprNode(boolean value) {
+    this.value = value;
+  }
+
+  @Override
+  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+
+  }
 }

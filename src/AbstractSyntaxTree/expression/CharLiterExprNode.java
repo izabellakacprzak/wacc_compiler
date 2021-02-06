@@ -1,9 +1,18 @@
 package AbstractSyntaxTree.expression;
 
-public class CharLiterExprNode extends ExpressionNode {
-    private final char value;
+import SemanticAnalysis.SymbolTable;
+import java.util.List;
 
-    public CharLiterExprNode(char value){
-      this.value = value;
-    }
+public class CharLiterExprNode implements ExpressionNode {
+
+  private final char value;
+
+  public CharLiterExprNode(char value) {
+    this.value = value;
+  }
+
+  @Override
+  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+
+  }
 }

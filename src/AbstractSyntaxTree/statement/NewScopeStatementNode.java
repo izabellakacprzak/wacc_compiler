@@ -1,9 +1,18 @@
 package AbstractSyntaxTree.statement;
 
-public class NewScopeStatementNode extends StatementNode {
-    private StatementNode statement;
+import SemanticAnalysis.SymbolTable;
+import java.util.List;
 
-    public NewScopeStatementNode(StatementNode statement) {
-        this.statement = statement;
-    }
+public class NewScopeStatementNode implements StatementNode {
+
+  private final StatementNode statement;
+
+  public NewScopeStatementNode(StatementNode statement) {
+    this.statement = statement;
+  }
+
+  @Override
+  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+
+  }
 }

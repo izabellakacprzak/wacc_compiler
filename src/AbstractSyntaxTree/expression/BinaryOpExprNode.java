@@ -1,6 +1,10 @@
 package AbstractSyntaxTree.expression;
 
-public class BinaryOpExprNode extends ExpressionNode {
+import SemanticAnalysis.SymbolTable;
+import java.util.List;
+
+public class BinaryOpExprNode implements ExpressionNode {
+
   private final ExpressionNode lhs;
   private final ExpressionNode rhs;
   //private final OperatorType operator; 
@@ -10,5 +14,10 @@ public class BinaryOpExprNode extends ExpressionNode {
     this.lhs = lhs;
     this.rhs = rhs;
     // this.operator = operator;
+  }
+
+  @Override
+  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+
   }
 }

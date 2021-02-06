@@ -4,10 +4,11 @@ import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
 
-public class IdentifierNode extends ExpressionNode {
+public class IdentifierNode implements ExpressionNode {
+
   private final String identifier;
 
-  public IdentifierNode(String identifier){
+  public IdentifierNode(String identifier) {
     this.identifier = identifier;
   }
 
