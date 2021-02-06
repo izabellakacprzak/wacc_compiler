@@ -8,8 +8,9 @@ import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 public class PairTypeNode implements TypeNode {
-    private TypeNode fstType;
-    private TypeNode sndType;
+
+    private final TypeNode fstType;
+    private final TypeNode sndType;
 
     public PairTypeNode(TypeNode fstType, TypeNode sndType) {
         this.fstType = fstType;

@@ -8,7 +8,7 @@ import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 public class ArrayTypeNode implements TypeNode {
-    private TypeNode type;
+    private final TypeNode type;
 
     public ArrayTypeNode(TypeNode type) {
         this.type = type;
