@@ -3,7 +3,11 @@ package AbstractSyntaxTree.statement;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.TypeNode;
+import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
+import SemanticAnalysis.VariableId;
+
 import java.util.List;
 
 public class DeclarationStatementNode implements StatementNode {
@@ -13,7 +17,7 @@ public class DeclarationStatementNode implements StatementNode {
     private final AssignRHSNode assignment;
 
     public DeclarationStatementNode(TypeNode type, IdentifierNode identifier,
-        AssignRHSNode assignment) {
+                                    AssignRHSNode assignment) {
         this.type = type;
         this.identifier = identifier;
         this.assignment = assignment;
@@ -21,6 +25,21 @@ public class DeclarationStatementNode implements StatementNode {
 
     @Override
     public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+        // Ensure the variable name is valid
+        identifier.semanticAnalysis(symbolTable, errorMessages);
+
+        if (symbolTable.lookupAll(identifier.getIdentifier()) != null) {
+            errorMessages.add("Variable with name " + identifier.getIdentifier() +
+                    " has already been declared in the same scope.");
+        } else {
+            symbolTable.add(identifier.getIdentifier(),
+                    new VariableId(this, (DataTypeId) type.createIdentifier(symbolTable)));
+        }
+        // get type of type node
+        // get type of RHS node
+        // compare the types, throw an error if not the same
 
     }
+
 }
+

@@ -14,6 +14,6 @@ public class PrintLineStatementNode implements StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-
+    expression.semanticAnalysis(symbolTable, errorMessages);
   }
 }

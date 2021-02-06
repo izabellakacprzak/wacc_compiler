@@ -17,5 +17,9 @@ public class WhileStatementNode implements StatementNode {
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
 
+    condition.semanticAnalysis(symbolTable, errorMessages);
+
+    // get condition type - if not bool throw error
+    statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
   }
 }

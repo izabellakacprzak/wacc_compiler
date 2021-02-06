@@ -4,7 +4,7 @@ import AbstractSyntaxTree.expression.ExpressionNode;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
-public class PairElemNode implements AssignRHSNode {
+public class PairElemNode implements AssignLHSNode, AssignRHSNode {
 
     private final int position; // 0 if FST otherwise SND
     private final ExpressionNode expr;

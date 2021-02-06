@@ -14,6 +14,9 @@ public class ExitStatementNode implements StatementNode {
 
     @Override
     public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+        expr.semanticAnalysis(symbolTable, errorMessages);
 
+        // get type of expr
+        // if type is not INT - throw error
     }
 }

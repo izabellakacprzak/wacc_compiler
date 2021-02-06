@@ -32,4 +32,8 @@ public class SymbolTable {
     }
     return currentObject;
   }
+
+  public boolean isTopSymTable(){
+    return parentSymTable == null;
+  }
 }

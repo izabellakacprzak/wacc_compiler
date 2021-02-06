@@ -15,5 +15,7 @@ public class ReadStatementNode implements StatementNode {
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
 
+      lhs.semanticAnalysis(symbolTable, errorMessages);
+      // check type of lhs - read allows only INT or CHAR
   }
 }

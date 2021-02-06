@@ -17,6 +17,15 @@ public class AssignVarNode implements StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    left.semanticAnalysis(symbolTable, errorMessages);
+    right.semanticAnalysis(symbolTable, errorMessages);
+
+    // get type of left node
+    // get type of right node
+
+    // override type equals and compare the two nodes
+    // if type differs - "Assignment to: " + left + "must be of type " + left.type +
+    // " not " + right.type
 
   }
 }
