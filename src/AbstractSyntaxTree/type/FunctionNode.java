@@ -11,31 +11,32 @@ import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 public class FunctionNode implements TypeNode {
-    private final TypeNode returnType;
-    private final IdentifierNode identifier;
-    private final ParamListNode params;
-    private StatementNode bodyStatement;
 
-    public FunctionNode(TypeNode returnType, IdentifierNode identifier,
-        ParamListNode params, StatementNode bodyStatement) {
-            this.returnType = returnType;
-            this.identifier = identifier;
-            this.params = params;
-            this.bodyStatement = bodyStatement;
-    }
+  private final TypeNode returnType;
+  private final IdentifierNode identifier;
+  private final ParamListNode params;
+  private final StatementNode bodyStatement;
 
-    @Override
-    public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    }
+  public FunctionNode(TypeNode returnType, IdentifierNode identifier,
+      ParamListNode params, StatementNode bodyStatement) {
+    this.returnType = returnType;
+    this.identifier = identifier;
+    this.params = params;
+    this.bodyStatement = bodyStatement;
+  }
 
-    public String getName(){
-        return identifier.getIdentifier();
-    }
+  @Override
+  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  }
 
-    @Override
-    public Identifier createIdentifier(SymbolTable topSymbolTable){
-        SymbolTable childSymTable = new SymbolTable(topSymbolTable);
-        return new FunctionId(this, (DataTypeId) returnType.createIdentifier(topSymbolTable),
-                params.createIdentifiers(topSymbolTable), childSymTable);
-    }
+  public String getName() {
+    return identifier.getIdentifier();
+  }
+
+  @Override
+  public Identifier createIdentifier(SymbolTable topSymbolTable) {
+    SymbolTable childSymTable = new SymbolTable(topSymbolTable);
+    return new FunctionId(this, (DataTypeId) returnType.createIdentifier(topSymbolTable),
+        params.createIdentifiers(topSymbolTable), childSymTable);
+  }
 }

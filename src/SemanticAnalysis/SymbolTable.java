@@ -6,11 +6,10 @@ import java.util.Map;
 public class SymbolTable {
 
   private final SymbolTable parentSymTable;
-  private final Map<String, Identifier> dictionary;
+  private final Map<String, Identifier> dictionary = new HashMap<>();
 
   public SymbolTable(SymbolTable parentSymTable) {
     this.parentSymTable = parentSymTable;
-    dictionary = new HashMap<>();
   }
 
   /* Add a name and object to the symbol table */

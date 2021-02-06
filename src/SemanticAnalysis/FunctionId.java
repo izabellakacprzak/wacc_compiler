@@ -8,14 +8,15 @@ public class FunctionId extends Identifier {
 
   private final DataTypeId returnType;
   private final List<ParameterId> params;
-  private final SymbolTable parentTable;
+  private final SymbolTable symTable;
 
-  public FunctionId(ASTNode node, DataTypeId returnType, List<Identifier> params,
-                    SymbolTable parentTable) {
+  public FunctionId(ASTNode node, DataTypeId returnType, List<ParameterId> params,
+      SymbolTable symTable) {
     super(node);
     this.returnType = returnType;
+    this.symTable = symTable;
     this.params = params;
-    this.parentTable = parentTable;
+
   }
 
   public DataTypeId getReturnType() {
@@ -26,8 +27,8 @@ public class FunctionId extends Identifier {
     return params;
   }
 
-  public SymbolTable getParentTable() {
-    return parentTable;
+  public SymbolTable getSymTable() {
+    return symTable;
   }
 
   @Override
