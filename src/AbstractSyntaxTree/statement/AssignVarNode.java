@@ -4,14 +4,26 @@ import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 
 public class AssignVarNode extends StatementNode {
-    private final AssignLHSNode left;
-    private final AssignRHSNode right;
+  private final AssignLHSNode left;
+  private final AssignRHSNode right;
 
-    public AssignVarNode(AssignLHSNode left, AssignRHSNode right) {
-        this.left = left;
-        this.right = right;
-    }
-    public boolean hasReturnStatement() {
-        return false;
-    }
+  public AssignVarNode(AssignLHSNode left, AssignRHSNode right) {
+    this.left = left;
+    this.right = right;
+  }
+
+  @Override
+  public boolean hasReturnStatement() {
+    return false;
+  }
+
+  @Override
+  public boolean hasNoStatementAfterReturn() {
+    return true;
+  }
+
+  @Override
+  public boolean hasExitStatement() {
+    return false;
+  }
 }

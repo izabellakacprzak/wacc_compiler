@@ -17,7 +17,10 @@ public class FunctionNode extends TypeNode {
     this.bodyStatement = bodyStatement;
   }
 
+
   public boolean checkSyntaxErrors() {
-    return !bodyStatement.hasReturnStatement();
+    boolean error = (!bodyStatement.hasReturnStatement() && !bodyStatement.hasExitStatement())
+               || (bodyStatement.hasReturnStatement() && !bodyStatement.hasNoStatementAfterReturn());
+     return error;
   }
 }

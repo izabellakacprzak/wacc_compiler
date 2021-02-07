@@ -9,7 +9,18 @@ public class ReadStatementNode extends StatementNode {
     this.lhs = lhs;
   }
 
+  @Override
   public boolean hasReturnStatement() {
+    return false;
+  }
+
+  @Override
+  public boolean hasNoStatementAfterReturn() {
+    return true;
+  }
+
+  @Override
+  public boolean hasExitStatement() {
     return false;
   }
 }

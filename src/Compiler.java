@@ -36,12 +36,18 @@ public class Compiler {
     // add our own error listener
     ParseTree tree = parser.program();
 
+    if (syntaxErrorListener.hasSyntaxErrors()) {
+      //TODO
+      syntaxErrorListener.printAllErrors();
+      System.exit(SYNTAX_ERROR_CODE);
+    }
+
 
     ASTVisitor visitor = new ASTVisitor();
-    ASTNode prog = visitor.visit(tree);
+    ProgramNode prog = (ProgramNode) visitor.visit(tree);
 
-    if (((ProgramNode) prog).checkSyntaxErrors()) {
-      parser.notifyErrorListeners("Missing return");
+    if (prog.checkSyntaxErrors()) {
+      parser.notifyErrorListeners("Missing return or misplaced return");
     }
 
     if (syntaxErrorListener.hasSyntaxErrors()) {

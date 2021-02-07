@@ -9,7 +9,18 @@ public class ReturnStatementNode extends StatementNode {
     this.returnExpr = returnExpr;
   }
 
+  @Override
   public boolean hasReturnStatement() {
     return true;
+  }
+
+  @Override
+  public boolean hasNoStatementAfterReturn() {
+    return true;
+  }
+
+  @Override
+  public boolean hasExitStatement() {
+    return false;
   }
 }

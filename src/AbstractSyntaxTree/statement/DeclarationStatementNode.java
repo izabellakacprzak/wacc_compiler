@@ -19,4 +19,14 @@ public class DeclarationStatementNode extends StatementNode {
     public boolean hasReturnStatement() {
         return false;
     }
+
+    @Override
+    public boolean hasNoStatementAfterReturn() {
+        return true;
+    }
+
+    @Override
+    public boolean hasExitStatement() {
+        return false;
+    }
 }

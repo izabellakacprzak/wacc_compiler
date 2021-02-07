@@ -8,4 +8,11 @@ public class StatementNode implements ASTNode {
     return false;
   }
 
+  public boolean hasNoStatementAfterReturn() {
+    return true;
+  }
+
+  public boolean hasExitStatement() {
+    return false;
+  }
 }

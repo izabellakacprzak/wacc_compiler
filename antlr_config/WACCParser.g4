@@ -4,7 +4,7 @@ options {
   tokenVocab=WACCLexer;
 }
 @parser::members {
-    private void inbounds(Token t) {
+    private void inbounds(RuleContext t) {
         try{
         int n = Integer.parseInt(t.getText());
         } catch (NumberFormatException e)
@@ -79,7 +79,7 @@ pair_liter: NULL ;
 
 
 // expressions
-expr: INT_LITER {inbounds($INT_LITER);}         #IntLiterExpr
+expr: int_liter {inbounds(_localctx);}         #IntLiterExpr
 | BOOL_LITER                                    #BoolLiterExpr
 | CHAR_LITER                                    #CharLiterExpr
 | STR_LITER                                     #StringLiterExpr
@@ -92,3 +92,4 @@ expr: INT_LITER {inbounds($INT_LITER);}         #IntLiterExpr
 | expr (AND | OR) expr                          #BinaryExpr
 | OPEN_PARENTHESES expr CLOSE_PARENTHESES       #BracketExpr
 ;
+int_liter: (PLUS | MINUS)? DIGIT+;

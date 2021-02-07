@@ -9,7 +9,18 @@ public class PrintStatementNode extends StatementNode {
     this.expression = expression;
   }
 
+  @Override
   public boolean hasReturnStatement() {
+    return false;
+  }
+
+  @Override
+  public boolean hasNoStatementAfterReturn() {
+    return true;
+  }
+
+  @Override
+  public boolean hasExitStatement() {
     return false;
   }
 }

@@ -5,7 +5,18 @@ public class SkipStatementNode extends StatementNode {
     return "skip";
   }
 
+  @Override
   public boolean hasReturnStatement() {
+    return false;
+  }
+
+  @Override
+  public boolean hasNoStatementAfterReturn() {
+    return true;
+  }
+
+  @Override
+  public boolean hasExitStatement() {
     return false;
   }
 }

@@ -1,6 +1,8 @@
 package AbstractSyntaxTree.expression;
 
-public class IdentifierNode extends ExpressionNode {
+import AbstractSyntaxTree.assignment.AssignLHSNode;
+
+public class IdentifierNode extends ExpressionNode implements AssignLHSNode {
   private final String identifier;
 
   public IdentifierNode(String identifier){

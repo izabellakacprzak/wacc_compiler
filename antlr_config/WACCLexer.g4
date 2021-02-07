@@ -69,9 +69,9 @@ OPEN_SQUARE_BRACKET: '[' ;
 CLOSE_SQUARE_BRACKET: ']' ;
 
 // numbers
-fragment DIGIT: '0'..'9' ;
-INT_LITER: (INT_SIGN)? DIGIT+ ;
-INT_SIGN: PLUS | MINUS ;
+DIGIT: '0'..'9' ;
+//INT_LITER: (INT_SIGN)? DIGIT+ ;
+//INT_SIGN: PLUS | MINUS ;
 
 // literals
 BOOL_LITER: 'true' | 'false' ;
@@ -85,7 +85,7 @@ STR_LITER: '"' CHARACTER* '"' ;
 
 ESCAPED_CHARACTER: '\\' ('0' | 'b' | 't' | 'n' | 'f' | 'r' | '"' | '\'' | '\\') ;
 
-UNDERSCORE: '_' ;
+
 NULL: 'null' ;
 
 

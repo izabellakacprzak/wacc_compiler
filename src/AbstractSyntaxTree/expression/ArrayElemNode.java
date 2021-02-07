@@ -1,8 +1,10 @@
 package AbstractSyntaxTree.expression;
 
+import AbstractSyntaxTree.assignment.AssignLHSNode;
+
 import java.util.List;
 
-public class ArrayElemNode extends ExpressionNode {
+public class ArrayElemNode extends ExpressionNode implements AssignLHSNode {
     private final IdentifierNode identifier;
     private final List<ExpressionNode> expressions;
 

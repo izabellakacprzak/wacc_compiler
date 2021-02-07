@@ -27,7 +27,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   @Override
   public ASTNode visitFunc(FuncContext ctx) {
     TypeNode type = (TypeNode) visit(ctx.type());
-    IdentifierNode identifier = new IdentifierNode(ctx.IDENT().toString());
+    IdentifierNode identifier = new IdentifierNode(ctx.IDENT().getText());
     StatementNode body = (StatementNode) visit(ctx.stat());
     ParamListNode params = new ParamListNode(new ArrayList<>(), new ArrayList<>());
 
@@ -44,7 +44,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
     if(ctx.IDENT() != null) {
       for(int i = 0; i < ctx.IDENT().size(); i++) {
-        names.add(new IdentifierNode(ctx.IDENT(i).toString()));
+        names.add(new IdentifierNode(ctx.IDENT(i).getText()));
         types.add((TypeNode) visit(ctx.type(i)));
       }
     }
@@ -95,7 +95,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   @Override
   public ASTNode visitFuncCallRHS(FuncCallRHSContext ctx) {
 
-    IdentifierNode identifierNode = new IdentifierNode(ctx.IDENT().toString());
+    IdentifierNode identifierNode = new IdentifierNode(ctx.IDENT().getText());
     List<ExpressionNode> arguments = new ArrayList<>();
     for (ExprContext e : ctx.expr()) {
       arguments.add((ExpressionNode) visit(e));
@@ -106,7 +106,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   /* LHS ASSIGNMENT NODES */
   @Override
   public ASTNode visitIdentLHS(IdentLHSContext ctx) {
-    return new IdentifierNode(ctx.IDENT().toString());
+    return new IdentifierNode(ctx.IDENT().getText());
   }
 
   @Override
@@ -116,7 +116,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
   @Override
   public ASTNode visitArray_elem(Array_elemContext ctx) {
-    IdentifierNode identifierNode = new IdentifierNode(ctx.IDENT().toString());
+    IdentifierNode identifierNode = new IdentifierNode(ctx.IDENT().getText());
     List<ExpressionNode> expressions = new ArrayList<>();
     for (ExprContext e : ctx.expr()) {
       expressions.add((ExpressionNode) visit(e));
@@ -151,12 +151,12 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
   @Override
   public ASTNode visitBoolLiterExpr(BoolLiterExprContext ctx) {
-    return new BoolLiterExprNode(Boolean.parseBoolean(ctx.BOOL_LITER().toString()));
+    return new BoolLiterExprNode(Boolean.parseBoolean(ctx.BOOL_LITER().getText()));
   }
 
   @Override
   public ASTNode visitCharLiterExpr(CharLiterExprContext ctx) {
-    switch (ctx.CHAR_LITER().toString()) {
+    switch (ctx.CHAR_LITER().getText()) {
       case "'\\0'":
         return new CharLiterExprNode('\0');
       case "'\\b'":
@@ -177,17 +177,17 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
         return new CharLiterExprNode('\\');
     }
 
-    return new CharLiterExprNode(ctx.CHAR_LITER().toString().charAt(1));
+    return new CharLiterExprNode(ctx.CHAR_LITER().getText().charAt(1));
   }
 
   @Override
   public ASTNode visitStringLiterExpr(StringLiterExprContext ctx) {
-    return new StringLiterExprNode(ctx.STR_LITER().toString());
+    return new StringLiterExprNode(ctx.STR_LITER().getText());
   }
 
   @Override
   public ASTNode visitIntLiterExpr(IntLiterExprContext ctx) {
-    return new IntLiterExprNode(Integer.parseInt(ctx.INT_LITER().toString()));
+    return new IntLiterExprNode(Integer.parseInt(ctx.int_liter().getText()));
   }
 
   @Override
@@ -197,7 +197,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
   @Override
   public ASTNode visitIdentExpr(IdentExprContext ctx) {
-    return new IdentifierNode(ctx.IDENT().toString());
+    return new IdentifierNode(ctx.IDENT().getText());
   }
 
   @Override
@@ -216,7 +216,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   @Override
   public ASTNode visitDeclStat(DeclStatContext ctx) {
     TypeNode type = (TypeNode) visit(ctx.type());
-    IdentifierNode identifier = new IdentifierNode(ctx.IDENT().toString());
+    IdentifierNode identifier = new IdentifierNode(ctx.IDENT().getText());
     AssignRHSNode rhs = (AssignRHSNode) visit(ctx.assign_rhs());
     return new DeclarationStatementNode(type, identifier, rhs);
   }
@@ -305,7 +305,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   //TODO
   @Override
   public ASTNode visitBaseType(BaseTypeContext ctx) {
-    return new BaseTypeNode(ctx.toString());
+    return new BaseTypeNode(ctx.getText());
   }
 
   @Override

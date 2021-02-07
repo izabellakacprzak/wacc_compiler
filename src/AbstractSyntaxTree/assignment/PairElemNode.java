@@ -2,7 +2,7 @@ package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 
-public class PairElemNode implements AssignRHSNode {
+public class PairElemNode implements AssignLHSNode {
     private int position; // 0 if FST otherwise SND
     private ExpressionNode expr;
 

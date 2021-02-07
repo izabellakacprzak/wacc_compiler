@@ -1,13 +1,24 @@
 package AbstractSyntaxTree.statement;
 
 public class NewScopeStatementNode extends StatementNode {
-    private StatementNode statement;
+  private StatementNode statement;
 
-    public NewScopeStatementNode(StatementNode statement) {
-        this.statement = statement;
-    }
+  public NewScopeStatementNode(StatementNode statement) {
+    this.statement = statement;
+  }
 
-    public boolean hasReturnStatement() {
-        return statement.hasReturnStatement();
-    }
+  @Override
+  public boolean hasReturnStatement() {
+    return statement.hasReturnStatement();
+  }
+
+  @Override
+  public boolean hasNoStatementAfterReturn() {
+    return true;
+  }
+
+  @Override
+  public boolean hasExitStatement() {
+    return false;
+  }
 }
