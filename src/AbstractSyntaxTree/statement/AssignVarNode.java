@@ -11,4 +11,7 @@ public class AssignVarNode extends StatementNode {
         this.left = left;
         this.right = right;
     }
+    public boolean hasReturnStatement() {
+        return false;
+    }
 }

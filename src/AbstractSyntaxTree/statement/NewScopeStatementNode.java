@@ -6,4 +6,8 @@ public class NewScopeStatementNode extends StatementNode {
     public NewScopeStatementNode(StatementNode statement) {
         this.statement = statement;
     }
+
+    public boolean hasReturnStatement() {
+        return statement.hasReturnStatement();
+    }
 }

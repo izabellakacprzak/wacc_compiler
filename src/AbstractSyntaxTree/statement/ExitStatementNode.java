@@ -8,4 +8,8 @@ public class ExitStatementNode extends StatementNode {
     public ExitStatementNode(ExpressionNode expr) {
         this.expr = expr;
     }
+
+    public boolean hasReturnStatement() {
+        return false;
+    }
 }

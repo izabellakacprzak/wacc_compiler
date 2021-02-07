@@ -7,4 +7,8 @@ public class FreeStatementNode extends StatementNode{
   public FreeStatementNode(ExpressionNode expr) {
     this.expr = expr;
   }
+
+  public boolean hasReturnStatement() {
+    return false;
+  }
 }

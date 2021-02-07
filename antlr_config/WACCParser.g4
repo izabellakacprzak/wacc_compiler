@@ -3,14 +3,23 @@ parser grammar WACCParser;
 options {
   tokenVocab=WACCLexer;
 }
-
+@parser::members {
+    private void inbounds(Token t) {
+        try{
+        int n = Integer.parseInt(t.getText());
+        } catch (NumberFormatException e)
+        {
+        notifyErrorListeners("Integer overflow");
+        }
+    }
+}
 // program
 program: BEGIN (func)* stat END EOF ;
 
 
 // function and parameters
 func: type IDENT OPEN_PARENTHESES (param_list)? CLOSE_PARENTHESES IS stat END ;
-param_list: type type IDENT (COMMA type IDENT)* ;
+param_list: type IDENT (COMMA type IDENT)* ;
 
 
 // statement
@@ -29,7 +38,7 @@ stat: SKP                         #SkipStat
 | stat SEMICOLON stat             #StatsListStat
 ;
 
-// assignents
+// assignments
 assign_lhs: IDENT  #IdentLHS
 | array_elem       #ArrayElemLHS
 | pair_elem        #PairElemLHS
@@ -70,7 +79,7 @@ pair_liter: NULL ;
 
 
 // expressions
-expr: INT_LITER                                 #IntLiterExpr
+expr: INT_LITER {inbounds($INT_LITER);}         #IntLiterExpr
 | BOOL_LITER                                    #BoolLiterExpr
 | CHAR_LITER                                    #CharLiterExpr
 | STR_LITER                                     #StringLiterExpr

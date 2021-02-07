@@ -13,4 +13,8 @@ public class IfStatementNode extends StatementNode {
             this.thenStatement = thenStatement;
             this.elseStatement = elseStatement;
     }
+
+  public boolean hasReturnStatement() {
+    return thenStatement.hasReturnStatement() && elseStatement.hasReturnStatement();
+  }
 }

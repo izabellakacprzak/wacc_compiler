@@ -14,4 +14,9 @@ public class DeclarationStatementNode extends StatementNode {
         this.identifier = identifier;
         this.assignment = assignment;
     }
+
+    @Override
+    public boolean hasReturnStatement() {
+        return false;
+    }
 }

@@ -10,4 +10,7 @@ public class WhileStatementNode extends StatementNode {
         this.condition = condition;
         this.statement = statement;
     }
+    public boolean hasReturnStatement() {
+        return statement.hasReturnStatement();
+    }
 }

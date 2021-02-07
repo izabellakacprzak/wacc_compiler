@@ -8,4 +8,8 @@ public class StatementsListNode extends StatementNode {
     public StatementsListNode(List<StatementNode> statements){
       this.statements = statements;
     }
+
+  public boolean hasReturnStatement() {
+    return statements.stream().anyMatch(StatementNode::hasReturnStatement);
+  }
 }

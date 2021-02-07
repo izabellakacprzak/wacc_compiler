@@ -12,4 +12,8 @@ public class ProgramNode implements ASTNode {
         this.statementNode = statementNode;
         this.functionNodes = functionNodes;
     }
+
+    public boolean checkSyntaxErrors(){
+    return functionNodes.stream().anyMatch(FunctionNode::checkSyntaxErrors);
+    }
 }
