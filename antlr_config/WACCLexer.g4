@@ -69,8 +69,8 @@ OPEN_SQUARE_BRACKET: '[' ;
 CLOSE_SQUARE_BRACKET: ']' ;
 
 // numbers
-DIGIT: '0'..'9' ;
-//INT_LITER: (INT_SIGN)? DIGIT+ ;
+fragment DIGIT: '0'..'9' ;
+INT_LITER: DIGIT+ ;
 //INT_SIGN: PLUS | MINUS ;
 
 // literals

@@ -92,4 +92,4 @@ expr: int_liter {inbounds(_localctx);}         #IntLiterExpr
 | expr (AND | OR) expr                          #BinaryExpr
 | OPEN_PARENTHESES expr CLOSE_PARENTHESES       #BracketExpr
 ;
-int_liter: (PLUS | MINUS)? DIGIT+;
+int_liter: (PLUS | MINUS)? INT_LITER;
