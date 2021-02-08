@@ -13,14 +13,4 @@ public class ReturnStatementNode extends StatementNode {
   public boolean hasReturnStatement() {
     return true;
   }
-
-  @Override
-  public boolean hasNoStatementAfterReturn() {
-    return true;
-  }
-
-  @Override
-  public boolean hasExitStatement() {
-    return false;
-  }
 }

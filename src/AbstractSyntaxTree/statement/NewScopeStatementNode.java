@@ -13,12 +13,7 @@ public class NewScopeStatementNode extends StatementNode {
   }
 
   @Override
-  public boolean hasNoStatementAfterReturn() {
-    return true;
-  }
-
-  @Override
   public boolean hasExitStatement() {
-    return false;
+    return statement.hasExitStatement();
   }
 }

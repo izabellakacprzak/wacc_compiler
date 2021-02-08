@@ -8,19 +8,4 @@ public class PrintStatementNode extends StatementNode {
   public PrintStatementNode(ExpressionNode expression) {
     this.expression = expression;
   }
-
-  @Override
-  public boolean hasReturnStatement() {
-    return false;
-  }
-
-  @Override
-  public boolean hasNoStatementAfterReturn() {
-    return true;
-  }
-
-  @Override
-  public boolean hasExitStatement() {
-    return false;
-  }
 }

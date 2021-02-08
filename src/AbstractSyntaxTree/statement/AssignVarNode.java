@@ -11,19 +11,4 @@ public class AssignVarNode extends StatementNode {
     this.left = left;
     this.right = right;
   }
-
-  @Override
-  public boolean hasReturnStatement() {
-    return false;
-  }
-
-  @Override
-  public boolean hasNoStatementAfterReturn() {
-    return true;
-  }
-
-  @Override
-  public boolean hasExitStatement() {
-    return false;
-  }
 }

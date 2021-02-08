@@ -8,19 +8,4 @@ public class FreeStatementNode extends StatementNode {
   public FreeStatementNode(ExpressionNode expr) {
     this.expr = expr;
   }
-
-  @Override
-  public boolean hasReturnStatement() {
-    return false;
-  }
-
-  @Override
-  public boolean hasNoStatementAfterReturn() {
-    return true;
-  }
-
-  @Override
-  public boolean hasExitStatement() {
-    return false;
-  }
 }

@@ -23,7 +23,7 @@ public class WhileStatementNode extends StatementNode {
 
   @Override
   public boolean hasExitStatement() {
-    return false;
+    return statement.hasExitStatement();
   }
 
 }

@@ -21,12 +21,7 @@ public class IfStatementNode extends StatementNode {
   }
 
   @Override
-  public boolean hasNoStatementAfterReturn() {
-    return true;
-  }
-
-  @Override
   public boolean hasExitStatement() {
-    return false;
+    return this.hasReturnStatement();
   }
 }
