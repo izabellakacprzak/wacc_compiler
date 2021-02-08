@@ -17,11 +17,6 @@ public class WhileStatementNode extends StatementNode {
   }
 
   @Override
-  public boolean hasNoStatementAfterReturn() {
-    return true;
-  }
-
-  @Override
   public boolean hasExitStatement() {
     return statement.hasExitStatement();
   }

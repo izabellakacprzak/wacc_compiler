@@ -1,43 +1,51 @@
 #!/bin/sh
-echo Running some tests...
 passedTests=0
 runTests=0
-walk_dir () {
+run_tests () {
     for pathname in "$1"/*; do
         if [ -d "$pathname" ]; then
-            walk_dir "$pathname"
+            run_tests "$pathname" "$2"
         else
             case "$pathname" in
                 *.wacc)
-                     java -cp bin:lib/antlr-4.9.1-complete.jar src/Compiler.java "$pathname" >/dev/null 2>&1
-
-
-                      if [ $? -eq 100 ]; then
-                      passedTests=$((passedTests + 1))
-                      echo test $runTests passed
-                      fi
-                      echo ran test $runTests "$pathname"
-                      runTests=$((runTests + 1))
+                  echo running test $runTests "$pathname"
+                  java -cp bin:lib/antlr-4.9.1-complete.jar Compiler "$pathname" >/dev/null 2>&1
+                  if [ $? -eq $(($2)) ]; then
+                    passedTests=$((passedTests + 1))
+                    echo test $runTests passed
+                  fi
+                  runTests=$((runTests + 1))
 
             esac
         fi
     done
 }
 
-DOWNLOADING_DIR=src/tests/invalid/syntaxErr
+VALID_TESTS=src/tests/valid
+SYNTAX_ERROR_TESTS=src/tests/invalid/syntaxErr
+SUCCESS_CODE=0
+SYNTAX_ERROR_CODE=100
+runValidTests=0
+runSyntaxErrorTests=0
+passedValidTests=0
+passedSyntaxErrorTests=0
 
-walk_dir "$DOWNLOADING_DIR"
+echo Running valid tests...
+run_tests "$VALID_TESTS" $SUCCESS_CODE
+echo passed $passedTests / $runTests valid tests
+runValidTests=$runTests
+passedValidTests=$passedTests
 
-#echo Running some tests...
-#passedTests=0
-#runTests=0
-#for file in src/tests/invalid/sytaxErr/**/*.wacc; do
-#  java -cp bin:lib/antlr-4.9.1-complete.jar src/Compiler.java file
-#  echo $file
-#  runTests=$((runTests + 1))
-#  if [ ${?} -eq 100 ]; then
-#  passedTests=$((passedTests + 1))
-#  fi
-#  echo Finished test...
-#done
-echo $passedTests '/' $runTests
+echo =======================
+passedTests=0
+runTests=0
+echo Running syntax error tests...
+run_tests "$SYNTAX_ERROR_TESTS" $SYNTAX_ERROR_CODE
+echo passed $passedTests / $runTests syntax error tests
+runSyntaxErrorTests=$runTests
+passedSyntaxErrorTests=$passedTests
+
+echo =======================
+echo SUMMARY
+echo passed $passedValidTests / $runValidTests valid tests
+echo passed $passedSyntaxErrorTests / $runSyntaxErrorTests syntax error tests
