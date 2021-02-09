@@ -49,3 +49,9 @@ echo =======================
 echo SUMMARY
 echo passed $passedValidTests / $runValidTests valid tests
 echo passed $passedSyntaxErrorTests / $runSyntaxErrorTests syntax error tests
+
+if [ $passedValidTests -eq $runValidTests ] && [ $passedSyntaxErrorTests -eq $runSyntaxErrorTests ]; then
+  exit 0
+else
+  exit 1
+fi
