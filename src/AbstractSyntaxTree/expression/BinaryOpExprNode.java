@@ -61,6 +61,6 @@ public class BinaryOpExprNode implements ExpressionNode {
 
   @Override
   public DataTypeId getType(SymbolTable symTable) {
-    return (DataTypeId) symTable.lookupAll(operator.getReturnType().toString().toLowerCase());
+    return operator.getReturnType();
   }
 }

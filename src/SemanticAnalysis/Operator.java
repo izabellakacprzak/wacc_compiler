@@ -13,26 +13,34 @@ public class Operator {
   public enum UnOp {
     NOT("!", BOOL, BOOL),
     NEGATION("-", INT, INT),
-    LEN("len", /* ARRAY,*/ INT),
+    LEN("len", INT),
     ORD("ord", CHAR, INT),
     CHR("chr", INT, CHAR);
 
     private final String label;
-    private final Type returnType;
-    private final Set<Type> argTypes = new HashSet<>();
+    private final DataTypeId returnType;
+    private final Set<DataTypeId> argTypes = new HashSet<>();
 
+    /* When specifying a type, no types implies an Array */
     UnOp(String label, Type returnType, Type... argTypes) {
       this.label = label;
-      this.returnType = returnType;
-      Collections.addAll(this.argTypes, argTypes);
+      this.returnType = new BaseType(returnType);
+
+      for (Type type : argTypes) {
+        this.argTypes.add(new BaseType(type));
+      }
     }
 
-    public Type getReturnType() {
+    public DataTypeId getReturnType() {
       return returnType;
     }
 
-    public Set<Type> getArgTypes() {
+    public Set<DataTypeId> getArgTypes() {
       return argTypes;
+    }
+
+    public String getLabel() {
+      return label;
     }
 
     public static UnOp valueOfLabel(String label) {
@@ -43,7 +51,6 @@ public class Operator {
       }
       return null;
     }
-
   }
 
   public enum BinOp {
