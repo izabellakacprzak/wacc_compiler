@@ -18,7 +18,7 @@ public class ParenthesisExprNode implements ExpressionNode {
   }
 
   @Override
-  public DataTypeId getType(SymbolTable symTable) {
-    return innerExpr.getType(symTable);
+  public DataTypeId getType(SymbolTable symbolTable) {
+    return innerExpr.getType(symbolTable);
   }
 }

@@ -5,11 +5,11 @@ import SemanticAnalysis.DataTypeId;
 public class ArrayType extends DataTypeId {
 
   private int size;
-  private final DataTypeId arrayType;
+  private final DataTypeId elemType;
 
-  public ArrayType(DataTypeId arrayType) {
+  public ArrayType(DataTypeId elemType) {
     super();
-    this.arrayType = arrayType;
+    this.elemType = elemType;
   }
 
   public int getSize() {
@@ -20,12 +20,25 @@ public class ArrayType extends DataTypeId {
     this.size = size;
   }
 
-  public DataTypeId getArrayType() {
-    return this.arrayType;
+  public DataTypeId getElemType() {
+    return elemType;
   }
 
   @Override
   public String toString() {
-    return arrayType.toString() + "[]";
+    return elemType.toString() + "[]";
+  }
+
+  @Override
+  public boolean equals(Object object) {
+    if ((object instanceof DataTypeId) && this.elemType == null) {
+      return true;
+    }
+
+    if (object instanceof ArrayType) {
+      ArrayType arrayObject = (ArrayType) object;
+      return arrayObject.getElemType() == null || arrayObject.getElemType().equals(this.elemType);
+    }
+    return false;
   }
 }

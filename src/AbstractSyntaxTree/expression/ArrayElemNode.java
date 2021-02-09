@@ -6,6 +6,8 @@ import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.DataTypes.BaseType.Type;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
+
+import SemanticAnalysis.VariableId;
 import java.util.List;
 
 public class ArrayElemNode implements ExpressionNode {
@@ -64,13 +66,6 @@ public class ArrayElemNode implements ExpressionNode {
 
   }
 
-  @Override
-  public DataTypeId getType(SymbolTable symTable) {
-    return (DataTypeId) symTable.lookupAll(identifier.getIdentifier());
-  }
-
-}
-
 //        if (thisType == null) {
 //          errorMessages.add("Type of " + identifier.getIdentifier() + "[" + i
 //              + "] not found. Expected: " + arrayType.toString());
@@ -78,3 +73,11 @@ public class ArrayElemNode implements ExpressionNode {
 //          errorMessages.add("Incompatible type of " + identifier.getIdentifier() + "[" + i
 //              + "]. Expected: " + arrayType.toString() + " Actual: " + thisType.toString());
 //        }
+
+  @Override
+  public DataTypeId getType(SymbolTable symbolTable) {
+    VariableId arrayName = (VariableId) symbolTable.lookupAll(identifier.getIdentifier());
+
+    return null;
+  }
+}

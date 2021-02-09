@@ -1,7 +1,6 @@
 package AbstractSyntaxTree.expression;
 
-import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.SymbolTable;
+import SemanticAnalysis.*;
 
 import java.util.List;
 
@@ -23,7 +22,16 @@ public class IdentifierNode implements ExpressionNode {
   }
 
   @Override
-  public DataTypeId getType(SymbolTable symTable) {
-    return (DataTypeId) symTable.lookupAll(identifier);
+  public DataTypeId getType(SymbolTable symbolTable) {
+    Identifier id = symbolTable.lookupAll(identifier);
+
+    if (id instanceof VariableId) {
+      //TODO: get type from Variable ID?
+      return null;
+    } else if (id instanceof FunctionId) {
+      return ((FunctionId) id).getReturnType();
+    } //sth else Id can be?
+
+    return null;
   }
 }

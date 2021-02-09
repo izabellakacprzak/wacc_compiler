@@ -1,6 +1,8 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
@@ -14,6 +16,12 @@ public class ExitStatementNode implements StatementNode {
 
     @Override
     public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+      expr.semanticAnalysis(symbolTable, errorMessages);
 
+      DataTypeId exprType = expr.getType(symbolTable);
+
+      if (!exprType.equals(new BaseType(BaseType.Type.INT))) {
+        errorMessages.add("Exit code must be of type INT not" + exprType.toString());
+      }
     }
 }

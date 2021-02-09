@@ -1,12 +1,10 @@
 package AbstractSyntaxTree.expression;
 
 import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.DataTypes.BaseType.Type;
 import SemanticAnalysis.Operator.BinOp;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 import java.util.Set;
-import javax.xml.crypto.Data;
 
 public class BinaryOpExprNode implements ExpressionNode {
 

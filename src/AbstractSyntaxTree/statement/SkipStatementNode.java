@@ -11,6 +11,5 @@ public class SkipStatementNode implements StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-
   }
 }

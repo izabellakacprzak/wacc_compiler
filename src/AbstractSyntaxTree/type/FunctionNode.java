@@ -44,4 +44,9 @@ public class FunctionNode implements TypeNode {
     return new FunctionId(this, (DataTypeId) returnType.getIdentifier(parentSymTable),
         params.getIdentifiers(parentSymTable), currSymTable);
   }
+
+  @Override
+  public DataTypeId getType() {
+    return returnType.getType();
+  }
 }

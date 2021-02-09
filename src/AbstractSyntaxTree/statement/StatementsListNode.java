@@ -13,6 +13,8 @@ public class StatementsListNode implements StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-
+    for (StatementNode stat : statements) {
+      stat.semanticAnalysis(symbolTable, errorMessages);
+    }
   }
 }

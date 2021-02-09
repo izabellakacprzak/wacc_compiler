@@ -1,6 +1,9 @@
 package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.PairType;
+import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
@@ -16,6 +19,17 @@ public class PairElemNode implements AssignRHSNode {
 
     @Override
     public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+        // expr is placeholder for identifier
+        DataTypeId type = expr.getType(symbolTable);
+        if (!(expr instanceof Identifier)) {
+            errorMessages.add(expr.toString() + "is not an instance of a Pair");
+        }
 
     }
+
+    @Override
+    public DataTypeId getType(SymbolTable symbolTable) {
+        return expr.getType(symbolTable);
+    }
 }
+

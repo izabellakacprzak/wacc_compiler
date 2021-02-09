@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.expression;
 
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
@@ -12,7 +13,7 @@ public class PairLiterExprNode implements ExpressionNode {
   }
 
   @Override
-  public DataTypeId getType(SymbolTable symTable) {
-    return null;
+  public DataTypeId getType(SymbolTable symbolTable) {
+    return new PairType(null, null);
   }
 }

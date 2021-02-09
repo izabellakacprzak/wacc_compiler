@@ -1,7 +1,7 @@
 package AbstractSyntaxTree.expression;
 
 import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.DataTypes.BaseType.Type;
+import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class IntLiterExprNode implements ExpressionNode {
   }
 
   @Override
-  public DataTypeId getType(SymbolTable symTable) {
-    return (DataTypeId) symTable.lookupAll(Type.INT.toString().toLowerCase());
+  public DataTypeId getType(SymbolTable symbolTable) {
+    return new BaseType(BaseType.Type.INT);
   }
 }

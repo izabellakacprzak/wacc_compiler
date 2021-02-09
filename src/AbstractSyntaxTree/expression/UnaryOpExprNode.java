@@ -43,4 +43,5 @@ public class UnaryOpExprNode implements ExpressionNode {
   public DataTypeId getType(SymbolTable symTable) {
     return operator.getReturnType();
   }
+
 }
