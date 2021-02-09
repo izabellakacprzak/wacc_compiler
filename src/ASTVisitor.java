@@ -5,6 +5,7 @@ import AbstractSyntaxTree.expression.*;
 import AbstractSyntaxTree.statement.*;
 import AbstractSyntaxTree.type.*;
 import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.Operator;
 import SemanticAnalysis.Operator.BinOp;
 import SemanticAnalysis.Operator.UnOp;
 import antlr.WACCParser.*;
@@ -109,51 +110,12 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   public ASTNode visitBinaryExpr(BinaryExprContext ctx) {
     ExpressionNode leftExpr = (ExpressionNode) visit(ctx.expr(0));
     ExpressionNode rightExpr = (ExpressionNode) visit(ctx.expr(1));
-    BinOp operator;
-    String opString = ctx.op.toString();
-    switch (opString) {
-      case "*":
-        operator = BinOp.MUL;
-        break;
-      case "/":
-        operator = BinOp.DIV;
-        break;
-      case "%":
-        operator = BinOp.MOD;
-        break;
-      case "+":
-        operator = BinOp.PLUS;
-        break;
-      case "-":
-        operator = BinOp.MINUS;
-        break;
-      case ">":
-        operator = BinOp.GREATER;
-        break;
-      case ">=":
-        operator = BinOp.GREATEREQ;
-        break;
-      case "<":
-        operator = BinOp.LESS;
-        break;
-      case "<=":
-        operator = BinOp.LESSEQ;
-        break;
-      case "==":
-        operator = BinOp.EQUAL;
-        break;
-      case "!=":
-        operator = BinOp.NOTEQUAL;
-        break;
-      case "&&":
-        operator = BinOp.AND;
-        break;
-      case "||":
-        operator = BinOp.OR;
-        break;
-      default:
-        throw new IllegalArgumentException("Invalid Binary Operator");
+    BinOp operator = Operator.BinOp.valueOfLabel(ctx.op.toString());
+
+    if (operator == null) {
+      throw new IllegalArgumentException("Invalid Binary Operator");
     }
+
     return new BinaryOpExprNode(leftExpr, rightExpr, operator);
   }
 
@@ -212,27 +174,12 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   @Override
   public ASTNode visitUnaryExpr(UnaryExprContext ctx) {
     ExpressionNode operand = (ExpressionNode) visit(ctx.expr());
-    UnOp operator;
-    String opString = ctx.op.toString();
-    switch (opString) {
-      case "!":
-        operator = UnOp.NOT;
-        break;
-      case "-":
-        operator = UnOp.NEGATION;
-        break;
-      case "len":
-        operator = UnOp.LENGTH;
-        break;
-      case "ord":
-        operator = UnOp.ORD;
-        break;
-      case "chr":
-        operator = UnOp.CHR;
-        break;
-      default:
-        throw new IllegalArgumentException("Invalid Unary Operator");
+    UnOp operator = Operator.UnOp.valueOfLabel(ctx.op.toString());
+
+    if (operator == null) {
+      throw new IllegalArgumentException("Invalid Unary Operator");
     }
+
     return new UnaryOpExprNode(operand, operator);
   }
 
@@ -339,23 +286,8 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   // TODO
   @Override
   public ASTNode visitBaseType(BaseTypeContext ctx) {
-    BaseType.Type baseType;
-    switch (ctx.base_type().toString()) {
-      case "int":
-        baseType = BaseType.Type.INT;
-        break;
-      case "bool":
-        baseType = BaseType.Type.BOOL;
-        break;
-      case "char":
-        baseType = BaseType.Type.CHAR;
-        break;
-      case "string":
-        baseType = BaseType.Type.STRING;
-        break;
-      default:
-        throw new IllegalArgumentException("Invalid Base Type");
-    }
+    BaseType.Type baseType = BaseType.Type.valueOf(ctx.base_type().toString().toUpperCase());
+
     return new BaseTypeNode(baseType, ctx.toString());
   }
 
