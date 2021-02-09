@@ -30,12 +30,16 @@ public class ArrayType extends DataTypeId {
 
   @Override
   public boolean equals(DataTypeId object) {
+    // might be a bit confusing to have both the type and the field be called array type?
+
+    if (this.arrayType == null) {
+      return true;
+    }
 
     if (object instanceof ArrayType) {
       ArrayType arrayObject = (ArrayType) object;
-      return arrayObject.getArrayType().equals(this.arrayType);
+      return arrayObject.getArrayType() == null ||  arrayObject.getArrayType().equals(this.arrayType);
     }
-
     return false;
   }
 }

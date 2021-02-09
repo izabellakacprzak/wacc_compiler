@@ -22,6 +22,10 @@ public class PairType extends DataTypeId {
     return sndType;
   }
 
+  private boolean equalsPairElem(DataTypeId el1, DataTypeId el2) {
+    return el1 == null || el2 == null || el1.equals(el2);
+  }
+
   @Override
   public String toString() {
     return "pair(" + fstType.toString() + ", " + sndType.toString() + ")";
@@ -32,8 +36,9 @@ public class PairType extends DataTypeId {
 
     if (object instanceof PairType) {
       PairType pairObject = (PairType) object;
-      return pairObject.getFstType().equals(this.fstType) &&
-              pairObject.getSndType().equals(this.sndType);
+      return equalsPairElem(pairObject.getFstType(), this.fstType) &&
+              equalsPairElem(pairObject.getSndType(), this.sndType);
+
     }
 
     return false;

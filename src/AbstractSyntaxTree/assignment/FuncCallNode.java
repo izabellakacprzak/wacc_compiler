@@ -2,8 +2,10 @@ package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import AbstractSyntaxTree.type.FunctionNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.FunctionId;
+import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
@@ -19,6 +21,17 @@ public class FuncCallNode implements AssignRHSNode {
 
     @Override
     public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+        Identifier functionId = symbolTable.lookupAll(identifier.getIdentifier());
+        if (functionId == null) {
+            errorMessages.add("Function " + identifier.getIdentifier() + " has not been declared.");
+            // TODO: Do we check the arguments? plain return?
+        }
+
+        if (!(functionId instanceof FunctionId)) {
+            errorMessages.add("Attempt at calling " + identifier.getIdentifier() + " as a function.");
+            // TODO: Do we check the arguments? plain return?
+        }
+
     }
 
 
