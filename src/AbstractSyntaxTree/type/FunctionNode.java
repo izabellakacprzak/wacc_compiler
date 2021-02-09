@@ -1,6 +1,5 @@
 package AbstractSyntaxTree.type;
 
-import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
 import SemanticAnalysis.DataTypeId;
@@ -17,6 +16,8 @@ public class FunctionNode implements TypeNode {
   private final ParamListNode params;
   private final StatementNode bodyStatement;
 
+  private SymbolTable currSymTable;
+
   public FunctionNode(TypeNode returnType, IdentifierNode identifier,
       ParamListNode params, StatementNode bodyStatement) {
     this.returnType = returnType;
@@ -27,6 +28,10 @@ public class FunctionNode implements TypeNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    returnType.semanticAnalysis(currSymTable, errorMessages);
+    identifier.semanticAnalysis(currSymTable, errorMessages);
+    params.semanticAnalysis(currSymTable, errorMessages);
+    bodyStatement.semanticAnalysis(currSymTable, errorMessages);
   }
 
   public String getName() {
@@ -34,9 +39,9 @@ public class FunctionNode implements TypeNode {
   }
 
   @Override
-  public Identifier createIdentifier(SymbolTable topSymbolTable) {
-    SymbolTable childSymTable = new SymbolTable(topSymbolTable);
-    return new FunctionId(this, (DataTypeId) returnType.createIdentifier(topSymbolTable),
-        params.createIdentifiers(topSymbolTable), childSymTable);
+  public Identifier getIdentifier(SymbolTable parentSymTable) {
+    currSymTable = new SymbolTable(parentSymTable);
+    return new FunctionId(this, (DataTypeId) returnType.getIdentifier(parentSymTable),
+        params.getIdentifiers(parentSymTable), currSymTable);
   }
 }

@@ -16,10 +16,11 @@ public class ArrayTypeNode implements TypeNode {
 
     @Override
     public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+        type.semanticAnalysis(symbolTable, errorMessages);
     }
 
     @Override
-    public Identifier createIdentifier(SymbolTable parentSymbolTable) {
-        return new ArrayType(this, (DataTypeId) type.createIdentifier(parentSymbolTable));
+    public Identifier getIdentifier(SymbolTable parentSymbolTable) {
+        return new ArrayType((DataTypeId) type.getIdentifier(parentSymbolTable));
     }
 }

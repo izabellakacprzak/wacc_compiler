@@ -1,5 +1,7 @@
 package AbstractSyntaxTree.expression;
 
+import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.BaseType.Type;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
@@ -14,5 +16,10 @@ public class CharLiterExprNode implements ExpressionNode {
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
 
+  }
+
+  @Override
+  public DataTypeId getType(SymbolTable symTable) {
+    return (DataTypeId) symTable.lookupAll(Type.CHAR.toString().toLowerCase());
   }
 }

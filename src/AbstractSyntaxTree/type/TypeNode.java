@@ -5,5 +5,5 @@ import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
 
 public interface TypeNode extends ASTNode {
-    Identifier createIdentifier(SymbolTable parentSymbolTable);
+    Identifier getIdentifier(SymbolTable parentSymbolTable);
 }

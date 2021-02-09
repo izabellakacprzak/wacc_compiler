@@ -19,12 +19,13 @@ public class PairTypeNode implements TypeNode {
 
     @Override
     public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-
+        fstType.semanticAnalysis(symbolTable, errorMessages);
+        sndType.semanticAnalysis(symbolTable, errorMessages);
     }
 
     @Override
-    public Identifier createIdentifier(SymbolTable parentSymbolTable) {
-        return new PairType(this, (DataTypeId) fstType.createIdentifier(parentSymbolTable),
-                (DataTypeId) sndType.createIdentifier(parentSymbolTable));
+    public Identifier getIdentifier(SymbolTable parentSymbolTable) {
+        return new PairType((DataTypeId) fstType.getIdentifier(parentSymbolTable),
+            (DataTypeId) sndType.getIdentifier(parentSymbolTable));
     }
 }

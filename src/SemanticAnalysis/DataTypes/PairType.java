@@ -8,8 +8,8 @@ public class PairType extends DataTypeId {
   private final DataTypeId fstType;
   private final DataTypeId sndType;
 
-  public PairType(ASTNode node, DataTypeId fstType, DataTypeId sndType) {
-    super(node);
+  public PairType(DataTypeId fstType, DataTypeId sndType) {
+    super();
     this.fstType = fstType;
     this.sndType = sndType;
   }

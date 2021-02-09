@@ -1,14 +1,13 @@
 package SemanticAnalysis.DataTypes;
 
-import AbstractSyntaxTree.ASTNode;
 import SemanticAnalysis.DataTypeId;
 
 public class BaseType extends DataTypeId {
 
   private final Type type;
 
-  public BaseType(ASTNode node, Type type) {
-    super(node);
+  public BaseType(Type type) {
+    super();
     this.type = type;
   }
 

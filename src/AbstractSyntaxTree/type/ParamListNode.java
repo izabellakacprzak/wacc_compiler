@@ -3,7 +3,6 @@ package AbstractSyntaxTree.type;
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.Identifier;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
 
@@ -21,14 +20,20 @@ public class ParamListNode implements ASTNode {
 
     @Override
     public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+        for (IdentifierNode identifier : identifiers) {
+            identifier.semanticAnalysis(symbolTable, errorMessages);
+        }
 
+        for (TypeNode type : types) {
+            type.semanticAnalysis(symbolTable, errorMessages);
+        }
     }
 
-    public List<ParameterId> createIdentifiers(SymbolTable parentSymbolTable) {
+    public List<ParameterId> getIdentifiers(SymbolTable parentSymbolTable) {
         List<ParameterId> paramIds = new ArrayList<>();
         for (int i = 0; i < identifiers.size(); i++) {
             paramIds.add(new ParameterId(identifiers.get(i),
-                (DataTypeId) types.get(i).createIdentifier(parentSymbolTable)));
+                (DataTypeId) types.get(i).getIdentifier(parentSymbolTable)));
         }
         return paramIds;
     }

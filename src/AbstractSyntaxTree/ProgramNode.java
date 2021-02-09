@@ -34,7 +34,7 @@ public class ProgramNode implements ASTNode {
 
         funcTables.put(func, new SymbolTable(topSymbolTable));
       } else {
-        FunctionId identifier = (FunctionId) func.createIdentifier(topSymbolTable);
+        FunctionId identifier = (FunctionId) func.getIdentifier(topSymbolTable);
 
         funcTables.put(func, identifier.getSymTable());
         topSymbolTable.add(func.getName(), identifier);
@@ -45,7 +45,7 @@ public class ProgramNode implements ASTNode {
       func.semanticAnalysis(funcTables.get(func), errorMessages);
     }
 
-    //do semantic analysis on the statement node
+    //do semantic analysis on the statement node with new scope
     statementNode.semanticAnalysis(new SymbolTable(topSymbolTable), errorMessages);
   }
 }
