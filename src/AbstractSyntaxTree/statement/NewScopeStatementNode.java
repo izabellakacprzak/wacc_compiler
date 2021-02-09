@@ -1,5 +1,7 @@
 package AbstractSyntaxTree.statement;
 
+import SemanticAnalysis.DataTypeId;
+
 public class NewScopeStatementNode extends StatementNode {
   private StatementNode statement;
 
@@ -15,5 +17,10 @@ public class NewScopeStatementNode extends StatementNode {
   @Override
   public boolean hasExitStatement() {
     return statement.hasExitStatement();
+  }
+
+  @Override
+  public void setReturnType(DataTypeId returnType) {
+    statement.setReturnType(returnType);
   }
 }

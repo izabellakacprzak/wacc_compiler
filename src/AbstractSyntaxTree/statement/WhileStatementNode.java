@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import SemanticAnalysis.DataTypeId;
 
 public class WhileStatementNode extends StatementNode {
   private final ExpressionNode condition;
@@ -21,4 +22,8 @@ public class WhileStatementNode extends StatementNode {
     return statement.hasExitStatement();
   }
 
+  @Override
+  public void setReturnType(DataTypeId returnType) {
+    statement.setReturnType(returnType);
+  }
 }
