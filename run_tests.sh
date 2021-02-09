@@ -21,8 +21,8 @@ run_tests () {
     done
 }
 
-VALID_TESTS=src/tests/valid
-SYNTAX_ERROR_TESTS=src/tests/invalid/syntaxErr
+VALID_TESTS=src/test/valid
+SYNTAX_ERROR_TESTS=src/test/invalid/syntaxErr
 SUCCESS_CODE=0
 SYNTAX_ERROR_CODE=100
 runValidTests=0

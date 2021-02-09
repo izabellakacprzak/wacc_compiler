@@ -6,10 +6,8 @@ import static org.junit.Assert.assertThat;
 
 public class DummyTest {
 
-  ASTVisitor visitor = new ASTVisitor();
-
   @Test
-  public void printsHello() {
-    assertThat(visitor.hello(), containsString("Hello"));
+  public void p() {
+    System.out.println("hello");
   }
 }

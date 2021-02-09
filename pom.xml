@@ -2,17 +2,6 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>ic.doc</groupId>
-  <executions>
-    <execution>
-      <phase>test</phase>
-      <goals>
-        <goal>exec</goal>
-      </goals>
-      <configuration>
-        <executable>${basedir}/run_tests.sh</executable>
-      </configuration>
-    </execution>
-  </executions>
   <artifactId>wacc_30</artifactId>
   <version>1</version>
   <dependencies>
@@ -24,6 +13,7 @@
     </dependency>
   </dependencies>
   <build>
+    <testSourceDirectory>tests</testSourceDirectory>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
