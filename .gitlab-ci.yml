@@ -4,7 +4,7 @@ stages:
 
 compile-job:
   before_script:
-    - apt-get -y install make
+    - apt-get -y install build-essential
   stage: compile
   script:
     - make
