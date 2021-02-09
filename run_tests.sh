@@ -9,7 +9,7 @@ run_tests () {
             case "$pathname" in
                 *.wacc)
                   echo running test $runTests "$pathname"
-                  java -cp bin:lib/antlr-4.9.1-complete.jar Compiler "$pathname" >/dev/null 2>&1
+                  ./compile "$pathname" >/dev/null 2>&1
                   if [ $? -eq $(($2)) ]; then
                     passedTests=$((passedTests + 1))
                     echo test $runTests passed
