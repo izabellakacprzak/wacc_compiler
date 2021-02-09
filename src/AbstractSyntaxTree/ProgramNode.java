@@ -20,7 +20,7 @@ public class ProgramNode implements ASTNode {
         String error;
         for(FunctionNode f : functionNodes) {
             error = f.checkSyntaxErrors();
-            if(error != null) {
+            if(!error.isEmpty()) {
                 syntaxErrors.add(error);
             }
         }
