@@ -8,7 +8,6 @@ compile-job:
   stage: compile
   script:
     - make
-    - mvn install -B
     - mvn compile
 
 test-job:
