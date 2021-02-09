@@ -8,4 +8,8 @@ public class IdentifierNode extends ExpressionNode implements AssignLHSNode {
   public IdentifierNode(String identifier){
     this.identifier = identifier;
   }
+
+  public String getIdentifier() {
+    return identifier;
+  }
 }

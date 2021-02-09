@@ -1,3 +1,4 @@
+import java.util.List;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
@@ -7,7 +8,11 @@ import java.util.ArrayList;
 
 public class SyntaxErrorListener extends BaseErrorListener {
 
-  private ArrayList<String> syntaxErrors = new ArrayList<>();
+  private List<String> syntaxErrors;
+
+  public SyntaxErrorListener() {
+    syntaxErrors = new ArrayList<>();
+  }
 
   @Override
   public void syntaxError(Recognizer<?, ?> recognizer,
@@ -16,8 +21,7 @@ public class SyntaxErrorListener extends BaseErrorListener {
                           String msg,
                           RecognitionException e) {
 
-    syntaxErrors.add("line " + line + ":" + charPositionInLine + " at " +
-                         offendingSymbol + ": " + msg);
+    syntaxErrors.add("Syntax error at line " + line + ":" + charPositionInLine + " " + msg);
   }
 
   public void printAllErrors() {
@@ -28,5 +32,9 @@ public class SyntaxErrorListener extends BaseErrorListener {
 
   public boolean hasSyntaxErrors() {
     return !syntaxErrors.isEmpty();
+  }
+
+  public int syntaxErrorsCount() {
+    return syntaxErrors.size();
   }
 }

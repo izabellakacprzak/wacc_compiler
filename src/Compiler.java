@@ -2,12 +2,14 @@ import java.io.IOException;
 
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.ProgramNode;
+import java.util.List;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import antlr.*;
 
 public class Compiler {
   private static final int SYNTAX_ERROR_CODE = 100;
+  private static final int INPUT_FILE_ERROR = 1;
 
   public static void main(String[] args) {
 
@@ -21,24 +23,23 @@ public class Compiler {
 
     } catch (IOException e) {
       System.out.println("File not found");
+      System.exit(INPUT_FILE_ERROR);
     }
 
     WACCLexer lexer = new WACCLexer(input);
     lexer.removeErrorListeners();
-    // add our own error  ??
     CommonTokenStream tokens = new CommonTokenStream(lexer);
 
     WACCParser parser = new WACCParser(tokens);
-
     parser.removeErrorListeners();
     SyntaxErrorListener syntaxErrorListener = new SyntaxErrorListener();
     parser.addErrorListener(syntaxErrorListener);
-    // add our own error listener
+
     ParseTree tree = parser.program();
 
     if (syntaxErrorListener.hasSyntaxErrors()) {
-      //TODO
       syntaxErrorListener.printAllErrors();
+      System.out.println(syntaxErrorListener.syntaxErrorsCount() + " syntax errors detected, exiting");
       System.exit(SYNTAX_ERROR_CODE);
     }
 
@@ -46,13 +47,12 @@ public class Compiler {
     ASTVisitor visitor = new ASTVisitor();
     ProgramNode prog = (ProgramNode) visitor.visit(tree);
 
-    if (prog.checkSyntaxErrors()) {
-      parser.notifyErrorListeners("Missing return or misplaced return");
-    }
-
-    if (syntaxErrorListener.hasSyntaxErrors()) {
-      //TODO
-      syntaxErrorListener.printAllErrors();
+    List<String> statementErrors = prog.checkSyntaxErrors();
+    if (!statementErrors.isEmpty()) {
+      for (String e : statementErrors) {
+        System.out.println(e);
+      }
+      System.out.println(statementErrors.size() + " syntax errors detected, exiting");
       System.exit(SYNTAX_ERROR_CODE);
     }
 

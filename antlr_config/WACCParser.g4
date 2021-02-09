@@ -5,11 +5,10 @@ options {
 }
 @parser::members {
     private void inbounds(RuleContext t) {
-        try{
-        int n = Integer.parseInt(t.getText());
-        } catch (NumberFormatException e)
-        {
-        notifyErrorListeners("Integer overflow");
+        try {
+          int n = Integer.parseInt(t.getText());
+        } catch (NumberFormatException e) {
+          notifyErrorListeners("Integer overflow");
         }
     }
 }
@@ -44,10 +43,10 @@ assign_lhs: IDENT  #IdentLHS
 | pair_elem        #PairElemLHS
 ;
 
-assign_rhs: expr                                                  #ExprRHS
-| OPEN_SQUARE_BRACKET (expr (COMMA expr)* )? CLOSE_SQUARE_BRACKET #ArrayLiterRHS
-| NEWPAIR OPEN_PARENTHESES expr COMMA expr CLOSE_PARENTHESES      #NewPairRHS
-| pair_elem                                                       #PairElemRHS
+assign_rhs: expr                                                            #ExprRHS
+| OPEN_SQUARE_BRACKET (expr (COMMA expr)* )? CLOSE_SQUARE_BRACKET           #ArrayLiterRHS
+| NEWPAIR OPEN_PARENTHESES expr COMMA expr CLOSE_PARENTHESES                #NewPairRHS
+| pair_elem                                                                 #PairElemRHS
 | CALL IDENT OPEN_PARENTHESES (expr (COMMA expr)*)? CLOSE_PARENTHESES       #FuncCallRHS
 ;
 
@@ -79,7 +78,7 @@ pair_liter: NULL ;
 
 
 // expressions
-expr: int_liter {inbounds(_localctx);}         #IntLiterExpr
+expr: int_liter {inbounds(_localctx);}          #IntLiterExpr
 | BOOL_LITER                                    #BoolLiterExpr
 | CHAR_LITER                                    #CharLiterExpr
 | STR_LITER                                     #StringLiterExpr

@@ -18,9 +18,18 @@ public class FunctionNode extends TypeNode {
   }
 
 
-  public boolean checkSyntaxErrors() {
-    boolean error = (!bodyStatement.hasReturnStatement() && !bodyStatement.hasExitStatement())
-               || (bodyStatement.hasReturnStatement() && !bodyStatement.hasNoStatementAfterReturn());
-     return error;
+  public String checkSyntaxErrors() {
+    StringBuilder errorMessage = new StringBuilder();
+    boolean error = !bodyStatement.hasReturnStatement() && !bodyStatement.hasExitStatement();
+    if(error) {
+      errorMessage.append("Function " + identifier.getIdentifier() + " has no return or exit statement\n");
+    } else {
+      error = bodyStatement.hasReturnStatement() && !bodyStatement.hasNoStatementAfterReturn();
+      if (error) {
+        errorMessage.append("Function " + identifier.toString() + " has statements after return\n");
+      }
+    }
+
+     return errorMessage.toString();
   }
 }
