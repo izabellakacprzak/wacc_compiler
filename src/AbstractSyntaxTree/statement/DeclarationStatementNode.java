@@ -35,10 +35,14 @@ public class DeclarationStatementNode implements StatementNode {
             symbolTable.add(identifier.getIdentifier(),
                     new VariableId(this, (DataTypeId) type.createIdentifier(symbolTable)));
         }
-        // get type of type node
-        // get type of RHS node
-        // compare the types, throw an error if not the same
 
+        DataTypeId declaredType = type.getType();
+        DataTypeId assignedType = assignment.getType(symbolTable);
+
+        if (!declaredType.equals(assignedType)) {
+            errorMessages.add("Declaration to: " + identifier.getIdentifier() + "must be of type " +
+                    declaredType.toString() + " not " + assignedType.toString());
+        }
     }
 
 }

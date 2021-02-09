@@ -31,5 +31,14 @@ public class BaseType extends DataTypeId {
     return type.toString().toLowerCase();
   }
 
+  @Override
+  public boolean equals(DataTypeId object) {
+    if(object instanceof BaseType) {
+      BaseType typeObject = (BaseType) object;
+      return typeObject.getType().equals(this.type);
+    }
+    return false;
+  }
+
   public enum Type {INT, BOOL, CHAR, STRING}
 }

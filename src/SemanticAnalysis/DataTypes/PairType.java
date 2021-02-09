@@ -26,4 +26,16 @@ public class PairType extends DataTypeId {
   public String toString() {
     return "pair(" + fstType.toString() + ", " + sndType.toString() + ")";
   }
+
+  @Override
+  public boolean equals(DataTypeId object) {
+
+    if (object instanceof PairType) {
+      PairType pairObject = (PairType) object;
+      return pairObject.getFstType().equals(this.fstType) &&
+              pairObject.getSndType().equals(this.sndType);
+    }
+
+    return false;
+  }
 }

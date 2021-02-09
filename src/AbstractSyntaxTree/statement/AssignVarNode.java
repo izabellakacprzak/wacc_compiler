@@ -2,6 +2,7 @@ package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
+import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
@@ -20,12 +21,12 @@ public class AssignVarNode implements StatementNode {
     left.semanticAnalysis(symbolTable, errorMessages);
     right.semanticAnalysis(symbolTable, errorMessages);
 
-    // get type of left node
-    // get type of right node
+    DataTypeId leftType = left.getType(symbolTable);
+    DataTypeId rightType = right.getType(symbolTable);
 
-    // override type equals and compare the two nodes
-    // if type differs - "Assignment to: " + left + "must be of type " + left.type +
-    // " not " + right.type
-
+    if (!leftType.equals(rightType)){
+       errorMessages.add("Assignment to: " + left.toString() + "must be of type " + leftType +
+       " not " + rightType);
+    }
   }
 }
