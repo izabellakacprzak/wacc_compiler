@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.type;
 
+import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
@@ -7,7 +8,6 @@ import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 public class BaseTypeNode implements TypeNode {
-  // some sort of an enum for type (INT, BOOL etc) ??
   private final BaseType.Type baseType;
   private String value;
 
@@ -23,5 +23,10 @@ public class BaseTypeNode implements TypeNode {
   @Override
   public Identifier createIdentifier(SymbolTable parentSymbolTable) {
     return new BaseType(this, baseType);
+  }
+
+  @Override
+  public DataTypeId getType() {
+    return new BaseType(null, baseType);
   }
 }

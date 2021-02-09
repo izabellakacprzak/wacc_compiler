@@ -8,8 +8,8 @@ import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 public class PairTypeNode implements TypeNode {
-    private TypeNode fstType;
-    private TypeNode sndType;
+    private final TypeNode fstType;
+    private final TypeNode sndType;
 
     public PairTypeNode(TypeNode fstType, TypeNode sndType) {
         this.fstType = fstType;
@@ -25,5 +25,10 @@ public class PairTypeNode implements TypeNode {
     public Identifier createIdentifier(SymbolTable parentSymbolTable) {
         return new PairType(this, (DataTypeId) fstType.createIdentifier(parentSymbolTable),
                 (DataTypeId) sndType.createIdentifier(parentSymbolTable));
+    }
+
+    @Override
+    public DataTypeId getType() {
+        return new PairType(null, fstType.getType(), sndType.getType());
     }
 }

@@ -1,7 +1,5 @@
 package AbstractSyntaxTree.assignment;
 
-import AbstractSyntaxTree.ASTNode;
-
-public interface AssignRHSNode extends ASTNode {
+public interface AssignRHSNode extends AssignLHSNode {
     
 }

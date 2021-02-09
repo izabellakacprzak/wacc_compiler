@@ -8,7 +8,7 @@ import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 public class ArrayTypeNode implements TypeNode {
-    private TypeNode type;
+    private final TypeNode type;
 
     public ArrayTypeNode(TypeNode type) {
         this.type = type;
@@ -21,5 +21,10 @@ public class ArrayTypeNode implements TypeNode {
     @Override
     public Identifier createIdentifier(SymbolTable parentSymbolTable) {
         return new ArrayType(this, (DataTypeId) type.createIdentifier(parentSymbolTable));
+    }
+
+    @Override
+    public DataTypeId getType() {
+        return new ArrayType(null, type.getType());
     }
 }
