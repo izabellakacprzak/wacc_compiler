@@ -3,6 +3,8 @@ stages:
   - test
 
 compile-job:
+  before_script:
+    - apt-get -y install make
   stage: compile
   script:
     - make
