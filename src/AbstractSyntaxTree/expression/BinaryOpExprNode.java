@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.expression;
 
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.Operator.BinOp;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
@@ -8,13 +9,12 @@ public class BinaryOpExprNode implements ExpressionNode {
 
   private final ExpressionNode lhs;
   private final ExpressionNode rhs;
-  //private final Operator.BinOp operator;
+  private final BinOp operator;
 
-  public BinaryOpExprNode(ExpressionNode lhs, ExpressionNode rhs) //, Operator.BinOp operator)
-  {
+  public BinaryOpExprNode(ExpressionNode lhs, ExpressionNode rhs, BinOp operator) {
     this.lhs = lhs;
     this.rhs = rhs;
-    // this.operator = operator;
+    this.operator = operator;
   }
 
   @Override

@@ -1,18 +1,19 @@
 package AbstractSyntaxTree.expression;
 
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.Operator.UnOp;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 public class UnaryOpExprNode implements ExpressionNode {
 
   private final ExpressionNode operand;
-  //private final OperatorType operator;
+  private final UnOp operator;
 
-  public UnaryOpExprNode(ExpressionNode operand) //, OperatorType operator)
+  public UnaryOpExprNode(ExpressionNode operand, UnOp operator) //, OperatorType operator)
   {
     this.operand = operand;
-    // this.operator = operator;
+    this.operator = operator;
   }
 
   @Override

@@ -5,6 +5,8 @@ import AbstractSyntaxTree.expression.*;
 import AbstractSyntaxTree.statement.*;
 import AbstractSyntaxTree.type.*;
 import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.Operator.BinOp;
+import SemanticAnalysis.Operator.UnOp;
 import antlr.WACCParser.*;
 import antlr.WACCParserBaseVisitor;
 
@@ -107,7 +109,52 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   public ASTNode visitBinaryExpr(BinaryExprContext ctx) {
     ExpressionNode leftExpr = (ExpressionNode) visit(ctx.expr(0));
     ExpressionNode rightExpr = (ExpressionNode) visit(ctx.expr(1));
-    return new BinaryOpExprNode(leftExpr, rightExpr);
+    BinOp operator;
+    String opString = ctx.op.toString();
+    switch (opString) {
+      case "*":
+        operator = BinOp.MUL;
+        break;
+      case "/":
+        operator = BinOp.DIV;
+        break;
+      case "%":
+        operator = BinOp.MOD;
+        break;
+      case "+":
+        operator = BinOp.PLUS;
+        break;
+      case "-":
+        operator = BinOp.MINUS;
+        break;
+      case ">":
+        operator = BinOp.GREATER;
+        break;
+      case ">=":
+        operator = BinOp.GREATEREQ;
+        break;
+      case "<":
+        operator = BinOp.LESS;
+        break;
+      case "<=":
+        operator = BinOp.LESSEQ;
+        break;
+      case "==":
+        operator = BinOp.EQUAL;
+        break;
+      case "!=":
+        operator = BinOp.NOTEQUAL;
+        break;
+      case "&&":
+        operator = BinOp.AND;
+        break;
+      case "||":
+        operator = BinOp.OR;
+        break;
+      default:
+        throw new IllegalArgumentException("Invalid Binary Operator");
+    }
+    return new BinaryOpExprNode(leftExpr, rightExpr, operator);
   }
 
   @Override
@@ -161,12 +208,32 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new IdentifierNode(ctx.IDENT().toString());
   }
 
-
   // TODO: add a operator to class
   @Override
   public ASTNode visitUnaryExpr(UnaryExprContext ctx) {
     ExpressionNode operand = (ExpressionNode) visit(ctx.expr());
-    return new UnaryOpExprNode(operand);
+    UnOp operator;
+    String opString = ctx.op.toString();
+    switch (opString) {
+      case "!":
+        operator = UnOp.NOT;
+        break;
+      case "-":
+        operator = UnOp.NEGATION;
+        break;
+      case "len":
+        operator = UnOp.LENGTH;
+        break;
+      case "ord":
+        operator = UnOp.ORD;
+        break;
+      case "chr":
+        operator = UnOp.CHR;
+        break;
+      default:
+        throw new IllegalArgumentException("Invalid Unary Operator");
+    }
+    return new UnaryOpExprNode(operand, operator);
   }
 
   @Override
@@ -175,8 +242,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new ParenthesisExprNode(expressionNode);
   }
 
-
-  //TODO: toString method of node to return "skip" or store skip in a field??
+  // TODO: toString method of node to return "skip" or store skip in a field??
   @Override
   public ASTNode visitSkipStat(SkipStatContext ctx) {
     return new SkipStatementNode();
@@ -254,24 +320,23 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new NewScopeStatementNode(statement);
   }
 
-  //TODO: left-recursion? stat1 = list of statements, what then? unfold also stat2 after?
+  // TODO: left-recursion? stat1 = list of statements, what then? unfold also stat2 after?
   // check in testing
   @Override
   public ASTNode visitStatsListStat(StatsListStatContext ctx) {
     List<StatementNode> statements = new ArrayList<>();
-    StatementNode stat1 = (StatementNode) visit(ctx.stat(0)); //list
+    StatementNode stat1 = (StatementNode) visit(ctx.stat(0)); // list
     StatementNode stat2 = (StatementNode) visit(ctx.stat(1));
     statements.add(stat1);
     statements.add(stat2);
     if (stat1 instanceof StatementsListNode) {
-      //TODO
+      // TODO
     }
-    //TODO: for stat2 what?
+    // TODO: for stat2 what?
     return new StatementsListNode(statements);
   }
 
-
-  //TODO
+  // TODO
   @Override
   public ASTNode visitBaseType(BaseTypeContext ctx) {
     BaseType.Type baseType;
@@ -294,7 +359,6 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new BaseTypeNode(baseType, ctx.toString());
   }
 
-
   @Override
   public ASTNode visitArrayType(ArrayTypeContext ctx) {
     return new ArrayTypeNode((TypeNode) visit(ctx.type()));
@@ -310,5 +374,4 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   public String hello() {
     return "hello";
   }
-
 }
