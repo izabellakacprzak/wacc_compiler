@@ -4,7 +4,7 @@ import AbstractSyntaxTree.assignment.*;
 import AbstractSyntaxTree.expression.*;
 import AbstractSyntaxTree.statement.*;
 import AbstractSyntaxTree.type.*;
-import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.DataTypes.BaseType.Type;
 import SemanticAnalysis.Operator;
 import SemanticAnalysis.Operator.BinOp;
 import SemanticAnalysis.Operator.UnOp;
@@ -286,7 +286,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   // TODO
   @Override
   public ASTNode visitBaseType(BaseTypeContext ctx) {
-    BaseType.Type baseType = BaseType.Type.valueOf(ctx.base_type().toString().toUpperCase());
+    Type baseType = Type.valueOf(ctx.base_type().toString().toUpperCase());
 
     return new BaseTypeNode(baseType, ctx.toString());
   }

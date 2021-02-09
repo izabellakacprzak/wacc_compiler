@@ -1,16 +1,17 @@
 package AbstractSyntaxTree.type;
 
-import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.DataTypes.BaseType.Type;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
 
 public class BaseTypeNode implements TypeNode {
-  private final BaseType.Type baseType;
+
+  private final Type baseType;
   private final String value;
 
-  public BaseTypeNode(BaseType.Type baseType, String value) {
+  public BaseTypeNode(Type baseType, String value) {
     this.baseType = baseType;
     this.value = value;
   }

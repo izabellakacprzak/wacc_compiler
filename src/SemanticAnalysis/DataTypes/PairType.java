@@ -1,6 +1,5 @@
 package SemanticAnalysis.DataTypes;
 
-import AbstractSyntaxTree.ASTNode;
 import SemanticAnalysis.DataTypeId;
 
 public class PairType extends DataTypeId {

@@ -1,9 +1,12 @@
 package AbstractSyntaxTree.expression;
 
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.BaseType.Type;
 import SemanticAnalysis.Operator.BinOp;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
+import java.util.Set;
+import javax.xml.crypto.Data;
 
 public class BinaryOpExprNode implements ExpressionNode {
 
@@ -22,11 +25,42 @@ public class BinaryOpExprNode implements ExpressionNode {
     lhs.semanticAnalysis(symbolTable, errorMessages);
     rhs.semanticAnalysis(symbolTable, errorMessages);
 
-    // ... with operator
+    DataTypeId lhsType = lhs.getType(symbolTable);
+    DataTypeId rhsType = rhs.getType(symbolTable);
+
+    /* LHS Expression and RHS Expression types do not match */
+    if (!lhsType.equals(rhsType)) {
+      errorMessages.add("Non-matching types for '" + operator.getLabel() + "' operator. "
+          + "Expected: " + lhsType.toString().toUpperCase()
+          + " Actual: " + rhsType.toString().toUpperCase());
+
+      return;
+    }
+
+    Set<DataTypeId> argTypes = operator.getArgTypes();
+
+    /* LHS Expression is not a valid type for the operator */
+    if (!argTypes.isEmpty() && !argTypes.contains(lhsType)) {
+      DataTypeId expected = argTypes.stream().findFirst().get();
+
+      errorMessages.add("Invalid LHS type for '" + operator.getLabel() + "' operator. "
+          + "Expected: " + expected.toString().toUpperCase()
+          + " Actual: " + lhsType.toString().toUpperCase());
+    }
+
+    /* RHS Expression is not a valid type for the operator */
+    if (!argTypes.isEmpty() && !argTypes.contains(rhsType)) {
+      DataTypeId expected = argTypes.stream().findFirst().get();
+
+      errorMessages.add("Invalid RHS type for '" + operator.getLabel() + "' operator. "
+          + "Expected: " + expected.toString().toUpperCase()
+          + " Actual: " + rhsType.toString().toUpperCase());
+    }
+
   }
 
   @Override
   public DataTypeId getType(SymbolTable symTable) {
-    return null;
+    return (DataTypeId) symTable.lookupAll(operator.getReturnType().toString().toLowerCase());
   }
 }
