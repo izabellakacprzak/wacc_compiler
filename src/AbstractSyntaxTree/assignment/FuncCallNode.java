@@ -2,10 +2,8 @@ package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
-import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.FunctionId;
-import SemanticAnalysis.Identifier;
-import SemanticAnalysis.SymbolTable;
+import SemanticAnalysis.*;
+
 import java.util.List;
 
 public class FuncCallNode implements AssignRHSNode {
@@ -31,15 +29,37 @@ public class FuncCallNode implements AssignRHSNode {
     if (functionId == null) {
       errorMessages.add(line + ":" + charPositionInLine
           + " Function " + identifier.getIdentifier() + " has not been declared.");
-      // TODO: Do we check the arguments? plain return?
+        return;
     }
 
     if (!(functionId instanceof FunctionId)) {
       errorMessages.add(line + ":" + charPositionInLine
           + " Attempt at calling " + identifier.getIdentifier() + " as a function.");
-      // TODO: Do we check the arguments? plain return?
+      return;
     }
 
+    FunctionId function = (FunctionId) functionId;
+    List<DataTypeId> paramTypes = function.getParamTypes();
+
+    // TODO: Print out number of expected arguments?
+    if (paramTypes.size() > arguments.size()) {
+      errorMessages.add(line + ":" + charPositionInLine
+              + " Function " + identifier.getIdentifier() + " has been called with less arguments than expected.");
+    } else if (paramTypes.size() < arguments.size()) {
+      errorMessages.add(line + ":" + charPositionInLine
+              + " Function " + identifier.getIdentifier() + " has been called with more arguments than expected.");
+    } else {
+      for (int i = 0; i < arguments.size(); i++){
+       DataTypeId currArg = arguments.get(i).getType(symbolTable);
+       DataTypeId currParamType = paramTypes.get(i);
+
+       if(!(currArg.equals(currParamType))) {
+         errorMessages.add(line + ":" + charPositionInLine
+                 + " Invalid type for argument in function call." + "Expected: " + currParamType.toString().toUpperCase()
+                 + " Actual: " + currArg.toString().toUpperCase());
+       }
+      }
+    }
   }
 
   @Override

@@ -20,7 +20,7 @@ public class ReadStatementNode implements StatementNode {
     lhs.semanticAnalysis(symbolTable, errorMessages);
 
     DataTypeId lhsType = lhs.getType(symbolTable);
-    // TODO: BETTER ERROR MESSAGE
+
     if (!lhsType.equals(new BaseType(BaseType.Type.INT)) ||
         !lhsType.equals(new BaseType(BaseType.Type.CHAR))) {
       errorMessages.add(lhs.getLine() + ":" + lhs.getCharPositionInLine()

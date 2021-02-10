@@ -1,6 +1,9 @@
 package SemanticAnalysis;
 
 import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.type.TypeNode;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class FunctionId extends Identifier {
@@ -28,6 +31,14 @@ public class FunctionId extends Identifier {
 
   public SymbolTable getSymTable() {
     return symTable;
+  }
+
+  public List<DataTypeId> getParamTypes() {
+    List<DataTypeId> paramTypes = new ArrayList<>();
+    for (ParameterId curr : params) {
+      paramTypes.add(curr.getType());
+    }
+    return paramTypes;
   }
 
   @Override

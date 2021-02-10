@@ -37,12 +37,4 @@ public class ParamListNode implements ASTNode {
     }
     return paramIds;
   }
-
-  public List<DataTypeId> getParamTypes() {
-    List<DataTypeId> params = new ArrayList<>();
-    for (TypeNode curr : types) {
-      params.add(curr.getType());
-    }
-    return params;
-  }
 }

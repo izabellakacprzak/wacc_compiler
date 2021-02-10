@@ -20,8 +20,8 @@ public class FreeStatementNode implements StatementNode {
     expr.semanticAnalysis(symbolTable, errorMessages);
 
     DataTypeId exprType = expr.getType(symbolTable);
-    // TODO: BETTER ERROR MESSAGE
-    if (!exprType.equals(new PairType(null, null)) ||
+
+    if (!exprType.equals(new PairType(null, null)) &&
         !exprType.equals(new ArrayType(null))) {
       errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
           + " 'free' call can only be executed on an expression of " +
