@@ -30,5 +30,5 @@ public class BaseType extends DataTypeId {
     return type.toString().toLowerCase();
   }
 
-  public enum Type {INT, BOOL, CHAR, STRING, PAIR}
+  public enum Type {INT, BOOL, CHAR, STRING}
 }

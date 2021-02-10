@@ -10,11 +10,9 @@ import java.util.List;
 public class BaseTypeNode implements TypeNode {
 
   private final Type baseType;
-  private final String value;
 
-  public BaseTypeNode(Type baseType, String value) {
+  public BaseTypeNode(Type baseType) {
     this.baseType = baseType;
-    this.value = value;
   }
 
   @Override

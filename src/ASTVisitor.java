@@ -34,7 +34,6 @@ import AbstractSyntaxTree.statement.WhileStatementNode;
 import AbstractSyntaxTree.type.ArrayTypeNode;
 import AbstractSyntaxTree.type.BaseTypeNode;
 import AbstractSyntaxTree.type.FunctionNode;
-import AbstractSyntaxTree.type.NestedPairTypeNode;
 import AbstractSyntaxTree.type.PairTypeNode;
 import AbstractSyntaxTree.type.ParamListNode;
 import AbstractSyntaxTree.type.TypeNode;
@@ -485,7 +484,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   @Override
   public ASTNode visitBase_type(Base_typeContext ctx) {
     Type baseType = Type.valueOf(ctx.getText().toUpperCase());
-    return new BaseTypeNode(baseType, ctx.getText());
+    return new BaseTypeNode(baseType);
   }
 
   @Override
@@ -501,7 +500,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
   @Override
   public ASTNode visitPairElemTypePair(PairElemTypePairContext ctx) {
-    return new NestedPairTypeNode();
+    return new PairTypeNode(null, null);
   }
 
   @Override

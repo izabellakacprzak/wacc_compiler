@@ -37,12 +37,15 @@ public class FunctionNode implements TypeNode {
     StringBuilder errorMessage = new StringBuilder();
     boolean error = !bodyStatement.hasReturnStatement() && !bodyStatement.hasExitStatement();
     if (error) {
-      errorMessage
-          .append("Function " + identifier.getIdentifier() + " has no return or exit statement\n");
+      errorMessage.append("Function ")
+          .append(identifier.getIdentifier())
+          .append(" has no return or exit statement\n");
     } else {
       error = bodyStatement.hasReturnStatement() && !bodyStatement.hasNoStatementAfterReturn();
       if (error) {
-        errorMessage.append("Function " + identifier.toString() + " has statements after return\n");
+        errorMessage.append("Function ")
+            .append(identifier.toString())
+            .append(" has statements after return\n");
       }
     }
 
