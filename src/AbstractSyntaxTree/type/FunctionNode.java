@@ -32,4 +32,8 @@ public class FunctionNode extends TypeNode {
 
      return errorMessage.toString();
   }
+
+  public void setReturnType(TypeNode returnType) {
+    //bodyStatement.setReturnType(returnType.getType());
+  }
 }

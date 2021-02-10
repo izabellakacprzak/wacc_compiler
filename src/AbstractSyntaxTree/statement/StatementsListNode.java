@@ -1,5 +1,7 @@
 package AbstractSyntaxTree.statement;
 
+import SemanticAnalysis.DataTypeId;
+
 import java.util.List;
 
 public class StatementsListNode extends StatementNode {
@@ -29,5 +31,10 @@ public class StatementsListNode extends StatementNode {
   public boolean hasExitStatement() {
     StatementNode last = statements.get(statements.size() - 1);
     return last.hasExitStatement();
+  }
+
+  @Override
+  public void setReturnType(DataTypeId returnType) {
+    statements.forEach(s -> s.setReturnType(returnType));
   }
 }

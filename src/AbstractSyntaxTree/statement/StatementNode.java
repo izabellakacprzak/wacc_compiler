@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.ASTNode;
+import SemanticAnalysis.DataTypeId;
 
 public class StatementNode implements ASTNode {
 
@@ -14,5 +15,8 @@ public class StatementNode implements ASTNode {
 
   public boolean hasExitStatement() {
     return false;
+  }
+
+  public void setReturnType(DataTypeId returnType) {
   }
 }

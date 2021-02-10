@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import SemanticAnalysis.DataTypeId;
 
 public class IfStatementNode extends StatementNode {
   private ExpressionNode condition;
@@ -17,11 +18,17 @@ public class IfStatementNode extends StatementNode {
   @Override
   public boolean hasReturnStatement() {
     return (thenStatement.hasReturnStatement() || thenStatement.hasExitStatement())
-    && (elseStatement.hasExitStatement() || elseStatement.hasReturnStatement());
+               && (elseStatement.hasExitStatement() || elseStatement.hasReturnStatement());
   }
 
   @Override
   public boolean hasExitStatement() {
     return this.hasReturnStatement();
+  }
+
+  @Override
+  public void setReturnType(DataTypeId returnType) {
+    thenStatement.setReturnType(returnType);
+    elseStatement.setReturnType(returnType);
   }
 }
