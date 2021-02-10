@@ -139,7 +139,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
       }
     }
 
-    return super.visitParam_list(ctx);
+    return new ParamListNode(names, types);
   }
 
   /* RHS ASSIGNMENT NODES */
@@ -336,7 +336,6 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new IdentifierNode(line, charPositionInLine, ctx.IDENT().getText());
   }
 
-  // TODO: add a operator to class
   @Override
   public ASTNode visitUnaryExpr(UnaryExprContext ctx) {
     int line = ctx.getStart().getLine();
@@ -362,7 +361,6 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new ParenthesisExprNode(line, charPositionInLine, expressionNode);
   }
 
-  // TODO: toString method of node to return "skip" or store skip in a field??
   /* STATEMENT NODES */
   @Override
   public ASTNode visitSkipStat(SkipStatContext ctx) {
