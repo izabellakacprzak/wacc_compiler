@@ -34,7 +34,9 @@ public class FunctionNode implements TypeNode {
   }
 
   public String getName() {
-    return identifier.getIdentifier();
+    // Add a '*' character in front of function name to cover the case of having
+    // functions and variables of the same name in symTable
+    return "*" + identifier.getIdentifier();
   }
 
   @Override

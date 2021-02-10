@@ -26,7 +26,21 @@ public class IdentifierNode implements ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    Identifier id = symbolTable.lookupAll(identifier);
 
+    if (id == null) {
+      errorMessages.add(line + ":" + charPositionInLine
+              + " Identifier " + identifier + " has not been declared.");
+    } else if (!(id instanceof VariableId)) {
+      errorMessages.add(line + ":" + charPositionInLine
+              + " Identifier " + identifier + " is referenced incorrectly as a variable.");
+    }
+
+    id = symbolTable.lookupAll("*" + identifier);
+    if (id instanceof FunctionId) {
+      errorMessages.add(line + ":" + charPositionInLine
+              + " Function " + identifier + " is referenced incorrectly as a variable.");
+    }
   }
 
   @Override
@@ -44,11 +58,13 @@ public class IdentifierNode implements ExpressionNode {
     Identifier id = symbolTable.lookupAll(identifier);
 
     if (id instanceof VariableId) {
-      //TODO: get type from Variable ID?
-      return null;
-    } else if (id instanceof FunctionId) {
+      return ((VariableId) id).getType();
+    }
+    // check whether identifier is a function instance
+    id = symbolTable.lookupAll("*" + identifier);
+    if (id instanceof FunctionId) {
       return ((FunctionId) id).getReturnType();
-    } //sth else Id can be?
+    }
 
     return null;
   }

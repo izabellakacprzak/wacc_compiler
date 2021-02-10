@@ -24,7 +24,7 @@ public class FuncCallNode implements AssignRHSNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    Identifier functionId = symbolTable.lookupAll(identifier.getIdentifier());
+    Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
 
     if (functionId == null) {
       errorMessages.add(line + ":" + charPositionInLine
@@ -74,7 +74,7 @@ public class FuncCallNode implements AssignRHSNode {
 
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
-    FunctionId function = (FunctionId) symbolTable.lookupAll(identifier.getIdentifier());
+    FunctionId function = (FunctionId) symbolTable.lookupAll("*" + identifier.getIdentifier());
     return function.getReturnType();
   }
 }

@@ -19,7 +19,7 @@ public class ParenthesisExprNode implements ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-
+    innerExpr.semanticAnalysis(symbolTable, errorMessages);
   }
 
   @Override

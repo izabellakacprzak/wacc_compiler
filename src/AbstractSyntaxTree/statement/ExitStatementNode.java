@@ -19,7 +19,8 @@ public class ExitStatementNode implements StatementNode {
     expr.semanticAnalysis(symbolTable, errorMessages);
 
     DataTypeId exprType = expr.getType(symbolTable);
-
+    //TODO: ADD CHECKS IN CASE TYPE CANNOT BE RESOLVED
+    // TODO: Refactor statement errors to include expected and actual type
     if (!exprType.equals(new BaseType(BaseType.Type.INT))) {
       errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
           + " Exit code must be of type INT not" + exprType.toString());

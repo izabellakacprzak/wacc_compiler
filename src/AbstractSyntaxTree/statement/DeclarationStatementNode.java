@@ -23,17 +23,16 @@ public class DeclarationStatementNode implements StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    // Ensure the variable name is valid
-    identifier.semanticAnalysis(symbolTable, errorMessages);
-
     if (symbolTable.lookupAll(identifier.getIdentifier()) != null) {
       errorMessages.add(identifier.getLine() + ":" + identifier.getCharPositionInLine()
           + " Variable with name " + identifier.getIdentifier() +
           " has already been declared in the same scope.");
     } else {
       symbolTable.add(identifier.getIdentifier(),
-          new VariableId(this, (DataTypeId) type.getIdentifier(symbolTable)));
+          new VariableId(identifier, (DataTypeId) type.getIdentifier(symbolTable)));
     }
+    // potentially might be redundant
+    identifier.semanticAnalysis(symbolTable, errorMessages);
 
     DataTypeId declaredType = type.getType();
     DataTypeId assignedType = assignment.getType(symbolTable);
@@ -46,4 +45,3 @@ public class DeclarationStatementNode implements StatementNode {
   }
 
 }
-

@@ -59,6 +59,7 @@ public class Compiler {
     List<String> semanticErrors = new ArrayList<>();
     SymbolTable topSymbolTable = new SymbolTable(null);
 
+    // TODO: Create our own semantic listener
     prog.semanticAnalysis(topSymbolTable, semanticErrors);
 
     if (!(semanticErrors.isEmpty())) {
