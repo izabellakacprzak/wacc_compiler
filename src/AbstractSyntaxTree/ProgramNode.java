@@ -49,7 +49,7 @@ public class ProgramNode implements ASTNode {
         }
 
         //do semantic analysis on the statement node with new scope
-        statementNode.semanticAnalysis(new SymbolTable(topSymbolTable), errorMessages);
+        statementNode.semanticAnalysis(topSymbolTable, errorMessages);
     }
 
     public List<String> checkSyntaxErrors() {

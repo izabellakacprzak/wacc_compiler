@@ -29,15 +29,22 @@ public class DeclarationStatementNode extends StatementNode {
               " has already been declared in the same scope.");
     } else {
       symbolTable.add(identifier.getIdentifier(),
-              new VariableId(identifier, (DataTypeId) type.getIdentifier(symbolTable)));
+              new VariableId(identifier, type.getType()));
     }
     // potentially might be redundant
     identifier.semanticAnalysis(symbolTable, errorMessages);
+    assignment.semanticAnalysis(symbolTable, errorMessages);
 
     DataTypeId declaredType = type.getType();
     DataTypeId assignedType = assignment.getType(symbolTable);
 
-    if (!declaredType.equals(assignedType)) {
+    if (declaredType == null) {
+      errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
+              + " Could not resolve type of " + identifier.getIdentifier());
+    } else if (assignedType == null) {
+      errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
+              + " Could not resolve type of " + assignment.toString());
+    } else if (!declaredType.equals(assignedType)) {
       errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
               + " Declaration to: " + identifier.getIdentifier() + "must be of type " +
               declaredType.toString() + " not " + assignedType.toString());

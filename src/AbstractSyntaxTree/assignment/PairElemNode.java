@@ -34,7 +34,10 @@ public class PairElemNode implements AssignRHSNode {
     } else {
       IdentifierNode pairId = (IdentifierNode) expr;
       DataTypeId expectedType = pairId.getType(symbolTable);
-      if(!(expectedType instanceof PairType)) {
+      if (expectedType == null) {
+        errorMessages.add(line + ":" + charPositionInLine
+                + "Could not resolve expected pair elem type. " );
+      } else if(!(expectedType instanceof PairType)) {
         errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
                 + " " + expr.toString() + "is not an instance of a Pair");
       }

@@ -21,6 +21,7 @@ public class ReturnStatementNode extends StatementNode {
     if (symbolTable.isTopSymTable()) {
       errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
               + " Return statement cannot be present in the body of the main function.");
+      return;
     }
 
     // compare return type from func declaration and returnExpr.type
@@ -28,7 +29,7 @@ public class ReturnStatementNode extends StatementNode {
     if (returnExprType == null) {
       errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
               + " Failed to procure type of return expression " + returnExpr.toString() + ".");
-    } else if ((returnExprType.equals(returnType))) {
+    } else if (!(returnExprType.equals(returnType))) {
       errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
               + " Return statement does not match expected return type."
               + " Expected: " + returnType.toString().toUpperCase()

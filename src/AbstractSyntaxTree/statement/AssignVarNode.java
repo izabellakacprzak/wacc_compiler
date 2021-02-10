@@ -24,7 +24,13 @@ public class AssignVarNode extends StatementNode {
     DataTypeId leftType = left.getType(symbolTable);
     DataTypeId rightType = right.getType(symbolTable);
 
-    if (!leftType.equals(rightType)) {
+    if (leftType == null) {
+      errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
+              + " Could not resolve type of left hand side assignment. ");
+    } else if (rightType == null) {
+      errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
+              + " Could not resolve type of right hand side assignment. ");
+    } else if (!leftType.equals(rightType)) {
       errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
           + " Assignment to: " + left.toString() + "must be of type " + leftType +
           " not " + rightType);

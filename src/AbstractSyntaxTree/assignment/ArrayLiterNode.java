@@ -24,21 +24,29 @@ public class ArrayLiterNode implements AssignRHSNode {
 
     ExpressionNode fstExpr = expressions.get(0);
     DataTypeId fstType = fstExpr.getType(symbolTable);
+    if (fstType == null) {
+      errorMessages.add(line + ":" + charPositionInLine
+              + " Could not resolve array type.") ;
+    } else {
+      for (int i = 1; i < expressions.size(); i++) {
+        ExpressionNode currExpr = expressions.get(i);
+        DataTypeId currType = currExpr.getType(symbolTable);
 
-    for (int i = 1; i < expressions.size(); i++) {
-      ExpressionNode currExpr = expressions.get(i);
-      DataTypeId currType = currExpr.getType(symbolTable);
-
-      if (!(fstType.equals(currType))) {
-        errorMessages.add(line + ":" + charPositionInLine
-            + " Multiple element types in array literal. Expected type: " +
-            fstType.toString() + ". Given type: " + currType.toString());
-        break;
+        if(currType == null) {
+          errorMessages.add(line + ":" + charPositionInLine
+                  + " Could not resolve type of" + i +" element in array. " );
+          break;
+        } else if (!(fstType.equals(currType))) {
+          errorMessages.add(line + ":" + charPositionInLine
+                  + " Multiple element types in array literal. Expected type: " +
+                  fstType.toString() + ". Given type: " + currType.toString());
+          break;
+        }
       }
-    }
 
-    for (ExpressionNode expr : expressions) {
-      expr.semanticAnalysis(symbolTable, errorMessages);
+      for (ExpressionNode expr : expressions) {
+        expr.semanticAnalysis(symbolTable, errorMessages);
+      }
     }
   }
 

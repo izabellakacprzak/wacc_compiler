@@ -33,6 +33,15 @@ public class BinaryOpExprNode implements ExpressionNode {
     DataTypeId rhsType = rhs.getType(symbolTable);
 
     /* LHS Expression and RHS Expression types do not match */
+    if (lhsType == null) {
+      errorMessages.add(line + ":" + charPositionInLine
+              + " Could not resolve left hand side of '" + operator.getLabel() + "' operator");
+      return;
+    } else if (rhsType == null){
+      errorMessages.add(line + ":" + charPositionInLine
+              + " Could not resolve right hand side of '" + operator.getLabel() + "' operator");
+      return;
+    }
     if (!lhsType.equals(rhsType)) {
       errorMessages.add(line + ":" + charPositionInLine
           + " Non-matching types for '" + operator.getLabel() + "' operator. "

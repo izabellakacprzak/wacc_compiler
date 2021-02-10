@@ -26,7 +26,11 @@ public class IfStatementNode extends StatementNode {
 
     // get condition type - if not bool throw error
     DataTypeId conditionType = condition.getType(symbolTable);
-    if (!conditionType.equals(new BaseType(BaseType.Type.BOOL))) {
+
+    if (conditionType == null) {
+      errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
+              + " Could not resolve If condition type" );
+    } else if (!conditionType.equals(new BaseType(BaseType.Type.BOOL))) {
       errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
           + " If Condition must be of type BOOL and not " + conditionType.toString());
     }

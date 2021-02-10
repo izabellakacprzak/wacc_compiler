@@ -40,6 +40,10 @@ public class NewPairNode implements AssignRHSNode {
 
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
+    if (leftExpr.getType(symbolTable) == null || rightExpr.getType(symbolTable) == null) {
+      return null;
+    }
+
     return new PairType(leftExpr.getType(symbolTable), rightExpr.getType(symbolTable));
   }
 }

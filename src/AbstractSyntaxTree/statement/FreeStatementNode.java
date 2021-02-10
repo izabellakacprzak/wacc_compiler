@@ -21,7 +21,10 @@ public class FreeStatementNode extends StatementNode {
 
     DataTypeId exprType = expr.getType(symbolTable);
 
-    if (!exprType.equals(new PairType(null, null)) &&
+    if (exprType == null) {
+      errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
+              + " Could not resolve 'free' statement type" );
+    } else if (!exprType.equals(new PairType(null, null)) &&
         !exprType.equals(new ArrayType(null))) {
       errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
           + " 'free' call can only be executed on an expression of " +

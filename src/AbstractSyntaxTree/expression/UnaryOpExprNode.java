@@ -29,6 +29,10 @@ public class UnaryOpExprNode implements ExpressionNode {
     DataTypeId opType = operand.getType(symbolTable);
     Set<DataTypeId> argTypes = operator.getArgTypes();
 
+    if (opType == null) {
+      errorMessages.add(line + ":" + charPositionInLine
+              + " Could not resolve operand '" + operator.getLabel() + "' type");
+    }
     if (!argTypes.isEmpty() && !argTypes.contains(opType)) {
       DataTypeId expected = argTypes.stream().findFirst().get();
 
@@ -36,7 +40,7 @@ public class UnaryOpExprNode implements ExpressionNode {
           + " Invalid type for '" + operator.getLabel() + "' operator. "
           + "Expected: " + expected.toString().toUpperCase()
           + " Actual: " + opType.toString().toUpperCase());
-    } else if (!(opType instanceof ArrayType)) {
+    } else if (argTypes.isEmpty() && !(opType instanceof ArrayType)) {
       DataTypeId expected = new ArrayType(null);
 
       errorMessages.add(line + ":" + charPositionInLine

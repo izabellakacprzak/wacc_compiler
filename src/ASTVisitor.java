@@ -476,6 +476,8 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     TypeNode fst = (TypeNode) visit(ctx.pair_elem_type(0));
     TypeNode snd = (TypeNode) visit(ctx.pair_elem_type(1));
 
+    System.out.println(fst);
+    System.out.println(snd);
     return new PairTypeNode(fst, snd);
   }
 

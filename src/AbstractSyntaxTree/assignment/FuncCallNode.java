@@ -53,7 +53,10 @@ public class FuncCallNode implements AssignRHSNode {
        DataTypeId currArg = arguments.get(i).getType(symbolTable);
        DataTypeId currParamType = paramTypes.get(i);
 
-       if(!(currArg.equals(currParamType))) {
+       if (currArg == null || currParamType == null) {
+         errorMessages.add(line + ":" + charPositionInLine
+                 + " Could not resolve parameter " + i + "in function call. ");
+       } else if (!(currArg.equals(currParamType))) {
          errorMessages.add(line + ":" + charPositionInLine
                  + " Invalid type for argument in function call." + "Expected: " + currParamType.toString().toUpperCase()
                  + " Actual: " + currArg.toString().toUpperCase());
