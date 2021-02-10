@@ -5,5 +5,10 @@ import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
 
 public interface ExpressionNode extends AssignRHSNode {
-    DataTypeId getType(SymbolTable symbolTable);
+
+  int getLine();
+
+  int getCharPositionInLine();
+
+  DataTypeId getType(SymbolTable symbolTable);
 }

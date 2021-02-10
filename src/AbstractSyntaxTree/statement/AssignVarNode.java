@@ -25,7 +25,8 @@ public class AssignVarNode implements StatementNode {
     DataTypeId rightType = right.getType(symbolTable);
 
     if (!leftType.equals(rightType)) {
-      errorMessages.add("Assignment to: " + left.toString() + "must be of type " + leftType +
+      errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
+          + " Assignment to: " + left.toString() + "must be of type " + leftType +
           " not " + rightType);
     }
   }

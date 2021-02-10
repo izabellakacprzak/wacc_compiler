@@ -1,10 +1,11 @@
 package SemanticAnalysis;
 
-import static SemanticAnalysis.DataTypes.BaseType.Type.*;
+import static SemanticAnalysis.DataTypes.BaseType.Type.BOOL;
+import static SemanticAnalysis.DataTypes.BaseType.Type.CHAR;
+import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
 
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.DataTypes.BaseType.Type;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 

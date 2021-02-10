@@ -1,7 +1,6 @@
 package SemanticAnalysis;
 
 import AbstractSyntaxTree.ASTNode;
-
 import java.util.List;
 
 public class FunctionId extends Identifier {

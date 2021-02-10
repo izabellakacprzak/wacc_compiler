@@ -2,11 +2,8 @@ package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
-import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
-
 import java.util.List;
 
 public class IfStatementNode implements StatementNode {
@@ -29,7 +26,8 @@ public class IfStatementNode implements StatementNode {
     // get condition type - if not bool throw error
     DataTypeId conditionType = condition.getType(symbolTable);
     if (!conditionType.equals(new BaseType(BaseType.Type.BOOL))) {
-      errorMessages.add("If Condition must be of type BOOL and not " + conditionType.toString());
+      errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
+          + " If Condition must be of type BOOL and not " + conditionType.toString());
     }
 
     thenStatement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);

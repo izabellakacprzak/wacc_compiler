@@ -6,7 +6,6 @@ import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
-
 import java.util.List;
 
 public class FunctionNode implements TypeNode {

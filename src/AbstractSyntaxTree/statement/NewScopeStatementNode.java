@@ -13,6 +13,6 @@ public class NewScopeStatementNode implements StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-      statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
+    statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
   }
 }

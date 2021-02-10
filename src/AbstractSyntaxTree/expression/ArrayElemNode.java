@@ -6,16 +6,21 @@ import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.DataTypes.BaseType.Type;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
-
 import SemanticAnalysis.VariableId;
 import java.util.List;
 
 public class ArrayElemNode implements ExpressionNode {
 
+  private final int line;
+  private final int charPositionInLine;
+
   private final IdentifierNode identifier;
   private final List<ExpressionNode> expressions;
 
-  public ArrayElemNode(IdentifierNode identifier, List<ExpressionNode> expressions) {
+  public ArrayElemNode(int line, int charPositionInLine, IdentifierNode identifier,
+      List<ExpressionNode> expressions) {
+    this.line = line;
+    this.charPositionInLine = charPositionInLine;
     this.identifier = identifier;
     this.expressions = expressions;
   }
@@ -37,11 +42,13 @@ public class ArrayElemNode implements ExpressionNode {
     Identifier idType = symTable.lookupAll(identifier.getIdentifier());
 
     if (idType == null) {
-      errorMessages.add("No declaration of " + identifier.getIdentifier());
+      errorMessages.add(line + ":" + charPositionInLine
+          + " No declaration of " + identifier.getIdentifier());
       return;
 
     } else if (!(idType instanceof ArrayType)) {
-      errorMessages.add("Incorrect declaration of " + identifier.getIdentifier()
+      errorMessages.add(line + ":" + charPositionInLine
+          + " Incorrect declaration of " + identifier.getIdentifier()
           + ". Expected: ARRAY. ACTUAL: " + idType.toString().toUpperCase());
       return;
     }
@@ -59,7 +66,7 @@ public class ArrayElemNode implements ExpressionNode {
           typeStr = thisType.toString().toUpperCase();
         }
 
-        errorMessages.add("Tried to access array with non-INT expression."
+        errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
             + " Expected: INT Actual: " + typeStr);
       }
     }
@@ -73,6 +80,16 @@ public class ArrayElemNode implements ExpressionNode {
 //          errorMessages.add("Incompatible type of " + identifier.getIdentifier() + "[" + i
 //              + "]. Expected: " + arrayType.toString() + " Actual: " + thisType.toString());
 //        }
+
+  @Override
+  public int getLine() {
+    return line;
+  }
+
+  @Override
+  public int getCharPositionInLine() {
+    return charPositionInLine;
+  }
 
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {

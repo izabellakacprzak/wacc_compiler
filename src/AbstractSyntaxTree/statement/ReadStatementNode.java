@@ -2,9 +2,7 @@ package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.assignment.AssignLHSNode;
 import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
-import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
@@ -25,7 +23,8 @@ public class ReadStatementNode implements StatementNode {
     // TODO: BETTER ERROR MESSAGE
     if (!lhsType.equals(new BaseType(BaseType.Type.INT)) ||
         !lhsType.equals(new BaseType(BaseType.Type.CHAR))) {
-      errorMessages.add("Standard input allows only INT and CHAR and not " + lhsType.toString());
+      errorMessages.add(lhs.getLine() + ":" + lhs.getCharPositionInLine()
+          + " Standard input allows only INT and CHAR and not " + lhsType.toString());
     }
   }
 }

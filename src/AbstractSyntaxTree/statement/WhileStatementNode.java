@@ -22,7 +22,8 @@ public class WhileStatementNode implements StatementNode {
 
     DataTypeId conditionType = condition.getType(symbolTable);
     if (!conditionType.equals(new BaseType(BaseType.Type.BOOL))) {
-      errorMessages.add("While Condition must be of type BOOL and not " + conditionType.toString());
+      errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
+          + " While Condition must be of type BOOL and not " + conditionType.toString());
     }
     statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
   }

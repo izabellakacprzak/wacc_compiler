@@ -6,7 +6,6 @@ import AbstractSyntaxTree.type.TypeNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
 import SemanticAnalysis.VariableId;
-
 import java.util.List;
 
 public class DeclarationStatementNode implements StatementNode {
@@ -28,7 +27,8 @@ public class DeclarationStatementNode implements StatementNode {
     identifier.semanticAnalysis(symbolTable, errorMessages);
 
     if (symbolTable.lookupAll(identifier.getIdentifier()) != null) {
-      errorMessages.add("Variable with name " + identifier.getIdentifier() +
+      errorMessages.add(identifier.getLine() + ":" + identifier.getCharPositionInLine()
+          + " Variable with name " + identifier.getIdentifier() +
           " has already been declared in the same scope.");
     } else {
       symbolTable.add(identifier.getIdentifier(),
@@ -39,7 +39,8 @@ public class DeclarationStatementNode implements StatementNode {
     DataTypeId assignedType = assignment.getType(symbolTable);
 
     if (!declaredType.equals(assignedType)) {
-      errorMessages.add("Declaration to: " + identifier.getIdentifier() + "must be of type " +
+      errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
+          + " Declaration to: " + identifier.getIdentifier() + "must be of type " +
           declaredType.toString() + " not " + assignedType.toString());
     }
   }

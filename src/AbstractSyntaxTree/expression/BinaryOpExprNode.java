@@ -8,11 +8,17 @@ import java.util.Set;
 
 public class BinaryOpExprNode implements ExpressionNode {
 
+  private final int line;
+  private final int charPositionInLine;
+
   private final ExpressionNode lhs;
   private final ExpressionNode rhs;
   private final BinOp operator;
 
-  public BinaryOpExprNode(ExpressionNode lhs, ExpressionNode rhs, BinOp operator) {
+  public BinaryOpExprNode(int line, int charPositionInLine, ExpressionNode lhs, ExpressionNode rhs,
+      BinOp operator) {
+    this.line = line;
+    this.charPositionInLine = charPositionInLine;
     this.lhs = lhs;
     this.rhs = rhs;
     this.operator = operator;
@@ -28,7 +34,8 @@ public class BinaryOpExprNode implements ExpressionNode {
 
     /* LHS Expression and RHS Expression types do not match */
     if (!lhsType.equals(rhsType)) {
-      errorMessages.add("Non-matching types for '" + operator.getLabel() + "' operator. "
+      errorMessages.add(line + ":" + charPositionInLine
+          + " Non-matching types for '" + operator.getLabel() + "' operator. "
           + "Expected: " + lhsType.toString().toUpperCase()
           + " Actual: " + rhsType.toString().toUpperCase());
 
@@ -41,7 +48,8 @@ public class BinaryOpExprNode implements ExpressionNode {
     if (!argTypes.isEmpty() && !argTypes.contains(lhsType)) {
       DataTypeId expected = argTypes.stream().findFirst().get();
 
-      errorMessages.add("Invalid LHS type for '" + operator.getLabel() + "' operator. "
+      errorMessages.add(line + ":" + charPositionInLine
+          + " Invalid LHS type for '" + operator.getLabel() + "' operator. "
           + "Expected: " + expected.toString().toUpperCase()
           + " Actual: " + lhsType.toString().toUpperCase());
     }
@@ -50,11 +58,22 @@ public class BinaryOpExprNode implements ExpressionNode {
     if (!argTypes.isEmpty() && !argTypes.contains(rhsType)) {
       DataTypeId expected = argTypes.stream().findFirst().get();
 
-      errorMessages.add("Invalid RHS type for '" + operator.getLabel() + "' operator. "
+      errorMessages.add(line + ":" + charPositionInLine
+          + " Invalid RHS type for '" + operator.getLabel() + "' operator. "
           + "Expected: " + expected.toString().toUpperCase()
           + " Actual: " + rhsType.toString().toUpperCase());
     }
 
+  }
+
+  @Override
+  public int getLine() {
+    return line;
+  }
+
+  @Override
+  public int getCharPositionInLine() {
+    return charPositionInLine;
   }
 
   @Override

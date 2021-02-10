@@ -8,15 +8,30 @@ import java.util.List;
 
 public class CharLiterExprNode implements ExpressionNode {
 
+  private final int line;
+  private final int charPositionInLine;
+
   private final char value;
 
-  public CharLiterExprNode(char value) {
+  public CharLiterExprNode(int line, int charPositionInLine, char value) {
+    this.line = line;
+    this.charPositionInLine = charPositionInLine;
     this.value = value;
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
 
+  }
+
+  @Override
+  public int getLine() {
+    return line;
+  }
+
+  @Override
+  public int getCharPositionInLine() {
+    return charPositionInLine;
   }
 
   @Override

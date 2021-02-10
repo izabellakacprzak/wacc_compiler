@@ -4,7 +4,6 @@ import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.type.FunctionNode;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.SymbolTable;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

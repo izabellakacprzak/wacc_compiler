@@ -6,5 +6,9 @@ import SemanticAnalysis.SymbolTable;
 
 public interface AssignLHSNode extends ASTNode {
 
-    DataTypeId getType(SymbolTable symbolTable);
+  int getLine();
+
+  int getCharPositionInLine();
+
+  DataTypeId getType(SymbolTable symbolTable);
 }

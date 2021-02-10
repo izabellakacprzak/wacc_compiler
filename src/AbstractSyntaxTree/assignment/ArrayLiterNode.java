@@ -8,9 +8,14 @@ import java.util.List;
 
 public class ArrayLiterNode implements AssignRHSNode {
 
+  private final int line;
+  private final int charPositionInLine;
+
   private final List<ExpressionNode> expressions;
 
-  public ArrayLiterNode(List<ExpressionNode> expressions) {
+  public ArrayLiterNode(int line, int charPositionInLine, List<ExpressionNode> expressions) {
+    this.line = line;
+    this.charPositionInLine = charPositionInLine;
     this.expressions = expressions;
   }
 
@@ -25,7 +30,8 @@ public class ArrayLiterNode implements AssignRHSNode {
       DataTypeId currType = currExpr.getType(symbolTable);
 
       if (!(fstType.equals(currType))) {
-        errorMessages.add("Multiple element types in array literal. Expected type: " +
+        errorMessages.add(line + ":" + charPositionInLine
+            + " Multiple element types in array literal. Expected type: " +
             fstType.toString() + ". Given type: " + currType.toString());
         break;
       }
@@ -34,6 +40,16 @@ public class ArrayLiterNode implements AssignRHSNode {
     for (ExpressionNode expr : expressions) {
       expr.semanticAnalysis(symbolTable, errorMessages);
     }
+  }
+
+  @Override
+  public int getLine() {
+    return line;
+  }
+
+  @Override
+  public int getCharPositionInLine() {
+    return charPositionInLine;
   }
 
   @Override

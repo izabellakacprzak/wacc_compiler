@@ -9,10 +9,15 @@ import java.util.Set;
 
 public class UnaryOpExprNode implements ExpressionNode {
 
+  private final int line;
+  private final int charPositionInLine;
+
   private final ExpressionNode operand;
   private final UnOp operator;
 
-  public UnaryOpExprNode(ExpressionNode operand, UnOp operator) {
+  public UnaryOpExprNode(int line, int charPositionInLine, ExpressionNode operand, UnOp operator) {
+    this.line = line;
+    this.charPositionInLine = charPositionInLine;
     this.operand = operand;
     this.operator = operator;
   }
@@ -27,21 +32,32 @@ public class UnaryOpExprNode implements ExpressionNode {
     if (!argTypes.isEmpty() && !argTypes.contains(opType)) {
       DataTypeId expected = argTypes.stream().findFirst().get();
 
-      errorMessages.add("Invalid type for '" + operator.getLabel() + "' operator. "
+      errorMessages.add(line + ":" + charPositionInLine
+          + " Invalid type for '" + operator.getLabel() + "' operator. "
           + "Expected: " + expected.toString().toUpperCase()
           + " Actual: " + opType.toString().toUpperCase());
     } else if (!(opType instanceof ArrayType)) {
       DataTypeId expected = new ArrayType(null);
 
-      errorMessages.add("Invalid type for '" + operator.getLabel() + "' operator. "
+      errorMessages.add(line + ":" + charPositionInLine
+          + " Invalid type for '" + operator.getLabel() + "' operator. "
           + "Expected: " + expected.toString().toUpperCase()
           + " Actual: " + opType.toString().toUpperCase());
     }
   }
 
   @Override
+  public int getLine() {
+    return line;
+  }
+
+  @Override
+  public int getCharPositionInLine() {
+    return charPositionInLine;
+  }
+
+  @Override
   public DataTypeId getType(SymbolTable symTable) {
     return operator.getReturnType();
   }
-
 }
