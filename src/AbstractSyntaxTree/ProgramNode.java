@@ -1,5 +1,6 @@
 package AbstractSyntaxTree;
 
+import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.type.FunctionNode;
 import SemanticAnalysis.FunctionId;
@@ -26,17 +27,18 @@ public class ProgramNode implements ASTNode {
         // and perform the semantic analysis on it, passing the newly created sym table
 
         for (FunctionNode func : functionNodes) {
+            func.setCurrSymTable(new SymbolTable(topSymbolTable));
+
             // check if declared
             // if not add to top table
-            if (topSymbolTable.lookupAll(func.getName()) == null) {
+            if (topSymbolTable.lookupAll(func.getName()) != null) {
                 // function is defined - add error message and exit
-                errorMessages.add("Attempt at redefining already existing function " + func.getName());
+                IdentifierNode id = func.getIdentifierNode();
+                errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
+                    + "Attempt at redefining already existing function " + func.getName());
 
-                func.setCurrSymTable(new SymbolTable(topSymbolTable));
             } else {
                 FunctionId identifier = (FunctionId) func.getIdentifier(topSymbolTable);
-
-                func.setCurrSymTable(identifier.getSymTable());
                 topSymbolTable.add(func.getName(), identifier);
             }
         }

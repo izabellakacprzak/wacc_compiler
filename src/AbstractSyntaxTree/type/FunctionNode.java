@@ -33,10 +33,6 @@ public class FunctionNode implements TypeNode {
     this.currSymTable = currSymTable;
   }
 
-  public void setReturnType(TypeNode returnType) {
-    //bodyStatement.setReturnType(returnType.getType());
-  }
-
   public String checkSyntaxErrors() {
     StringBuilder errorMessage = new StringBuilder();
     boolean error = !bodyStatement.hasReturnStatement() && !bodyStatement.hasExitStatement();
@@ -55,8 +51,10 @@ public class FunctionNode implements TypeNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    bodyStatement.setReturnType(returnType.getType());
+
     returnType.semanticAnalysis(symbolTable, errorMessages);
-    identifier.semanticAnalysis(symbolTable, errorMessages);
+    //identifier.semanticAnalysis(symbolTable, errorMessages);
     params.semanticAnalysis(symbolTable, errorMessages);
     bodyStatement.semanticAnalysis(symbolTable, errorMessages);
   }
@@ -65,6 +63,10 @@ public class FunctionNode implements TypeNode {
     // Add a '*' character in front of function name to cover the case of having
     // functions and variables of the same name in symTable
     return "*" + identifier.getIdentifier();
+  }
+
+  public IdentifierNode getIdentifierNode() {
+    return identifier;
   }
 
   @Override

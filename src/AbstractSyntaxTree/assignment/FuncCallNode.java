@@ -2,8 +2,10 @@ package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
-import SemanticAnalysis.*;
-
+import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.FunctionId;
+import SemanticAnalysis.Identifier;
+import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 public class FuncCallNode implements AssignRHSNode {
@@ -78,6 +80,11 @@ public class FuncCallNode implements AssignRHSNode {
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
     FunctionId function = (FunctionId) symbolTable.lookupAll("*" + identifier.getIdentifier());
+
+    if (function == null) {
+      return null;
+    }
+
     return function.getReturnType();
   }
 }
