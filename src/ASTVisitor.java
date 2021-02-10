@@ -113,6 +113,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     if(ctx.param_list() != null) {
       params = (ParamListNode) visit(ctx.param_list());
     }
+
     return new FunctionNode(type, identifier, params, body);
   }
 
@@ -478,14 +479,9 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
   @Override
   public ASTNode visitPairType(PairTypeContext ctx) {
-    System.out.println(ctx.pair_elem_type(0));
-    System.out.println(ctx.pair_elem_type(1));
-
     TypeNode fst = (TypeNode) visit(ctx.pair_elem_type(0));
     TypeNode snd = (TypeNode) visit(ctx.pair_elem_type(1));
 
-    System.out.println(fst);
-    System.out.println(snd);
     return new PairTypeNode(fst, snd);
   }
 
