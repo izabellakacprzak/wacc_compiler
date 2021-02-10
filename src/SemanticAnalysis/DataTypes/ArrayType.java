@@ -1,25 +1,44 @@
 package SemanticAnalysis.DataTypes;
 
-import AbstractSyntaxTree.ASTNode;
 import SemanticAnalysis.DataTypeId;
 
 public class ArrayType extends DataTypeId {
 
-  private final int size;
-  private final DataTypeId arrayType;
+  private int size;
+  private final DataTypeId elemType;
 
-  public ArrayType(ASTNode node, int size, DataTypeId arrayType) {
-    super(node);
-    this.size = size;
-    this.arrayType = arrayType;
+  public ArrayType(DataTypeId elemType) {
+    super();
+    this.elemType = elemType;
   }
 
   public int getSize() {
     return size;
   }
 
+  public void setSize(int size) {
+    this.size = size;
+  }
+
+  public DataTypeId getElemType() {
+    return elemType;
+  }
+
   @Override
   public String toString() {
-    return arrayType.toString() + "[]";
+    return elemType.toString() + "[]";
+  }
+
+  @Override
+  public boolean equals(Object object) {
+    if ((object instanceof DataTypeId) && this.elemType == null) {
+      return true;
+    }
+
+    if (object instanceof ArrayType) {
+      ArrayType arrayObject = (ArrayType) object;
+      return arrayObject.getElemType() == null || arrayObject.getElemType().equals(this.elemType);
+    }
+    return false;
   }
 }

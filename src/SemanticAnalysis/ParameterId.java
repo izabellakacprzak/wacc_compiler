@@ -11,8 +11,13 @@ public class ParameterId extends Identifier {
     this.type = type;
   }
 
+  public DataTypeId getType() {
+    return type;
+  }
+
   @Override
   public String toString() {
-    return type.toString()/* + ASTNode.identifier()*/;
+    return type.toString() + super.getNode().toString();
   }
 }
+

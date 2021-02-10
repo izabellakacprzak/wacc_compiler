@@ -3,7 +3,7 @@ package AbstractSyntaxTree.statement;
 import AbstractSyntaxTree.ASTNode;
 import SemanticAnalysis.DataTypeId;
 
-public class StatementNode implements ASTNode {
+public abstract class StatementNode implements ASTNode {
 
   public boolean hasReturnStatement() {
     return false;

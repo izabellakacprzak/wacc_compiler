@@ -2,21 +2,28 @@ package AbstractSyntaxTree.type;
 
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
+import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.FunctionId;
+import SemanticAnalysis.Identifier;
+import SemanticAnalysis.SymbolTable;
+import java.util.List;
 
-public class FunctionNode extends TypeNode {
-  private TypeNode returnType;
-  private IdentifierNode identifier;
-  private ParamListNode params;
-  private StatementNode bodyStatement;
+public class FunctionNode implements TypeNode {
+
+  private final TypeNode returnType;
+  private final IdentifierNode identifier;
+  private final ParamListNode params;
+  private final StatementNode bodyStatement;
+
+  private SymbolTable currSymTable;
 
   public FunctionNode(TypeNode returnType, IdentifierNode identifier,
-                      ParamListNode params, StatementNode bodyStatement) {
+      ParamListNode params, StatementNode bodyStatement) {
     this.returnType = returnType;
     this.identifier = identifier;
     this.params = params;
     this.bodyStatement = bodyStatement;
   }
-
 
   public String checkSyntaxErrors() {
     StringBuilder errorMessage = new StringBuilder();
@@ -35,5 +42,31 @@ public class FunctionNode extends TypeNode {
 
   public void setReturnType(TypeNode returnType) {
     //bodyStatement.setReturnType(returnType.getType());
+  }
+
+  @Override
+  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    returnType.semanticAnalysis(currSymTable, errorMessages);
+    identifier.semanticAnalysis(currSymTable, errorMessages);
+    params.semanticAnalysis(currSymTable, errorMessages);
+    bodyStatement.semanticAnalysis(currSymTable, errorMessages);
+  }
+
+  public String getName() {
+    // Add a '*' character in front of function name to cover the case of having
+    // functions and variables of the same name in symTable
+    return "*" + identifier.getIdentifier();
+  }
+
+  @Override
+  public Identifier getIdentifier(SymbolTable parentSymTable) {
+    currSymTable = new SymbolTable(parentSymTable);
+    return new FunctionId(this, (DataTypeId) returnType.getIdentifier(parentSymTable),
+        params.getIdentifiers(parentSymTable), currSymTable);
+  }
+
+  @Override
+  public DataTypeId getType() {
+    return returnType.getType();
   }
 }

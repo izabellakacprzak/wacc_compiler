@@ -1,12 +1,83 @@
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.ProgramNode;
-import AbstractSyntaxTree.assignment.*;
-import AbstractSyntaxTree.expression.*;
-import AbstractSyntaxTree.statement.*;
+import AbstractSyntaxTree.assignment.ArrayLiterNode;
+import AbstractSyntaxTree.assignment.AssignLHSNode;
+import AbstractSyntaxTree.assignment.AssignRHSNode;
+import AbstractSyntaxTree.assignment.FuncCallNode;
+import AbstractSyntaxTree.assignment.NewPairNode;
+import AbstractSyntaxTree.assignment.PairElemNode;
+import AbstractSyntaxTree.expression.ArrayElemNode;
+import AbstractSyntaxTree.expression.BinaryOpExprNode;
+import AbstractSyntaxTree.expression.BoolLiterExprNode;
+import AbstractSyntaxTree.expression.CharLiterExprNode;
+import AbstractSyntaxTree.expression.ExpressionNode;
+import AbstractSyntaxTree.expression.IdentifierNode;
+import AbstractSyntaxTree.expression.IntLiterExprNode;
+import AbstractSyntaxTree.expression.PairLiterExprNode;
+import AbstractSyntaxTree.expression.ParenthesisExprNode;
+import AbstractSyntaxTree.expression.StringLiterExprNode;
+import AbstractSyntaxTree.expression.UnaryOpExprNode;
+import AbstractSyntaxTree.statement.AssignVarNode;
+import AbstractSyntaxTree.statement.DeclarationStatementNode;
+import AbstractSyntaxTree.statement.ExitStatementNode;
+import AbstractSyntaxTree.statement.FreeStatementNode;
+import AbstractSyntaxTree.statement.IfStatementNode;
+import AbstractSyntaxTree.statement.NewScopeStatementNode;
+import AbstractSyntaxTree.statement.PrintLineStatementNode;
+import AbstractSyntaxTree.statement.PrintStatementNode;
+import AbstractSyntaxTree.statement.ReadStatementNode;
+import AbstractSyntaxTree.statement.ReturnStatementNode;
+import AbstractSyntaxTree.statement.SkipStatementNode;
+import AbstractSyntaxTree.statement.StatementNode;
+import AbstractSyntaxTree.statement.StatementsListNode;
+import AbstractSyntaxTree.statement.WhileStatementNode;
 import AbstractSyntaxTree.type.*;
-import antlr.WACCParser.*;
+import SemanticAnalysis.DataTypes.BaseType.Type;
+import SemanticAnalysis.Operator;
+import SemanticAnalysis.Operator.BinOp;
+import SemanticAnalysis.Operator.UnOp;
+import antlr.WACCParser;
+import antlr.WACCParser.ArrayElemExprContext;
+import antlr.WACCParser.ArrayElemLHSContext;
+import antlr.WACCParser.ArrayLiterRHSContext;
+import antlr.WACCParser.ArrayTypeContext;
+import antlr.WACCParser.Array_elemContext;
+import antlr.WACCParser.AssignStatContext;
+import antlr.WACCParser.BaseTypeContext;
+import antlr.WACCParser.BinaryExprContext;
+import antlr.WACCParser.BoolLiterExprContext;
+import antlr.WACCParser.BracketExprContext;
+import antlr.WACCParser.CharLiterExprContext;
+import antlr.WACCParser.DeclStatContext;
+import antlr.WACCParser.ExitStatContext;
+import antlr.WACCParser.ExprContext;
+import antlr.WACCParser.ExprRHSContext;
+import antlr.WACCParser.FreeStatContext;
+import antlr.WACCParser.FstPairExprContext;
+import antlr.WACCParser.FuncCallRHSContext;
+import antlr.WACCParser.FuncContext;
+import antlr.WACCParser.IdentExprContext;
+import antlr.WACCParser.IdentLHSContext;
+import antlr.WACCParser.IfStatContext;
+import antlr.WACCParser.IntLiterExprContext;
+import antlr.WACCParser.NewPairRHSContext;
+import antlr.WACCParser.PairElemLHSContext;
+import antlr.WACCParser.PairElemRHSContext;
+import antlr.WACCParser.PairLiterExprContext;
+import antlr.WACCParser.PairTypeContext;
+import antlr.WACCParser.PrintStatContext;
+import antlr.WACCParser.PrintlnStatContext;
+import antlr.WACCParser.ProgramContext;
+import antlr.WACCParser.ReadStatContext;
+import antlr.WACCParser.ReturnStatContext;
+import antlr.WACCParser.ScopeStatContext;
+import antlr.WACCParser.SkipStatContext;
+import antlr.WACCParser.SndPairExprContext;
+import antlr.WACCParser.StatsListStatContext;
+import antlr.WACCParser.StringLiterExprContext;
+import antlr.WACCParser.UnaryExprContext;
+import antlr.WACCParser.WhileStatContext;
 import antlr.WACCParserBaseVisitor;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +98,10 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   @Override
   public ASTNode visitFunc(FuncContext ctx) {
     TypeNode type = (TypeNode) visit(ctx.type());
-    IdentifierNode identifier = new IdentifierNode(ctx.IDENT().getText());
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
+    IdentifierNode identifier = new IdentifierNode(line, charPositionInLine, ctx.IDENT().getText());
     StatementNode body = (StatementNode) visit(ctx.stat());
     ParamListNode params = new ParamListNode(new ArrayList<>(), new ArrayList<>());
 
@@ -38,13 +112,17 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   }
 
   @Override
-  public ASTNode visitParam_list(Param_listContext ctx) {
+  public ASTNode visitParam_list(WACCParser.Param_listContext ctx) {
     List<IdentifierNode> names = new ArrayList<>();
     List<TypeNode> types = new ArrayList<>();
 
     if(ctx.IDENT() != null) {
+      int line = ctx.getStart().getLine();
+      int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
       for(int i = 0; i < ctx.IDENT().size(); i++) {
-        names.add(new IdentifierNode(ctx.IDENT(i).getText()));
+
+        names.add(new IdentifierNode(line, charPositionInLine, ctx.IDENT(i).getText()));
         types.add((TypeNode) visit(ctx.type(i)));
       }
     }
@@ -60,18 +138,24 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
   @Override
   public ASTNode visitArrayLiterRHS(ArrayLiterRHSContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
     List<ExpressionNode> expressionNodes = new ArrayList<>();
     for (ExprContext e : ctx.expr()) {
       expressionNodes.add((ExpressionNode) visit(e));
     }
-    return new ArrayLiterNode(expressionNodes);
+    return new ArrayLiterNode(line, charPositionInLine, expressionNodes);
   }
 
   @Override
   public ASTNode visitNewPairRHS(NewPairRHSContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
     ExpressionNode leftExpr = (ExpressionNode) visit(ctx.expr(0));
     ExpressionNode rightExpr = (ExpressionNode) visit(ctx.expr(1));
-    return new NewPairNode(leftExpr, rightExpr);
+
+    return new NewPairNode(line, charPositionInLine, leftExpr, rightExpr);
   }
 
   // figure out what happens here
@@ -82,31 +166,44 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
   @Override
   public ASTNode visitFstPairExpr(FstPairExprContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
     ExpressionNode expressionNode = (ExpressionNode) visit(ctx.expr());
-    return new PairElemNode(0, expressionNode);
+
+    return new PairElemNode(line, charPositionInLine, 0, expressionNode);
   }
 
   @Override
   public ASTNode visitSndPairExpr(SndPairExprContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
     ExpressionNode expressionNode = (ExpressionNode) visit(ctx.expr());
-    return new PairElemNode(1, expressionNode);
+
+    return new PairElemNode(line, charPositionInLine, 1, expressionNode);
   }
 
   @Override
   public ASTNode visitFuncCallRHS(FuncCallRHSContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
 
-    IdentifierNode identifierNode = new IdentifierNode(ctx.IDENT().getText());
+    IdentifierNode identifierNode = new IdentifierNode(line, charPositionInLine,
+        ctx.IDENT().getText());
     List<ExpressionNode> arguments = new ArrayList<>();
     for (ExprContext e : ctx.expr()) {
       arguments.add((ExpressionNode) visit(e));
     }
-    return new FuncCallNode(identifierNode, arguments);
+    return new FuncCallNode(line, charPositionInLine, identifierNode, arguments);
   }
 
   /* LHS ASSIGNMENT NODES */
   @Override
   public ASTNode visitIdentLHS(IdentLHSContext ctx) {
-    return new IdentifierNode(ctx.IDENT().getText());
+
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
+    return new IdentifierNode(line, charPositionInLine, ctx.IDENT().getText());
   }
 
   @Override
@@ -116,12 +213,18 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
   @Override
   public ASTNode visitArray_elem(Array_elemContext ctx) {
-    IdentifierNode identifierNode = new IdentifierNode(ctx.IDENT().getText());
+
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
+    IdentifierNode identifierNode = new IdentifierNode(line, charPositionInLine,
+        ctx.IDENT().getText());
+
     List<ExpressionNode> expressions = new ArrayList<>();
     for (ExprContext e : ctx.expr()) {
       expressions.add((ExpressionNode) visit(e));
     }
-    return new ArrayElemNode(identifierNode, expressions);
+    return new ArrayElemNode(line, charPositionInLine, identifierNode, expressions);
   }
 
   @Override
@@ -135,79 +238,128 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return visit(ctx.array_elem());
   }
 
-  // TODO: add a operator to class
-  @Override
-  public ASTNode visitUnaryExpr(UnaryExprContext ctx) {
-    ExpressionNode operand = (ExpressionNode) visit(ctx.expr());
-    return new UnaryOpExprNode(operand);
-  }
-
   @Override
   public ASTNode visitBinaryExpr(BinaryExprContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
     ExpressionNode leftExpr = (ExpressionNode) visit(ctx.expr(0));
     ExpressionNode rightExpr = (ExpressionNode) visit(ctx.expr(1));
-    return new BinaryOpExprNode(leftExpr, rightExpr);
+    BinOp operator = Operator.BinOp.valueOfLabel(ctx.op.getText());
+
+    if (operator == null) {
+      throw new IllegalArgumentException("Invalid Binary Operator");
+    }
+
+    return new BinaryOpExprNode(line, charPositionInLine, leftExpr, rightExpr, operator);
   }
 
   @Override
   public ASTNode visitBoolLiterExpr(BoolLiterExprContext ctx) {
-    return new BoolLiterExprNode(Boolean.parseBoolean(ctx.BOOL_LITER().getText()));
+
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
+    return new BoolLiterExprNode(line, charPositionInLine,
+        Boolean.parseBoolean(ctx.BOOL_LITER().getText()));
+
   }
 
   @Override
   public ASTNode visitCharLiterExpr(CharLiterExprContext ctx) {
+
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
     switch (ctx.CHAR_LITER().getText()) {
       case "'\\0'":
-        return new CharLiterExprNode('\0');
+        return new CharLiterExprNode(line, charPositionInLine, '\0');
       case "'\\b'":
-        return new CharLiterExprNode('\b');
+        return new CharLiterExprNode(line, charPositionInLine, '\b');
       case "'\\t'":
-        return new CharLiterExprNode('\t');
+        return new CharLiterExprNode(line, charPositionInLine, '\t');
       case "'\\n'":
-        return new CharLiterExprNode('\n');
+        return new CharLiterExprNode(line, charPositionInLine, '\n');
       case "'\\f'":
-        return new CharLiterExprNode('\f');
+        return new CharLiterExprNode(line, charPositionInLine, '\f');
       case "'\\r'":
-        return new CharLiterExprNode('\r');
+        return new CharLiterExprNode(line, charPositionInLine, '\r');
       case "'\\\"'":
-        return new CharLiterExprNode('\"');
+        return new CharLiterExprNode(line, charPositionInLine, '\"');
       case "'\\''":
-        return new CharLiterExprNode('\'');
+        return new CharLiterExprNode(line, charPositionInLine, '\'');
       case "'\\\\'":
-        return new CharLiterExprNode('\\');
+        return new CharLiterExprNode(line, charPositionInLine, '\\');
     }
 
-    return new CharLiterExprNode(ctx.CHAR_LITER().getText().charAt(1));
+
+    return new CharLiterExprNode(line, charPositionInLine, ctx.CHAR_LITER().getText().charAt(1));
   }
 
   @Override
   public ASTNode visitStringLiterExpr(StringLiterExprContext ctx) {
-    return new StringLiterExprNode(ctx.STR_LITER().getText());
+
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
+    return new StringLiterExprNode(line, charPositionInLine, ctx.STR_LITER().getText());
   }
 
   @Override
   public ASTNode visitIntLiterExpr(IntLiterExprContext ctx) {
-    return new IntLiterExprNode(Integer.parseInt(ctx.int_liter().getText()));
+
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
+    return new IntLiterExprNode(line, charPositionInLine,
+        Integer.parseInt(ctx.int_liter().getText()));
   }
 
   @Override
   public ASTNode visitPairLiterExpr(PairLiterExprContext ctx) {
-    return new PairLiterExprNode();
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
+    return new PairLiterExprNode(line, charPositionInLine);
   }
 
   @Override
   public ASTNode visitIdentExpr(IdentExprContext ctx) {
-    return new IdentifierNode(ctx.IDENT().getText());
+
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
+    return new IdentifierNode(line, charPositionInLine, ctx.IDENT().getText());
+  }
+
+  // TODO: add a operator to class
+  @Override
+  public ASTNode visitUnaryExpr(UnaryExprContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
+    ExpressionNode operand = (ExpressionNode) visit(ctx.expr());
+    UnOp operator = Operator.UnOp.valueOfLabel(ctx.op.getText());
+
+    if (operator == null) {
+      throw new IllegalArgumentException("Invalid Unary Operator");
+    }
+
+    return new UnaryOpExprNode(line, charPositionInLine, operand, operator);
   }
 
   @Override
   public ASTNode visitBracketExpr(BracketExprContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
     ExpressionNode expressionNode = (ExpressionNode) visit(ctx.expr());
-    return new ParenthesisExprNode(expressionNode);
+
+
+    return new ParenthesisExprNode(line, charPositionInLine, expressionNode);
   }
 
+  // TODO: toString method of node to return "skip" or store skip in a field??
   /* STATEMENT NODES */
-  //TODO: toString method of node to return "skip" or store skip in a field??
   @Override
   public ASTNode visitSkipStat(SkipStatContext ctx) {
     return new SkipStatementNode();
@@ -215,9 +367,14 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
   @Override
   public ASTNode visitDeclStat(DeclStatContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
     TypeNode type = (TypeNode) visit(ctx.type());
-    IdentifierNode identifier = new IdentifierNode(ctx.IDENT().getText());
+
+    IdentifierNode identifier = new IdentifierNode(line, charPositionInLine,
+        ctx.IDENT().getText());
     AssignRHSNode rhs = (AssignRHSNode) visit(ctx.assign_rhs());
+
     return new DeclarationStatementNode(type, identifier, rhs);
   }
 
@@ -285,27 +442,28 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new NewScopeStatementNode(statement);
   }
 
-  //TODO: left-recursion? stat1 = list of statements, what then? unfold also stat2 after?
+  // TODO: left-recursion? stat1 = list of statements, what then? unfold also stat2 after?
   // check in testing
   @Override
   public ASTNode visitStatsListStat(StatsListStatContext ctx) {
     List<StatementNode> statements = new ArrayList<>();
-    StatementNode stat1 = (StatementNode) visit(ctx.stat(0)); //list
+    StatementNode stat1 = (StatementNode) visit(ctx.stat(0)); // list
     StatementNode stat2 = (StatementNode) visit(ctx.stat(1));
     statements.add(stat1);
     statements.add(stat2);
     if (stat1 instanceof StatementsListNode) {
-      //TODO
+      // TODO
     }
-    //TODO: for stat2 what?
+    // TODO: for stat2 what?
     return new StatementsListNode(statements);
   }
 
   /* TYPE NODES */
-  //TODO
   @Override
   public ASTNode visitBaseType(BaseTypeContext ctx) {
-    return new BaseTypeNode(ctx.getText());
+    Type baseType = Type.valueOf(ctx.base_type().getText().toUpperCase());
+
+    return new BaseTypeNode(baseType, ctx.getText());
   }
 
   @Override
@@ -317,11 +475,11 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   public ASTNode visitPairType(PairTypeContext ctx) {
     TypeNode fst = (TypeNode) visit(ctx.pair_elem_type(0));
     TypeNode snd = (TypeNode) visit(ctx.pair_elem_type(1));
+
     return new PairTypeNode(fst, snd);
   }
 
   public String hello() {
     return "hello";
   }
-
 }

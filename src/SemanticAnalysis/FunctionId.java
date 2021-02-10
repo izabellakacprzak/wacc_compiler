@@ -1,31 +1,44 @@
 package SemanticAnalysis;
 
 import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.type.TypeNode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FunctionId extends Identifier {
 
   private final DataTypeId returnType;
-  private final ParameterId[] params;
-  private final SymbolTable parentTable;
+  private final List<ParameterId> params;
+  private final SymbolTable symTable;
 
-  public FunctionId(ASTNode node, DataTypeId returnType, ParameterId[] params,
-      SymbolTable parentTable) {
+  public FunctionId(ASTNode node, DataTypeId returnType, List<ParameterId> params,
+      SymbolTable symTable) {
     super(node);
     this.returnType = returnType;
+    this.symTable = symTable;
     this.params = params;
-    this.parentTable = parentTable;
+
   }
 
   public DataTypeId getReturnType() {
     return returnType;
   }
 
-  public ParameterId[] getParams() {
+  public List<ParameterId> getParams() {
     return params;
   }
 
-  public SymbolTable getParentTable() {
-    return parentTable;
+  public SymbolTable getSymTable() {
+    return symTable;
+  }
+
+  public List<DataTypeId> getParamTypes() {
+    List<DataTypeId> paramTypes = new ArrayList<>();
+    for (ParameterId curr : params) {
+      paramTypes.add(curr.getType());
+    }
+    return paramTypes;
   }
 
   @Override
@@ -35,10 +48,10 @@ public class FunctionId extends Identifier {
     string.append(returnType.toString());
     string.append(" <identifier>(");
 
-    for (int i = 0; i < params.length; i++) {
-      string.append(params[i].toString());
+    for (int i = 0; i < params.size(); i++) {
+      string.append(params.get(i).toString());
 
-      if (i != params.length - 1) {
+      if (i != params.size() - 1) {
         string.append(", ");
       }
     }

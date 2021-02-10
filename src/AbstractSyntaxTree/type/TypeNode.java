@@ -1,7 +1,13 @@
 package AbstractSyntaxTree.type;
 
 import AbstractSyntaxTree.ASTNode;
+import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.Identifier;
+import SemanticAnalysis.SymbolTable;
 
-public class TypeNode implements ASTNode {
-    
+public interface TypeNode extends ASTNode {
+
+  Identifier getIdentifier(SymbolTable parentSymbolTable);
+
+  DataTypeId getType();
 }

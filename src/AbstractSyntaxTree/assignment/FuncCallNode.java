@@ -2,14 +2,79 @@ package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import SemanticAnalysis.*;
+
 import java.util.List;
 
 public class FuncCallNode implements AssignRHSNode {
-    private IdentifierNode identifier;
-    private List<ExpressionNode> arguments;
 
-    public FuncCallNode(IdentifierNode identifier, List<ExpressionNode> arguments) {
-        this.identifier = identifier;
-        this.arguments = arguments;
+  private final int line;
+  private final int charPositionInLine;
+
+  private final IdentifierNode identifier;
+  private final List<ExpressionNode> arguments;
+
+  public FuncCallNode(int line, int charPositionInLine, IdentifierNode identifier,
+      List<ExpressionNode> arguments) {
+    this.line = line;
+    this.charPositionInLine = charPositionInLine;
+    this.identifier = identifier;
+    this.arguments = arguments;
+  }
+
+  @Override
+  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
+
+    if (functionId == null) {
+      errorMessages.add(line + ":" + charPositionInLine
+          + " Function " + identifier.getIdentifier() + " has not been declared.");
+        return;
     }
+
+    if (!(functionId instanceof FunctionId)) {
+      errorMessages.add(line + ":" + charPositionInLine
+          + " Attempt at calling " + identifier.getIdentifier() + " as a function.");
+      return;
+    }
+
+    FunctionId function = (FunctionId) functionId;
+    List<DataTypeId> paramTypes = function.getParamTypes();
+
+    // TODO: Print out number of expected arguments?
+    if (paramTypes.size() > arguments.size()) {
+      errorMessages.add(line + ":" + charPositionInLine
+              + " Function " + identifier.getIdentifier() + " has been called with less arguments than expected.");
+    } else if (paramTypes.size() < arguments.size()) {
+      errorMessages.add(line + ":" + charPositionInLine
+              + " Function " + identifier.getIdentifier() + " has been called with more arguments than expected.");
+    } else {
+      for (int i = 0; i < arguments.size(); i++){
+       DataTypeId currArg = arguments.get(i).getType(symbolTable);
+       DataTypeId currParamType = paramTypes.get(i);
+
+       if(!(currArg.equals(currParamType))) {
+         errorMessages.add(line + ":" + charPositionInLine
+                 + " Invalid type for argument in function call." + "Expected: " + currParamType.toString().toUpperCase()
+                 + " Actual: " + currArg.toString().toUpperCase());
+       }
+      }
+    }
+  }
+
+  @Override
+  public int getLine() {
+    return line;
+  }
+
+  @Override
+  public int getCharPositionInLine() {
+    return charPositionInLine;
+  }
+
+  @Override
+  public DataTypeId getType(SymbolTable symbolTable) {
+    FunctionId function = (FunctionId) symbolTable.lookupAll("*" + identifier.getIdentifier());
+    return function.getReturnType();
+  }
 }

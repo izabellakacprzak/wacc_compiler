@@ -85,10 +85,10 @@ expr: int_liter {inbounds(_localctx);}          #IntLiterExpr
 | pair_liter                                    #PairLiterExpr
 | IDENT                                         #IdentExpr
 | array_elem                                    #ArrayElemExpr
-| (NEGATION | MINUS | LENGTH | ORD | CHR) expr  #UnaryExpr
-| expr (MULT | DIV | MOD | PLUS | MINUS) expr   #BinaryExpr
-| expr (GT | GTE | LT | LTE | EQ | NEQ) expr    #BinaryExpr
-| expr (AND | OR) expr                          #BinaryExpr
+| op=(NEGATION | MINUS | LENGTH | ORD | CHR) expr  #UnaryExpr
+| expr op=(MULT | DIV | MOD | PLUS | MINUS) expr   #BinaryExpr
+| expr op=(GT | GTE | LT | LTE | EQ | NEQ) expr    #BinaryExpr
+| expr op=(AND | OR) expr                          #BinaryExpr
 | OPEN_PARENTHESES expr CLOSE_PARENTHESES       #BracketExpr
 ;
 int_liter: (PLUS | MINUS)? INT_LITER;

@@ -1,17 +1,21 @@
-import java.io.IOException;
-
-import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.ProgramNode;
 import java.util.List;
+import java.util.ArrayList;
+
+import SemanticAnalysis.SymbolTable;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
+import java.io.IOException;
 import antlr.*;
 
 public class Compiler {
   private static final int SYNTAX_ERROR_CODE = 100;
   private static final int INPUT_FILE_ERROR = 1;
+  private static final int SEMANTIC_ERROR_CODE = 200;
 
-  public static void main(String[] args) {
+
+  public static void main(String[] args){
+
 
     if (args.length != 1) {
       throw new IllegalArgumentException("Incorrect number of arguments received");
@@ -60,5 +64,18 @@ public class Compiler {
 
     // check if error listener encountered any errors and if so exit with an error code
     // otherwise continue with semantics checking
+
+    List<String> semanticErrors = new ArrayList<>();
+    SymbolTable topSymbolTable = new SymbolTable(null);
+
+    // TODO: Create our own semantic listener
+    prog.semanticAnalysis(topSymbolTable, semanticErrors);
+
+    if (!(semanticErrors.isEmpty())) {
+      for (String error : semanticErrors) {
+        System.out.println(error);
+      }
+      System.exit(SEMANTIC_ERROR_CODE);
+    }
   }
 }

@@ -1,11 +1,35 @@
 package AbstractSyntaxTree.type;
 
-public class PairTypeNode extends TypeNode {
-    private TypeNode fstType;
-    private TypeNode sndType;
+import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.PairType;
+import SemanticAnalysis.Identifier;
+import SemanticAnalysis.SymbolTable;
+import java.util.List;
 
-    public PairTypeNode(TypeNode fstType, TypeNode sndType) {
-        this.fstType = fstType;
-        this.sndType = sndType;
-    }
+public class PairTypeNode implements TypeNode {
+
+  private final TypeNode fstType;
+  private final TypeNode sndType;
+
+  public PairTypeNode(TypeNode fstType, TypeNode sndType) {
+    this.fstType = fstType;
+    this.sndType = sndType;
+  }
+
+  @Override
+  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    fstType.semanticAnalysis(symbolTable, errorMessages);
+    sndType.semanticAnalysis(symbolTable, errorMessages);
+  }
+
+  @Override
+  public Identifier getIdentifier(SymbolTable parentSymbolTable) {
+    return new PairType((DataTypeId) fstType.getIdentifier(parentSymbolTable),
+        (DataTypeId) sndType.getIdentifier(parentSymbolTable));
+  }
+
+  @Override
+  public DataTypeId getType() {
+    return new PairType(fstType.getType(), sndType.getType());
+  }
 }
