@@ -66,9 +66,10 @@ base_type: INT
 
 array_elem: IDENT (OPEN_SQUARE_BRACKET expr CLOSE_SQUARE_BRACKET)+ ;
 
-pair_elem_type: base_type
-| type
-| PAIR ;
+pair_elem_type: base_type                       #PairElemTypeBase
+| type OPEN_SQUARE_BRACKET CLOSE_SQUARE_BRACKET #PairElemTypeArray
+| PAIR                                          #PairElemTypePair
+;
 
 pair_elem: FST expr #FstPairExpr
 | SND expr          #SndPairExpr
