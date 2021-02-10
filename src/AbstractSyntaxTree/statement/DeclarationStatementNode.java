@@ -46,8 +46,8 @@ public class DeclarationStatementNode extends StatementNode {
               + " Could not resolve type of " + assignment.toString());
     } else if (!declaredType.equals(assignedType)) {
       errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
-              + " Declaration to: " + identifier.getIdentifier() + "must be of type " +
-              declaredType.toString() + " not " + assignedType.toString());
+          + " Declaration to: " + identifier.getIdentifier() + " must be of type " +
+          declaredType.toString() + " not " + assignedType.toString());
     }
   }
 }

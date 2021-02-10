@@ -5,7 +5,6 @@ import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.Operator.UnOp;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
-import java.util.Set;
 
 public class UnaryOpExprNode implements ExpressionNode {
 
@@ -27,19 +26,31 @@ public class UnaryOpExprNode implements ExpressionNode {
     operand.semanticAnalysis(symbolTable, errorMessages);
 
     DataTypeId opType = operand.getType(symbolTable);
-    Set<DataTypeId> argTypes = operator.getArgTypes();
 
     if (opType == null) {
       errorMessages.add(line + ":" + charPositionInLine
-              + " Could not resolve operand '" + operator.getLabel() + "' type");
+          + " Could not resolve operand '" + operator.getLabel() + "' type");
+      return;
     }
-    if (!argTypes.isEmpty() && !argTypes.contains(opType)) {
-      DataTypeId expected = argTypes.stream().findFirst().get();
+
+    List<DataTypeId> argTypes = operator.getArgTypes();
+    boolean argMatched = false;
+
+    for (DataTypeId argType : argTypes) {
+      if (opType.equals(argType)) {
+        argMatched = true;
+        break;
+      }
+    }
+
+    if (!argTypes.isEmpty() && !argMatched) {
+      DataTypeId expected = argTypes.get(0);
 
       errorMessages.add(line + ":" + charPositionInLine
           + " Invalid type for '" + operator.getLabel() + "' operator. "
           + "Expected: " + expected.toString().toUpperCase()
           + " Actual: " + opType.toString().toUpperCase());
+
     } else if (argTypes.isEmpty() && !(opType instanceof ArrayType)) {
       DataTypeId expected = new ArrayType(null);
 

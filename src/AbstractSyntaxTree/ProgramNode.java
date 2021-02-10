@@ -1,19 +1,17 @@
 package AbstractSyntaxTree;
+
 import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.type.FunctionNode;
-import java.util.ArrayList;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.SymbolTable;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ProgramNode implements ASTNode {
 
     private final StatementNode statementNode;
     private final List<FunctionNode> functionNodes;
-    private final Map<FunctionNode, SymbolTable> funcTables = new HashMap<>();
-    private List<String> syntaxErrors;
+    private final List<String> syntaxErrors;
 
 
     public ProgramNode(StatementNode statementNode, List<FunctionNode> functionNodes) {
@@ -34,18 +32,17 @@ public class ProgramNode implements ASTNode {
                 // function is defined - add error message and exit
                 errorMessages.add("Attempt at redefining already existing function " + func.getName());
 
-                funcTables.put(func, new SymbolTable(topSymbolTable));
+                func.setCurrSymTable(new SymbolTable(topSymbolTable));
             } else {
                 FunctionId identifier = (FunctionId) func.getIdentifier(topSymbolTable);
 
-                funcTables.put(func, identifier.getSymTable());
+                func.setCurrSymTable(identifier.getSymTable());
                 topSymbolTable.add(func.getName(), identifier);
             }
         }
 
         for (FunctionNode func : functionNodes) {
-            func.semanticAnalysis(funcTables.get(func), errorMessages);
-
+            func.semanticAnalysis(func.getCurrSymTable(), errorMessages);
         }
 
         //do semantic analysis on the statement node with new scope

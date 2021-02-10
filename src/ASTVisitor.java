@@ -31,7 +31,12 @@ import AbstractSyntaxTree.statement.SkipStatementNode;
 import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.statement.StatementsListNode;
 import AbstractSyntaxTree.statement.WhileStatementNode;
-import AbstractSyntaxTree.type.*;
+import AbstractSyntaxTree.type.ArrayTypeNode;
+import AbstractSyntaxTree.type.BaseTypeNode;
+import AbstractSyntaxTree.type.FunctionNode;
+import AbstractSyntaxTree.type.PairTypeNode;
+import AbstractSyntaxTree.type.ParamListNode;
+import AbstractSyntaxTree.type.TypeNode;
 import SemanticAnalysis.DataTypes.BaseType.Type;
 import SemanticAnalysis.Operator;
 import SemanticAnalysis.Operator.BinOp;
@@ -473,6 +478,9 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
   @Override
   public ASTNode visitPairType(PairTypeContext ctx) {
+    System.out.println(ctx.pair_elem_type(0));
+    System.out.println(ctx.pair_elem_type(1));
+
     TypeNode fst = (TypeNode) visit(ctx.pair_elem_type(0));
     TypeNode snd = (TypeNode) visit(ctx.pair_elem_type(1));
 

@@ -15,7 +15,7 @@ public class FunctionNode implements TypeNode {
   private final ParamListNode params;
   private final StatementNode bodyStatement;
 
-  private SymbolTable currSymTable;
+  private SymbolTable currSymTable = null;
 
   public FunctionNode(TypeNode returnType, IdentifierNode identifier,
       ParamListNode params, StatementNode bodyStatement) {
@@ -25,11 +25,24 @@ public class FunctionNode implements TypeNode {
     this.bodyStatement = bodyStatement;
   }
 
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
+
+  public void setCurrSymTable(SymbolTable currSymTable) {
+    this.currSymTable = currSymTable;
+  }
+
+  public void setReturnType(TypeNode returnType) {
+    //bodyStatement.setReturnType(returnType.getType());
+  }
+
   public String checkSyntaxErrors() {
     StringBuilder errorMessage = new StringBuilder();
     boolean error = !bodyStatement.hasReturnStatement() && !bodyStatement.hasExitStatement();
-    if(error) {
-      errorMessage.append("Function " + identifier.getIdentifier() + " has no return or exit statement\n");
+    if (error) {
+      errorMessage
+          .append("Function " + identifier.getIdentifier() + " has no return or exit statement\n");
     } else {
       error = bodyStatement.hasReturnStatement() && !bodyStatement.hasNoStatementAfterReturn();
       if (error) {
@@ -37,19 +50,15 @@ public class FunctionNode implements TypeNode {
       }
     }
 
-     return errorMessage.toString();
-  }
-
-  public void setReturnType(TypeNode returnType) {
-    //bodyStatement.setReturnType(returnType.getType());
+    return errorMessage.toString();
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    returnType.semanticAnalysis(currSymTable, errorMessages);
-    identifier.semanticAnalysis(currSymTable, errorMessages);
-    params.semanticAnalysis(currSymTable, errorMessages);
-    bodyStatement.semanticAnalysis(currSymTable, errorMessages);
+    returnType.semanticAnalysis(symbolTable, errorMessages);
+    identifier.semanticAnalysis(symbolTable, errorMessages);
+    params.semanticAnalysis(symbolTable, errorMessages);
+    bodyStatement.semanticAnalysis(symbolTable, errorMessages);
   }
 
   public String getName() {
@@ -60,7 +69,6 @@ public class FunctionNode implements TypeNode {
 
   @Override
   public Identifier getIdentifier(SymbolTable parentSymTable) {
-    currSymTable = new SymbolTable(parentSymTable);
     return new FunctionId(this, (DataTypeId) returnType.getIdentifier(parentSymTable),
         params.getIdentifiers(parentSymTable), currSymTable);
   }

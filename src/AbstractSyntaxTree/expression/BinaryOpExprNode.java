@@ -4,7 +4,6 @@ import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.Operator.BinOp;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
-import java.util.Set;
 
 public class BinaryOpExprNode implements ExpressionNode {
 
@@ -39,7 +38,7 @@ public class BinaryOpExprNode implements ExpressionNode {
       return;
     } else if (rhsType == null){
       errorMessages.add(line + ":" + charPositionInLine
-              + " Could not resolve right hand side of '" + operator.getLabel() + "' operator");
+          + " Could not resolve right hand side of '" + operator.getLabel() + "' operator");
       return;
     }
     if (!lhsType.equals(rhsType)) {
@@ -47,31 +46,49 @@ public class BinaryOpExprNode implements ExpressionNode {
           + " Non-matching types for '" + operator.getLabel() + "' operator. "
           + "Expected: " + lhsType.toString().toUpperCase()
           + " Actual: " + rhsType.toString().toUpperCase());
+    }
 
+    List<DataTypeId> argTypes = operator.getArgTypes();
+    boolean argMatched = false;
+
+    for (DataTypeId argType : argTypes) {
+      if (lhsType.equals(argType)) {
+        argMatched = true;
+        break;
+      }
+    }
+
+    /* LHS Expression is not a valid type for the operator */
+    if (!argTypes.isEmpty() && !argMatched) {
+      DataTypeId expected = argTypes.get(0);
+
+      errorMessages.add(line + ":" + charPositionInLine
+          + " Invalid types for '" + operator.getLabel() + "' operator. "
+          + "Expected: " + expected.toString().toUpperCase()
+          + " Actual: " + lhsType.toString().toUpperCase());
       return;
     }
 
-    Set<DataTypeId> argTypes = operator.getArgTypes();
+    argMatched = false;
 
-    /* LHS Expression is not a valid type for the operator */
-    if (!argTypes.isEmpty() && !argTypes.contains(lhsType)) {
-      DataTypeId expected = argTypes.stream().findFirst().get();
-
-      errorMessages.add(line + ":" + charPositionInLine
-          + " Invalid LHS type for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + expected.toString().toUpperCase()
-          + " Actual: " + lhsType.toString().toUpperCase());
+    for (DataTypeId argType : argTypes) {
+      if (rhsType.equals(argType)) {
+        argMatched = true;
+        break;
+      }
     }
 
     /* RHS Expression is not a valid type for the operator */
-    if (!argTypes.isEmpty() && !argTypes.contains(rhsType)) {
-      DataTypeId expected = argTypes.stream().findFirst().get();
+    if (!argTypes.isEmpty() && !argMatched) {
+      DataTypeId expected = argTypes.get(0);
 
       errorMessages.add(line + ":" + charPositionInLine
           + " Invalid RHS type for '" + operator.getLabel() + "' operator. "
           + "Expected: " + expected.toString().toUpperCase()
           + " Actual: " + rhsType.toString().toUpperCase());
+      // TODO: return;
     }
+
 
   }
 
