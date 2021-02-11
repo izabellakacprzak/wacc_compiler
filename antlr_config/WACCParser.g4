@@ -12,6 +12,7 @@ options {
         }
     }
 }
+
 // program
 program: BEGIN (func)* stat END EOF ;
 
@@ -78,17 +79,18 @@ pair_liter: NULL ;
 
 
 // expressions
-expr: int_liter {inbounds(_localctx);}          #IntLiterExpr
-| BOOL_LITER                                    #BoolLiterExpr
-| CHAR_LITER                                    #CharLiterExpr
-| STR_LITER                                     #StringLiterExpr
-| pair_liter                                    #PairLiterExpr
-| IDENT                                         #IdentExpr
-| array_elem                                    #ArrayElemExpr
-| op=(NEGATION | MINUS | LENGTH | ORD | CHR) expr  #UnaryExpr
-| expr op=(MULT | DIV | MOD | PLUS | MINUS) expr   #BinaryExpr
-| expr op=(GT | GTE | LT | LTE | EQ | NEQ) expr    #BinaryExpr
-| expr op=(AND | OR) expr                          #BinaryExpr
-| OPEN_PARENTHESES expr CLOSE_PARENTHESES       #BracketExpr
+expr: int_liter {inbounds(_localctx);}            #IntLiterExpr
+| BOOL_LITER                                      #BoolLiterExpr
+| CHAR_LITER                                      #CharLiterExpr
+| STR_LITER                                       #StringLiterExpr
+| pair_liter                                      #PairLiterExpr
+| IDENT                                           #IdentExpr
+| array_elem                                      #ArrayElemExpr
+| op=(NEGATION | MINUS | LENGTH | ORD | CHR) expr #UnaryExpr
+| expr op=(MULT | DIV | MOD | PLUS | MINUS) expr  #BinaryExpr
+| expr op=(GT | GTE | LT | LTE | EQ | NEQ) expr   #BinaryExpr
+| expr op=(AND | OR) expr                         #BinaryExpr
+| OPEN_PARENTHESES expr CLOSE_PARENTHESES         #BracketExpr
 ;
+
 int_liter: (PLUS | MINUS)? INT_LITER;
