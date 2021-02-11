@@ -87,4 +87,20 @@ public class FuncCallNode implements AssignRHSNode {
 
     return function.getReturnType();
   }
+
+  @Override
+  public String toString() {
+    StringBuilder str = new StringBuilder();
+    str.append("call ").append(identifier.getIdentifier()).append('(');
+
+    for (ExpressionNode argument : arguments) {
+      str.append(argument.toString()).append(", ");
+    }
+
+    if (!arguments.isEmpty()) {
+      str.delete(str.length() - 2, str.length() - 1);
+    }
+
+    return str.append(')').toString();
+  }
 }

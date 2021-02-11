@@ -106,4 +106,9 @@ public class BinaryOpExprNode implements ExpressionNode {
   public DataTypeId getType(SymbolTable symTable) {
     return operator.getReturnType();
   }
+
+  @Override
+  public String toString() {
+    return lhs + " " + operator.getLabel() + " " + rhs;
+  }
 }

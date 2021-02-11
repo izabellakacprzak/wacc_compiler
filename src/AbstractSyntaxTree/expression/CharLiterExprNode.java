@@ -38,4 +38,9 @@ public class CharLiterExprNode implements ExpressionNode {
   public DataTypeId getType(SymbolTable symbolTable) {
     return new BaseType(Type.CHAR);
   }
+
+  @Override
+  public String toString() {
+    return Character.toString(value);
+  }
 }

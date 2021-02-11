@@ -62,11 +62,21 @@ public class PairElemNode implements AssignRHSNode {
 
     IdentifierNode pairId = (IdentifierNode) expr;
     DataTypeId pairType = pairId.getType(symbolTable);
-    if(!(pairType instanceof PairType)) {
+    if (!(pairType instanceof PairType)) {
       return null;
     }
 
-    return position == FST ? ((PairType) pairType).getFstType() : ((PairType) pairType).getSndType();
+    return position == FST ? ((PairType) pairType).getFstType()
+        : ((PairType) pairType).getSndType();
+  }
+
+  @Override
+  public String toString() {
+    if (position == FST) {
+      return "fst " + expr;
+    } else {
+      return "snd " + expr;
+    }
   }
 }
 

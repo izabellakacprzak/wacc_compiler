@@ -68,4 +68,9 @@ public class IdentifierNode implements ExpressionNode {
 
     return null;
   }
+
+  @Override
+  public String toString() {
+    return identifier;
+  }
 }

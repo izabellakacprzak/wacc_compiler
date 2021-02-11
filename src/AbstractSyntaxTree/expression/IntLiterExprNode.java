@@ -36,4 +36,9 @@ public class IntLiterExprNode implements ExpressionNode {
   public DataTypeId getType(SymbolTable symbolTable) {
     return new BaseType(BaseType.Type.INT);
   }
+
+  @Override
+  public String toString() {
+    return Integer.toString(value);
+  }
 }

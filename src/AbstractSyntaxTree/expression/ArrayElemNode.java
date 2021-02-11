@@ -7,7 +7,6 @@ import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
 import SemanticAnalysis.VariableId;
-
 import java.util.List;
 
 public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
@@ -97,5 +96,21 @@ public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
     VariableId arrayName = (VariableId) symbolTable.lookupAll(identifier.getIdentifier());
 
     return null;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder str = new StringBuilder();
+
+    str.append(identifier.getIdentifier()).append("[");
+
+    for (ExpressionNode expression : expressions) {
+      str.append(expression.toString()).append("][");
+    }
+
+    str.delete(str.length() - 2, str.length() - 1);
+    str.append(']');
+
+    return str.toString();
   }
 }

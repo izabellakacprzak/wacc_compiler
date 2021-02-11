@@ -26,7 +26,7 @@ public class ArrayLiterNode implements AssignRHSNode {
     DataTypeId fstType = fstExpr.getType(symbolTable);
     if (fstType == null) {
       errorMessages.add(line + ":" + charPositionInLine
-              + " Could not resolve array type.") ;
+          + " Could not resolve type. Expected: ");
     } else {
       for (int i = 1; i < expressions.size(); i++) {
         ExpressionNode currExpr = expressions.get(i);
@@ -67,5 +67,24 @@ public class ArrayLiterNode implements AssignRHSNode {
     } else {
       return expressions.get(0).getType(symbolTable);
     }
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder str = new StringBuilder();
+
+    str.append("[");
+
+    for (ExpressionNode expression : expressions) {
+      str.append(expression.toString()).append(", ");
+    }
+
+    if (!expressions.isEmpty()) {
+      str.delete(str.length() - 2, str.length() - 1);
+    }
+
+    str.append(']');
+
+    return str.toString();
   }
 }

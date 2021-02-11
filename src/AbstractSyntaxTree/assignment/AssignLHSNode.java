@@ -11,4 +11,7 @@ public interface AssignLHSNode extends ASTNode {
   int getCharPositionInLine();
 
   DataTypeId getType(SymbolTable symbolTable);
+
+  @Override
+  String toString();
 }
