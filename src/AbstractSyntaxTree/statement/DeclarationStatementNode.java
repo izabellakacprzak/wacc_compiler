@@ -23,7 +23,7 @@ public class DeclarationStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    if (symbolTable.lookupAll(identifier.getIdentifier()) != null) {
+    if (symbolTable.lookup(identifier.getIdentifier()) != null) {
       errorMessages.add(identifier.getLine() + ":" + identifier.getCharPositionInLine()
               + " Variable with name " + identifier.getIdentifier() +
               " has already been declared in the same scope.");

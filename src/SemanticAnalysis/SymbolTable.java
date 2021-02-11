@@ -18,7 +18,7 @@ public class SymbolTable {
   }
 
   /* Get an identifier object from the symbol table */
-  private Identifier lookup(String name) {
+  public Identifier lookup(String name) {
     return dictionary.get(name);
   }
 

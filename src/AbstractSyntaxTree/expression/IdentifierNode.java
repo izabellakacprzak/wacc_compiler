@@ -33,8 +33,9 @@ public class IdentifierNode implements ExpressionNode {
               + " Identifier " + identifier + " is referenced incorrectly as a variable.");
     }
 
-    id = symbolTable.lookupAll("*" + identifier);
-    if (id instanceof FunctionId) {
+    Identifier funcIdentifier = symbolTable.lookupAll("*" + identifier);
+    if (((id instanceof VariableId) || (id instanceof ParameterId))
+            && (funcIdentifier instanceof VariableId)) {
       errorMessages.add(line + ":" + charPositionInLine
               + " Function " + identifier + " is referenced incorrectly as a variable.");
     }
