@@ -37,4 +37,9 @@ public class BoolLiterExprNode implements ExpressionNode {
   public DataTypeId getType(SymbolTable symbolTable) {
     return new BaseType(BaseType.Type.BOOL);
   }
+
+  @Override
+  public String toString() {
+    return Boolean.toString(value);
+  }
 }

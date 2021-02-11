@@ -30,39 +30,46 @@ public class FuncCallNode implements AssignRHSNode {
 
     if (functionId == null) {
       errorMessages.add(line + ":" + charPositionInLine
-          + " Function " + identifier.getIdentifier() + " has not been declared.");
-        return;
+          + " No declaration of '" + identifier.getIdentifier() + "' identifier."
+          + " Expected: FUNCTION IDENTIFIER");
+      return;
     }
 
     if (!(functionId instanceof FunctionId)) {
       errorMessages.add(line + ":" + charPositionInLine
-          + " Attempt at calling " + identifier.getIdentifier() + " as a function.");
+          + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
+          + " Expected: FUNCTION IDENTIFIER"
+          + " Actual: " + identifier.getType(symbolTable) + " IDENTIFIER");
       return;
     }
 
     FunctionId function = (FunctionId) functionId;
     List<DataTypeId> paramTypes = function.getParamTypes();
 
-    // TODO: Print out number of expected arguments?
-    if (paramTypes.size() > arguments.size()) {
+    if (paramTypes.size() > arguments.size() || paramTypes.size() < arguments.size()) {
       errorMessages.add(line + ":" + charPositionInLine
-              + " Function " + identifier.getIdentifier() + " has been called with less arguments than expected.");
-    } else if (paramTypes.size() < arguments.size()) {
-      errorMessages.add(line + ":" + charPositionInLine
-              + " Function " + identifier.getIdentifier() + " has been called with more arguments than expected.");
-    } else {
-      for (int i = 0; i < arguments.size(); i++){
-       DataTypeId currArg = arguments.get(i).getType(symbolTable);
-       DataTypeId currParamType = paramTypes.get(i);
+          + " Function '" + identifier.getIdentifier()
+          + "' has been called with the incorrect number of parameters."
+          + " Expected: " + paramTypes.size() + " Actual: " + arguments.size());
+      return;
+    }
 
-       if (currArg == null || currParamType == null) {
-         errorMessages.add(line + ":" + charPositionInLine
-                 + " Could not resolve parameter " + i + "in function call. ");
-       } else if (!(currArg.equals(currParamType))) {
-         errorMessages.add(line + ":" + charPositionInLine
-                 + " Invalid type for argument in function call." + "Expected: " + currParamType.toString().toUpperCase()
-                 + " Actual: " + currArg.toString().toUpperCase());
-       }
+    for (int i = 0; i < arguments.size(); i++) {
+      DataTypeId currArg = arguments.get(i).getType(symbolTable);
+      DataTypeId currParamType = paramTypes.get(i);
+
+      if (currParamType == null) {
+        break;
+      }
+
+      if (currArg == null) {
+        errorMessages.add(line + ":" + charPositionInLine
+            + " Could not resolve type of parameter " + i + " in '" + identifier + "' function."
+            + " Expected: " + currParamType);
+      } else if (!(currArg.equals(currParamType))) {
+        errorMessages.add(line + ":" + charPositionInLine
+            + " Invalid type for parameter " + i + " in '" + identifier + "' function."
+            + " Expected: " + currParamType + " Actual: " + currArg);
       }
     }
   }
@@ -90,6 +97,17 @@ public class FuncCallNode implements AssignRHSNode {
 
   @Override
   public String toString() {
-    return "call " + identifier.getIdentifier();
+    StringBuilder str = new StringBuilder();
+    str.append("call ").append(identifier.getIdentifier()).append('(');
+
+    for (ExpressionNode argument : arguments) {
+      str.append(argument.toString()).append(", ");
+    }
+
+    if (!arguments.isEmpty()) {
+      str.delete(str.length() - 2, str.length() - 1);
+    }
+
+    return str.append(')').toString();
   }
 }

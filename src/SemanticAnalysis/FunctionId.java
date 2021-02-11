@@ -1,8 +1,7 @@
 package SemanticAnalysis;
 
 import AbstractSyntaxTree.ASTNode;
-import AbstractSyntaxTree.type.TypeNode;
-
+import AbstractSyntaxTree.type.FunctionNode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,21 +42,23 @@ public class FunctionId extends Identifier {
 
   @Override
   public String toString() {
-    StringBuilder string = new StringBuilder();
+    String identifier = ((FunctionNode) super.getNode()).getIdentifierNode().getIdentifier();
 
-    string.append(returnType.toString());
-    string.append(" <identifier>(");
+    StringBuilder str = new StringBuilder();
 
-    for (int i = 0; i < params.size(); i++) {
-      string.append(params.get(i).toString());
+    str.append(returnType.toString()).append(' ')
+        .append(identifier).append(" (");
 
-      if (i != params.size() - 1) {
-        string.append(", ");
-      }
+    for (ParameterId param : params) {
+      str.append(param.toString()).append(", ");
     }
 
-    string.append(")");
+    if (!params.isEmpty()) {
+      str.delete(str.length() - 2, str.length() - 1);
+    }
 
-    return string.toString();
+    str.append(")");
+
+    return str.toString();
   }
 }

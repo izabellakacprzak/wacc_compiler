@@ -27,7 +27,7 @@ public class ArrayLiterNode implements AssignRHSNode {
       DataTypeId fstType = fstExpr.getType(symbolTable);
       if (fstType == null) {
         errorMessages.add(line + ":" + charPositionInLine
-                + " Could not resolve array type.");
+                + " Could not resolve type of array assignment.");
       } else {
         for (int i = 1; i < expressions.size(); i++) {
           ExpressionNode currExpr = expressions.get(i);
@@ -35,18 +35,17 @@ public class ArrayLiterNode implements AssignRHSNode {
 
           if (currType == null) {
             errorMessages.add(line + ":" + charPositionInLine
-                    + " Could not resolve type of" + i + " element in array. ");
+                    + " Could not resolve element type(s) in array literal."
+                    + " Expected: " + fstType);
             break;
           } else if (!(fstType.equals(currType))) {
             errorMessages.add(line + ":" + charPositionInLine
-                    + " Multiple element types in array literal. Expected type: " +
-                    fstType.toString() + ". Given type: " + currType.toString());
+                    + " Incompatible element type(s) in array literal."
+                    + " Expected: " + fstType + " Actual: " + currType);
             break;
-          }
-        }
 
-        for (ExpressionNode expr : expressions) {
-          expr.semanticAnalysis(symbolTable, errorMessages);
+          }
+          currExpr.semanticAnalysis(symbolTable, errorMessages);
         }
       }
     }
@@ -69,5 +68,24 @@ public class ArrayLiterNode implements AssignRHSNode {
     } else {
       return new ArrayType(expressions.get(0).getType(symbolTable));
     }
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder str = new StringBuilder();
+
+    str.append("[");
+
+    for (ExpressionNode expression : expressions) {
+      str.append(expression.toString()).append(", ");
+    }
+
+    if (!expressions.isEmpty()) {
+      str.delete(str.length() - 2, str.length() - 1);
+    }
+
+    str.append(']');
+
+    return str.toString();
   }
 }

@@ -46,4 +46,9 @@ public class NewPairNode implements AssignRHSNode {
 
     return new PairType(leftExpr.getType(symbolTable), rightExpr.getType(symbolTable));
   }
+
+  @Override
+  public String toString() {
+    return "newpair(" + leftExpr + ", " + rightExpr + ")";
+  }
 }

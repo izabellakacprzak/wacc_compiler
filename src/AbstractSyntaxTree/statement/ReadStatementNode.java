@@ -26,7 +26,7 @@ public class ReadStatementNode extends StatementNode {
     } else if (!lhsType.equals(new BaseType(BaseType.Type.INT)) &&
         !lhsType.equals(new BaseType(BaseType.Type.CHAR))) {
       errorMessages.add(lhs.getLine() + ":" + lhs.getCharPositionInLine()
-          + " Standard input allows only INT and CHAR and not " + lhsType.toString().toUpperCase());
+          + " Standard input allows only INT and CHAR and not " + lhsType.toString());
     }
   }
 }

@@ -28,27 +28,26 @@ public class BinaryOpExprNode implements ExpressionNode {
     lhs.semanticAnalysis(symbolTable, errorMessages);
     rhs.semanticAnalysis(symbolTable, errorMessages);
 
+    List<DataTypeId> argTypes = operator.getArgTypes();
+
     DataTypeId lhsType = lhs.getType(symbolTable);
     DataTypeId rhsType = rhs.getType(symbolTable);
 
     /* LHS Expression and RHS Expression types do not match */
     if (lhsType == null) {
       errorMessages.add(line + ":" + charPositionInLine
-              + " Could not resolve left hand side of '" + operator.getLabel() + "' operator");
+          + " Could not resolve type of LHS expression for '" + operator.getLabel() + "' operator."
+          + " Expected: " + argTypes);
       return;
-    } else if (rhsType == null){
-      errorMessages.add(line + ":" + charPositionInLine
-          + " Could not resolve right hand side of '" + operator.getLabel() + "' operator");
-      return;
-    }
-    if (!lhsType.equals(rhsType)) {
-      errorMessages.add(line + ":" + charPositionInLine
-          + " Non-matching types for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + lhsType.toString().toUpperCase()
-          + " Actual: " + rhsType.toString().toUpperCase());
     }
 
-    List<DataTypeId> argTypes = operator.getArgTypes();
+    if (rhsType == null) {
+      errorMessages.add(line + ":" + charPositionInLine
+          + " Could not resolve type of RHS expression for '" + operator.getLabel() + "' operator."
+          + " Expected: " + argTypes);
+      return;
+    }
+
     boolean argMatched = false;
 
     for (DataTypeId argType : argTypes) {
@@ -60,12 +59,9 @@ public class BinaryOpExprNode implements ExpressionNode {
 
     /* LHS Expression is not a valid type for the operator */
     if (!argTypes.isEmpty() && !argMatched) {
-      DataTypeId expected = argTypes.get(0);
-
       errorMessages.add(line + ":" + charPositionInLine
-          + " Invalid types for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + expected.toString().toUpperCase()
-          + " Actual: " + lhsType.toString().toUpperCase());
+          + " Incompatible types for '" + operator.getLabel() + "' operator."
+          + " Expected: " + argTypes + " Actual: " + lhsType);
       return;
     }
 
@@ -80,16 +76,17 @@ public class BinaryOpExprNode implements ExpressionNode {
 
     /* RHS Expression is not a valid type for the operator */
     if (!argTypes.isEmpty() && !argMatched) {
-      DataTypeId expected = argTypes.get(0);
-
       errorMessages.add(line + ":" + charPositionInLine
-          + " Invalid RHS type for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + expected.toString().toUpperCase()
-          + " Actual: " + rhsType.toString().toUpperCase());
-      // TODO: return;
+          + " Incompatible RHS type for '" + operator.getLabel() + "' operator."
+          + " Expected: " + argTypes + " Actual: " + rhsType);
+      return;
     }
 
-
+    if (!lhsType.equals(rhsType)) {
+      errorMessages.add(line + ":" + charPositionInLine
+          + " RHS type does not match LHS type for '" + operator.getLabel() + "' operator. "
+          + "Expected: " + lhsType + " Actual: " + rhsType);
+    }
   }
 
   @Override
@@ -105,5 +102,10 @@ public class BinaryOpExprNode implements ExpressionNode {
   @Override
   public DataTypeId getType(SymbolTable symTable) {
     return operator.getReturnType();
+  }
+
+  @Override
+  public String toString() {
+    return lhs + " " + operator.getLabel() + " " + rhs;
   }
 }

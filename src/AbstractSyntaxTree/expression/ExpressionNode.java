@@ -11,4 +11,7 @@ public interface ExpressionNode extends AssignRHSNode {
   int getCharPositionInLine();
 
   DataTypeId getType(SymbolTable symbolTable);
+
+  @Override
+  String toString();
 }

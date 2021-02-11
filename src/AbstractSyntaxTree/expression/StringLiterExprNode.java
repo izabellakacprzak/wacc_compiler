@@ -37,4 +37,9 @@ public class StringLiterExprNode implements ExpressionNode {
   public DataTypeId getType(SymbolTable symbolTable) {
     return new BaseType(BaseType.Type.STRING);
   }
+
+  @Override
+  public String toString() {
+    return value;
+  }
 }

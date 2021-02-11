@@ -33,4 +33,9 @@ public class PairLiterExprNode implements ExpressionNode {
   public DataTypeId getType(SymbolTable symbolTable) {
     return new PairType(null, null);
   }
+
+  @Override
+  public String toString() {
+    return "null";
+  }
 }

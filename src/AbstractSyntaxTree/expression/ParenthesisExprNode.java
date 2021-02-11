@@ -36,4 +36,9 @@ public class ParenthesisExprNode implements ExpressionNode {
   public DataTypeId getType(SymbolTable symbolTable) {
     return innerExpr.getType(symbolTable);
   }
+
+  @Override
+  public String toString() {
+    return "(" + innerExpr + ")";
+  }
 }
