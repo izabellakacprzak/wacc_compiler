@@ -27,17 +27,11 @@ public class IdentifierNode extends ExpressionNode {
 
     if (id == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Identifier " + identifier + " has not been declared.");
+          + " Identifier '" + identifier + "' has not been declared.");
     } else if (!(id instanceof VariableId) && !(id instanceof ParameterId)) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Identifier " + identifier + " is referenced incorrectly as a variable.");
-    }
-
-    Identifier funcIdentifier = symbolTable.lookupAll("*" + identifier);
-    if (((id instanceof VariableId) || (id instanceof ParameterId))
-            && (funcIdentifier instanceof VariableId)) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Function " + identifier + " is referenced incorrectly as a variable.");
+          + " Identifier '" + identifier + "' is referenced incorrectly."
+          + " Expected: VARIABLE IDENTIFIER, PARAMETER IDENTIFIER");
     }
   }
 
@@ -50,6 +44,7 @@ public class IdentifierNode extends ExpressionNode {
     } else if (id instanceof ParameterId) {
       return ((ParameterId) id).getType();
     }
+
     // check whether identifier is a function instance
     id = symbolTable.lookupAll("*" + identifier);
     if (id instanceof FunctionId) {

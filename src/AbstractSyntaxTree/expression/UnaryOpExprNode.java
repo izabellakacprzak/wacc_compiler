@@ -27,7 +27,7 @@ public class UnaryOpExprNode extends ExpressionNode {
     if (opType == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Could not resolve type for '" + operator.getLabel() + "' operand."
-          + " Expected: " + argTypes);
+          + " Expected: " + listTypeToString(argTypes));
       return;
     }
 
@@ -43,13 +43,20 @@ public class UnaryOpExprNode extends ExpressionNode {
     if (!argTypes.isEmpty() && !argMatched) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Invalid type for '" + operator.getLabel() + "' operator."
-          + " Expected: " + argTypes + " Actual: " + opType);
+          + " Expected: " + listTypeToString(argTypes) + " Actual: " + opType);
 
     } else if (argTypes.isEmpty() && !(opType instanceof ArrayType)) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Incompatible type for '" + operator.getLabel() + "' operator."
           + " Expected: ARRAY Actual: " + opType);
     }
+  }
+
+  private String listTypeToString(List<DataTypeId> list) {
+    StringBuilder argsStr = new StringBuilder().append(list);
+    argsStr.deleteCharAt(argsStr.length() - 1).deleteCharAt(0);
+
+    return argsStr.toString();
   }
 
   @Override

@@ -33,14 +33,14 @@ public class BinaryOpExprNode extends ExpressionNode {
     if (lhsType == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Could not resolve type of LHS expression for '" + operator.getLabel() + "' operator."
-          + " Expected: " + argTypes);
+          + " Expected: " + listTypeToString(argTypes));
       return;
     }
 
     if (rhsType == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Could not resolve type of RHS expression for '" + operator.getLabel() + "' operator."
-          + " Expected: " + argTypes);
+          + " Expected: " + listTypeToString(argTypes));
       return;
     }
 
@@ -57,7 +57,7 @@ public class BinaryOpExprNode extends ExpressionNode {
     if (!argTypes.isEmpty() && !argMatched) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Incompatible types for '" + operator.getLabel() + "' operator."
-          + " Expected: " + argTypes + " Actual: " + lhsType);
+          + " Expected: " + listTypeToString(argTypes) + " Actual: " + lhsType);
       return;
     }
 
@@ -74,7 +74,7 @@ public class BinaryOpExprNode extends ExpressionNode {
     if (!argTypes.isEmpty() && !argMatched) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Incompatible RHS type for '" + operator.getLabel() + "' operator."
-          + " Expected: " + argTypes + " Actual: " + rhsType);
+          + " Expected: " + listTypeToString(argTypes) + " Actual: " + rhsType);
       return;
     }
 
@@ -83,6 +83,13 @@ public class BinaryOpExprNode extends ExpressionNode {
           + " RHS type does not match LHS type for '" + operator.getLabel() + "' operator. "
           + "Expected: " + lhsType + " Actual: " + rhsType);
     }
+  }
+
+  private String listTypeToString(List<DataTypeId> list) {
+    StringBuilder argsStr = new StringBuilder().append(list);
+    argsStr.deleteCharAt(argsStr.length() - 1).deleteCharAt(0);
+
+    return argsStr.toString();
   }
 
   @Override
