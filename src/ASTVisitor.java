@@ -31,7 +31,12 @@ import AbstractSyntaxTree.statement.SkipStatementNode;
 import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.statement.StatementsListNode;
 import AbstractSyntaxTree.statement.WhileStatementNode;
-import AbstractSyntaxTree.type.*;
+import AbstractSyntaxTree.type.ArrayTypeNode;
+import AbstractSyntaxTree.type.BaseTypeNode;
+import AbstractSyntaxTree.type.FunctionNode;
+import AbstractSyntaxTree.type.PairTypeNode;
+import AbstractSyntaxTree.type.ParamListNode;
+import AbstractSyntaxTree.type.TypeNode;
 import SemanticAnalysis.DataTypes.BaseType.Type;
 import SemanticAnalysis.Operator;
 import SemanticAnalysis.Operator.BinOp;
@@ -80,7 +85,6 @@ import antlr.WACCParser.WhileStatContext;
 import antlr.WACCParserBaseVisitor;
 import java.util.ArrayList;
 import java.util.List;
-import org.antlr.v4.runtime.RuleContext;
 
 public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
@@ -333,7 +337,6 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new IdentifierNode(line, charPositionInLine, ctx.IDENT().getText());
   }
 
-  // TODO: add a operator to class
   @Override
   public ASTNode visitUnaryExpr(UnaryExprContext ctx) {
     int line = ctx.getStart().getLine();
@@ -359,7 +362,6 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new ParenthesisExprNode(line, charPositionInLine, expressionNode);
   }
 
-  // TODO: toString method of node to return "skip" or store skip in a field??
   /* STATEMENT NODES */
   @Override
   public ASTNode visitSkipStat(SkipStatContext ctx) {
@@ -443,19 +445,11 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new NewScopeStatementNode(statement);
   }
 
-  // TODO: left-recursion? stat1 = list of statements, what then? unfold also stat2 after?
-  // check in testing
   @Override
   public ASTNode visitStatsListStat(StatsListStatContext ctx) {
     List<StatementNode> statements = new ArrayList<>();
-    StatementNode stat1 = (StatementNode) visit(ctx.stat(0)); // list
-    StatementNode stat2 = (StatementNode) visit(ctx.stat(1));
-    statements.add(stat1);
-    statements.add(stat2);
-    if (stat1 instanceof StatementsListNode) {
-      // TODO
-    }
-    // TODO: for stat2 what?
+    statements.add((StatementNode) visit(ctx.stat(0)));
+    statements.add((StatementNode) visit(ctx.stat(1)));
     return new StatementsListNode(statements);
   }
 
@@ -478,9 +472,5 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     TypeNode snd = (TypeNode) visit(ctx.pair_elem_type(1));
 
     return new PairTypeNode(fst, snd);
-  }
-
-  public String hello() {
-    return "hello";
   }
 }
