@@ -80,6 +80,7 @@ import antlr.WACCParser.WhileStatContext;
 import antlr.WACCParserBaseVisitor;
 import java.util.ArrayList;
 import java.util.List;
+import org.antlr.v4.runtime.RuleContext;
 
 public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 

@@ -27,14 +27,12 @@ public class FunctionNode implements TypeNode {
 
   public String checkSyntaxErrors() {
     StringBuilder errorMessage = new StringBuilder();
-    boolean error = !bodyStatement.hasReturnStatement() && !bodyStatement.hasExitStatement();
-    if(error) {
-      errorMessage.append("Function " + identifier.getIdentifier() + " has no return or exit statement\n");
-    } else {
-      error = bodyStatement.hasReturnStatement() && !bodyStatement.hasNoStatementAfterReturn();
-      if (error) {
-        errorMessage.append("Function " + identifier.toString() + " has statements after return\n");
-      }
+    if ((!bodyStatement.hasReturnStatement() && !bodyStatement.hasExitStatement())
+        || (bodyStatement.hasReturnStatement() && !bodyStatement.hasNoStatementAfterReturn())) {
+      errorMessage.append(
+            "Syntax error at line " + identifier.getLine() + ":"
+                + identifier.getCharPositionInLine() + " function "
+                + identifier.getIdentifier() + " does not end with a return or exit statement");
     }
 
      return errorMessage.toString();

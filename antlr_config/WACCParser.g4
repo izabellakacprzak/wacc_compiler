@@ -8,10 +8,13 @@ options {
         try {
           int n = Integer.parseInt(t.getText());
         } catch (NumberFormatException e) {
-          notifyErrorListeners("Integer overflow");
+          notifyErrorListeners("Integer value is badly formatted (either it has a badly defined "
+          + "sign or it is too large for a 32-bit signed integer)");
         }
     }
 }
+
+
 // program
 program: BEGIN (func)* stat END EOF ;
 
@@ -37,6 +40,7 @@ stat: SKP                         #SkipStat
 | stat SEMICOLON stat             #StatsListStat
 ;
 
+
 // assignments
 assign_lhs: IDENT  #IdentLHS
 | array_elem       #ArrayElemLHS
@@ -44,7 +48,7 @@ assign_lhs: IDENT  #IdentLHS
 ;
 
 assign_rhs: expr                                                            #ExprRHS
-| OPEN_SQUARE_BRACKET (expr (COMMA expr)* )? CLOSE_SQUARE_BRACKET           #ArrayLiterRHS
+| OPEN_SQUARE_BRACKET (expr (COMMA expr)*)? CLOSE_SQUARE_BRACKET           #ArrayLiterRHS
 | NEWPAIR OPEN_PARENTHESES expr COMMA expr CLOSE_PARENTHESES                #NewPairRHS
 | pair_elem                                                                 #PairElemRHS
 | CALL IDENT OPEN_PARENTHESES (expr (COMMA expr)*)? CLOSE_PARENTHESES       #FuncCallRHS
@@ -62,12 +66,10 @@ base_type: INT
 | CHAR
 | STRING ;
 
-
-
 array_elem: IDENT (OPEN_SQUARE_BRACKET expr CLOSE_SQUARE_BRACKET)+ ;
 
 pair_elem_type: base_type
-| type
+| type OPEN_SQUARE_BRACKET CLOSE_SQUARE_BRACKET
 | PAIR ;
 
 pair_elem: FST expr #FstPairExpr
@@ -78,17 +80,18 @@ pair_liter: NULL ;
 
 
 // expressions
-expr: int_liter {inbounds(_localctx);}          #IntLiterExpr
-| BOOL_LITER                                    #BoolLiterExpr
-| CHAR_LITER                                    #CharLiterExpr
-| STR_LITER                                     #StringLiterExpr
-| pair_liter                                    #PairLiterExpr
-| IDENT                                         #IdentExpr
-| array_elem                                    #ArrayElemExpr
+expr: int_liter {inbounds(_localctx);}             #IntLiterExpr
+| BOOL_LITER                                       #BoolLiterExpr
+| CHAR_LITER                                       #CharLiterExpr
+| STR_LITER                                        #StringLiterExpr
+| pair_liter                                       #PairLiterExpr
+| IDENT                                            #IdentExpr
+| array_elem                                       #ArrayElemExpr
 | op=(NEGATION | MINUS | LENGTH | ORD | CHR) expr  #UnaryExpr
 | expr op=(MULT | DIV | MOD | PLUS | MINUS) expr   #BinaryExpr
 | expr op=(GT | GTE | LT | LTE | EQ | NEQ) expr    #BinaryExpr
 | expr op=(AND | OR) expr                          #BinaryExpr
-| OPEN_PARENTHESES expr CLOSE_PARENTHESES       #BracketExpr
+| OPEN_PARENTHESES expr CLOSE_PARENTHESES          #BracketExpr
 ;
+
 int_liter: (PLUS | MINUS)? INT_LITER;
