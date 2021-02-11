@@ -48,16 +48,16 @@ public class UnaryOpExprNode implements ExpressionNode {
 
       errorMessages.add(line + ":" + charPositionInLine
           + " Invalid type for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + expected.toString().toUpperCase()
-          + " Actual: " + opType.toString().toUpperCase());
+          + "Expected: " + expected.toString()
+          + " Actual: " + opType.toString());
 
     } else if (argTypes.isEmpty() && !(opType instanceof ArrayType)) {
       DataTypeId expected = new ArrayType(null);
 
       errorMessages.add(line + ":" + charPositionInLine
           + " Invalid type for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + expected.toString().toUpperCase()
-          + " Actual: " + opType.toString().toUpperCase());
+          + "Expected: " + expected.toString()
+          + " Actual: " + opType.toString());
     }
   }
 

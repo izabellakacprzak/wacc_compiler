@@ -26,7 +26,7 @@ public class ArrayLiterNode implements AssignRHSNode {
     DataTypeId fstType = fstExpr.getType(symbolTable);
     if (fstType == null) {
       errorMessages.add(line + ":" + charPositionInLine
-          + " Could not resolve type. Expected: ");
+          + " Could not resolve type of array assignment.");
     } else {
       for (int i = 1; i < expressions.size(); i++) {
         ExpressionNode currExpr = expressions.get(i);
@@ -34,12 +34,13 @@ public class ArrayLiterNode implements AssignRHSNode {
 
         if(currType == null) {
           errorMessages.add(line + ":" + charPositionInLine
-                  + " Could not resolve type of" + i +" element in array. " );
+              + " Could not resolve type of element " + i + " in array. "
+              + "Expected: " + fstType.toString());
           break;
         } else if (!(fstType.equals(currType))) {
           errorMessages.add(line + ":" + charPositionInLine
-                  + " Multiple element types in array literal. Expected type: " +
-                  fstType.toString() + ". Given type: " + currType.toString());
+              + " Multiple element types in array literal. Expected: " +
+              fstType.toString() + " Actual: " + currType.toString());
           break;
         }
       }

@@ -60,8 +60,9 @@ public class FuncCallNode implements AssignRHSNode {
                  + " Could not resolve parameter " + i + "in function call. ");
        } else if (!(currArg.equals(currParamType))) {
          errorMessages.add(line + ":" + charPositionInLine
-                 + " Invalid type for argument in function call." + "Expected: " + currParamType.toString().toUpperCase()
-                 + " Actual: " + currArg.toString().toUpperCase());
+             + " Invalid type for argument in function call." + "Expected: " + currParamType
+             .toString()
+             + " Actual: " + currArg.toString());
        }
       }
     }

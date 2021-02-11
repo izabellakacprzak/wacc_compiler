@@ -44,8 +44,8 @@ public class BinaryOpExprNode implements ExpressionNode {
     if (!lhsType.equals(rhsType)) {
       errorMessages.add(line + ":" + charPositionInLine
           + " Non-matching types for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + lhsType.toString().toUpperCase()
-          + " Actual: " + rhsType.toString().toUpperCase());
+          + "Expected: " + lhsType.toString()
+          + " Actual: " + rhsType.toString());
     }
 
     List<DataTypeId> argTypes = operator.getArgTypes();
@@ -64,8 +64,8 @@ public class BinaryOpExprNode implements ExpressionNode {
 
       errorMessages.add(line + ":" + charPositionInLine
           + " Invalid types for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + expected.toString().toUpperCase()
-          + " Actual: " + lhsType.toString().toUpperCase());
+          + "Expected: " + expected.toString()
+          + " Actual: " + lhsType.toString());
       return;
     }
 
@@ -84,8 +84,8 @@ public class BinaryOpExprNode implements ExpressionNode {
 
       errorMessages.add(line + ":" + charPositionInLine
           + " Invalid RHS type for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + expected.toString().toUpperCase()
-          + " Actual: " + rhsType.toString().toUpperCase());
+          + "Expected: " + expected.toString()
+          + " Actual: " + rhsType.toString());
       // TODO: return;
     }
 

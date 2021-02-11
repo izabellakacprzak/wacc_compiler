@@ -3,7 +3,6 @@ package AbstractSyntaxTree.statement;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
-
 import java.util.List;
 
 public class ReturnStatementNode extends StatementNode {
@@ -31,9 +30,9 @@ public class ReturnStatementNode extends StatementNode {
               + " Failed to procure type of return expression " + returnExpr.toString() + ".");
     } else if (!(returnExprType.equals(returnType))) {
       errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
-              + " Return statement does not match expected return type."
-              + " Expected: " + returnType.toString().toUpperCase()
-              + " Actual: " + returnExprType.toString().toUpperCase());
+          + " Return statement does not match expected return type."
+          + " Expected: " + returnType.toString()
+          + " Actual: " + returnExprType.toString());
     }
   }
 

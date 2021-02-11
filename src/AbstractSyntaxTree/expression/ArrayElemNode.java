@@ -49,7 +49,7 @@ public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
     } else if (!(idType instanceof ArrayType)) {
       errorMessages.add(line + ":" + charPositionInLine
           + " Incorrect declaration of " + identifier.getIdentifier()
-          + ". Expected: ARRAY. ACTUAL: " + idType.toString().toUpperCase());
+          + ". Expected: ARRAY. ACTUAL: " + idType.toString());
       return;
     }
 
@@ -63,7 +63,7 @@ public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
         if (thisType == null) {
           typeStr = "UNDEFINED";
         } else {
-          typeStr = thisType.toString().toUpperCase();
+          typeStr = thisType.toString();
         }
 
         errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()

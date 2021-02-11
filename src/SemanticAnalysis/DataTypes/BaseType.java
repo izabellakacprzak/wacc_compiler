@@ -27,7 +27,7 @@ public class BaseType extends DataTypeId {
 
   @Override
   public String toString() {
-    return type.toString().toLowerCase();
+    return type.toString();
   }
 
   public enum Type {INT, BOOL, CHAR, STRING}
