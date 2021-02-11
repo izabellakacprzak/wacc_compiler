@@ -6,6 +6,7 @@ import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 public class ReturnStatementNode extends StatementNode {
+
   private final ExpressionNode returnExpr;
   private DataTypeId returnType;
 
@@ -19,7 +20,7 @@ public class ReturnStatementNode extends StatementNode {
     // if symbol table is top one - sem error - must return from a non-main func
     if (symbolTable.isTopSymTable()) {
       errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
-              + " Return statement cannot be present in the body of the main function.");
+          + " 'return' statement cannot be present in the body of the main function.");
       return;
     }
 
@@ -27,12 +28,11 @@ public class ReturnStatementNode extends StatementNode {
     DataTypeId returnExprType = returnExpr.getType(symbolTable);
     if (returnExprType == null) {
       errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
-              + " Failed to procure type of return expression " + returnExpr.toString() + ".");
+          + " Could not resolve type for '" + returnExpr + "'.");
     } else if (!(returnExprType.equals(returnType))) {
       errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
-          + " Return statement does not match expected return type."
-          + " Expected: " + returnType.toString()
-          + " Actual: " + returnExprType.toString());
+          + " Declared return type does not match 'return' statement type."
+          + " Expected: " + returnType + " Actual: " + returnExprType);
     }
   }
 

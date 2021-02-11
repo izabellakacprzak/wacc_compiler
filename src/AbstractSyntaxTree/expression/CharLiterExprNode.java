@@ -17,7 +17,6 @@ public class CharLiterExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-
   }
 
   @Override

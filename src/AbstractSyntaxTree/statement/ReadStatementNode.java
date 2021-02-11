@@ -8,25 +8,29 @@ import java.util.List;
 
 public class ReadStatementNode extends StatementNode {
 
-  private final AssignLHSNode lhs;
+  private final AssignLHSNode left;
 
-  public ReadStatementNode(AssignLHSNode lhs) {
-    this.lhs = lhs;
+  public ReadStatementNode(AssignLHSNode left) {
+    this.left = left;
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
 
-    lhs.semanticAnalysis(symbolTable, errorMessages);
+    left.semanticAnalysis(symbolTable, errorMessages);
 
-    DataTypeId lhsType = lhs.getType(symbolTable);
-    if (lhsType == null) {
-      errorMessages.add(lhs.getLine() + ":" + lhs.getCharPositionInLine()
-          + " Could not resolve type of read statement. ");
-    } else if (!lhsType.equals(new BaseType(BaseType.Type.INT)) &&
-        !lhsType.equals(new BaseType(BaseType.Type.CHAR))) {
-      errorMessages.add(lhs.getLine() + ":" + lhs.getCharPositionInLine()
-          + " Standard input allows only INT and CHAR and not " + lhsType.toString());
+    DataTypeId leftType = left.getType(symbolTable);
+
+    if (leftType == null) {
+      errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
+          + " Could not resolve type for '" + left + "."
+          + " Expected: INT, CHAR");
+
+    } else if (!leftType.equals(new BaseType(BaseType.Type.INT)) &&
+        !leftType.equals(new BaseType(BaseType.Type.CHAR))) {
+      errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
+          + " Incompatible type for 'read' statement."
+          + " Expected: INT, CHAR Actual: " + leftType);
     }
   }
 }

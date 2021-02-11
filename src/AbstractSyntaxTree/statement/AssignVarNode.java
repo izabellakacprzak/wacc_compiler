@@ -24,21 +24,20 @@ public class AssignVarNode extends StatementNode {
     DataTypeId leftType = left.getType(symbolTable);
     DataTypeId rightType = right.getType(symbolTable);
 
-
     if (leftType == null) {
       if (varHasBeenDeclared(errorMessages, left)) {
         errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
-                + " Could not resolve type of left hand side assignment. ");
+            + " Could not resolve type of LHS assignment '" + left + "'.");
       }
     } else if (rightType == null) {
       if (varHasBeenDeclared(errorMessages, right)) {
         errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
-                + " Could not resolve type of right hand side assignment. ");
+            + " Could not resolve type of RHS assignment'" + right + "'.");
       }
     } else if (!leftType.equals(rightType)) {
       errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
-              + " Assignment to: " + left.toString() + "must be of type " + leftType +
-              " not " + rightType);
+          + " RHS type does not match LHS type for assignment. "
+          + " Expected: " + leftType + " Actual: " + rightType);
     }
   }
 
@@ -49,8 +48,8 @@ public class AssignVarNode extends StatementNode {
       String charPos = Integer.toString(node.getCharPositionInLine());
 
       return (!lastErrorMsg.contains(line + ":" + charPos) || !lastErrorMsg.contains("Identifier"));
-      }
-    return true;
     }
+    return true;
+  }
 }
 

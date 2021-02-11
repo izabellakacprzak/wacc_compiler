@@ -4,7 +4,6 @@ import AbstractSyntaxTree.expression.ExpressionNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
-
 import java.util.List;
 
 public class IfStatementNode extends StatementNode {
@@ -29,10 +28,12 @@ public class IfStatementNode extends StatementNode {
 
     if (conditionType == null) {
       errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
-              + " Could not resolve If condition type" );
+          + " Could not resolve type for '" + condition + "'."
+          + " Expected: BOOL");
     } else if (!conditionType.equals(new BaseType(BaseType.Type.BOOL))) {
       errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
-          + " If Condition must be of type BOOL and not " + conditionType.toString());
+          + " Incompatible type for 'If' condition."
+          + " Expected: BOOL Actual: " + conditionType);
     }
 
     thenStatement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
@@ -42,7 +43,7 @@ public class IfStatementNode extends StatementNode {
   @Override
   public boolean hasReturnStatement() {
     return (thenStatement.hasReturnStatement() || thenStatement.hasExitStatement())
-            && (elseStatement.hasExitStatement() || elseStatement.hasReturnStatement());
+        && (elseStatement.hasExitStatement() || elseStatement.hasReturnStatement());
   }
 
   @Override

@@ -21,9 +21,11 @@ public class ArrayLiterNode extends AssignRHSNode {
     if (!expressions.isEmpty()) {
       ExpressionNode fstExpr = expressions.get(0);
       DataTypeId fstType = fstExpr.getType(symbolTable);
+
       if (fstType == null) {
         errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
             + " Could not resolve type of array assignment.");
+
       } else {
         for (int i = 1; i < expressions.size(); i++) {
           ExpressionNode currExpr = expressions.get(i);
@@ -34,6 +36,7 @@ public class ArrayLiterNode extends AssignRHSNode {
                 + " Could not resolve element type(s) in array literal."
                 + " Expected: " + fstType);
             break;
+
           } else if (!(fstType.equals(currType))) {
             errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
                 + " Incompatible element type(s) in array literal."
@@ -41,6 +44,7 @@ public class ArrayLiterNode extends AssignRHSNode {
             break;
 
           }
+
           currExpr.semanticAnalysis(symbolTable, errorMessages);
         }
       }

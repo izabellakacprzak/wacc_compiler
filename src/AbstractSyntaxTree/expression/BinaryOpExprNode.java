@@ -7,27 +7,28 @@ import java.util.List;
 
 public class BinaryOpExprNode extends ExpressionNode {
 
-  private final ExpressionNode lhs;
-  private final ExpressionNode rhs;
+  private final ExpressionNode left;
+  private final ExpressionNode right;
   private final BinOp operator;
 
-  public BinaryOpExprNode(int line, int charPositionInLine, ExpressionNode lhs, ExpressionNode rhs,
+  public BinaryOpExprNode(int line, int charPositionInLine, ExpressionNode left,
+      ExpressionNode right,
       BinOp operator) {
     super(line, charPositionInLine);
-    this.lhs = lhs;
-    this.rhs = rhs;
+    this.left = left;
+    this.right = right;
     this.operator = operator;
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    lhs.semanticAnalysis(symbolTable, errorMessages);
-    rhs.semanticAnalysis(symbolTable, errorMessages);
+    left.semanticAnalysis(symbolTable, errorMessages);
+    right.semanticAnalysis(symbolTable, errorMessages);
 
     List<DataTypeId> argTypes = operator.getArgTypes();
 
-    DataTypeId lhsType = lhs.getType(symbolTable);
-    DataTypeId rhsType = rhs.getType(symbolTable);
+    DataTypeId lhsType = left.getType(symbolTable);
+    DataTypeId rhsType = right.getType(symbolTable);
 
     /* LHS Expression and RHS Expression types do not match */
     if (lhsType == null) {
@@ -56,7 +57,7 @@ public class BinaryOpExprNode extends ExpressionNode {
     /* LHS Expression is not a valid type for the operator */
     if (!argTypes.isEmpty() && !argMatched) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Incompatible types for '" + operator.getLabel() + "' operator."
+          + " Incompatible LHS type for '" + operator.getLabel() + "' operator."
           + " Expected: " + listTypeToString(argTypes) + " Actual: " + lhsType);
       return;
     }
@@ -99,6 +100,6 @@ public class BinaryOpExprNode extends ExpressionNode {
 
   @Override
   public String toString() {
-    return lhs + " " + operator.getLabel() + " " + rhs;
+    return left + " " + operator.getLabel() + " " + right;
   }
 }

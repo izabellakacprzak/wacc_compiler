@@ -15,7 +15,7 @@ public class DeclarationStatementNode extends StatementNode {
   private final AssignRHSNode assignment;
 
   public DeclarationStatementNode(TypeNode type, IdentifierNode identifier,
-                                  AssignRHSNode assignment) {
+      AssignRHSNode assignment) {
     this.type = type;
     this.identifier = identifier;
     this.assignment = assignment;
@@ -25,13 +25,14 @@ public class DeclarationStatementNode extends StatementNode {
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     if (symbolTable.lookup(identifier.getIdentifier()) != null) {
       errorMessages.add(identifier.getLine() + ":" + identifier.getCharPositionInLine()
-              + " Variable with name " + identifier.getIdentifier() +
-              " has already been declared in the same scope.");
+          + " Identifier '" + identifier.getIdentifier()
+          + "' has already been declared in the same scope.");
+
     } else {
       symbolTable.add(identifier.getIdentifier(),
-              new VariableId(identifier, type.getType()));
+          new VariableId(identifier, type.getType()));
     }
-    // potentially might be redundant
+
     identifier.semanticAnalysis(symbolTable, errorMessages);
     assignment.semanticAnalysis(symbolTable, errorMessages);
 
@@ -40,14 +41,18 @@ public class DeclarationStatementNode extends StatementNode {
 
     if (declaredType == null) {
       errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
-              + " Could not resolve type of " + identifier.getIdentifier());
+          + " Could not resolve type of '" + identifier.getIdentifier() + "'.");
+
     } else if (assignedType == null) {
       errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
-              + " Could not resolve type of " + assignment.toString());
+          + " Could not resolve type of '" + assignment.toString() + "'."
+          + " Expected: " + declaredType);
+
     } else if (!declaredType.equals(assignedType)) {
       errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
-          + " Declaration to: " + identifier.getIdentifier() + " must be of type " +
-          declaredType.toString() + " not " + assignedType.toString());
+          + " Assignment type does not match declared type for '"
+          + identifier.getIdentifier() + "'."
+          + " Expected: " + declaredType + "Actual: " + assignedType);
     }
   }
 }
