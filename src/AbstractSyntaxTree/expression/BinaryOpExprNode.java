@@ -4,80 +4,102 @@ import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.Operator.BinOp;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
-import java.util.Set;
 
-public class BinaryOpExprNode implements ExpressionNode {
+public class BinaryOpExprNode extends ExpressionNode {
 
-  private final int line;
-  private final int charPositionInLine;
-
-  private final ExpressionNode lhs;
-  private final ExpressionNode rhs;
+  private final ExpressionNode left;
+  private final ExpressionNode right;
   private final BinOp operator;
 
-  public BinaryOpExprNode(int line, int charPositionInLine, ExpressionNode lhs, ExpressionNode rhs,
+  public BinaryOpExprNode(int line, int charPositionInLine, ExpressionNode left,
+      ExpressionNode right,
       BinOp operator) {
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
-    this.lhs = lhs;
-    this.rhs = rhs;
+    super(line, charPositionInLine);
+    this.left = left;
+    this.right = right;
     this.operator = operator;
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    lhs.semanticAnalysis(symbolTable, errorMessages);
-    rhs.semanticAnalysis(symbolTable, errorMessages);
+    left.semanticAnalysis(symbolTable, errorMessages);
+    right.semanticAnalysis(symbolTable, errorMessages);
 
-    DataTypeId lhsType = lhs.getType(symbolTable);
-    DataTypeId rhsType = rhs.getType(symbolTable);
+    List<DataTypeId> argTypes = operator.getArgTypes();
+
+    DataTypeId lhsType = left.getType(symbolTable);
+    DataTypeId rhsType = right.getType(symbolTable);
 
     /* LHS Expression and RHS Expression types do not match */
-    if (!lhsType.equals(rhsType)) {
-      errorMessages.add(line + ":" + charPositionInLine
-          + " Non-matching types for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + lhsType.toString().toUpperCase()
-          + " Actual: " + rhsType.toString().toUpperCase());
-
+    if (lhsType == null) {
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
+          + " Could not resolve type of LHS expression for '" + operator.getLabel() + "' operator."
+          + " Expected: " + listTypeToString(argTypes));
       return;
     }
 
-    Set<DataTypeId> argTypes = operator.getArgTypes();
+    if (rhsType == null) {
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
+          + " Could not resolve type of RHS expression for '" + operator.getLabel() + "' operator."
+          + " Expected: " + listTypeToString(argTypes));
+      return;
+    }
+
+    boolean argMatched = false;
+
+    for (DataTypeId argType : argTypes) {
+      if (lhsType.equals(argType)) {
+        argMatched = true;
+        break;
+      }
+    }
 
     /* LHS Expression is not a valid type for the operator */
-    if (!argTypes.isEmpty() && !argTypes.contains(lhsType)) {
-      DataTypeId expected = argTypes.stream().findFirst().get();
+    if (!argTypes.isEmpty() && !argMatched) {
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
+          + " Incompatible LHS type for '" + operator.getLabel() + "' operator."
+          + " Expected: " + listTypeToString(argTypes) + " Actual: " + lhsType);
+      return;
+    }
 
-      errorMessages.add(line + ":" + charPositionInLine
-          + " Invalid LHS type for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + expected.toString().toUpperCase()
-          + " Actual: " + lhsType.toString().toUpperCase());
+    argMatched = false;
+
+    for (DataTypeId argType : argTypes) {
+      if (rhsType.equals(argType)) {
+        argMatched = true;
+        break;
+      }
     }
 
     /* RHS Expression is not a valid type for the operator */
-    if (!argTypes.isEmpty() && !argTypes.contains(rhsType)) {
-      DataTypeId expected = argTypes.stream().findFirst().get();
-
-      errorMessages.add(line + ":" + charPositionInLine
-          + " Invalid RHS type for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + expected.toString().toUpperCase()
-          + " Actual: " + rhsType.toString().toUpperCase());
+    if (!argTypes.isEmpty() && !argMatched) {
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
+          + " Incompatible RHS type for '" + operator.getLabel() + "' operator."
+          + " Expected: " + listTypeToString(argTypes) + " Actual: " + rhsType);
+      return;
     }
 
+    if (!lhsType.equals(rhsType)) {
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
+          + " RHS type does not match LHS type for '" + operator.getLabel() + "' operator. "
+          + "Expected: " + lhsType + " Actual: " + rhsType);
+    }
   }
 
-  @Override
-  public int getLine() {
-    return line;
-  }
+  private String listTypeToString(List<DataTypeId> list) {
+    StringBuilder argsStr = new StringBuilder().append(list);
+    argsStr.deleteCharAt(argsStr.length() - 1).deleteCharAt(0);
 
-  @Override
-  public int getCharPositionInLine() {
-    return charPositionInLine;
+    return argsStr.toString();
   }
 
   @Override
   public DataTypeId getType(SymbolTable symTable) {
     return operator.getReturnType();
+  }
+
+  @Override
+  public String toString() {
+    return left + " " + operator.getLabel() + " " + right;
   }
 }

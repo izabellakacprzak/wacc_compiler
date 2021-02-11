@@ -21,11 +21,15 @@ public class FreeStatementNode extends StatementNode {
 
     DataTypeId exprType = expr.getType(symbolTable);
 
-    if (!exprType.equals(new PairType(null, null)) &&
+    if (exprType == null) {
+      errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
+          + " Could not resolve type for '" + expr + "'."
+          + " Expected: ARRAY, PAIR");
+    } else if (!exprType.equals(new PairType(null, null)) &&
         !exprType.equals(new ArrayType(null))) {
       errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
-          + " 'free' call can only be executed on an expression of " +
-          "type Pair or Array, and not on" + exprType.toString());
+          + " Incompatible type for 'free' statement." +
+          " Expected: ARRAY, PAIR Actual: " + exprType);
     }
   }
 }

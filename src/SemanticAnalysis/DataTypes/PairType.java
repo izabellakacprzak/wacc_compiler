@@ -27,7 +27,7 @@ public class PairType extends DataTypeId {
 
   @Override
   public String toString() {
-    return "pair(" + fstType.toString() + ", " + sndType.toString() + ")";
+    return "PAIR(" + fstType.toString() + ", " + sndType.toString() + ")";
   }
 
   @Override

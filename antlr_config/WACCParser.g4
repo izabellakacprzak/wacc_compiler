@@ -46,11 +46,11 @@ assign_lhs: IDENT  #IdentLHS
 | pair_elem        #PairElemLHS
 ;
 
-assign_rhs: expr                                                            #ExprRHS
+assign_rhs: expr                                                           #ExprRHS
 | OPEN_SQUARE_BRACKET (expr (COMMA expr)*)? CLOSE_SQUARE_BRACKET           #ArrayLiterRHS
-| NEWPAIR OPEN_PARENTHESES expr COMMA expr CLOSE_PARENTHESES                #NewPairRHS
-| pair_elem                                                                 #PairElemRHS
-| CALL IDENT OPEN_PARENTHESES (expr (COMMA expr)*)? CLOSE_PARENTHESES       #FuncCallRHS
+| NEWPAIR OPEN_PARENTHESES expr COMMA expr CLOSE_PARENTHESES               #NewPairRHS
+| pair_elem                                                                #PairElemRHS
+| CALL IDENT OPEN_PARENTHESES (expr (COMMA expr)*)? CLOSE_PARENTHESES      #FuncCallRHS
 ;
 
 
@@ -67,9 +67,10 @@ base_type: INT
 
 array_elem: IDENT (OPEN_SQUARE_BRACKET expr CLOSE_SQUARE_BRACKET)+ ;
 
-pair_elem_type: base_type
-| type OPEN_SQUARE_BRACKET CLOSE_SQUARE_BRACKET
-| PAIR ;
+pair_elem_type: base_type                       #PairElemTypeBase
+| type OPEN_SQUARE_BRACKET CLOSE_SQUARE_BRACKET #PairElemTypeArray
+| PAIR                                          #PairElemTypePair
+;
 
 pair_elem: FST expr #FstPairExpr
 | SND expr          #SndPairExpr

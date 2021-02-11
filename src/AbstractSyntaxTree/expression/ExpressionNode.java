@@ -4,11 +4,14 @@ import AbstractSyntaxTree.assignment.AssignRHSNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
 
-public interface ExpressionNode extends AssignRHSNode {
+public abstract class ExpressionNode extends AssignRHSNode {
 
-  int getLine();
+  public ExpressionNode(int line, int charPositionInLine) {
+    super(line, charPositionInLine);
+  }
 
-  int getCharPositionInLine();
+  public abstract DataTypeId getType(SymbolTable symbolTable);
 
-  DataTypeId getType(SymbolTable symbolTable);
+  @Override
+  public abstract String toString();
 }

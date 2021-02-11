@@ -20,12 +20,19 @@ public class WhileStatementNode extends StatementNode {
     condition.semanticAnalysis(symbolTable, errorMessages);
 
     DataTypeId conditionType = condition.getType(symbolTable);
-    if (!conditionType.equals(new BaseType(BaseType.Type.BOOL))) {
-      errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
-          + " While Condition must be of type BOOL and not " + conditionType.toString());
-    }
-    statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
 
+    if (conditionType == null) {
+      errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
+          + " Could not resolve type of '" + condition + "'."
+          + " Expected: BOOL");
+
+    } else if (!conditionType.equals(new BaseType(BaseType.Type.BOOL))) {
+      errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
+          + " Incompatible type for 'If' condition."
+          + " Expected: BOOL Actual: " + conditionType);
+    }
+
+    statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
   }
 
   @Override

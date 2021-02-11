@@ -14,5 +14,6 @@ public abstract class Identifier {
     return node;
   }
 
+  @Override
   public abstract String toString();
 }

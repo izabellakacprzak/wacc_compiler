@@ -18,8 +18,12 @@ public class PairTypeNode implements TypeNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    fstType.semanticAnalysis(symbolTable, errorMessages);
-    sndType.semanticAnalysis(symbolTable, errorMessages);
+    if (fstType != null) {
+      fstType.semanticAnalysis(symbolTable, errorMessages);
+    }
+    if (sndType != null) {
+      sndType.semanticAnalysis(symbolTable, errorMessages);
+    }
   }
 
   @Override
@@ -28,8 +32,16 @@ public class PairTypeNode implements TypeNode {
         (DataTypeId) sndType.getIdentifier(parentSymbolTable));
   }
 
+  private DataTypeId getPairElemNode(TypeNode elem) {
+
+    if (elem == null) {
+      return null;
+    }
+    return elem.getType();
+  }
+
   @Override
   public DataTypeId getType() {
-    return new PairType(fstType.getType(), sndType.getType());
+    return new PairType(getPairElemNode(fstType), getPairElemNode(sndType));
   }
 }

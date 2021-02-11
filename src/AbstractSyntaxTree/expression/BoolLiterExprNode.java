@@ -5,36 +5,26 @@ import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
-public class BoolLiterExprNode implements ExpressionNode {
-
-  private final int line;
-  private final int charPositionInLine;
+public class BoolLiterExprNode extends ExpressionNode {
 
   private final boolean value;
 
   public BoolLiterExprNode(int line, int charPositionInLine, boolean value) {
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
+    super(line, charPositionInLine);
     this.value = value;
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-
-  }
-
-  @Override
-  public int getLine() {
-    return line;
-  }
-
-  @Override
-  public int getCharPositionInLine() {
-    return charPositionInLine;
   }
 
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
     return new BaseType(BaseType.Type.BOOL);
+  }
+
+  @Override
+  public String toString() {
+    return Boolean.toString(value);
   }
 }

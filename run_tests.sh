@@ -58,12 +58,12 @@ SEMANTIC_ERROR_CODE=200
 runSemanticErrorTests=0
 passedSemanticErrorTests=0
 
-#echo Running valid tests...
-#LINES=$(cat $VALID_TESTS)
-#run_tests "$LINES" $SUCCESS_CODE
-#echo passed $passedTests / $runTests valid tests
-#runValidTests=$runTests
-#passedValidTests=$passedTests
+echo Running valid tests...
+LINES=$(cat $VALID_TESTS)
+run_tests "$LINES" $SUCCESS_CODE
+echo passed $passedTests / $runTests valid tests
+runValidTests=$runTests
+passedValidTests=$passedTests
 
 echo =======================
 passedTests=0
@@ -76,24 +76,24 @@ runSyntaxErrorTests=$runTests
 passedSyntaxErrorTests=$passedTests
 
 
-#echo =======================
-#passedTests=0
-#runTests=0
-#echo Running semantic error tests...
-#LINES=$(cat $SEMANTIC_ERROR_TESTS)
-#run_tests "$LINES" $SEMANTIC_ERROR_CODE
-#echo passed $passedTests / $runTests semantic error tests
-#runSemanticErrorTests=$runTests
-#passedSemanticErrorTests=$passedTests
+echo =======================
+passedTests=0
+runTests=0
+echo Running semantic error tests...
+LINES=$(cat $SEMANTIC_ERROR_TESTS)
+run_tests "$LINES" $SEMANTIC_ERROR_CODE
+echo passed $passedTests / $runTests semantic error tests
+runSemanticErrorTests=$runTests
+passedSemanticErrorTests=$passedTests
 
 echo =======================
 echo SUMMARY
-#echo passed $passedValidTests / $runValidTests valid tests
+echo passed $passedValidTests / $runValidTests valid tests
 echo passed $passedSyntaxErrorTests / $runSyntaxErrorTests syntax error tests
-#echo passed $passedSemanticErrorTests / $runSemanticErrorTests semantic error tests
+echo passed $passedSemanticErrorTests / $runSemanticErrorTests semantic error tests
 
 
-if [ $passedSyntaxErrorTests -eq $runSyntaxErrorTests ]; then
+if [ $passedValidTests -eq $runValidTests ] && [ $passedSyntaxErrorTests -eq $runSyntaxErrorTests ] && [ $passedSemanticErrorTests -eq $runSemanticErrorTests ]; then
   exit 0
 else
   exit 1

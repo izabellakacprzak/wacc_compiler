@@ -3,20 +3,17 @@ package AbstractSyntaxTree.expression;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
+import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
 import SemanticAnalysis.VariableId;
 import java.util.List;
 
-public class IdentifierNode implements ExpressionNode {
-
-  private final int line;
-  private final int charPositionInLine;
+public class IdentifierNode extends ExpressionNode {
 
   private final String identifier;
 
   public IdentifierNode(int line, int charPositionInLine, String identifier) {
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
+    super(line, charPositionInLine);
     this.identifier = identifier;
   }
 
@@ -29,28 +26,13 @@ public class IdentifierNode implements ExpressionNode {
     Identifier id = symbolTable.lookupAll(identifier);
 
     if (id == null) {
-      errorMessages.add(line + ":" + charPositionInLine
-              + " Identifier " + identifier + " has not been declared.");
-    } else if (!(id instanceof VariableId)) {
-      errorMessages.add(line + ":" + charPositionInLine
-              + " Identifier " + identifier + " is referenced incorrectly as a variable.");
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
+          + " Identifier '" + identifier + "' has not been declared.");
+    } else if (!(id instanceof VariableId) && !(id instanceof ParameterId)) {
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
+          + " Identifier '" + identifier + "' is referenced incorrectly."
+          + " Expected: VARIABLE IDENTIFIER, PARAMETER IDENTIFIER");
     }
-
-    id = symbolTable.lookupAll("*" + identifier);
-    if (id instanceof FunctionId) {
-      errorMessages.add(line + ":" + charPositionInLine
-              + " Function " + identifier + " is referenced incorrectly as a variable.");
-    }
-  }
-
-  @Override
-  public int getLine() {
-    return line;
-  }
-
-  @Override
-  public int getCharPositionInLine() {
-    return charPositionInLine;
   }
 
   @Override
@@ -59,7 +41,10 @@ public class IdentifierNode implements ExpressionNode {
 
     if (id instanceof VariableId) {
       return ((VariableId) id).getType();
+    } else if (id instanceof ParameterId) {
+      return ((ParameterId) id).getType();
     }
+
     // check whether identifier is a function instance
     id = symbolTable.lookupAll("*" + identifier);
     if (id instanceof FunctionId) {
@@ -67,5 +52,10 @@ public class IdentifierNode implements ExpressionNode {
     }
 
     return null;
+  }
+
+  @Override
+  public String toString() {
+    return identifier;
   }
 }

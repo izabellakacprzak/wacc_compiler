@@ -15,7 +15,7 @@ public class FunctionNode implements TypeNode {
   private final ParamListNode params;
   private final StatementNode bodyStatement;
 
-  private SymbolTable currSymTable;
+  private SymbolTable currSymTable = null;
 
   public FunctionNode(TypeNode returnType, IdentifierNode identifier,
       ParamListNode params, StatementNode bodyStatement) {
@@ -25,29 +25,34 @@ public class FunctionNode implements TypeNode {
     this.bodyStatement = bodyStatement;
   }
 
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
+
+  public void setCurrSymTable(SymbolTable currSymTable) {
+    this.currSymTable = currSymTable;
+  }
+
   public String checkSyntaxErrors() {
     StringBuilder errorMessage = new StringBuilder();
     if ((!bodyStatement.hasReturnStatement() && !bodyStatement.hasExitStatement())
         || (bodyStatement.hasReturnStatement() && !bodyStatement.hasNoStatementAfterReturn())) {
-      errorMessage.append(
-            "Syntax error at line " + identifier.getLine() + ":"
-                + identifier.getCharPositionInLine() + " function "
-                + identifier.getIdentifier() + " does not end with a return or exit statement");
+      errorMessage.append("Syntax error at line ").append(identifier.getLine()).append(":")
+          .append(identifier.getCharPositionInLine()).append(" function ")
+          .append(identifier.getIdentifier())
+          .append(" does not end with a return or exit statement");
     }
 
-     return errorMessage.toString();
-  }
-
-  public void setReturnType(TypeNode returnType) {
-    //bodyStatement.setReturnType(returnType.getType());
+    return errorMessage.toString();
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    returnType.semanticAnalysis(currSymTable, errorMessages);
-    identifier.semanticAnalysis(currSymTable, errorMessages);
-    params.semanticAnalysis(currSymTable, errorMessages);
-    bodyStatement.semanticAnalysis(currSymTable, errorMessages);
+    bodyStatement.setReturnType(returnType.getType());
+
+    params.semanticAnalysis(symbolTable, errorMessages);
+    bodyStatement.semanticAnalysis(symbolTable, errorMessages);
+    returnType.semanticAnalysis(symbolTable, errorMessages);
   }
 
   public String getName() {
@@ -56,15 +61,24 @@ public class FunctionNode implements TypeNode {
     return "*" + identifier.getIdentifier();
   }
 
+  public IdentifierNode getIdentifierNode() {
+    return identifier;
+  }
+
   @Override
-  public Identifier getIdentifier(SymbolTable parentSymTable) {
-    currSymTable = new SymbolTable(parentSymTable);
-    return new FunctionId(this, (DataTypeId) returnType.getIdentifier(parentSymTable),
-        params.getIdentifiers(parentSymTable), currSymTable);
+  public Identifier getIdentifier(SymbolTable symbolTable) {
+
+    return new FunctionId(this, returnType.getType(),
+        params.getIdentifiers(symbolTable), symbolTable);
   }
 
   @Override
   public DataTypeId getType() {
     return returnType.getType();
+  }
+
+  @Override
+  public String toString() {
+    return identifier.getIdentifier();
   }
 }

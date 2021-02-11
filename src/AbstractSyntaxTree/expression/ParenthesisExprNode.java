@@ -4,16 +4,12 @@ import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
-public class ParenthesisExprNode implements ExpressionNode {
-
-  private final int line;
-  private final int charPositionInLine;
+public class ParenthesisExprNode extends ExpressionNode {
 
   private final ExpressionNode innerExpr;
 
   public ParenthesisExprNode(int line, int charPositionInLine, ExpressionNode innerExpr) {
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
+    super(line, charPositionInLine);
     this.innerExpr = innerExpr;
   }
 
@@ -23,17 +19,12 @@ public class ParenthesisExprNode implements ExpressionNode {
   }
 
   @Override
-  public int getLine() {
-    return line;
-  }
-
-  @Override
-  public int getCharPositionInLine() {
-    return charPositionInLine;
-  }
-
-  @Override
   public DataTypeId getType(SymbolTable symbolTable) {
     return innerExpr.getType(symbolTable);
+  }
+
+  @Override
+  public String toString() {
+    return "(" + innerExpr + ")";
   }
 }

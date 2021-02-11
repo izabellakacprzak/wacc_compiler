@@ -1,101 +1,91 @@
 package AbstractSyntaxTree.expression;
 
-import AbstractSyntaxTree.assignment.AssignLHSNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
-import SemanticAnalysis.VariableId;
-
 import java.util.List;
 
-public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
-
-  private final int line;
-  private final int charPositionInLine;
+public class ArrayElemNode extends ExpressionNode {
 
   private final IdentifierNode identifier;
   private final List<ExpressionNode> expressions;
 
   public ArrayElemNode(int line, int charPositionInLine, IdentifierNode identifier,
       List<ExpressionNode> expressions) {
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
+    super(line, charPositionInLine);
     this.identifier = identifier;
     this.expressions = expressions;
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symTable, List<String> errorMessages) {
-    identifier.semanticAnalysis(symTable, errorMessages);
+  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    identifier.semanticAnalysis(symbolTable, errorMessages);
     for (ExpressionNode expression : expressions) {
-      expression.semanticAnalysis(symTable, errorMessages);
+      expression.semanticAnalysis(symbolTable, errorMessages);
     }
 
-    /* Is this needed? If it's 0 then it shouldn't be an array-elem */
-    /*
-    if (expressions.size() < 1) {
-      errorMessages.add("");
-    }
-    */
-
-    Identifier idType = symTable.lookupAll(identifier.getIdentifier());
+    Identifier idType = symbolTable.lookupAll(identifier.getIdentifier());
 
     if (idType == null) {
-      errorMessages.add(line + ":" + charPositionInLine
-          + " No declaration of " + identifier.getIdentifier());
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
+          + " No declaration of '" + identifier.getIdentifier() + "' identifier."
+          + " Expected: ARRAY IDENTIFIER.");
       return;
 
-    } else if (!(idType instanceof ArrayType)) {
-      errorMessages.add(line + ":" + charPositionInLine
-          + " Incorrect declaration of " + identifier.getIdentifier()
-          + ". Expected: ARRAY. ACTUAL: " + idType.toString().toUpperCase());
+    }
+    if (!(identifier.getType(symbolTable) instanceof ArrayType)) {
+      System.out.println(identifier);
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
+          + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
+          + " Expected: ARRAY IDENTIFIER Actual: " + idType.toString() + "IDENTIFIER");
       return;
     }
 
     DataTypeId thisType;
     for (ExpressionNode expression : expressions) {
-      thisType = expression.getType(symTable);
+      thisType = expression.getType(symbolTable);
 
-      if (thisType == null || !thisType.equals(new BaseType(BaseType.Type.INT))) {
-        String typeStr;
-
-        if (thisType == null) {
-          typeStr = "UNDEFINED";
-        } else {
-          typeStr = thisType.toString().toUpperCase();
-        }
-
+      if (thisType == null) {
         errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-            + " Expected: INT Actual: " + typeStr);
+            + " Could not resolve type of '" + expression + "' in ARRAY ELEM."
+            + " Expected: INT");
+        break;
+      }
+
+      if (!thisType.equals(new BaseType(BaseType.Type.INT))) {
+        errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
+            + " Incompatible type of '" + expression + "' in ARRAY ELEM."
+            + " Expected: INT Actual: " + thisType);
       }
     }
 
   }
 
-//        if (thisType == null) {
-//          errorMessages.add("Type of " + identifier.getIdentifier() + "[" + i
-//              + "] not found. Expected: " + arrayType.toString());
-//        } else if (arrayType != thisType) {
-//          errorMessages.add("Incompatible type of " + identifier.getIdentifier() + "[" + i
-//              + "]. Expected: " + arrayType.toString() + " Actual: " + thisType.toString());
-//        }
-
-  @Override
-  public int getLine() {
-    return line;
-  }
-
-  @Override
-  public int getCharPositionInLine() {
-    return charPositionInLine;
-  }
-
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
-    VariableId arrayName = (VariableId) symbolTable.lookupAll(identifier.getIdentifier());
+    DataTypeId idType = identifier.getType(symbolTable);
+    if (!(idType instanceof ArrayType)) {
+      return null;
+    }
 
-    return null;
+    return ((ArrayType) idType).getElemType();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder str = new StringBuilder();
+
+    str.append(identifier.getIdentifier()).append("[");
+
+    for (ExpressionNode expression : expressions) {
+      str.append(expression.toString()).append("][");
+    }
+
+    str.delete(str.length() - 2, str.length() - 1);
+    str.append(']');
+
+    return str.toString();
   }
 }

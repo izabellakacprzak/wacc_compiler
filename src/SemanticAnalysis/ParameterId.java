@@ -1,6 +1,7 @@
 package SemanticAnalysis;
 
 import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.expression.IdentifierNode;
 
 public class ParameterId extends Identifier {
 
@@ -17,7 +18,7 @@ public class ParameterId extends Identifier {
 
   @Override
   public String toString() {
-    return type.toString() + super.getNode().toString();
+    return type.toString() + " " + ((IdentifierNode) super.getNode()).getIdentifier();
   }
 }
 

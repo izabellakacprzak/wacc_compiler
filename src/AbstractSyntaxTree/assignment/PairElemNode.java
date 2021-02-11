@@ -7,19 +7,16 @@ import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
-public class PairElemNode implements AssignRHSNode {
+public class PairElemNode extends AssignRHSNode {
 
-  private final int line;
-  private final int charPositionInLine;
+  private static final int FST = 0;
 
   private final int position; // 0 if FST otherwise SND
   private final ExpressionNode expr;
-  private static final int FST = 0;
 
 
   public PairElemNode(int line, int charPositionInLine, int position, ExpressionNode expr) {
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
+    super(line, charPositionInLine);
     this.position = position;
     this.expr = expr;
   }
@@ -30,25 +27,19 @@ public class PairElemNode implements AssignRHSNode {
 
     if (!(expr instanceof IdentifierNode)) {
       errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
-          + " " + expr.toString() + "is not an instance of a Pair");
+          + " Invalid identifier. Expected: PAIR IDENTIFIER Actual: '" + expr + "'");
     } else {
       IdentifierNode pairId = (IdentifierNode) expr;
       DataTypeId expectedType = pairId.getType(symbolTable);
-      if(!(expectedType instanceof PairType)) {
+      if (expectedType == null) {
+        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
+            + " Could not resolve type of '" + pairId + "'. Expected: PAIR");
+      } else if (!(expectedType instanceof PairType)) {
         errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
-                + " " + expr.toString() + "is not an instance of a Pair");
+            + " Incompatible type of '" + expr + "'. "
+            + " Expected: PAIR Actual: " + expectedType);
       }
     }
-  }
-
-  @Override
-  public int getLine() {
-    return line;
-  }
-
-  @Override
-  public int getCharPositionInLine() {
-    return charPositionInLine;
   }
 
   @Override
@@ -59,11 +50,21 @@ public class PairElemNode implements AssignRHSNode {
 
     IdentifierNode pairId = (IdentifierNode) expr;
     DataTypeId pairType = pairId.getType(symbolTable);
-    if(!(pairType instanceof PairType)) {
+    if (!(pairType instanceof PairType)) {
       return null;
     }
 
-    return position == FST ? ((PairType) pairType).getFstType() : ((PairType) pairType).getSndType();
+    return position == FST ? ((PairType) pairType).getFstType()
+        : ((PairType) pairType).getSndType();
+  }
+
+  @Override
+  public String toString() {
+    if (position == FST) {
+      return "fst " + expr;
+    } else {
+      return "snd " + expr;
+    }
   }
 }
 

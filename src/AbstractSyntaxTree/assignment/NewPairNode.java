@@ -6,18 +6,14 @@ import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
-public class NewPairNode implements AssignRHSNode {
-
-  private final int line;
-  private final int charPositionInLine;
+public class NewPairNode extends AssignRHSNode {
 
   private final ExpressionNode leftExpr;
   private final ExpressionNode rightExpr;
 
   public NewPairNode(int line, int charPositionInLine, ExpressionNode leftExpr,
       ExpressionNode rightExpr) {
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
+    super(line, charPositionInLine);
     this.leftExpr = leftExpr;
     this.rightExpr = rightExpr;
   }
@@ -29,17 +25,16 @@ public class NewPairNode implements AssignRHSNode {
   }
 
   @Override
-  public int getLine() {
-    return line;
-  }
-
-  @Override
-  public int getCharPositionInLine() {
-    return charPositionInLine;
-  }
-
-  @Override
   public DataTypeId getType(SymbolTable symbolTable) {
+    if (leftExpr.getType(symbolTable) == null || rightExpr.getType(symbolTable) == null) {
+      return null;
+    }
+
     return new PairType(leftExpr.getType(symbolTable), rightExpr.getType(symbolTable));
+  }
+
+  @Override
+  public String toString() {
+    return "newpair(" + leftExpr + ", " + rightExpr + ")";
   }
 }

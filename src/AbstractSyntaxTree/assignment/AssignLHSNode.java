@@ -4,11 +4,26 @@ import AbstractSyntaxTree.ASTNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
 
-public interface AssignLHSNode extends ASTNode {
+public abstract class AssignLHSNode implements ASTNode {
 
-  int getLine();
+  private final int line;
+  private final int charPositionInLine;
 
-  int getCharPositionInLine();
+  protected AssignLHSNode(int line, int charPositionInLine) {
+    this.line = line;
+    this.charPositionInLine = charPositionInLine;
+  }
 
-  DataTypeId getType(SymbolTable symbolTable);
+  public int getLine() {
+    return line;
+  }
+
+  public int getCharPositionInLine() {
+    return charPositionInLine;
+  }
+
+  public abstract DataTypeId getType(SymbolTable symbolTable);
+
+  @Override
+  public abstract String toString();
 }

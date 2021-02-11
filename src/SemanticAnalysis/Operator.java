@@ -6,8 +6,8 @@ import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
 
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.DataTypes.BaseType.Type;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Operator {
 
@@ -15,12 +15,12 @@ public class Operator {
     NOT("!", BOOL, BOOL),
     NEGATION("-", INT, INT),
     LEN("len", INT),
-    ORD("ord", CHAR, INT),
-    CHR("chr", INT, CHAR);
+    ORD("ord", INT, CHAR),
+    CHR("chr", CHAR, INT);
 
     private final String label;
     private final DataTypeId returnType;
-    private final Set<DataTypeId> argTypes = new HashSet<>();
+    private final List<DataTypeId> argTypes = new ArrayList<>();
 
     /* When specifying a type, no types implies an Array */
     UnOp(String label, Type returnType, Type... argTypes) {
@@ -36,7 +36,7 @@ public class Operator {
       return returnType;
     }
 
-    public Set<DataTypeId> getArgTypes() {
+    public List<DataTypeId> getArgTypes() {
       return argTypes;
     }
 
@@ -71,7 +71,7 @@ public class Operator {
 
     private final String label;
     private final DataTypeId returnType;
-    private final Set<DataTypeId> argTypes = new HashSet<>();
+    private final List<DataTypeId> argTypes = new ArrayList<>();
 
     /* When specifying a type, no types implies any type */
     BinOp(String label, Type returnType, Type... argTypes) {
@@ -91,7 +91,7 @@ public class Operator {
       return returnType;
     }
 
-    public Set<DataTypeId> getArgTypes() {
+    public List<DataTypeId> getArgTypes() {
       return argTypes;
     }
 

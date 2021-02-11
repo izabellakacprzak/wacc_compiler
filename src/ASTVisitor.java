@@ -49,6 +49,7 @@ import antlr.WACCParser.ArrayTypeContext;
 import antlr.WACCParser.Array_elemContext;
 import antlr.WACCParser.AssignStatContext;
 import antlr.WACCParser.BaseTypeContext;
+import antlr.WACCParser.Base_typeContext;
 import antlr.WACCParser.BinaryExprContext;
 import antlr.WACCParser.BoolLiterExprContext;
 import antlr.WACCParser.BracketExprContext;
@@ -65,11 +66,16 @@ import antlr.WACCParser.IdentExprContext;
 import antlr.WACCParser.IdentLHSContext;
 import antlr.WACCParser.IfStatContext;
 import antlr.WACCParser.IntLiterExprContext;
+import antlr.WACCParser.Int_literContext;
 import antlr.WACCParser.NewPairRHSContext;
 import antlr.WACCParser.PairElemLHSContext;
 import antlr.WACCParser.PairElemRHSContext;
+import antlr.WACCParser.PairElemTypeArrayContext;
+import antlr.WACCParser.PairElemTypeBaseContext;
+import antlr.WACCParser.PairElemTypePairContext;
 import antlr.WACCParser.PairLiterExprContext;
 import antlr.WACCParser.PairTypeContext;
+import antlr.WACCParser.Pair_literContext;
 import antlr.WACCParser.PrintStatContext;
 import antlr.WACCParser.PrintlnStatContext;
 import antlr.WACCParser.ProgramContext;
@@ -113,6 +119,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     if(ctx.param_list() != null) {
       params = (ParamListNode) visit(ctx.param_list());
     }
+
     return new FunctionNode(type, identifier, params, body);
   }
 
@@ -132,7 +139,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
       }
     }
 
-    return super.visitParam_list(ctx);
+    return new ParamListNode(names, types);
   }
 
   /* RHS ASSIGNMENT NODES */
@@ -312,20 +319,12 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
   @Override
   public ASTNode visitIntLiterExpr(IntLiterExprContext ctx) {
-
-    int line = ctx.getStart().getLine();
-    int charPositionInLine = ctx.getStart().getCharPositionInLine();
-
-    return new IntLiterExprNode(line, charPositionInLine,
-        Integer.parseInt(ctx.int_liter().getText()));
+    return visitInt_liter(ctx.int_liter());
   }
 
   @Override
   public ASTNode visitPairLiterExpr(PairLiterExprContext ctx) {
-    int line = ctx.getStart().getLine();
-    int charPositionInLine = ctx.getStart().getCharPositionInLine();
-
-    return new PairLiterExprNode(line, charPositionInLine);
+    return visitPair_liter(ctx.pair_liter());
   }
 
   @Override
@@ -456,9 +455,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   /* TYPE NODES */
   @Override
   public ASTNode visitBaseType(BaseTypeContext ctx) {
-    Type baseType = Type.valueOf(ctx.base_type().getText().toUpperCase());
-
-    return new BaseTypeNode(baseType, ctx.getText());
+    return visitBase_type(ctx.base_type());
   }
 
   @Override
@@ -472,5 +469,44 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     TypeNode snd = (TypeNode) visit(ctx.pair_elem_type(1));
 
     return new PairTypeNode(fst, snd);
+  }
+
+  @Override
+  public ASTNode visitBase_type(Base_typeContext ctx) {
+    Type baseType = Type.valueOf(ctx.getText().toUpperCase());
+    return new BaseTypeNode(baseType);
+  }
+
+  @Override
+  public ASTNode visitPairElemTypeBase(PairElemTypeBaseContext ctx) {
+    return visitBase_type(ctx.base_type());
+  }
+
+  @Override
+  public ASTNode visitPairElemTypeArray(PairElemTypeArrayContext ctx) {
+    TypeNode type = (TypeNode) visit(ctx.type());
+    return new ArrayTypeNode(type);
+  }
+
+  @Override
+  public ASTNode visitPairElemTypePair(PairElemTypePairContext ctx) {
+    return new PairTypeNode(null, null);
+  }
+
+  @Override
+  public ASTNode visitPair_liter(Pair_literContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
+    return new PairLiterExprNode(line, charPositionInLine);
+  }
+
+  @Override
+  public ASTNode visitInt_liter(Int_literContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+
+    return new IntLiterExprNode(line, charPositionInLine,
+        Integer.parseInt(ctx.getText()));
   }
 }
