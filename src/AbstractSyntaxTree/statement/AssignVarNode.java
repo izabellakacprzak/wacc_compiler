@@ -24,16 +24,33 @@ public class AssignVarNode extends StatementNode {
     DataTypeId leftType = left.getType(symbolTable);
     DataTypeId rightType = right.getType(symbolTable);
 
+
     if (leftType == null) {
-      errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
-              + " Could not resolve type of left hand side assignment. ");
+      if (varHasBeenDeclared(errorMessages, left)) {
+        errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
+                + " Could not resolve type of left hand side assignment. ");
+      }
     } else if (rightType == null) {
-      errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
-              + " Could not resolve type of right hand side assignment. ");
+      if (varHasBeenDeclared(errorMessages, right)) {
+        errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
+                + " Could not resolve type of right hand side assignment. ");
+      }
     } else if (!leftType.equals(rightType)) {
       errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
-          + " Assignment to: " + left.toString() + "must be of type " + leftType +
-          " not " + rightType);
+              + " Assignment to: " + left.toString() + "must be of type " + leftType +
+              " not " + rightType);
     }
   }
+
+  public boolean varHasBeenDeclared(List<String> errorMessages, AssignLHSNode node) {
+    if (!errorMessages.isEmpty()) {
+      String lastErrorMsg = errorMessages.get(errorMessages.size() - 1);
+      String line = Integer.toString(node.getLine());
+      String charPos = Integer.toString(node.getCharPositionInLine());
+
+      return (!lastErrorMsg.contains(line + ":" + charPos) || !lastErrorMsg.contains("Identifier"));
+      }
+    return true;
+    }
 }
+
