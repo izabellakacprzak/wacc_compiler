@@ -4,6 +4,8 @@ import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
+
+import javax.xml.crypto.Data;
 import java.util.List;
 
 public class PairTypeNode implements TypeNode {
@@ -28,8 +30,16 @@ public class PairTypeNode implements TypeNode {
         (DataTypeId) sndType.getIdentifier(parentSymbolTable));
   }
 
+  private DataTypeId getPairElemNode(TypeNode elem) {
+
+    if (elem == null) {
+      return null;
+    }
+    return elem.getType();
+  }
+
   @Override
   public DataTypeId getType() {
-    return new PairType(fstType.getType(), sndType.getType());
+    return new PairType(getPairElemNode(fstType), getPairElemNode(sndType));
   }
 }

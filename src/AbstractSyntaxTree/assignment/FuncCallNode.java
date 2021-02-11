@@ -87,4 +87,9 @@ public class FuncCallNode implements AssignRHSNode {
 
     return function.getReturnType();
   }
+
+  @Override
+  public String toString() {
+    return "call " + identifier.getIdentifier();
+  }
 }
