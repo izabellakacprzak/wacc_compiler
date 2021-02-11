@@ -20,8 +20,12 @@ public class PairTypeNode implements TypeNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    fstType.semanticAnalysis(symbolTable, errorMessages);
-    sndType.semanticAnalysis(symbolTable, errorMessages);
+    if (fstType != null) {
+      fstType.semanticAnalysis(symbolTable, errorMessages);
+    }
+    if (sndType != null) {
+      sndType.semanticAnalysis(symbolTable, errorMessages);
+    }
   }
 
   @Override

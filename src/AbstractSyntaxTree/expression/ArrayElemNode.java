@@ -8,6 +8,7 @@ import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
 import SemanticAnalysis.VariableId;
 
+import javax.xml.crypto.Data;
 import java.util.List;
 
 public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
@@ -27,27 +28,22 @@ public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symTable, List<String> errorMessages) {
-    identifier.semanticAnalysis(symTable, errorMessages);
+  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    identifier.semanticAnalysis(symbolTable, errorMessages);
     for (ExpressionNode expression : expressions) {
-      expression.semanticAnalysis(symTable, errorMessages);
+      expression.semanticAnalysis(symbolTable, errorMessages);
     }
 
-    /* Is this needed? If it's 0 then it shouldn't be an array-elem */
-    /*
-    if (expressions.size() < 1) {
-      errorMessages.add("");
-    }
-    */
-
-    Identifier idType = symTable.lookupAll(identifier.getIdentifier());
+    Identifier idType = symbolTable.lookupAll(identifier.getIdentifier());
 
     if (idType == null) {
       errorMessages.add(line + ":" + charPositionInLine
           + " No declaration of " + identifier.getIdentifier());
       return;
 
-    } else if (!(idType instanceof ArrayType)) {
+    }
+    if (!(identifier.getType(symbolTable) instanceof ArrayType)) {
+      System.out.println(identifier);
       errorMessages.add(line + ":" + charPositionInLine
           + " Incorrect declaration of " + identifier.getIdentifier()
           + ". Expected: ARRAY. ACTUAL: " + idType.toString().toUpperCase());
@@ -56,7 +52,7 @@ public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
 
     DataTypeId thisType;
     for (ExpressionNode expression : expressions) {
-      thisType = expression.getType(symTable);
+      thisType = expression.getType(symbolTable);
 
       if (thisType == null || !thisType.equals(new BaseType(BaseType.Type.INT))) {
         String typeStr;
@@ -94,8 +90,11 @@ public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
 
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
-    VariableId arrayName = (VariableId) symbolTable.lookupAll(identifier.getIdentifier());
+    DataTypeId idType = identifier.getType(symbolTable);
+    if(!(idType instanceof ArrayType)) {
+      return null;
+    }
 
-    return null;
+    return ((ArrayType) idType).getElemType();
   }
 }
