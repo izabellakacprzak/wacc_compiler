@@ -7,10 +7,7 @@ import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
-public class PairElemNode implements AssignRHSNode {
-
-  private final int line;
-  private final int charPositionInLine;
+public class PairElemNode extends AssignRHSNode {
 
   private static final int FST = 0;
 
@@ -19,8 +16,7 @@ public class PairElemNode implements AssignRHSNode {
 
 
   public PairElemNode(int line, int charPositionInLine, int position, ExpressionNode expr) {
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
+    super(line, charPositionInLine);
     this.position = position;
     this.expr = expr;
   }
@@ -36,7 +32,7 @@ public class PairElemNode implements AssignRHSNode {
       IdentifierNode pairId = (IdentifierNode) expr;
       DataTypeId expectedType = pairId.getType(symbolTable);
       if (expectedType == null) {
-        errorMessages.add(line + ":" + charPositionInLine
+        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
             + " Could not resolve type of '" + pairId + "'. Expected: PAIR");
       } else if(!(expectedType instanceof PairType)) {
         errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
@@ -44,16 +40,6 @@ public class PairElemNode implements AssignRHSNode {
             + " Expected: PAIR Actual: " + expectedType);
       }
     }
-  }
-
-  @Override
-  public int getLine() {
-    return line;
-  }
-
-  @Override
-  public int getCharPositionInLine() {
-    return charPositionInLine;
   }
 
   @Override

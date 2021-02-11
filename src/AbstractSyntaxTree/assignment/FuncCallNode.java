@@ -8,18 +8,14 @@ import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
-public class FuncCallNode implements AssignRHSNode {
-
-  private final int line;
-  private final int charPositionInLine;
+public class FuncCallNode extends AssignRHSNode {
 
   private final IdentifierNode identifier;
   private final List<ExpressionNode> arguments;
 
   public FuncCallNode(int line, int charPositionInLine, IdentifierNode identifier,
       List<ExpressionNode> arguments) {
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
+    super(line, charPositionInLine);
     this.identifier = identifier;
     this.arguments = arguments;
   }
@@ -29,14 +25,14 @@ public class FuncCallNode implements AssignRHSNode {
     Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
 
     if (functionId == null) {
-      errorMessages.add(line + ":" + charPositionInLine
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " No declaration of '" + identifier.getIdentifier() + "' identifier."
           + " Expected: FUNCTION IDENTIFIER");
       return;
     }
 
     if (!(functionId instanceof FunctionId)) {
-      errorMessages.add(line + ":" + charPositionInLine
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
           + " Expected: FUNCTION IDENTIFIER"
           + " Actual: " + identifier.getType(symbolTable) + " IDENTIFIER");
@@ -47,7 +43,7 @@ public class FuncCallNode implements AssignRHSNode {
     List<DataTypeId> paramTypes = function.getParamTypes();
 
     if (paramTypes.size() > arguments.size() || paramTypes.size() < arguments.size()) {
-      errorMessages.add(line + ":" + charPositionInLine
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Function '" + identifier.getIdentifier()
           + "' has been called with the incorrect number of parameters."
           + " Expected: " + paramTypes.size() + " Actual: " + arguments.size());
@@ -63,25 +59,15 @@ public class FuncCallNode implements AssignRHSNode {
       }
 
       if (currArg == null) {
-        errorMessages.add(line + ":" + charPositionInLine
+        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
             + " Could not resolve type of parameter " + i + " in '" + identifier + "' function."
             + " Expected: " + currParamType);
       } else if (!(currArg.equals(currParamType))) {
-        errorMessages.add(line + ":" + charPositionInLine
+        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
             + " Invalid type for parameter " + i + " in '" + identifier + "' function."
             + " Expected: " + currParamType + " Actual: " + currArg);
       }
     }
-  }
-
-  @Override
-  public int getLine() {
-    return line;
-  }
-
-  @Override
-  public int getCharPositionInLine() {
-    return charPositionInLine;
   }
 
   @Override

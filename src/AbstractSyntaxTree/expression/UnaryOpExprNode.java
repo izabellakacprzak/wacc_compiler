@@ -6,17 +6,13 @@ import SemanticAnalysis.Operator.UnOp;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
-public class UnaryOpExprNode implements ExpressionNode {
-
-  private final int line;
-  private final int charPositionInLine;
+public class UnaryOpExprNode extends ExpressionNode {
 
   private final ExpressionNode operand;
   private final UnOp operator;
 
   public UnaryOpExprNode(int line, int charPositionInLine, ExpressionNode operand, UnOp operator) {
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
+    super(line, charPositionInLine);
     this.operand = operand;
     this.operator = operator;
   }
@@ -29,7 +25,7 @@ public class UnaryOpExprNode implements ExpressionNode {
     DataTypeId opType = operand.getType(symbolTable);
 
     if (opType == null) {
-      errorMessages.add(line + ":" + charPositionInLine
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Could not resolve type for '" + operator.getLabel() + "' operand."
           + " Expected: " + argTypes);
       return;
@@ -45,25 +41,15 @@ public class UnaryOpExprNode implements ExpressionNode {
     }
 
     if (!argTypes.isEmpty() && !argMatched) {
-      errorMessages.add(line + ":" + charPositionInLine
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Invalid type for '" + operator.getLabel() + "' operator."
           + " Expected: " + argTypes + " Actual: " + opType);
 
     } else if (argTypes.isEmpty() && !(opType instanceof ArrayType)) {
-      errorMessages.add(line + ":" + charPositionInLine
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Incompatible type for '" + operator.getLabel() + "' operator."
           + " Expected: ARRAY Actual: " + opType);
     }
-  }
-
-  @Override
-  public int getLine() {
-    return line;
-  }
-
-  @Override
-  public int getCharPositionInLine() {
-    return charPositionInLine;
   }
 
   @Override

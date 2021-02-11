@@ -6,16 +6,12 @@ import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
-public class ArrayLiterNode implements AssignRHSNode {
-
-  private final int line;
-  private final int charPositionInLine;
+public class ArrayLiterNode extends AssignRHSNode {
 
   private final List<ExpressionNode> expressions;
 
   public ArrayLiterNode(int line, int charPositionInLine, List<ExpressionNode> expressions) {
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
+    super(line, charPositionInLine);
     this.expressions = expressions;
   }
 
@@ -26,22 +22,22 @@ public class ArrayLiterNode implements AssignRHSNode {
       ExpressionNode fstExpr = expressions.get(0);
       DataTypeId fstType = fstExpr.getType(symbolTable);
       if (fstType == null) {
-        errorMessages.add(line + ":" + charPositionInLine
-                + " Could not resolve type of array assignment.");
+        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
+            + " Could not resolve type of array assignment.");
       } else {
         for (int i = 1; i < expressions.size(); i++) {
           ExpressionNode currExpr = expressions.get(i);
           DataTypeId currType = currExpr.getType(symbolTable);
 
           if (currType == null) {
-            errorMessages.add(line + ":" + charPositionInLine
-                    + " Could not resolve element type(s) in array literal."
-                    + " Expected: " + fstType);
+            errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
+                + " Could not resolve element type(s) in array literal."
+                + " Expected: " + fstType);
             break;
           } else if (!(fstType.equals(currType))) {
-            errorMessages.add(line + ":" + charPositionInLine
-                    + " Incompatible element type(s) in array literal."
-                    + " Expected: " + fstType + " Actual: " + currType);
+            errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
+                + " Incompatible element type(s) in array literal."
+                + " Expected: " + fstType + " Actual: " + currType);
             break;
 
           }
@@ -49,16 +45,6 @@ public class ArrayLiterNode implements AssignRHSNode {
         }
       }
     }
-  }
-
-  @Override
-  public int getLine() {
-    return line;
-  }
-
-  @Override
-  public int getCharPositionInLine() {
-    return charPositionInLine;
   }
 
   @Override

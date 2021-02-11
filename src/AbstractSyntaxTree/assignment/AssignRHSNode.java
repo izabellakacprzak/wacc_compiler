@@ -1,5 +1,8 @@
 package AbstractSyntaxTree.assignment;
 
-public interface AssignRHSNode extends AssignLHSNode {
+public abstract class AssignRHSNode extends AssignLHSNode {
 
+  public AssignRHSNode(int line, int charPositionInLine) {
+    super(line, charPositionInLine);
+  }
 }

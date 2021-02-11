@@ -5,28 +5,14 @@ import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
-public class PairLiterExprNode implements ExpressionNode {
-
-  private final int line;
-  private final int charPositionInLine;
+public class PairLiterExprNode extends ExpressionNode {
 
   public PairLiterExprNode(int line, int charPositionInLine) {
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
+    super(line, charPositionInLine);
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-  }
-
-  @Override
-  public int getLine() {
-    return line;
-  }
-
-  @Override
-  public int getCharPositionInLine() {
-    return charPositionInLine;
   }
 
   @Override

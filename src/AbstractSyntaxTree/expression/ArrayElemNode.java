@@ -1,26 +1,20 @@
 package AbstractSyntaxTree.expression;
 
-import AbstractSyntaxTree.assignment.AssignLHSNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
-
 import java.util.List;
 
-public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
-
-  private final int line;
-  private final int charPositionInLine;
+public class ArrayElemNode extends ExpressionNode {
 
   private final IdentifierNode identifier;
   private final List<ExpressionNode> expressions;
 
   public ArrayElemNode(int line, int charPositionInLine, IdentifierNode identifier,
       List<ExpressionNode> expressions) {
-    this.line = line;
-    this.charPositionInLine = charPositionInLine;
+    super(line, charPositionInLine);
     this.identifier = identifier;
     this.expressions = expressions;
   }
@@ -35,7 +29,7 @@ public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
     Identifier idType = symbolTable.lookupAll(identifier.getIdentifier());
 
     if (idType == null) {
-      errorMessages.add(line + ":" + charPositionInLine
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " No declaration of '" + identifier.getIdentifier() + "' identifier."
           + " Expected: ARRAY IDENTIFIER.");
       return;
@@ -43,7 +37,7 @@ public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
     }
     if (!(identifier.getType(symbolTable) instanceof ArrayType)) {
       System.out.println(identifier);
-      errorMessages.add(line + ":" + charPositionInLine
+      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
           + " Expected: ARRAY IDENTIFIER Actual: " + idType.toString() + "IDENTIFIER");
       return;
@@ -67,24 +61,6 @@ public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
       }
     }
 
-  }
-
-//        if (thisType == null) {
-//          errorMessages.add("Type of " + identifier.getIdentifier() + "[" + i
-//              + "] not found. Expected: " + arrayType.toString());
-//        } else if (arrayType != thisType) {
-//          errorMessages.add("Incompatible type of " + identifier.getIdentifier() + "[" + i
-//              + "]. Expected: " + arrayType.toString() + " Actual: " + thisType.toString());
-//        }
-
-  @Override
-  public int getLine() {
-    return line;
-  }
-
-  @Override
-  public int getCharPositionInLine() {
-    return charPositionInLine;
   }
 
   @Override
