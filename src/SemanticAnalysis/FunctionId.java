@@ -46,19 +46,18 @@ public class FunctionId extends Identifier {
 
     StringBuilder str = new StringBuilder();
 
-    str.append(returnType.toString()).append(' ')
-        .append(identifier).append(" (");
+    str.append(" ").append(identifier).append("(");
 
     for (ParameterId param : params) {
       str.append(param.toString()).append(", ");
     }
 
     if (!params.isEmpty()) {
-      str.delete(str.length() - 2, str.length() - 1);
+      str.deleteCharAt(str.length() - 1).deleteCharAt(str.length() - 1);
     }
 
     str.append(")");
 
-    return str.toString();
+    return "FUNCTION IDENTIFIER for '" + str + "'";
   }
 }

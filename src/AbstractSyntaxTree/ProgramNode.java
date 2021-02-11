@@ -35,7 +35,7 @@ public class ProgramNode implements ASTNode {
             // function is defined - add error message and exit
             IdentifierNode id = func.getIdentifierNode();
             errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
-                + "Attempt at redefining already existing function " + func.getName());
+                + " Function '" + func + "' has already been declared.");
 
           } else {
             FunctionId identifier = (FunctionId) func.getIdentifier(func.getCurrSymTable());

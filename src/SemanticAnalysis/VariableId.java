@@ -18,6 +18,6 @@ public class VariableId extends Identifier {
 
   @Override
   public String toString() {
-    return type.toString() + " " + ((IdentifierNode) super.getNode()).getIdentifier();
+    return type + " IDENTIFIER for '" + ((IdentifierNode) super.getNode()).getIdentifier() + "'";
   }
 }

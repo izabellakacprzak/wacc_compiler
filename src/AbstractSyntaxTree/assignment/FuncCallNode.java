@@ -35,7 +35,7 @@ public class FuncCallNode extends AssignRHSNode {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
           + " Expected: FUNCTION IDENTIFIER"
-          + " Actual: " + identifier.getType(symbolTable) + " IDENTIFIER");
+          + " Actual: " + identifier.getType(symbolTable));
       return;
     }
 
@@ -60,11 +60,12 @@ public class FuncCallNode extends AssignRHSNode {
 
       if (currArg == null) {
         errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-            + " Could not resolve type of parameter " + i + " in '" + identifier + "' function."
+            + " Could not resolve type of parameter " + (i + 1) + " in '" + identifier
+            + "' function."
             + " Expected: " + currParamType);
       } else if (!(currArg.equals(currParamType))) {
         errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-            + " Invalid type for parameter " + i + " in '" + identifier + "' function."
+            + " Invalid type for parameter " + (i + 1) + " in '" + identifier + "' function."
             + " Expected: " + currParamType + " Actual: " + currArg);
       }
     }

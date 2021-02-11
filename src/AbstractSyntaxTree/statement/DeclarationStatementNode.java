@@ -52,7 +52,7 @@ public class DeclarationStatementNode extends StatementNode {
       errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
           + " Assignment type does not match declared type for '"
           + identifier.getIdentifier() + "'."
-          + " Expected: " + declaredType + "Actual: " + assignedType);
+          + " Expected: " + declaredType + " Actual: " + assignedType);
     }
   }
 }

@@ -39,7 +39,7 @@ public class ArrayElemNode extends ExpressionNode {
       System.out.println(identifier);
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
-          + " Expected: ARRAY IDENTIFIER Actual: " + idType.toString() + "IDENTIFIER");
+          + " Expected: ARRAY IDENTIFIER Actual: " + idType);
       return;
     }
 
@@ -80,11 +80,10 @@ public class ArrayElemNode extends ExpressionNode {
     str.append(identifier.getIdentifier()).append("[");
 
     for (ExpressionNode expression : expressions) {
-      str.append(expression.toString()).append("][");
+      str.append(expression).append("][");
     }
 
-    str.delete(str.length() - 2, str.length() - 1);
-    str.append(']');
+    str.deleteCharAt(str.length() - 1);
 
     return str.toString();
   }

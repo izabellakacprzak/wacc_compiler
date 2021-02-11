@@ -26,7 +26,7 @@ public class ArrayType extends DataTypeId {
 
   @Override
   public String toString() {
-    return elemType.toString() + "[]";
+    return elemType + "[]";
   }
 
   @Override
