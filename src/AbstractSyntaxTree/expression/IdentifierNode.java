@@ -1,10 +1,7 @@
 package AbstractSyntaxTree.expression;
 
-import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.FunctionId;
-import SemanticAnalysis.Identifier;
-import SemanticAnalysis.SymbolTable;
-import SemanticAnalysis.VariableId;
+import SemanticAnalysis.*;
+
 import java.util.List;
 
 public class IdentifierNode implements ExpressionNode {
@@ -31,7 +28,7 @@ public class IdentifierNode implements ExpressionNode {
     if (id == null) {
       errorMessages.add(line + ":" + charPositionInLine
               + " Identifier " + identifier + " has not been declared.");
-    } else if (!(id instanceof VariableId)) {
+    } else if (!(id instanceof VariableId) && !(id instanceof ParameterId)) {
       errorMessages.add(line + ":" + charPositionInLine
               + " Identifier " + identifier + " is referenced incorrectly as a variable.");
     }
@@ -59,6 +56,8 @@ public class IdentifierNode implements ExpressionNode {
 
     if (id instanceof VariableId) {
       return ((VariableId) id).getType();
+    } else if (id instanceof ParameterId) {
+      return ((ParameterId) id).getType();
     }
     // check whether identifier is a function instance
     id = symbolTable.lookupAll("*" + identifier);

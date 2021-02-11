@@ -56,10 +56,9 @@ public class FunctionNode implements TypeNode {
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     bodyStatement.setReturnType(returnType.getType());
 
-    returnType.semanticAnalysis(symbolTable, errorMessages);
-    //identifier.semanticAnalysis(symbolTable, errorMessages);
     params.semanticAnalysis(symbolTable, errorMessages);
     bodyStatement.semanticAnalysis(symbolTable, errorMessages);
+    returnType.semanticAnalysis(symbolTable, errorMessages);
   }
 
   public String getName() {
@@ -73,10 +72,10 @@ public class FunctionNode implements TypeNode {
   }
 
   @Override
-  public Identifier getIdentifier(SymbolTable parentSymTable) {
+  public Identifier getIdentifier(SymbolTable symbolTable) {
 
     return new FunctionId(this, returnType.getType(),
-        params.getIdentifiers(parentSymTable), currSymTable);
+        params.getIdentifiers(symbolTable), symbolTable);
   }
 
   @Override

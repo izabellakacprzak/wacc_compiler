@@ -29,11 +29,14 @@ public class ParamListNode implements ASTNode {
     }
   }
 
-  public List<ParameterId> getIdentifiers(SymbolTable parentSymbolTable) {
+  public List<ParameterId> getIdentifiers(SymbolTable symbolTable) {
     List<ParameterId> paramIds = new ArrayList<>();
     for (int i = 0; i < identifiers.size(); i++) {
-      paramIds.add(new ParameterId(identifiers.get(i),
-          (DataTypeId) types.get(i).getIdentifier(parentSymbolTable)));
+
+      ParameterId parameter = new ParameterId(identifiers.get(i),
+              types.get(i).getType());
+      paramIds.add(parameter);
+      symbolTable.add(identifiers.get(i).getIdentifier(), parameter);
     }
     return paramIds;
   }

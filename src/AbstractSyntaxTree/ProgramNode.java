@@ -38,7 +38,7 @@ public class ProgramNode implements ASTNode {
                     + "Attempt at redefining already existing function " + func.getName());
 
             } else {
-                FunctionId identifier = (FunctionId) func.getIdentifier(topSymbolTable);
+                FunctionId identifier = (FunctionId) func.getIdentifier(func.getCurrSymTable());
                 topSymbolTable.add(func.getName(), identifier);
             }
         }
