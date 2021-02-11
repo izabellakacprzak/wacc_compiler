@@ -31,39 +31,38 @@ public class FuncCallNode implements AssignRHSNode {
     if (functionId == null) {
       errorMessages.add(line + ":" + charPositionInLine
           + " Function " + identifier.getIdentifier() + " has not been declared.");
-        return;
+      return;
     }
 
     if (!(functionId instanceof FunctionId)) {
       errorMessages.add(line + ":" + charPositionInLine
-          + " Attempt at calling " + identifier.getIdentifier() + " as a function.");
+          + " Attempt at calling " + identifier.getIdentifier() + " as a function."
+          + " Actual: " + identifier.getType(symbolTable).toString());
       return;
     }
 
     FunctionId function = (FunctionId) functionId;
     List<DataTypeId> paramTypes = function.getParamTypes();
 
-    // TODO: Print out number of expected arguments?
-    if (paramTypes.size() > arguments.size()) {
+    if (paramTypes.size() > arguments.size() || paramTypes.size() < arguments.size()) {
       errorMessages.add(line + ":" + charPositionInLine
-              + " Function " + identifier.getIdentifier() + " has been called with less arguments than expected.");
-    } else if (paramTypes.size() < arguments.size()) {
-      errorMessages.add(line + ":" + charPositionInLine
-              + " Function " + identifier.getIdentifier() + " has been called with more arguments than expected.");
-    } else {
-      for (int i = 0; i < arguments.size(); i++){
-       DataTypeId currArg = arguments.get(i).getType(symbolTable);
-       DataTypeId currParamType = paramTypes.get(i);
+          + " Function " + identifier.getIdentifier()
+          + " has been called with the incorrect number of parameters."
+          + " Expected: " + paramTypes.size() + " Actual: " + arguments.size());
+      return;
+    }
 
-       if (currArg == null || currParamType == null) {
-         errorMessages.add(line + ":" + charPositionInLine
-                 + " Could not resolve parameter " + i + "in function call. ");
-       } else if (!(currArg.equals(currParamType))) {
-         errorMessages.add(line + ":" + charPositionInLine
-             + " Invalid type for argument in function call." + "Expected: " + currParamType
-             .toString()
-             + " Actual: " + currArg.toString());
-       }
+    for (int i = 0; i < arguments.size(); i++) {
+      DataTypeId currArg = arguments.get(i).getType(symbolTable);
+      DataTypeId currParamType = paramTypes.get(i);
+
+      if (currArg == null || currParamType == null) {
+        errorMessages.add(line + ":" + charPositionInLine
+            + " Could not resolve parameter " + i + " in function call.");
+      } else if (!(currArg.equals(currParamType))) {
+        errorMessages.add(line + ":" + charPositionInLine
+            + " Invalid type for parameter " + i + " in function call."
+            + " Expected: " + currParamType.toString() + " Actual: " + currArg.toString());
       }
     }
   }

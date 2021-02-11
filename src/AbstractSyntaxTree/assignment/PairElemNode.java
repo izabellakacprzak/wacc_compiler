@@ -12,9 +12,10 @@ public class PairElemNode implements AssignRHSNode {
   private final int line;
   private final int charPositionInLine;
 
+  private static final int FST = 0;
+
   private final int position; // 0 if FST otherwise SND
   private final ExpressionNode expr;
-  private static final int FST = 0;
 
 
   public PairElemNode(int line, int charPositionInLine, int position, ExpressionNode expr) {
@@ -30,16 +31,17 @@ public class PairElemNode implements AssignRHSNode {
 
     if (!(expr instanceof IdentifierNode)) {
       errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
-          + " " + expr.toString() + "is not an instance of a Pair");
+          + " Invalid identifier. Expected: PAIR IDENTIFIER Actual: '" + expr + "'");
     } else {
       IdentifierNode pairId = (IdentifierNode) expr;
       DataTypeId expectedType = pairId.getType(symbolTable);
       if (expectedType == null) {
         errorMessages.add(line + ":" + charPositionInLine
-                + "Could not resolve expected pair elem type. " );
+            + " Could not resolve type of '" + expr + "'. Expected: PAIR");
       } else if(!(expectedType instanceof PairType)) {
         errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
-                + " " + expr.toString() + "is not an instance of a Pair");
+            + " Incompatible type of '" + expr + "'. "
+            + " Expected: PAIR Actual: " + expectedType);
       }
     }
   }

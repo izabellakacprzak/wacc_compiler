@@ -34,13 +34,13 @@ public class ArrayLiterNode implements AssignRHSNode {
 
         if(currType == null) {
           errorMessages.add(line + ":" + charPositionInLine
-              + " Could not resolve type of element " + i + " in array. "
-              + "Expected: " + fstType.toString());
+              + " Could not resolve element type(s) in array literal."
+              + " Expected: " + fstType.toString());
           break;
         } else if (!(fstType.equals(currType))) {
           errorMessages.add(line + ":" + charPositionInLine
-              + " Multiple element types in array literal. Expected: " +
-              fstType.toString() + " Actual: " + currType.toString());
+              + " Incorrect element type(s) in array literal."
+              + " Expected: " + fstType.toString() + " Actual: " + currType.toString());
           break;
         }
       }

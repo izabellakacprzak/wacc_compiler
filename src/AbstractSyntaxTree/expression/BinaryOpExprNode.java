@@ -34,18 +34,18 @@ public class BinaryOpExprNode implements ExpressionNode {
     /* LHS Expression and RHS Expression types do not match */
     if (lhsType == null) {
       errorMessages.add(line + ":" + charPositionInLine
-              + " Could not resolve left hand side of '" + operator.getLabel() + "' operator");
+          + " Could not resolve type of LHS expression for '" + operator.getLabel() + "' operator");
       return;
     } else if (rhsType == null){
       errorMessages.add(line + ":" + charPositionInLine
-          + " Could not resolve right hand side of '" + operator.getLabel() + "' operator");
+          + " Could not resolve type of RHS expression for '" + operator.getLabel() + "' operator");
       return;
     }
+
     if (!lhsType.equals(rhsType)) {
       errorMessages.add(line + ":" + charPositionInLine
           + " Non-matching types for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + lhsType.toString()
-          + " Actual: " + rhsType.toString());
+          + "Expected: " + lhsType.toString() + " Actual: " + rhsType.toString());
     }
 
     List<DataTypeId> argTypes = operator.getArgTypes();
@@ -63,9 +63,8 @@ public class BinaryOpExprNode implements ExpressionNode {
       DataTypeId expected = argTypes.get(0);
 
       errorMessages.add(line + ":" + charPositionInLine
-          + " Invalid types for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + expected.toString()
-          + " Actual: " + lhsType.toString());
+          + " Incompatible types for '" + operator.getLabel() + "' operator."
+          + " Expected: " + expected.toString() + " Actual: " + lhsType.toString());
       return;
     }
 
@@ -83,9 +82,8 @@ public class BinaryOpExprNode implements ExpressionNode {
       DataTypeId expected = argTypes.get(0);
 
       errorMessages.add(line + ":" + charPositionInLine
-          + " Invalid RHS type for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + expected.toString()
-          + " Actual: " + rhsType.toString());
+          + " Incompatible RHS type for '" + operator.getLabel() + "' operator."
+          + " Expected: " + expected.toString() + " Actual: " + rhsType.toString());
       // TODO: return;
     }
 

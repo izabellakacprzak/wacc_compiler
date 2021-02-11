@@ -49,6 +49,6 @@ public class NewPairNode implements AssignRHSNode {
 
   @Override
   public String toString() {
-    return "newpair (" + leftExpr + ", " + rightExpr + ")";
+    return "newpair(" + leftExpr + ", " + rightExpr + ")";
   }
 }
