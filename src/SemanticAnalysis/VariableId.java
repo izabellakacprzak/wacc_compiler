@@ -1,13 +1,12 @@
 package SemanticAnalysis;
 
-import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 
 public class VariableId extends Identifier {
 
   private final DataTypeId type;
 
-  public VariableId(ASTNode node, DataTypeId type) {
+  public VariableId(IdentifierNode node, DataTypeId type) {
     super(node);
     this.type = type;
   }
@@ -18,6 +17,6 @@ public class VariableId extends Identifier {
 
   @Override
   public String toString() {
-    return type + " IDENTIFIER for '" + ((IdentifierNode) super.getNode()).getIdentifier() + "'";
+    return type + " IDENTIFIER for '" + super.getNode() + "'";
   }
 }

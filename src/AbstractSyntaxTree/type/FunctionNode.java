@@ -68,8 +68,8 @@ public class FunctionNode implements TypeNode {
   @Override
   public Identifier getIdentifier(SymbolTable symbolTable) {
 
-    return new FunctionId(this, returnType.getType(),
-        params.getIdentifiers(symbolTable), symbolTable);
+    return new FunctionId(identifier, returnType.getType(),
+        params.getIdentifiers(symbolTable));
   }
 
   @Override

@@ -1,19 +1,21 @@
 package SemanticAnalysis;
 
-import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.expression.IdentifierNode;
 
 public abstract class Identifier {
 
-  private final ASTNode node;
+  /* Store node associated with Identifier for accessing identifier string */
+  private final IdentifierNode node;
 
-  public Identifier(ASTNode node) {
+  public Identifier(IdentifierNode node) {
     this.node = node;
   }
 
-  public ASTNode getNode() {
+  public IdentifierNode getNode() {
     return node;
   }
 
+  /* All identifiers must Override toString for use in error messages */
   @Override
   public abstract String toString();
 }

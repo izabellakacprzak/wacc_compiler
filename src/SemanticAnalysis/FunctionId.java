@@ -1,7 +1,6 @@
 package SemanticAnalysis;
 
-import AbstractSyntaxTree.ASTNode;
-import AbstractSyntaxTree.type.FunctionNode;
+import AbstractSyntaxTree.expression.IdentifierNode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,27 +8,15 @@ public class FunctionId extends Identifier {
 
   private final DataTypeId returnType;
   private final List<ParameterId> params;
-  private final SymbolTable symTable;
 
-  public FunctionId(ASTNode node, DataTypeId returnType, List<ParameterId> params,
-      SymbolTable symTable) {
+  public FunctionId(IdentifierNode node, DataTypeId returnType, List<ParameterId> params) {
     super(node);
     this.returnType = returnType;
-    this.symTable = symTable;
     this.params = params;
-
   }
 
   public DataTypeId getReturnType() {
     return returnType;
-  }
-
-  public List<ParameterId> getParams() {
-    return params;
-  }
-
-  public SymbolTable getSymTable() {
-    return symTable;
   }
 
   public List<DataTypeId> getParamTypes() {
@@ -42,11 +29,8 @@ public class FunctionId extends Identifier {
 
   @Override
   public String toString() {
-    String identifier = ((FunctionNode) super.getNode()).getIdentifierNode().getIdentifier();
-
     StringBuilder str = new StringBuilder();
-
-    str.append(" ").append(identifier).append("(");
+    str.append(" ").append(super.getNode()).append("(");
 
     for (ParameterId param : params) {
       str.append(param.toString()).append(", ");

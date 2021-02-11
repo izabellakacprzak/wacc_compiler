@@ -1,13 +1,12 @@
 package SemanticAnalysis;
 
-import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 
 public class ParameterId extends Identifier {
 
   private final DataTypeId type;
 
-  public ParameterId(ASTNode node, DataTypeId type) {
+  public ParameterId(IdentifierNode node, DataTypeId type) {
     super(node);
     this.type = type;
   }
@@ -18,7 +17,7 @@ public class ParameterId extends Identifier {
 
   @Override
   public String toString() {
-    return type + " IDENTIFIER for '" + ((IdentifierNode) super.getNode()).getIdentifier() + "'";
+    return type + " IDENTIFIER for '" + super.getNode() + "'";
   }
 }
 
