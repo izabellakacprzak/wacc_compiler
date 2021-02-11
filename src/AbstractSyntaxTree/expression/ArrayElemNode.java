@@ -32,24 +32,18 @@ public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
       expression.semanticAnalysis(symTable, errorMessages);
     }
 
-    /* Is this needed? If it's 0 then it shouldn't be an array-elem */
-    /*
-    if (expressions.size() < 1) {
-      errorMessages.add("");
-    }
-    */
-
     Identifier idType = symTable.lookupAll(identifier.getIdentifier());
 
     if (idType == null) {
       errorMessages.add(line + ":" + charPositionInLine
-          + " No declaration of " + identifier.getIdentifier());
+          + " No declaration of '" + identifier.getIdentifier() + "' identifier."
+          + " Expected: ARRAY IDENTIFIER.");
       return;
 
     } else if (!(idType instanceof ArrayType)) {
       errorMessages.add(line + ":" + charPositionInLine
-          + " Incorrect declaration of " + identifier.getIdentifier()
-          + ". Expected: ARRAY. ACTUAL: " + idType.toString());
+          + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
+          + " Expected: ARRAY IDENTIFIER Actual: " + idType.toString() + "IDENTIFIER");
       return;
     }
 
@@ -57,17 +51,17 @@ public class ArrayElemNode implements AssignLHSNode, ExpressionNode {
     for (ExpressionNode expression : expressions) {
       thisType = expression.getType(symTable);
 
-      if (thisType == null || !thisType.equals(new BaseType(BaseType.Type.INT))) {
-        String typeStr;
-
-        if (thisType == null) {
-          typeStr = "UNDEFINED";
-        } else {
-          typeStr = thisType.toString();
-        }
-
+      if (thisType == null) {
         errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-            + " Expected: INT Actual: " + typeStr);
+            + " Could not resolve type of '" + expression + "' in ARRAY ELEM."
+            + " Expected: INT");
+        break;
+      }
+
+      if (!thisType.equals(new BaseType(BaseType.Type.INT))) {
+        errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
+            + " Incompatible type of '" + expression + "' in ARRAY ELEM."
+            + " Expected: INT Actual: " + thisType);
       }
     }
 

@@ -25,15 +25,16 @@ public class UnaryOpExprNode implements ExpressionNode {
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     operand.semanticAnalysis(symbolTable, errorMessages);
 
+    List<DataTypeId> argTypes = operator.getArgTypes();
     DataTypeId opType = operand.getType(symbolTable);
 
     if (opType == null) {
       errorMessages.add(line + ":" + charPositionInLine
-          + " Could not resolve operand '" + operator.getLabel() + "' type");
+          + " Could not resolve type for '" + operator.getLabel() + "' operand."
+          + " Expected: " + argTypes);
       return;
     }
 
-    List<DataTypeId> argTypes = operator.getArgTypes();
     boolean argMatched = false;
 
     for (DataTypeId argType : argTypes) {
@@ -44,20 +45,14 @@ public class UnaryOpExprNode implements ExpressionNode {
     }
 
     if (!argTypes.isEmpty() && !argMatched) {
-      DataTypeId expected = argTypes.get(0);
-
       errorMessages.add(line + ":" + charPositionInLine
-          + " Invalid type for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + expected.toString()
-          + " Actual: " + opType.toString());
+          + " Invalid type for '" + operator.getLabel() + "' operator."
+          + " Expected: " + argTypes + " Actual: " + opType);
 
     } else if (argTypes.isEmpty() && !(opType instanceof ArrayType)) {
-      DataTypeId expected = new ArrayType(null);
-
       errorMessages.add(line + ":" + charPositionInLine
-          + " Invalid type for '" + operator.getLabel() + "' operator. "
-          + "Expected: " + expected.toString()
-          + " Actual: " + opType.toString());
+          + " Incompatible type for '" + operator.getLabel() + "' operator."
+          + " Expected: ARRAY Actual: " + opType);
     }
   }
 

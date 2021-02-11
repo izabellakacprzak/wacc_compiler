@@ -39,8 +39,8 @@ public class ArrayLiterNode implements AssignRHSNode {
           break;
         } else if (!(fstType.equals(currType))) {
           errorMessages.add(line + ":" + charPositionInLine
-              + " Incorrect element type(s) in array literal."
-              + " Expected: " + fstType.toString() + " Actual: " + currType.toString());
+              + " Incompatible element type(s) in array literal."
+              + " Expected: " + fstType + " Actual: " + currType);
           break;
         }
       }

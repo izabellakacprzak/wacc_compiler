@@ -30,14 +30,16 @@ public class FuncCallNode implements AssignRHSNode {
 
     if (functionId == null) {
       errorMessages.add(line + ":" + charPositionInLine
-          + " Function " + identifier.getIdentifier() + " has not been declared.");
+          + " No declaration of '" + identifier.getIdentifier() + "' identifier."
+          + " Expected: FUNCTION IDENTIFIER");
       return;
     }
 
     if (!(functionId instanceof FunctionId)) {
       errorMessages.add(line + ":" + charPositionInLine
-          + " Attempt at calling " + identifier.getIdentifier() + " as a function."
-          + " Actual: " + identifier.getType(symbolTable).toString());
+          + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
+          + " Expected: FUNCTION IDENTIFIER"
+          + " Actual: " + identifier.getType(symbolTable) + " IDENTIFIER");
       return;
     }
 
@@ -46,8 +48,8 @@ public class FuncCallNode implements AssignRHSNode {
 
     if (paramTypes.size() > arguments.size() || paramTypes.size() < arguments.size()) {
       errorMessages.add(line + ":" + charPositionInLine
-          + " Function " + identifier.getIdentifier()
-          + " has been called with the incorrect number of parameters."
+          + " Function '" + identifier.getIdentifier()
+          + "' has been called with the incorrect number of parameters."
           + " Expected: " + paramTypes.size() + " Actual: " + arguments.size());
       return;
     }
@@ -56,13 +58,19 @@ public class FuncCallNode implements AssignRHSNode {
       DataTypeId currArg = arguments.get(i).getType(symbolTable);
       DataTypeId currParamType = paramTypes.get(i);
 
-      if (currArg == null || currParamType == null) {
+      //TODO: think this is handled elsewhere but idk man
+      if (currParamType == null) {
+        break;
+      }
+
+      if (currArg == null) {
         errorMessages.add(line + ":" + charPositionInLine
-            + " Could not resolve parameter " + i + " in function call.");
+            + " Could not resolve type of parameter " + i + " in '" + identifier + "' function."
+            + " Expected: " + currParamType);
       } else if (!(currArg.equals(currParamType))) {
         errorMessages.add(line + ":" + charPositionInLine
-            + " Invalid type for parameter " + i + " in function call."
-            + " Expected: " + currParamType.toString() + " Actual: " + currArg.toString());
+            + " Invalid type for parameter " + i + " in '" + identifier + "' function."
+            + " Expected: " + currParamType + " Actual: " + currArg);
       }
     }
   }

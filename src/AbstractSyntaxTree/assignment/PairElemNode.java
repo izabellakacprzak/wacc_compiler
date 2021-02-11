@@ -37,7 +37,7 @@ public class PairElemNode implements AssignRHSNode {
       DataTypeId expectedType = pairId.getType(symbolTable);
       if (expectedType == null) {
         errorMessages.add(line + ":" + charPositionInLine
-            + " Could not resolve type of '" + expr + "'. Expected: PAIR");
+            + " Could not resolve type of '" + pairId + "'. Expected: PAIR");
       } else if(!(expectedType instanceof PairType)) {
         errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
             + " Incompatible type of '" + expr + "'. "
