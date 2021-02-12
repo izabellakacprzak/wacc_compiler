@@ -5,22 +5,24 @@ import SemanticAnalysis.DataTypeId;
 
 public abstract class StatementNode implements ASTNode {
 
-  /* false for all StatementNodes except for ExitStatementNode and StatementsListNode */
+  /* false for all StatementNodes except for ExitStatementNode, overridden by nodes
+   * that can have exit statements in their child nodes. Used for syntax error checking */
   public boolean hasExitStatement() {
     return false;
   }
 
-  /* false for all StatementNodes except for ReturnStatementNode and StatementsListNode */
+  /* false for all StatementNodes except for ReturnStatementNode, overridden by nodes
+   * that can have return statements in their child nodes. Used for syntax error checking */
   public boolean hasReturnStatement() {
     return false;
   }
 
-  /* true for all StatementNodes except for StatementsListNode */
+  /* ltrue for all StatementNodes except for StatementsListNode. Used for syntax error checking */
   public boolean hasNoStatementAfterReturn() {
     return true;
   }
 
-  /* Used to set the expected return type in ReturnStatementNode */
+  /* Used to recursively set the function expected return type in ReturnStatementNode */
   public void setReturnType(DataTypeId returnType) {
   }
 }

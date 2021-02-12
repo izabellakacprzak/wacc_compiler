@@ -5,6 +5,7 @@ import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.type.FunctionNode;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class ProgramNode implements ASTNode {
         /* A function with the same name has already been declared */
         IdentifierNode id = func.getIdentifierNode();
         errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
-            + " Function '" + func + "' has already been declared.");
+                              + " Function '" + func + "' has already been declared.");
 
       } else {
         /* Create function identifier and add it to the topSymbolTable */
@@ -52,8 +53,9 @@ public class ProgramNode implements ASTNode {
     statementNode.semanticAnalysis(topSymbolTable, errorMessages);
   }
 
-  // TODO: idk if this is right
-  /* Check to see whether any syntax errors are found in each function */
+
+  /* Check to see whether any syntax errors are found in each function nodes of the  program.
+   * Accumulates them and returns them to notify the syntax error listener. */
   public List<String> checkSyntaxErrors() {
     String error;
     for (FunctionNode f : functionNodes) {

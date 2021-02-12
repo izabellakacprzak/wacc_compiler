@@ -4,10 +4,10 @@ import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.List;
 
 public class AssignVarNode extends StatementNode {
-
   private final AssignLHSNode left;
   private final AssignRHSNode right;
 
@@ -30,22 +30,22 @@ public class AssignVarNode extends StatementNode {
     if (leftType == null) {
       if (varHasBeenDeclared(errorMessages, left)) {
         errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
-            + " Could not resolve type of LHS assignment '" + left + "'.");
+                              + " Could not resolve type of LHS assignment '" + left + "'.");
       }
     } else if (rightType == null) {
       if (varHasBeenDeclared(errorMessages, right)) {
         errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
-            + " Could not resolve type of RHS assignment'" + right + "'.");
+                              + " Could not resolve type of RHS assignment'" + right + "'.");
       }
     } else if (!leftType.equals(rightType)) {
       errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
-          + " RHS type does not match LHS type for assignment. "
-          + " Expected: " + leftType + " Actual: " + rightType);
+                            + " RHS type does not match LHS type for assignment. "
+                            + " Expected: " + leftType + " Actual: " + rightType);
     }
   }
 
   /* Check whether the inability to resolve the assignment does not stem from an undeclared variable.
-  *  true if variable has been declared in the current scope. */
+   *  true if variable has been declared in the current scope. */
   public boolean varHasBeenDeclared(List<String> errorMessages, AssignLHSNode node) {
     if (!errorMessages.isEmpty()) {
       String lastErrorMsg = errorMessages.get(errorMessages.size() - 1);
