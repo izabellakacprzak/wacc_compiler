@@ -44,8 +44,8 @@ public class AssignVarNode extends StatementNode {
     }
   }
 
-  // TODO: not sure what this is
-  /* */
+  /* Check whether the inability to resolve the assignment does not stem from an undeclared variable.
+  *  true if variable has been declared in the current scope. */
   public boolean varHasBeenDeclared(List<String> errorMessages, AssignLHSNode node) {
     if (!errorMessages.isEmpty()) {
       String lastErrorMsg = errorMessages.get(errorMessages.size() - 1);

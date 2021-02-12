@@ -26,7 +26,7 @@ public class DeclarationStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    /* Check whether identifier has been previously declared as another variable.
+    /* Check whether identifier has been previously declared as another variable in the current scope.
      * If not, add a new VariableId to the symbol table under identifier */
     if (symbolTable.lookup(identifier.getIdentifier()) != null) {
       errorMessages.add(identifier.getLine() + ":" + identifier.getCharPositionInLine()
