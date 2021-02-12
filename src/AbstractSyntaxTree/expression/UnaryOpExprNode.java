@@ -74,6 +74,7 @@ public class UnaryOpExprNode extends ExpressionNode {
     return operator.getReturnType();
   }
 
+  /* Returns a UnaryOpExpr in the form: operator expr */
   @Override
   public String toString() {
     return operator.getLabel() + " " + operand;

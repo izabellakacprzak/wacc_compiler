@@ -109,6 +109,7 @@ public class BinaryOpExprNode extends ExpressionNode {
     return operator.getReturnType();
   }
 
+  /* Returns a BinaryOpExpr in the form: left_expr operator right_expr */
   @Override
   public String toString() {
     return left + " " + operator.getLabel() + " " + right;

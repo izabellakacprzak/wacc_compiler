@@ -4,6 +4,7 @@ import AbstractSyntaxTree.expression.ExpressionNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.List;
 
 public class IfStatementNode extends StatementNode {
@@ -16,7 +17,7 @@ public class IfStatementNode extends StatementNode {
   private final StatementNode elseStatement;
 
   public IfStatementNode(ExpressionNode condition, StatementNode thenStatement,
-      StatementNode elseStatement) {
+                         StatementNode elseStatement) {
     this.condition = condition;
     this.thenStatement = thenStatement;
     this.elseStatement = elseStatement;
@@ -32,12 +33,12 @@ public class IfStatementNode extends StatementNode {
 
     if (conditionType == null) {
       errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
-          + " Could not resolve type for '" + condition + "'."
-          + " Expected: BOOL");
+                            + " Could not resolve type for '" + condition + "'."
+                            + " Expected: BOOL");
     } else if (!conditionType.equals(new BaseType(BaseType.Type.BOOL))) {
       errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
-          + " Incompatible type for 'If' condition."
-          + " Expected: BOOL Actual: " + conditionType);
+                            + " Incompatible type for 'If' condition."
+                            + " Expected: BOOL Actual: " + conditionType);
     }
 
     /* Recursively call semanticAnalysis on statement nodes */
@@ -45,11 +46,12 @@ public class IfStatementNode extends StatementNode {
     elseStatement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
   }
 
-  /* true if both the then and else statements have either an exit or return statement */
+  /* true if both the then and else statements have either an exit or return statement.
+   * Used for syntax error checking. */
   @Override
   public boolean hasReturnStatement() {
     return (thenStatement.hasReturnStatement() || thenStatement.hasExitStatement())
-        && (elseStatement.hasExitStatement() || elseStatement.hasReturnStatement());
+               && (elseStatement.hasExitStatement() || elseStatement.hasReturnStatement());
   }
 
   @Override

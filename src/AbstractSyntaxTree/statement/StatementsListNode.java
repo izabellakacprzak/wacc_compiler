@@ -39,7 +39,6 @@ public class StatementsListNode extends StatementNode {
    * in the statements list */
   @Override
   public boolean hasNoStatementAfterReturn() {
-    // TODO: is this supposed to be -2 rather than -1?
     for (int i = 0; i < statements.size() - 1; i++) {
       if (statements.get(i).hasReturnStatement()) {
         return false;

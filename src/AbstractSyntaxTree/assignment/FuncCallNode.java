@@ -103,6 +103,7 @@ public class FuncCallNode extends AssignRHSNode {
     return function.getReturnType();
   }
 
+  /* Returns a FuncCall in the form: call func_id(arg1, arg2, ..., argN) */
   @Override
   public String toString() {
     StringBuilder str = new StringBuilder();

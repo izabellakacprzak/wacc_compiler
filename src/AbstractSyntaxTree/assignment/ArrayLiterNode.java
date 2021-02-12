@@ -67,6 +67,7 @@ public class ArrayLiterNode extends AssignRHSNode {
     }
   }
 
+  /* Returns an ArrayLiter in the form: [expr1, expr2, ..., exprN] */
   @Override
   public String toString() {
     StringBuilder str = new StringBuilder();
