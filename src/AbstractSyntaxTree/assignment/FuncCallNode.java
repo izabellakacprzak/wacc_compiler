@@ -28,9 +28,9 @@ public class FuncCallNode extends AssignRHSNode {
     this.arguments = arguments;
   }
 
-  private boolean charArrayToString(DataTypeId leftType, DataTypeId rightType) {
-    if (leftType.equals(new ArrayType(new BaseType(CHAR)))) {
-      return rightType.equals(new BaseType(STRING));
+  private boolean stringToCharArray(DataTypeId leftType, DataTypeId rightType) {
+    if (leftType.equals(new BaseType(STRING))) {
+      return rightType.equals(new ArrayType(new BaseType(CHAR)));
     }
 
     return false;
@@ -83,7 +83,7 @@ public class FuncCallNode extends AssignRHSNode {
             + " Could not resolve type of parameter " + (i + 1) + " in '" + identifier
             + "' function."
             + " Expected: " + currParamType);
-      } else if (!(currArg.equals(currParamType)) && !charArrayToString(currParamType, currArg)) {
+      } else if (!(currArg.equals(currParamType)) && !stringToCharArray(currParamType, currArg)) {
         errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
             + " Invalid type for parameter " + (i + 1) + " in '" + identifier + "' function."
             + " Expected: " + currParamType + " Actual: " + currArg);

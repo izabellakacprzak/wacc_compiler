@@ -29,9 +29,9 @@ public abstract class StatementNode implements ASTNode {
   public void setReturnType(DataTypeId returnType) {
   }
 
-   boolean charArrayToString(DataTypeId declaredType, DataTypeId assignedType) {
-    if (declaredType.equals(new ArrayType(new BaseType(CHAR)))) {
-      return assignedType.equals(new BaseType(STRING));
+   boolean stringToCharArray(DataTypeId declaredType, DataTypeId assignedType) {
+    if (declaredType.equals(new BaseType(STRING))) {
+      return assignedType.equals(new ArrayType(new BaseType(CHAR)));
     }
 
     return false;

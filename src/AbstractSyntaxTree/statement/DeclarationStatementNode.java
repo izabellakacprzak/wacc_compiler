@@ -52,7 +52,7 @@ public class DeclarationStatementNode extends StatementNode {
           + " Could not resolve type of '" + assignment.toString() + "'."
           + " Expected: " + declaredType);
 
-    } else if (!declaredType.equals(assignedType) && !charArrayToString(declaredType, assignedType)) {
+    } else if (!declaredType.equals(assignedType) && !stringToCharArray(declaredType, assignedType)) {
       errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
           + " Assignment type does not match declared type for '"
           + identifier.getIdentifier() + "'."

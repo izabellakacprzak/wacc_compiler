@@ -37,7 +37,7 @@ public class ReturnStatementNode extends StatementNode {
     if (returnExprType == null) {
       errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
           + " Could not resolve type for '" + returnExpr + "'.");
-    } else if (!(returnExprType.equals(returnType)) && !charArrayToString(returnType, returnExprType)) {
+    } else if (!(returnExprType.equals(returnType)) && !stringToCharArray(returnType, returnExprType)) {
       errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
           + " Declared return type does not match 'return' statement type."
           + " Expected: " + returnType + " Actual: " + returnExprType);

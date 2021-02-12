@@ -1,0 +1,5 @@
+begin
+  string str = ['h', 'e', 'l', 'l'] ;
+  println str
+end
+

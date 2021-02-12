@@ -1,0 +1,5 @@
+begin
+  char[] str = "hello" ;
+  println str
+end
+

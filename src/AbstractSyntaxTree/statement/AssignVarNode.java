@@ -37,7 +37,7 @@ public class AssignVarNode extends StatementNode {
         errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
             + " Could not resolve type of RHS assignment'" + right + "'.");
       }
-    } else if (!leftType.equals(rightType) && !charArrayToString(leftType, rightType)) {
+    } else if (!leftType.equals(rightType) && !stringToCharArray(leftType, rightType)) {
       errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
           + " RHS type does not match LHS type for assignment. "
           + " Expected: " + leftType + " Actual: " + rightType);
