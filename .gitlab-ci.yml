@@ -14,7 +14,6 @@ compile-job:
 test-job:
   stage: test
   script:
-    - make
     - mvn test
 
 clean-job:
