@@ -3,7 +3,6 @@ package AbstractSyntaxTree.statement;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
-
 import java.util.List;
 
 public class ReturnStatementNode extends StatementNode {
@@ -17,8 +16,6 @@ public class ReturnStatementNode extends StatementNode {
     this.returnExpr = returnExpr;
   }
 
-
-
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     /* Recursively call semanticAnalysis on expression node */
@@ -28,7 +25,7 @@ public class ReturnStatementNode extends StatementNode {
      * Return statements cannot be present in the body of the main function */
     if (symbolTable.isTopSymTable()) {
       errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
-                            + " 'return' statement cannot be present in the body of the main function.");
+          + " 'return' statement cannot be present in the body of the main function.");
       return;
     }
 
@@ -38,12 +35,19 @@ public class ReturnStatementNode extends StatementNode {
     if (returnExprType == null) {
       errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
           + " Could not resolve type for '" + returnExpr + "'.");
-    } else if (!(returnExprType.equals(returnType)) && !stringToCharArray(returnType, returnExprType)) {
+    } else if (!(returnExprType.equals(returnType)) && !stringToCharArray(returnType,
+        returnExprType)) {
 
       errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
-                            + " Declared return type does not match 'return' statement type."
-                            + " Expected: " + returnType + " Actual: " + returnExprType);
+          + " Declared return type does not match 'return' statement type."
+          + " Expected: " + returnType + " Actual: " + returnExprType);
     }
+  }
+
+  /* Sets the function expected returnType  */
+  @Override
+  public void setReturnType(DataTypeId returnType) {
+    this.returnType = returnType;
   }
 
   /* true for this StatementNode as it represents a return statement. Used for syntax error
@@ -51,11 +55,5 @@ public class ReturnStatementNode extends StatementNode {
   @Override
   public boolean hasReturnStatement() {
     return true;
-  }
-
-  /* Sets the function expected returnType  */
-  @Override
-  public void setReturnType(DataTypeId returnType) {
-    this.returnType = returnType;
   }
 }

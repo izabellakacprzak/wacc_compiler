@@ -45,15 +45,15 @@ public class IdentifierNode extends ExpressionNode {
     Identifier id = symbolTable.lookupAll(identifier);
 
     if (id instanceof VariableId) {
-      return ((VariableId) id).getType();
+      return id.getType();
     } else if (id instanceof ParameterId) {
-      return ((ParameterId) id).getType();
+      return id.getType();
     }
 
     /* Add '*' to search for a FunctionId */
     id = symbolTable.lookupAll("*" + identifier);
     if (id instanceof FunctionId) {
-      return ((FunctionId) id).getReturnType();
+      return id.getType();
     }
 
     return null;

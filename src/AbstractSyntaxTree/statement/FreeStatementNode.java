@@ -28,6 +28,7 @@ public class FreeStatementNode extends StatementNode {
       errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
           + " Could not resolve type for '" + expression + "'."
           + " Expected: ARRAY, PAIR");
+
     } else if (!exprType.equals(new PairType(null, null)) &&
         !exprType.equals(new ArrayType(null))) {
       errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()

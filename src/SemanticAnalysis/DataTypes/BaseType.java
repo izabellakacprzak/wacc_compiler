@@ -11,7 +11,7 @@ public class BaseType extends DataTypeId {
     this.type = type;
   }
 
-  public Type getType() {
+  public Type getBaseType() {
     return type;
   }
 
@@ -23,7 +23,7 @@ public class BaseType extends DataTypeId {
     }
 
     BaseType baseType = (BaseType) o;
-    return baseType.getType() == type;
+    return baseType.getBaseType() == type;
   }
 
   @Override

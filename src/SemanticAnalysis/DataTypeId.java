@@ -7,6 +7,13 @@ public abstract class DataTypeId extends Identifier {
     super(null);
   }
 
+  /* A DataTypeId's type is themself */
+  @Override
+  public DataTypeId getType() {
+    return this;
+  }
+
+  /* All DataTypeIds must Override the equals method */
   @Override
   public abstract boolean equals(Object object);
 }

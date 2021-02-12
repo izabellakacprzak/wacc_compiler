@@ -45,7 +45,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     StatementNode body = (StatementNode) visit(ctx.stat());
     ParamListNode params = new ParamListNode(new ArrayList<>(), new ArrayList<>());
 
-    if(ctx.param_list() != null) {
+    if (ctx.param_list() != null) {
       params = (ParamListNode) visit(ctx.param_list());
     }
 
@@ -60,11 +60,11 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     List<IdentifierNode> names = new ArrayList<>();
     List<TypeNode> types = new ArrayList<>();
 
-    if(ctx.IDENT() != null) {
+    if (ctx.IDENT() != null) {
       int line = ctx.getStart().getLine();
       int charPositionInLine = ctx.getStart().getCharPositionInLine();
 
-      for(int i = 0; i < ctx.IDENT().size(); i++) {
+      for (int i = 0; i < ctx.IDENT().size(); i++) {
 
         names.add(new IdentifierNode(line, charPositionInLine, ctx.IDENT(i).getText()));
         types.add((TypeNode) visit(ctx.type(i)));
@@ -359,7 +359,6 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     int line = ctx.getStart().getLine();
     int charPositionInLine = ctx.getStart().getCharPositionInLine();
     ExpressionNode expressionNode = (ExpressionNode) visit(ctx.expr());
-
 
     return new ParenthesisExprNode(line, charPositionInLine, expressionNode);
   }

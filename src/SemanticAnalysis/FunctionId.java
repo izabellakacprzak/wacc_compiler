@@ -17,7 +17,8 @@ public class FunctionId extends Identifier {
     this.params = params;
   }
 
-  public DataTypeId getReturnType() {
+  @Override
+  public DataTypeId getType() {
     return returnType;
   }
 

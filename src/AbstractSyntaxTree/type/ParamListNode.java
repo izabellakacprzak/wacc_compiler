@@ -19,6 +19,20 @@ public class ParamListNode implements ASTNode {
     this.types = types;
   }
 
+  /* Create a new ParameterId for each parameter and add to the symbolTable.
+   * Returns the ParameterIds as a list  */
+  public List<ParameterId> getIdentifiers(SymbolTable symbolTable) {
+    List<ParameterId> paramIds = new ArrayList<>();
+
+    for (int i = 0; i < identifiers.size(); i++) {
+      ParameterId parameter = new ParameterId(identifiers.get(i), types.get(i).getType());
+      paramIds.add(parameter);
+      symbolTable.add(identifiers.get(i).getIdentifier(), parameter);
+    }
+
+    return paramIds;
+  }
+
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     /* Recursively call semanticAnalysis on each identifier */
@@ -30,18 +44,5 @@ public class ParamListNode implements ASTNode {
     for (TypeNode type : types) {
       type.semanticAnalysis(symbolTable, errorMessages);
     }
-  }
-
-  public List<ParameterId> getIdentifiers(SymbolTable symbolTable) {
-    List<ParameterId> paramIds = new ArrayList<>();
-
-    /* Create a new ParameterId for each parameter and add to the symbolTable */
-    for (int i = 0; i < identifiers.size(); i++) {
-      ParameterId parameter = new ParameterId(identifiers.get(i), types.get(i).getType());
-      paramIds.add(parameter);
-      symbolTable.add(identifiers.get(i).getIdentifier(), parameter);
-    }
-
-    return paramIds;
   }
 }

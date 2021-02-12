@@ -19,6 +19,15 @@ public class UnaryOpExprNode extends ExpressionNode {
     this.operator = operator;
   }
 
+  /* Returns the toString of a list without the square brackets "[]"
+   * surrounding the elements */
+  private String listTypeToString(List<DataTypeId> list) {
+    StringBuilder argsStr = new StringBuilder().append(list);
+    argsStr.deleteCharAt(argsStr.length() - 1).deleteCharAt(0);
+
+    return argsStr.toString();
+  }
+
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     /* Recursively call semanticAnalysis on operand node */
@@ -58,15 +67,6 @@ public class UnaryOpExprNode extends ExpressionNode {
           + " Incompatible type for '" + operator.getLabel() + "' operator."
           + " Expected: ARRAY Actual: " + opType);
     }
-  }
-
-  /* Returns the toString of a list without the square brackets "[]"
-   * surrounding the elements */
-  private String listTypeToString(List<DataTypeId> list) {
-    StringBuilder argsStr = new StringBuilder().append(list);
-    argsStr.deleteCharAt(argsStr.length() - 1).deleteCharAt(0);
-
-    return argsStr.toString();
   }
 
   @Override

@@ -13,6 +13,7 @@ public class ParameterId extends Identifier {
     this.type = type;
   }
 
+  @Override
   public DataTypeId getType() {
     return type;
   }

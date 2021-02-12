@@ -13,6 +13,7 @@ public class VariableId extends Identifier {
     this.type = type;
   }
 
+  @Override
   public DataTypeId getType() {
     return type;
   }

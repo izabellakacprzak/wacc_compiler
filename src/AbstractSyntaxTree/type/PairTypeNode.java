@@ -18,6 +18,16 @@ public class PairTypeNode implements TypeNode {
     this.sndType = sndType;
   }
 
+  /* Returns the corresponding DataTypeId of a pair elem,
+   * returning null if the elem is null */
+  private DataTypeId getPairElemNode(TypeNode elem) {
+    if (elem == null) {
+      return null;
+    }
+
+    return elem.getType();
+  }
+
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     /* Recursively call semanticAnalysis on each type */
@@ -34,16 +44,6 @@ public class PairTypeNode implements TypeNode {
   public Identifier getIdentifier(SymbolTable symbolTable) {
     return new PairType((DataTypeId) fstType.getIdentifier(symbolTable),
         (DataTypeId) sndType.getIdentifier(symbolTable));
-  }
-
-  /* Returns the corresponding DataTypeId of a pair elem,
-   * returning null if the elem is null */
-  private DataTypeId getPairElemNode(TypeNode elem) {
-    if (elem == null) {
-      return null;
-    }
-
-    return elem.getType();
   }
 
   @Override

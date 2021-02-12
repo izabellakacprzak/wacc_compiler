@@ -2,7 +2,6 @@ package AbstractSyntaxTree.statement;
 
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
-
 import java.util.List;
 
 public class NewScopeStatementNode extends StatementNode {
@@ -20,6 +19,13 @@ public class NewScopeStatementNode extends StatementNode {
     statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
   }
 
+  /* Recursively traverses the AST and sets the function expected return type in the ReturnNode
+   * that it reaches. */
+  @Override
+  public void setReturnType(DataTypeId returnType) {
+    statement.setReturnType(returnType);
+  }
+
   /* Checks that the statement has a child return statement by recursively traversing the AST.
    * Used for syntax error checking. */
   @Override
@@ -32,12 +38,5 @@ public class NewScopeStatementNode extends StatementNode {
   @Override
   public boolean hasExitStatement() {
     return statement.hasExitStatement();
-  }
-
-  /* Recursively traverses the AST and sets the function expected return type in the ReturnNode
-   * that it reaches. */
-  @Override
-  public void setReturnType(DataTypeId returnType) {
-    statement.setReturnType(returnType);
   }
 }

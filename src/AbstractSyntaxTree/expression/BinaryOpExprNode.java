@@ -23,6 +23,15 @@ public class BinaryOpExprNode extends ExpressionNode {
     this.operator = operator;
   }
 
+  /* Returns the toString of a list without the square brackets "[]"
+   * surrounding the elements */
+  private String listTypeToString(List<DataTypeId> list) {
+    StringBuilder argsStr = new StringBuilder().append(list);
+    argsStr.deleteCharAt(argsStr.length() - 1).deleteCharAt(0);
+
+    return argsStr.toString();
+  }
+
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     /* Recursively call semanticAnalysis on assignment nodes */
@@ -93,15 +102,6 @@ public class BinaryOpExprNode extends ExpressionNode {
           + " RHS type does not match LHS type for '" + operator.getLabel() + "' operator. "
           + "Expected: " + lhsType + " Actual: " + rhsType);
     }
-  }
-
-  /* Returns the toString of a list without the square brackets "[]"
-   * surrounding the elements */
-  private String listTypeToString(List<DataTypeId> list) {
-    StringBuilder argsStr = new StringBuilder().append(list);
-    argsStr.deleteCharAt(argsStr.length() - 1).deleteCharAt(0);
-
-    return argsStr.toString();
   }
 
   @Override

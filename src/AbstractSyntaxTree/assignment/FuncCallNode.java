@@ -1,5 +1,8 @@
 package AbstractSyntaxTree.assignment;
 
+import static SemanticAnalysis.DataTypes.BaseType.Type.CHAR;
+import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
+
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import SemanticAnalysis.DataTypeId;
@@ -9,9 +12,6 @@ import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
-
-import static SemanticAnalysis.DataTypes.BaseType.Type.CHAR;
-import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
 
 public class FuncCallNode extends AssignRHSNode {
 
@@ -28,9 +28,10 @@ public class FuncCallNode extends AssignRHSNode {
     this.arguments = arguments;
   }
 
-  private boolean stringToCharArray(DataTypeId leftType, DataTypeId rightType) {
-    if (leftType.equals(new BaseType(STRING))) {
-      return rightType.equals(new ArrayType(new BaseType(CHAR)));
+  /* Returns true when the declared type is a STRING and assigned type is a CHAR[] */
+  private boolean stringToCharArray(DataTypeId declaredType, DataTypeId assignedType) {
+    if (declaredType.equals(new BaseType(STRING))) {
+      return assignedType.equals(new ArrayType(new BaseType(CHAR)));
     }
 
     return false;
@@ -100,7 +101,7 @@ public class FuncCallNode extends AssignRHSNode {
       return null;
     }
 
-    return function.getReturnType();
+    return function.getType();
   }
 
   /* Returns a FuncCall in the form: call func_id(arg1, arg2, ..., argN) */

@@ -70,20 +70,6 @@ public class ArrayLiterNode extends AssignRHSNode {
   /* Returns an ArrayLiter in the form: [expr1, expr2, ..., exprN] */
   @Override
   public String toString() {
-    StringBuilder str = new StringBuilder();
-
-    str.append("[");
-
-    for (ExpressionNode expression : expressions) {
-      str.append(expression.toString()).append(", ");
-    }
-
-    if (!expressions.isEmpty()) {
-      str.delete(str.length() - 2, str.length() - 1);
-    }
-
-    str.append(']');
-
-    return str.toString();
+    return expressions.toString();
   }
 }

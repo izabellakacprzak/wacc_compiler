@@ -1,16 +1,16 @@
 import AbstractSyntaxTree.ProgramNode;
-
-import java.util.List;
-
 import SemanticAnalysis.SymbolTable;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
-
+import antlr.WACCLexer;
+import antlr.WACCParser;
 import java.io.IOException;
-
-import antlr.*;
+import java.util.List;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 public class Compiler {
+
   private static final int SYNTAX_ERROR_CODE = 100;
   private static final int INPUT_FILE_ERROR = 1;
   private static final int SEMANTIC_ERROR_CODE = 200;
@@ -56,10 +56,10 @@ public class Compiler {
      * error code. */
     if (syntaxErrorListener.hasSyntaxErrors()) {
       syntaxErrorListener.printAllErrors();
-      System.out.println(syntaxErrorListener.syntaxErrorsCount() + " syntax errors detected, exiting...");
+      System.out
+          .println(syntaxErrorListener.syntaxErrorsCount() + " syntax errors detected, exiting...");
       System.exit(SYNTAX_ERROR_CODE);
     }
-
 
     ASTVisitor visitor = new ASTVisitor();
     ProgramNode prog = (ProgramNode) visitor.visit(tree);
@@ -91,7 +91,8 @@ public class Compiler {
      * error code. */
     if (semanticErrorListener.hasSemanticErrors()) {
       semanticErrorListener.printAllErrors();
-      System.out.println(semanticErrorListener.semanticErrorsCount() + " semantic errors detected, exiting...");
+      System.out.println(
+          semanticErrorListener.semanticErrorsCount() + " semantic errors detected, exiting...");
       System.exit(SEMANTIC_ERROR_CODE);
     }
   }

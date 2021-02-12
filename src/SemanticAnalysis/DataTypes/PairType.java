@@ -28,11 +28,6 @@ public class PairType extends DataTypeId {
     return el1 == null || el2 == null || el1.equals(el2);
   }
 
-  @Override
-  public String toString() {
-    return "PAIR(" + fstType.toString() + ", " + sndType.toString() + ")";
-  }
-
   /* PairTypes are equal if their first and second types are equal
    * according to equalsPairElem */
   @Override
@@ -44,5 +39,10 @@ public class PairType extends DataTypeId {
     PairType pairObject = (PairType) object;
     return equalsPairElem(pairObject.getFstType(), this.fstType) &&
         equalsPairElem(pairObject.getSndType(), this.sndType);
+  }
+
+  @Override
+  public String toString() {
+    return "PAIR(" + fstType.toString() + ", " + sndType.toString() + ")";
   }
 }

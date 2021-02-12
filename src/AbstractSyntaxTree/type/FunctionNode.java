@@ -40,6 +40,17 @@ public class FunctionNode implements TypeNode {
     this.currSymTable = currSymTable;
   }
 
+  /* Returns the function identifier string as is stored in the symbol table.
+   * Character '*' added to differentiate from variable and parameter names */
+  public String getName() {
+    return "*" + identifier.getIdentifier();
+  }
+
+  /* Returns identifier without extra '*' character */
+  public IdentifierNode getIdentifierNode() {
+    return identifier;
+  }
+
   /* Check for whether the function has either an exit statement or return statement
    * or if there are statements after a return statement in the function body */
   public String checkSyntaxErrors() {
@@ -65,17 +76,6 @@ public class FunctionNode implements TypeNode {
     params.semanticAnalysis(symbolTable, errorMessages);
     bodyStatement.semanticAnalysis(symbolTable, errorMessages);
     returnType.semanticAnalysis(symbolTable, errorMessages);
-  }
-
-  /* Returns the function identifier string as is stored in the symbol table.
-   * Character '*' added to differentiate from variable and parameter names */
-  public String getName() {
-    return "*" + identifier.getIdentifier();
-  }
-
-  /* Returns identifier without extra '*' character */
-  public IdentifierNode getIdentifierNode() {
-    return identifier;
   }
 
   @Override

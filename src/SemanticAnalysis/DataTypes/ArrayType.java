@@ -15,11 +15,6 @@ public class ArrayType extends DataTypeId {
     return elemType;
   }
 
-  @Override
-  public String toString() {
-    return elemType + "[]";
-  }
-
   /* ArrayTypes are equal if their element types are equal,
    * or at least one has a null element type */
   @Override
@@ -28,10 +23,16 @@ public class ArrayType extends DataTypeId {
       return true;
     }
 
-    if (object instanceof ArrayType) {
-      ArrayType arrayObject = (ArrayType) object;
-      return arrayObject.getElemType() == null || arrayObject.getElemType().equals(this.elemType);
+    if (!(object instanceof ArrayType)) {
+      return false;
     }
-    return false;
+
+    ArrayType arrayObject = (ArrayType) object;
+    return arrayObject.getElemType() == null || arrayObject.getElemType().equals(this.elemType);
+  }
+
+  @Override
+  public String toString() {
+    return elemType + "[]";
   }
 }

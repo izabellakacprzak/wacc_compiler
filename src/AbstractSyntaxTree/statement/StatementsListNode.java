@@ -21,6 +21,13 @@ public class StatementsListNode extends StatementNode {
     }
   }
 
+  /* Recursively call setReturnType on each statement to set
+   * the expected return type of a ReturnStatementNode */
+  @Override
+  public void setReturnType(DataTypeId returnType) {
+    statements.forEach(s -> s.setReturnType(returnType));
+  }
+
   /* Check to see if the final statement is an ExitStatementNode */
   @Override
   public boolean hasExitStatement() {
@@ -45,12 +52,5 @@ public class StatementsListNode extends StatementNode {
       }
     }
     return true;
-  }
-
-  /* Recursively call setReturnType on each statement to set
-   * the expected return type of a ReturnStatementNode */
-  @Override
-  public void setReturnType(DataTypeId returnType) {
-    statements.forEach(s -> s.setReturnType(returnType));
   }
 }

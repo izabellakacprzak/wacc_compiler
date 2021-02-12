@@ -15,6 +15,10 @@ public abstract class Identifier {
     return node;
   }
 
+  /* Returns the DataTypeId corresponding to the Identifier's type
+   * or the type it returns */
+  public abstract DataTypeId getType();
+
   /* All identifiers must Override toString for use in error messages */
   @Override
   public abstract String toString();

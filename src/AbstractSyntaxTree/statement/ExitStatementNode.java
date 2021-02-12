@@ -4,7 +4,6 @@ import AbstractSyntaxTree.expression.ExpressionNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
-
 import java.util.List;
 
 public class ExitStatementNode extends StatementNode {
@@ -26,12 +25,12 @@ public class ExitStatementNode extends StatementNode {
 
     if (exprType == null) {
       errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-                            + " Could not resolve type for '" + expression + "'."
-                            + " Expected: INT");
+          + " Could not resolve type for '" + expression + "'."
+          + " Expected: INT");
     } else if (!exprType.equals(new BaseType(BaseType.Type.INT))) {
       errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-                            + " Incompatible type for 'exit' statement."
-                            + " Expected: INT Actual: " + exprType);
+          + " Incompatible type for 'exit' statement."
+          + " Expected: INT Actual: " + exprType);
     }
   }
 
