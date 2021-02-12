@@ -87,7 +87,6 @@ public class ArrayElemNode extends ExpressionNode {
     str.append(identifier.getIdentifier()).append("[");
 
     for (ExpressionNode expression : expressions) {
-      // TODO: Im probably missing something here but why are we not doing array_id[expr1, expr2,....]?
       str.append(expression).append("][");
     }
 

@@ -5,7 +5,6 @@ import SemanticAnalysis.DataTypeId;
 public class ArrayType extends DataTypeId {
 
   /* elemType:  DataTypeId of the corresponding type of elements the array contains */
-  // TODO: removed size and corresponding setter and getter
   private final DataTypeId elemType;
 
   public ArrayType(DataTypeId elemType) {
