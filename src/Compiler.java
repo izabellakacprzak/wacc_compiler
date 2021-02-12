@@ -65,16 +65,14 @@ public class Compiler {
     // check if error listener encountered any errors and if so exit with an error code
     // otherwise continue with semantics checking
 
-    List<String> semanticErrors = new ArrayList<>();
+    SemanticErrorListener semanticErrorListener = new SemanticErrorListener();
     SymbolTable topSymbolTable = new SymbolTable(null);
 
-    // TODO: Create our own semantic listener
-    prog.semanticAnalysis(topSymbolTable, semanticErrors);
+    prog.semanticAnalysis(topSymbolTable, semanticErrorListener.getList());
 
-    if (!(semanticErrors.isEmpty())) {
-      for (String error : semanticErrors) {
-        System.out.println(error);
-      }
+    if (semanticErrorListener.hasSemanticErrors()) {
+      semanticErrorListener.printAllErrors();
+      System.out.println(semanticErrorListener.semanticErrorsCount() + " semantic errors detected, exiting");
       System.exit(SEMANTIC_ERROR_CODE);
     }
   }
