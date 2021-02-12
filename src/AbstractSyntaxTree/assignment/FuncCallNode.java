@@ -3,10 +3,15 @@ package AbstractSyntaxTree.assignment;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.ArrayType;
+import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
+
+import static SemanticAnalysis.DataTypes.BaseType.Type.CHAR;
+import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
 
 public class FuncCallNode extends AssignRHSNode {
 
@@ -21,6 +26,14 @@ public class FuncCallNode extends AssignRHSNode {
     super(line, charPositionInLine);
     this.identifier = identifier;
     this.arguments = arguments;
+  }
+
+  private boolean charArrayToString(DataTypeId leftType, DataTypeId rightType) {
+    if (leftType.equals(new ArrayType(new BaseType(CHAR)))) {
+      return rightType.equals(new BaseType(STRING));
+    }
+
+    return false;
   }
 
   @Override
@@ -70,7 +83,7 @@ public class FuncCallNode extends AssignRHSNode {
             + " Could not resolve type of parameter " + (i + 1) + " in '" + identifier
             + "' function."
             + " Expected: " + currParamType);
-      } else if (!(currArg.equals(currParamType))) {
+      } else if (!(currArg.equals(currParamType)) && !charArrayToString(currParamType, currArg)) {
         errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
             + " Invalid type for parameter " + (i + 1) + " in '" + identifier + "' function."
             + " Expected: " + currParamType + " Actual: " + currArg);

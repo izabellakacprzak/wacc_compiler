@@ -1,0 +1,4 @@
+begin
+  pair(bool, bool) p = newpair(true , true);
+  read p
+end

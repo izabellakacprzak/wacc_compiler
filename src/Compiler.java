@@ -43,7 +43,7 @@ public class Compiler {
 
     if (syntaxErrorListener.hasSyntaxErrors()) {
       syntaxErrorListener.printAllErrors();
-      System.out.println(syntaxErrorListener.syntaxErrorsCount() + " syntax errors detected, exiting");
+      System.out.println(syntaxErrorListener.syntaxErrorsCount() + " syntax errors detected, exiting...");
       System.exit(SYNTAX_ERROR_CODE);
     }
 
@@ -72,7 +72,7 @@ public class Compiler {
 
     if (semanticErrorListener.hasSemanticErrors()) {
       semanticErrorListener.printAllErrors();
-      System.out.println(semanticErrorListener.semanticErrorsCount() + " semantic errors detected, exiting");
+      System.out.println(semanticErrorListener.semanticErrorsCount() + " semantic errors detected, exiting...");
       System.exit(SEMANTIC_ERROR_CODE);
     }
   }

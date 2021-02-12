@@ -1,0 +1,10 @@
+begin
+  string a = "wacc";
+  char[] b = ['w', 'a', 'c', 'c'];
+  if a == b
+  then
+    println a
+  else  
+    println b
+  fi
+ end

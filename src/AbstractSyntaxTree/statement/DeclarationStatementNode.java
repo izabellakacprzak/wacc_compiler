@@ -38,10 +38,6 @@ public class DeclarationStatementNode extends StatementNode {
           new VariableId(identifier, type.getType()));
     }
 
-    /* Recursively call semanticAnalysis on stored nodes */
-    identifier.semanticAnalysis(symbolTable, errorMessages);
-    assignment.semanticAnalysis(symbolTable, errorMessages);
-
     /* Check that the expected (declared) type and the type of assignment
      * can be resolved and match */
     DataTypeId declaredType = type.getType();
@@ -56,11 +52,15 @@ public class DeclarationStatementNode extends StatementNode {
           + " Could not resolve type of '" + assignment.toString() + "'."
           + " Expected: " + declaredType);
 
-    } else if (!declaredType.equals(assignedType)) {
+    } else if (!declaredType.equals(assignedType) && !charArrayToString(declaredType, assignedType)) {
       errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
           + " Assignment type does not match declared type for '"
           + identifier.getIdentifier() + "'."
           + " Expected: " + declaredType + " Actual: " + assignedType);
     }
+
+    /* Recursively call semanticAnalysis on stored nodes */
+    identifier.semanticAnalysis(symbolTable, errorMessages);
+    assignment.semanticAnalysis(symbolTable, errorMessages);
   }
 }

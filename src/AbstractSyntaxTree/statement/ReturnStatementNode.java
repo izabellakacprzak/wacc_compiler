@@ -16,6 +16,9 @@ public class ReturnStatementNode extends StatementNode {
     this.returnExpr = returnExpr;
   }
 
+
+
+  @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     /* Recursively call semanticAnalysis on expression node */
     returnExpr.semanticAnalysis(symbolTable, errorMessages);
@@ -34,7 +37,7 @@ public class ReturnStatementNode extends StatementNode {
     if (returnExprType == null) {
       errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
           + " Could not resolve type for '" + returnExpr + "'.");
-    } else if (!(returnExprType.equals(returnType))) {
+    } else if (!(returnExprType.equals(returnType)) && !charArrayToString(returnType, returnExprType)) {
       errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
           + " Declared return type does not match 'return' statement type."
           + " Expected: " + returnType + " Actual: " + returnExprType);

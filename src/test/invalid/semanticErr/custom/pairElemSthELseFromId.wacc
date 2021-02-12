@@ -1,0 +1,4 @@
+begin
+  pair(int, char) p = newpair(10, 'a') ;
+  bool f = fst 1
+end

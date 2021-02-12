@@ -18,7 +18,7 @@ public class AssignVarNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    /* Recursively call semanticAnalysis on assignment nodes */
+    /* Recursively call semanticAnalysis on LHS node */
     left.semanticAnalysis(symbolTable, errorMessages);
     right.semanticAnalysis(symbolTable, errorMessages);
 
@@ -37,7 +37,7 @@ public class AssignVarNode extends StatementNode {
         errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
             + " Could not resolve type of RHS assignment'" + right + "'.");
       }
-    } else if (!leftType.equals(rightType)) {
+    } else if (!leftType.equals(rightType) && !charArrayToString(leftType, rightType)) {
       errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
           + " RHS type does not match LHS type for assignment. "
           + " Expected: " + leftType + " Actual: " + rightType);
@@ -45,16 +45,17 @@ public class AssignVarNode extends StatementNode {
   }
 
   /* Check whether the inability to resolve the assignment does not stem from an undeclared variable.
-  *  true if variable has been declared in the current scope. */
+   * true if variable has been declared in the current scope. */
   public boolean varHasBeenDeclared(List<String> errorMessages, AssignLHSNode node) {
-    if (!errorMessages.isEmpty()) {
-      String lastErrorMsg = errorMessages.get(errorMessages.size() - 1);
-      String line = Integer.toString(node.getLine());
-      String charPos = Integer.toString(node.getCharPositionInLine());
-
-      return (!lastErrorMsg.contains(line + ":" + charPos) || !lastErrorMsg.contains("Identifier"));
+    if (errorMessages.isEmpty()) {
+      return true;
     }
-    return true;
+
+    String lastErrorMsg = errorMessages.get(errorMessages.size() - 1);
+    String line = Integer.toString(node.getLine());
+    String charPos = Integer.toString(node.getCharPositionInLine());
+
+    return (!lastErrorMsg.contains(line + ":" + charPos) || !lastErrorMsg.contains("Identifier"));
   }
 }
 

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class SyntaxErrorListener extends BaseErrorListener {
 
-  private List<String> syntaxErrors;
+  private final List<String> syntaxErrors;
 
   public SyntaxErrorListener() {
     syntaxErrors = new ArrayList<>();

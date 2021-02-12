@@ -15,7 +15,7 @@ public class SemanticErrorListener {
 
     public void printAllErrors() {
         for (String error : semanticErrors) {
-            System.out.println(error);
+            System.out.println("Semantic error at line " + error);
         }
     }
 
