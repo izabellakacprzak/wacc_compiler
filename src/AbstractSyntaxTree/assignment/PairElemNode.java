@@ -71,6 +71,7 @@ public class PairElemNode extends AssignRHSNode {
         : ((PairType) pairType).getSndType();
   }
 
+  /* Returns a PairElem in the form: (fst | snd) expr */
   @Override
   public String toString() {
     if (position == FST) {

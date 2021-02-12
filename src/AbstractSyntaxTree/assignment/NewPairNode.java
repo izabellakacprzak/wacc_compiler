@@ -36,6 +36,7 @@ public class NewPairNode extends AssignRHSNode {
     return new PairType(fstExpr.getType(symbolTable), sndExpr.getType(symbolTable));
   }
 
+  /* Returns a NewPair in the form: newpair(fst, snd) */
   @Override
   public String toString() {
     return "newpair(" + fstExpr + ", " + sndExpr + ")";

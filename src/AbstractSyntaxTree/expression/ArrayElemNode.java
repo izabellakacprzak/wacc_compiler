@@ -49,6 +49,7 @@ public class ArrayElemNode extends ExpressionNode {
     }
 
     // TODO: should we have a check to see if they're within range? Or would that be annoying :/
+    // TODO: If you mean INT then we check if they're in range in the parser (JAVA range) <3
     /* Check that each expression is of type INT */
     DataTypeId thisType;
     for (ExpressionNode expression : expressions) {
@@ -80,6 +81,7 @@ public class ArrayElemNode extends ExpressionNode {
     return ((ArrayType) idType).getElemType();
   }
 
+  /* Returns a ArrayElem in the form: array_id[expr1][expr2]...[exprN] */
   @Override
   public String toString() {
     StringBuilder str = new StringBuilder();
@@ -87,6 +89,7 @@ public class ArrayElemNode extends ExpressionNode {
     str.append(identifier.getIdentifier()).append("[");
 
     for (ExpressionNode expression : expressions) {
+      // TODO: Im probably missing something here but why are we not doing array_id[expr1, expr2,....]?
       str.append(expression).append("][");
     }
 

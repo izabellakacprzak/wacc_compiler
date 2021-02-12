@@ -3,6 +3,7 @@ image: maven:3-jdk-11
 stages:
   - compile
   - test
+  - clean
 
 compile-job:
   stage: compile
@@ -15,3 +16,8 @@ test-job:
   script:
     - make
     - mvn test
+
+clean-job:
+  stage: clean
+  script:
+    - make clean
