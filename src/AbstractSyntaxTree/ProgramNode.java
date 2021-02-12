@@ -10,6 +10,9 @@ import java.util.List;
 
 public class ProgramNode implements ASTNode {
 
+  /* statementNode: Root node of program's statements
+   * functionNode:  List of all function declaration nodes
+   * syntaxErrors:  List to add any syntax error messages for syntax errors */
   private final StatementNode statementNode;
   private final List<FunctionNode> functionNodes;
   private final List<String> syntaxErrors;
@@ -23,42 +26,42 @@ public class ProgramNode implements ASTNode {
 
   @Override
   public void semanticAnalysis(SymbolTable topSymbolTable, List<String> errorMessages) {
-        // go through list of nodes, for each new function create a symbol table
-        // and perform the semantic analysis on it, passing the newly created sym table
+    for (FunctionNode func : functionNodes) {
+      /* Create a new SymbolTable for the function's scope */
+      func.setCurrSymTable(new SymbolTable(topSymbolTable));
 
-        for (FunctionNode func : functionNodes) {
-          func.setCurrSymTable(new SymbolTable(topSymbolTable));
+      if (topSymbolTable.lookupAll(func.getName()) != null) {
+        /* A function with the same name has already been declared */
+        IdentifierNode id = func.getIdentifierNode();
+        errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
+            + " Function '" + func + "' has already been declared.");
 
-          // check if declared
-          // if not add to top table
-          if (topSymbolTable.lookupAll(func.getName()) != null) {
-            // function is defined - add error message and exit
-            IdentifierNode id = func.getIdentifierNode();
-            errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
-                + " Function '" + func + "' has already been declared.");
+      } else {
+        /* Create function identifier and add it to the topSymbolTable */
+        FunctionId identifier = (FunctionId) func.getIdentifier(func.getCurrSymTable());
+        topSymbolTable.add(func.getName(), identifier);
+      }
+    }
 
-          } else {
-            FunctionId identifier = (FunctionId) func.getIdentifier(func.getCurrSymTable());
-            topSymbolTable.add(func.getName(), identifier);
-          }
-        }
+    /* Call semanticAnalysis on each function, even if it has been declared twice */
+    for (FunctionNode func : functionNodes) {
+      func.semanticAnalysis(func.getCurrSymTable(), errorMessages);
+    }
 
-        for (FunctionNode func : functionNodes) {
-          func.semanticAnalysis(func.getCurrSymTable(), errorMessages);
-        }
-
-        //do semantic analysis on the statement node with new scope
+    /* Call semanticAnalysis on the root statement node to analysis the rest of the program */
     statementNode.semanticAnalysis(topSymbolTable, errorMessages);
-    }
+  }
 
-    public List<String> checkSyntaxErrors() {
-        String error;
-        for (FunctionNode f : functionNodes) {
-            error = f.checkSyntaxErrors();
-            if (!error.isEmpty()) {
-                syntaxErrors.add(error);
-            }
-        }
-        return syntaxErrors;
+  // TODO: idk if this is right
+  /* Check to see whether any syntax errors are found in each function */
+  public List<String> checkSyntaxErrors() {
+    String error;
+    for (FunctionNode f : functionNodes) {
+      error = f.checkSyntaxErrors();
+      if (!error.isEmpty()) {
+        syntaxErrors.add(error);
+      }
     }
+    return syntaxErrors;
+  }
 }

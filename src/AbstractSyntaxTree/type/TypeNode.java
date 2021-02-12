@@ -7,7 +7,10 @@ import SemanticAnalysis.SymbolTable;
 
 public interface TypeNode extends ASTNode {
 
-  Identifier getIdentifier(SymbolTable parentSymbolTable);
+  /* Returns an Identifier corresponding to the type or identifier type
+   * associated with the TypeNode */
+  Identifier getIdentifier(SymbolTable symbolTable);
 
+  /* Returns the DataTypeId corresponding to the TypeNode's DataType or return DataType */
   DataTypeId getType();
 }

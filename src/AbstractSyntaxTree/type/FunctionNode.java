@@ -10,11 +10,18 @@ import java.util.List;
 
 public class FunctionNode implements TypeNode {
 
+  /* returnType:    TypeNode of the return type
+   * identifier:    IdentifierNode of the function's declaration
+   * params:        ParamListNode containing a list of the function's parameter
+   *                  IdentifierNodes and TypeNodes
+   * bodyStatement: Root node for the statement tree of the function's body */
   private final TypeNode returnType;
   private final IdentifierNode identifier;
   private final ParamListNode params;
   private final StatementNode bodyStatement;
 
+  /* currSymTable: stores the SymbolTable corresponding to the function's scope.
+   * Set before semanticAnalysis begins in ProgramNode */
   private SymbolTable currSymTable = null;
 
   public FunctionNode(TypeNode returnType, IdentifierNode identifier,
@@ -33,6 +40,8 @@ public class FunctionNode implements TypeNode {
     this.currSymTable = currSymTable;
   }
 
+  /* Check for whether the function has either an exit statement or return statement
+   * or if there are statements after a return statement in the function body */
   public String checkSyntaxErrors() {
     StringBuilder errorMessage = new StringBuilder();
     if ((!bodyStatement.hasReturnStatement() && !bodyStatement.hasExitStatement())
@@ -48,26 +57,29 @@ public class FunctionNode implements TypeNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    /* Set the expected return type in the corresponding ReturnStatementNode of the
+     * function body */
     bodyStatement.setReturnType(returnType.getType());
 
+    /* Recursively call semanticAnalysis on each stored node */
     params.semanticAnalysis(symbolTable, errorMessages);
     bodyStatement.semanticAnalysis(symbolTable, errorMessages);
     returnType.semanticAnalysis(symbolTable, errorMessages);
   }
 
+  /* Returns the function identifier string as is stored in the symbol table.
+   * Character '*' added to differentiate from variable and parameter names */
   public String getName() {
-    // Add a '*' character in front of function name to cover the case of having
-    // functions and variables of the same name in symTable
     return "*" + identifier.getIdentifier();
   }
 
+  /* Returns identifier without extra '*' character */
   public IdentifierNode getIdentifierNode() {
     return identifier;
   }
 
   @Override
   public Identifier getIdentifier(SymbolTable symbolTable) {
-
     return new FunctionId(identifier, returnType.getType(),
         params.getIdentifiers(symbolTable));
   }

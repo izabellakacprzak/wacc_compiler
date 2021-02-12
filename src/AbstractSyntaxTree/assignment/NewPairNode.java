@@ -8,33 +8,36 @@ import java.util.List;
 
 public class NewPairNode extends AssignRHSNode {
 
-  private final ExpressionNode leftExpr;
-  private final ExpressionNode rightExpr;
+  /* fstExpr: ExpressionNode corresponding to the first element of this node's PAIR
+   * sndExpr: ExpressionNode corresponding to the second element of this node's PAIR */
+  private final ExpressionNode fstExpr;
+  private final ExpressionNode sndExpr;
 
-  public NewPairNode(int line, int charPositionInLine, ExpressionNode leftExpr,
-      ExpressionNode rightExpr) {
+  public NewPairNode(int line, int charPositionInLine, ExpressionNode fstExpr,
+      ExpressionNode sndExpr) {
     super(line, charPositionInLine);
-    this.leftExpr = leftExpr;
-    this.rightExpr = rightExpr;
+    this.fstExpr = fstExpr;
+    this.sndExpr = sndExpr;
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    leftExpr.semanticAnalysis(symbolTable, errorMessages);
-    rightExpr.semanticAnalysis(symbolTable, errorMessages);
+    /* Recursively call semanticAnalysis on expression nodes */
+    fstExpr.semanticAnalysis(symbolTable, errorMessages);
+    sndExpr.semanticAnalysis(symbolTable, errorMessages);
   }
 
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
-    if (leftExpr.getType(symbolTable) == null || rightExpr.getType(symbolTable) == null) {
+    if (fstExpr.getType(symbolTable) == null || sndExpr.getType(symbolTable) == null) {
       return null;
     }
 
-    return new PairType(leftExpr.getType(symbolTable), rightExpr.getType(symbolTable));
+    return new PairType(fstExpr.getType(symbolTable), sndExpr.getType(symbolTable));
   }
 
   @Override
   public String toString() {
-    return "newpair(" + leftExpr + ", " + rightExpr + ")";
+    return "newpair(" + fstExpr + ", " + sndExpr + ")";
   }
 }

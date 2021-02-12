@@ -9,6 +9,7 @@ import java.util.List;
 
 public class BaseTypeNode implements TypeNode {
 
+  /* type: BaseType.Type enum corresponding to the base type this represents */
   private final Type baseType;
 
   public BaseTypeNode(Type baseType) {
@@ -20,8 +21,8 @@ public class BaseTypeNode implements TypeNode {
   }
 
   @Override
-  public Identifier getIdentifier(SymbolTable parentSymbolTable) {
-    return parentSymbolTable.lookupAll(baseType.toString().toLowerCase());
+  public Identifier getIdentifier(SymbolTable symbolTable) {
+    return symbolTable.lookupAll(baseType.toString().toLowerCase());
   }
 
   @Override

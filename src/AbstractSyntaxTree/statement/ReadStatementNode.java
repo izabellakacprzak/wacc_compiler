@@ -8,29 +8,32 @@ import java.util.List;
 
 public class ReadStatementNode extends StatementNode {
 
-  private final AssignLHSNode left;
+  /* assignment:  AssignLHSNode corresponding to the IdentifierNode, ArrayElemNode
+   *                or PairElemNode 'read' was called with */
+  private final AssignLHSNode assignment;
 
-  public ReadStatementNode(AssignLHSNode left) {
-    this.left = left;
+  public ReadStatementNode(AssignLHSNode assignment) {
+    this.assignment = assignment;
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    /* Recursively call semanticAnalysis on assignment node */
+    assignment.semanticAnalysis(symbolTable, errorMessages);
 
-    left.semanticAnalysis(symbolTable, errorMessages);
+    /* Check that the type of assignment is an INT or a CHAR */
+    DataTypeId assignmentType = assignment.getType(symbolTable);
 
-    DataTypeId leftType = left.getType(symbolTable);
-
-    if (leftType == null) {
-      errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
-          + " Could not resolve type for '" + left + "."
+    if (assignmentType == null) {
+      errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
+          + " Could not resolve type for '" + assignment + "."
           + " Expected: INT, CHAR");
 
-    } else if (!leftType.equals(new BaseType(BaseType.Type.INT)) &&
-        !leftType.equals(new BaseType(BaseType.Type.CHAR))) {
-      errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
+    } else if (!assignmentType.equals(new BaseType(BaseType.Type.INT)) &&
+        !assignmentType.equals(new BaseType(BaseType.Type.CHAR))) {
+      errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
           + " Incompatible type for 'read' statement."
-          + " Expected: INT, CHAR Actual: " + leftType);
+          + " Expected: INT, CHAR Actual: " + assignmentType);
     }
   }
 }

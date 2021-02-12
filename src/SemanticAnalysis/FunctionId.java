@@ -6,6 +6,8 @@ import java.util.List;
 
 public class FunctionId extends Identifier {
 
+  /* returnType:  DataTypeId of the return type
+   * params:      List of DataTypeIds corresponding to the function's parameter types */
   private final DataTypeId returnType;
   private final List<ParameterId> params;
 

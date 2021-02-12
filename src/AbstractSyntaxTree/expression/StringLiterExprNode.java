@@ -7,6 +7,7 @@ import java.util.List;
 
 public class StringLiterExprNode extends ExpressionNode {
 
+  /* value: String representing the value of this node's STRING literal */
   private final String value;
 
   public StringLiterExprNode(int line, int charPositionInLine, String value) {

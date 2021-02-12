@@ -4,10 +4,10 @@ import SemanticAnalysis.DataTypeId;
 
 public class BaseType extends DataTypeId {
 
+  /* type: BaseType.Type enum corresponding to the base type this represents */
   private final Type type;
 
   public BaseType(Type type) {
-    super();
     this.type = type;
   }
 
@@ -15,6 +15,7 @@ public class BaseType extends DataTypeId {
     return type;
   }
 
+  /* BaseTypes are equal if their type is the same */
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof BaseType)) {

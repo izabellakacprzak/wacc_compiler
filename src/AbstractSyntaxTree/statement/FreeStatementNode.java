@@ -9,25 +9,28 @@ import java.util.List;
 
 public class FreeStatementNode extends StatementNode {
 
-  private final ExpressionNode expr;
+  /* expression:  ExpressionNode corresponding to the expression 'free' was called with */
+  private final ExpressionNode expression;
 
-  public FreeStatementNode(ExpressionNode expr) {
-    this.expr = expr;
+  public FreeStatementNode(ExpressionNode expression) {
+    this.expression = expression;
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    expr.semanticAnalysis(symbolTable, errorMessages);
+    /* Recursively call semanticAnalysis on expression node */
+    expression.semanticAnalysis(symbolTable, errorMessages);
 
-    DataTypeId exprType = expr.getType(symbolTable);
+    /* Check that the type of assignment is an ARRAY or a PAIR */
+    DataTypeId exprType = expression.getType(symbolTable);
 
     if (exprType == null) {
-      errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
-          + " Could not resolve type for '" + expr + "'."
+      errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
+          + " Could not resolve type for '" + expression + "'."
           + " Expected: ARRAY, PAIR");
     } else if (!exprType.equals(new PairType(null, null)) &&
         !exprType.equals(new ArrayType(null))) {
-      errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
+      errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
           + " Incompatible type for 'free' statement." +
           " Expected: ARRAY, PAIR Actual: " + exprType);
     }

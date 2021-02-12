@@ -6,6 +6,7 @@ import java.util.List;
 
 public class ParenthesisExprNode extends ExpressionNode {
 
+  /* innerExpr: ExpressionNode corresponding to the expression within parenthesis */
   private final ExpressionNode innerExpr;
 
   public ParenthesisExprNode(int line, int charPositionInLine, ExpressionNode innerExpr) {
@@ -15,6 +16,7 @@ public class ParenthesisExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    /* Recursively call semanticAnalysis on expression node */
     innerExpr.semanticAnalysis(symbolTable, errorMessages);
   }
 

@@ -4,20 +4,12 @@ import SemanticAnalysis.DataTypeId;
 
 public class ArrayType extends DataTypeId {
 
-  private int size;
+  /* elemType:  DataTypeId of the corresponding type of elements the array contains */
+  // TODO: removed size and corresponding setter and getter
   private final DataTypeId elemType;
 
   public ArrayType(DataTypeId elemType) {
-    super();
     this.elemType = elemType;
-  }
-
-  public int getSize() {
-    return size;
-  }
-
-  public void setSize(int size) {
-    this.size = size;
   }
 
   public DataTypeId getElemType() {
@@ -29,6 +21,8 @@ public class ArrayType extends DataTypeId {
     return elemType + "[]";
   }
 
+  /* ArrayTypes are equal if their element types are equal,
+   * or at least one has a null element type */
   @Override
   public boolean equals(Object object) {
     if ((object instanceof DataTypeId) && this.elemType == null) {

@@ -8,24 +8,27 @@ import java.util.List;
 
 public class ExitStatementNode extends StatementNode {
 
-  private final ExpressionNode expr;
+  /* expression:  ExpressionNode corresponding to the expression 'exit' was called with */
+  private final ExpressionNode expression;
 
-  public ExitStatementNode(ExpressionNode expr) {
-    this.expr = expr;
+  public ExitStatementNode(ExpressionNode expression) {
+    this.expression = expression;
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    expr.semanticAnalysis(symbolTable, errorMessages);
+    /* Recursively call semanticAnalysis on expression node */
+    expression.semanticAnalysis(symbolTable, errorMessages);
 
-    DataTypeId exprType = expr.getType(symbolTable);
+    /* Check that the type of assignment is an INT */
+    DataTypeId exprType = expression.getType(symbolTable);
 
     if (exprType == null) {
-      errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
-          + " Could not resolve type for '" + expr + "'."
+      errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
+          + " Could not resolve type for '" + expression + "'."
           + " Expected: INT");
     } else if (!exprType.equals(new BaseType(BaseType.Type.INT))) {
-      errorMessages.add(expr.getLine() + ":" + expr.getCharPositionInLine()
+      errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
           + " Incompatible type for 'exit' statement."
           + " Expected: INT Actual: " + exprType);
     }

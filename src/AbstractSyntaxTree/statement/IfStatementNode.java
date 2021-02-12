@@ -8,6 +8,9 @@ import java.util.List;
 
 public class IfStatementNode extends StatementNode {
 
+  /* condition: ExpressionNode representing the condition of the if statement
+   * thenStatement: StatementNode representing the 'then' body of the if statement
+   * elseStatement: StatementNode representing the 'else' body of the if statement */
   private final ExpressionNode condition;
   private final StatementNode thenStatement;
   private final StatementNode elseStatement;
@@ -21,9 +24,10 @@ public class IfStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    /* Recursively call semanticAnalysis on condition node */
     condition.semanticAnalysis(symbolTable, errorMessages);
 
-    // get condition type - if not bool throw error
+    /* Check that the type of the condition expression is of type BOOL */
     DataTypeId conditionType = condition.getType(symbolTable);
 
     if (conditionType == null) {
@@ -36,10 +40,12 @@ public class IfStatementNode extends StatementNode {
           + " Expected: BOOL Actual: " + conditionType);
     }
 
+    /* Recursively call semanticAnalysis on statement nodes */
     thenStatement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
     elseStatement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
   }
 
+  /* true if both the then and else statements have either an exit or return statement */
   @Override
   public boolean hasReturnStatement() {
     return (thenStatement.hasReturnStatement() || thenStatement.hasExitStatement())
@@ -51,6 +57,7 @@ public class IfStatementNode extends StatementNode {
     return this.hasReturnStatement();
   }
 
+  /* Recursively call on statement nodes */
   @Override
   public void setReturnType(DataTypeId returnType) {
     thenStatement.setReturnType(returnType);

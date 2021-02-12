@@ -10,6 +10,9 @@ import java.util.List;
 
 public class DeclarationStatementNode extends StatementNode {
 
+  /* type:       TypeNode corresponding to the type of the new variable
+   * identifier: Name identifier given to the new variable
+   * assignment: AssignRHSNode corresponding to the value assigned to the new variable */
   private final TypeNode type;
   private final IdentifierNode identifier;
   private final AssignRHSNode assignment;
@@ -23,6 +26,8 @@ public class DeclarationStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    /* Check whether identifier has been previously declared as another variable.
+     * If not, add a new VariableId to the symbol table under identifier */
     if (symbolTable.lookup(identifier.getIdentifier()) != null) {
       errorMessages.add(identifier.getLine() + ":" + identifier.getCharPositionInLine()
           + " Identifier '" + identifier.getIdentifier()
@@ -33,9 +38,12 @@ public class DeclarationStatementNode extends StatementNode {
           new VariableId(identifier, type.getType()));
     }
 
+    /* Recursively call semanticAnalysis on stored nodes */
     identifier.semanticAnalysis(symbolTable, errorMessages);
     assignment.semanticAnalysis(symbolTable, errorMessages);
 
+    /* Check that the expected (declared) type and the type of assignment
+     * can be resolved and match */
     DataTypeId declaredType = type.getType();
     DataTypeId assignedType = assignment.getType(symbolTable);
 

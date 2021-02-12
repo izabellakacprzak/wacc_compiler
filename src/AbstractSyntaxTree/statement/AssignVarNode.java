@@ -18,9 +18,12 @@ public class AssignVarNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    /* Recursively call semanticAnalysis on assignment nodes */
     left.semanticAnalysis(symbolTable, errorMessages);
     right.semanticAnalysis(symbolTable, errorMessages);
 
+    /* Check that the left assignment type and the right assignment type
+     * can be resolved and match */
     DataTypeId leftType = left.getType(symbolTable);
     DataTypeId rightType = right.getType(symbolTable);
 
@@ -41,6 +44,8 @@ public class AssignVarNode extends StatementNode {
     }
   }
 
+  // TODO: not sure what this is
+  /* */
   public boolean varHasBeenDeclared(List<String> errorMessages, AssignLHSNode node) {
     if (!errorMessages.isEmpty()) {
       String lastErrorMsg = errorMessages.get(errorMessages.size() - 1);

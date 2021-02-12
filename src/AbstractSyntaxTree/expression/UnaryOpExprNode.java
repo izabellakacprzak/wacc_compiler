@@ -8,6 +8,8 @@ import java.util.List;
 
 public class UnaryOpExprNode extends ExpressionNode {
 
+  /* operand:  ExpressionNode corresponding to the expression the operator was called with
+   * operator: UnOp enum representing the operator corresponding to this node */
   private final ExpressionNode operand;
   private final UnOp operator;
 
@@ -19,8 +21,11 @@ public class UnaryOpExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    /* Recursively call semanticAnalysis on operand node */
     operand.semanticAnalysis(symbolTable, errorMessages);
 
+    /* Check that the operand type can be resolved and matches with one of the
+     * operator's expected argument types */
     List<DataTypeId> argTypes = operator.getArgTypes();
     DataTypeId opType = operand.getType(symbolTable);
 
@@ -31,6 +36,8 @@ public class UnaryOpExprNode extends ExpressionNode {
       return;
     }
 
+    /* Check that at least one of the operator's possible
+     * argument types matches the operand's type */
     boolean argMatched = false;
 
     for (DataTypeId argType : argTypes) {
@@ -46,12 +53,15 @@ public class UnaryOpExprNode extends ExpressionNode {
           + " Expected: " + listTypeToString(argTypes) + " Actual: " + opType);
 
     } else if (argTypes.isEmpty() && !(opType instanceof ArrayType)) {
+      /* No expected argument types in argTypes implies an ARRAY is expected */
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Incompatible type for '" + operator.getLabel() + "' operator."
           + " Expected: ARRAY Actual: " + opType);
     }
   }
 
+  /* Returns the toString of a list without the square brackets "[]"
+   * surrounding the elements */
   private String listTypeToString(List<DataTypeId> list) {
     StringBuilder argsStr = new StringBuilder().append(list);
     argsStr.deleteCharAt(argsStr.length() - 1).deleteCharAt(0);

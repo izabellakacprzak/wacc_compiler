@@ -8,6 +8,8 @@ import java.util.List;
 
 public class WhileStatementNode extends StatementNode {
 
+  /* condition: ExpressionNode representing the condition of the while loop
+   * statement: StatementNode representing the body of the while loop */
   private final ExpressionNode condition;
   private final StatementNode statement;
 
@@ -17,8 +19,10 @@ public class WhileStatementNode extends StatementNode {
   }
 
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    /* Recursively call semanticAnalysis on condition node */
     condition.semanticAnalysis(symbolTable, errorMessages);
 
+    /* Check that the type of the condition expression is of type BOOL */
     DataTypeId conditionType = condition.getType(symbolTable);
 
     if (conditionType == null) {
@@ -32,6 +36,7 @@ public class WhileStatementNode extends StatementNode {
           + " Expected: BOOL Actual: " + conditionType);
     }
 
+    /* Recursively call semanticAnalysis on statement node */
     statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
   }
 

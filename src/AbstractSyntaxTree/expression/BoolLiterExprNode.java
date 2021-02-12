@@ -7,6 +7,7 @@ import java.util.List;
 
 public class BoolLiterExprNode extends ExpressionNode {
 
+  /* value: boolean representing the value of this node's BOOL literal */
   private final boolean value;
 
   public BoolLiterExprNode(int line, int charPositionInLine, boolean value) {

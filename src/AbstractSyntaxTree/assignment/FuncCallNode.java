@@ -10,6 +10,9 @@ import java.util.List;
 
 public class FuncCallNode extends AssignRHSNode {
 
+  /* identifier: IdentifierNode corresponding to the function's name identifier
+   * arguments:  List of ExpressionNodes corresponding to the arguments
+   *               passed into the function call */
   private final IdentifierNode identifier;
   private final List<ExpressionNode> arguments;
 
@@ -22,6 +25,7 @@ public class FuncCallNode extends AssignRHSNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    /* Check that the function has been previously declared as a FunctionId with its identifier */
     Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
 
     if (functionId == null) {
@@ -39,6 +43,7 @@ public class FuncCallNode extends AssignRHSNode {
       return;
     }
 
+    /* Check that function has been called with the correct number of arguments */
     FunctionId function = (FunctionId) functionId;
     List<DataTypeId> paramTypes = function.getParamTypes();
 
@@ -50,6 +55,8 @@ public class FuncCallNode extends AssignRHSNode {
       return;
     }
 
+    /* Check that each parameter's type can be resolved and matches the
+     * corresponding argument type */
     for (int i = 0; i < arguments.size(); i++) {
       DataTypeId currArg = arguments.get(i).getType(symbolTable);
       DataTypeId currParamType = paramTypes.get(i);
@@ -71,6 +78,7 @@ public class FuncCallNode extends AssignRHSNode {
     }
   }
 
+  /* Return the return type of the function */
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
     FunctionId function = (FunctionId) symbolTable.lookupAll("*" + identifier.getIdentifier());

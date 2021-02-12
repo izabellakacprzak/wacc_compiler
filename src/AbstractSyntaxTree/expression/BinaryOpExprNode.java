@@ -7,6 +7,9 @@ import java.util.List;
 
 public class BinaryOpExprNode extends ExpressionNode {
 
+  /* left:     ExpressionNode corresponding to the left expression the operator was called with
+   * right:    ExpressionNode corresponding to the right expression the operator was called with
+   * operator: BinOp enum representing the operator corresponding to this node */
   private final ExpressionNode left;
   private final ExpressionNode right;
   private final BinOp operator;
@@ -22,15 +25,16 @@ public class BinaryOpExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    /* Recursively call semanticAnalysis on assignment nodes */
     left.semanticAnalysis(symbolTable, errorMessages);
     right.semanticAnalysis(symbolTable, errorMessages);
 
+    /* Check that the left assignment type and the right assignment type
+     * can be resolved and match one of the operator's expected argument types */
     List<DataTypeId> argTypes = operator.getArgTypes();
-
     DataTypeId lhsType = left.getType(symbolTable);
     DataTypeId rhsType = right.getType(symbolTable);
 
-    /* LHS Expression and RHS Expression types do not match */
     if (lhsType == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Could not resolve type of LHS expression for '" + operator.getLabel() + "' operator."
@@ -45,6 +49,8 @@ public class BinaryOpExprNode extends ExpressionNode {
       return;
     }
 
+    /* Check that at least one of the operator's possible
+     * argument types matches the LHS assignment's type */
     boolean argMatched = false;
 
     for (DataTypeId argType : argTypes) {
@@ -54,7 +60,7 @@ public class BinaryOpExprNode extends ExpressionNode {
       }
     }
 
-    /* LHS Expression is not a valid type for the operator */
+    /* No expected argument types in argTypes implies any type is expected */
     if (!argTypes.isEmpty() && !argMatched) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Incompatible LHS type for '" + operator.getLabel() + "' operator."
@@ -62,6 +68,8 @@ public class BinaryOpExprNode extends ExpressionNode {
       return;
     }
 
+    /* Check that at least one of the operator's possible
+     * argument types matches the RHS assignment's type */
     argMatched = false;
 
     for (DataTypeId argType : argTypes) {
@@ -71,7 +79,7 @@ public class BinaryOpExprNode extends ExpressionNode {
       }
     }
 
-    /* RHS Expression is not a valid type for the operator */
+    /* No expected argument types in argTypes implies any type is expected */
     if (!argTypes.isEmpty() && !argMatched) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Incompatible RHS type for '" + operator.getLabel() + "' operator."
@@ -79,6 +87,7 @@ public class BinaryOpExprNode extends ExpressionNode {
       return;
     }
 
+    /* Check that the LHS and RHS assignment types match */
     if (!lhsType.equals(rhsType)) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " RHS type does not match LHS type for '" + operator.getLabel() + "' operator. "
@@ -86,6 +95,8 @@ public class BinaryOpExprNode extends ExpressionNode {
     }
   }
 
+  /* Returns the toString of a list without the square brackets "[]"
+   * surrounding the elements */
   private String listTypeToString(List<DataTypeId> list) {
     StringBuilder argsStr = new StringBuilder().append(list);
     argsStr.deleteCharAt(argsStr.length() - 1).deleteCharAt(0);

@@ -10,6 +10,7 @@ import java.util.List;
 
 public class IdentifierNode extends ExpressionNode {
 
+  /* value: String representing the identifier of this node */
   private final String identifier;
 
   public IdentifierNode(int line, int charPositionInLine, String identifier) {
@@ -23,6 +24,9 @@ public class IdentifierNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    /* Check that the identifier has been declared as either a ParameterId or VariableId.
+    // TODO: should we include this second bit?
+     * FunctionId identifiers do not call this function */
     Identifier id = symbolTable.lookupAll(identifier);
 
     if (id == null) {
@@ -37,6 +41,8 @@ public class IdentifierNode extends ExpressionNode {
 
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
+    /* Check whether identifier is declared as a VariableId, ParameterId or FunctionId
+     * and return the type if so */
     Identifier id = symbolTable.lookupAll(identifier);
 
     if (id instanceof VariableId) {
@@ -45,7 +51,7 @@ public class IdentifierNode extends ExpressionNode {
       return ((ParameterId) id).getType();
     }
 
-    // check whether identifier is a function instance
+    /* Add '*' to search for a FunctionId */
     id = symbolTable.lookupAll("*" + identifier);
     if (id instanceof FunctionId) {
       return ((FunctionId) id).getReturnType();

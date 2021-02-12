@@ -10,8 +10,10 @@ public abstract class ExpressionNode extends AssignRHSNode {
     super(line, charPositionInLine);
   }
 
+  /* Returns the DataTypeId corresponding to the ExpressionNode's DataType or return DataType */
   public abstract DataTypeId getType(SymbolTable symbolTable);
 
+  /* All ExpressionNodes must Override toString for use in error messages */
   @Override
   public abstract String toString();
 }

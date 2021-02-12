@@ -8,6 +8,8 @@ import java.util.List;
 
 public class PairTypeNode implements TypeNode {
 
+  /* fstType:  TypeNode of the first element in the pair's type
+   * sndType:  TypeNode of the second element in the pair's type */
   private final TypeNode fstType;
   private final TypeNode sndType;
 
@@ -18,25 +20,29 @@ public class PairTypeNode implements TypeNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    /* Recursively call semanticAnalysis on each type */
     if (fstType != null) {
       fstType.semanticAnalysis(symbolTable, errorMessages);
     }
+
     if (sndType != null) {
       sndType.semanticAnalysis(symbolTable, errorMessages);
     }
   }
 
   @Override
-  public Identifier getIdentifier(SymbolTable parentSymbolTable) {
-    return new PairType((DataTypeId) fstType.getIdentifier(parentSymbolTable),
-        (DataTypeId) sndType.getIdentifier(parentSymbolTable));
+  public Identifier getIdentifier(SymbolTable symbolTable) {
+    return new PairType((DataTypeId) fstType.getIdentifier(symbolTable),
+        (DataTypeId) sndType.getIdentifier(symbolTable));
   }
 
+  /* Returns the corresponding DataTypeId of a pair elem,
+   * returning null if the elem is null */
   private DataTypeId getPairElemNode(TypeNode elem) {
-
     if (elem == null) {
       return null;
     }
+
     return elem.getType();
   }
 
