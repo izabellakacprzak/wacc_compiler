@@ -76,9 +76,6 @@ public class Compiler {
       System.exit(SYNTAX_ERROR_CODE);
     }
 
-    System.out.println(tree.toStringTree(parser));
-
-
     /* If there are no syntax errors, it proceeds to semantic error checking and creates a new
      * semanticErrorListener object. */
     SemanticErrorListener semanticErrorListener = new SemanticErrorListener();
