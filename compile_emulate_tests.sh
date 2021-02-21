@@ -24,10 +24,13 @@ run_test_in_dir() {
                       fi
                     done; } < output.txt
                     if [ $flag ]; then
-                      echo Passed test $runTests "$pathname"
-                      runTests=$((runTests + 1))
+                      passedTests=$((passedTests + 1))
+                      echo ${GREEN}passed${NC}: test $runTests "$pathname"
+                    else
+                      echo ${RED}failed${NC}: test $runTests "$pathname"
                     fi
                   fi
+                  runTests=$((runTests + 1))
             esac
         fi
     done
@@ -57,15 +60,23 @@ run_tests () {
                       fi
                     done; } < output.txt
                     if [ $flag ]; then
-                      echo Passed test $runTests "$pathname"
-                      runTests=$((runTests + 1))
+                      passedTests=$((passedTests + 1))
+                      echo ${GREEN}passed${NC}: test $runTests "$pathname"
+                    else
+                      echo ${RED}failed${NC}: test $runTests "$pathname"
                     fi
                   fi
+                  runTests=$((runTests + 1))
             esac
         fi
     done
 }
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+runTests=0
+passedTests=0
 touch output.txt
 run_tests "src/test/valid"
 rm output.txt
