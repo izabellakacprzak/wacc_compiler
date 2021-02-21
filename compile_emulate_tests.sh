@@ -10,11 +10,12 @@ run_test_in_dir() {
                   echo running test $runTests "$pathname"
                   output=${pathname/valid/backendtests}
                   refLine=$(head -n 1 ${output/.wacc/.txt})
+                  refCode=$((refLine))
                   flag=true
                   ./compile "$pathname" >/dev/null 2>&1
                   arm-linux-gnueabi-gcc -o FILENAME1 -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
                   qemu-arm -L /usr/arm-linux-gnueabi/ ${pathname/.wacc/} > output.txt
-                  if [ "$refLine" -eq $? ]; then
+                  if [ "$refCode" -eq $? ]; then
                     { read -r;
                     while read -r refLine && $flag;
                     do
@@ -46,11 +47,12 @@ run_tests () {
                   echo running test $runTests "$pathname"
                   output=${pathname/valid/backendtests}
                   refLine=$(head -n 1 ${output/.wacc/.txt})
+                  refCode=$((refLine))
                   flag=true
                   ./compile "$pathname" >/dev/null 2>&1
                   arm-linux-gnueabi-gcc -o FILENAME1 -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
                   qemu-arm -L /usr/arm-linux-gnueabi/ ${pathname/.wacc/}
-                  if [ "$refLine" -eq $? ]; then
+                  if [ "$refCode" -eq $? ]; then
                     { read -r;
                     while read -r refLine && $flag;
                     do
