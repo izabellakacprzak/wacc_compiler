@@ -54,6 +54,8 @@ run_tests () {
                   ./compile "$pathname" >/dev/null 2>&1
                   arm-linux-gnueabi-gcc -o ${pathname/.wacc/} -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
                   qemu-arm -L /usr/arm-linux-gnueabi/ ${pathname/.wacc/}
+                  rm ${pathname/.wacc/.s}
+                  rm ${pathname/.wacc/}
                   if [ "$refCode" -eq $? ]; then
                     { read -r;
                     while read -r refLine && $flag;
