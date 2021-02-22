@@ -2,6 +2,7 @@ import AbstractSyntaxTree.ProgramNode;
 import SemanticAnalysis.SymbolTable;
 import antlr.WACCLexer;
 import antlr.WACCParser;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import org.antlr.v4.runtime.CharStream;
@@ -94,6 +95,13 @@ public class Compiler {
       System.out.println(
           semanticErrorListener.semanticErrorsCount() + " semantic errors detected, exiting...");
       System.exit(SEMANTIC_ERROR_CODE);
+    }
+
+    File assemblyFile = new File(args[0].replaceFirst(".wacc", ".s"));
+    try {
+      assemblyFile.createNewFile();
+    } catch (IOException e) {
+      System.out.println("Could not create new file");
     }
   }
 }
