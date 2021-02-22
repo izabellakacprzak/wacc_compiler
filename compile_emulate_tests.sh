@@ -13,7 +13,7 @@ run_test_in_dir() {
                   refCode=$((refLine))
                   flag=true
                   ./compile "$pathname" >/dev/null 2>&1
-                  arm-linux-gnueabi-gcc -o FILENAME1 -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
+                  arm-linux-gnueabi-gcc -o ${pathname/.wacc/} -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
                   qemu-arm -L /usr/arm-linux-gnueabi/ ${pathname/.wacc/} > output.txt
                   if [ "$refCode" -eq $? ]; then
                     { read -r;
@@ -50,7 +50,7 @@ run_tests () {
                   refCode=$((refLine))
                   flag=true
                   ./compile "$pathname" >/dev/null 2>&1
-                  arm-linux-gnueabi-gcc -o FILENAME1 -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
+                  arm-linux-gnueabi-gcc -o ${pathname/.wacc/} -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
                   qemu-arm -L /usr/arm-linux-gnueabi/ ${pathname/.wacc/}
                   if [ "$refCode" -eq $? ]; then
                     { read -r;
