@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 run_test_in_dir() {
   for pathname in "$1"/*; do
