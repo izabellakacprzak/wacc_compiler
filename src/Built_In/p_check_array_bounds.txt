@@ -1,0 +1,10 @@
+p_check_array_bounds:
+      PUSH {lr}
+      CMP r0, #0
+      LDRLT r0, =msg_0
+      BLLT p_throw_runtime_error
+      LDR r1, [r1]
+      CMP r0, r1
+      LDRCS r0, =msg_1
+      BLCS p_throw_runtime_error
+      POP {pc}
