@@ -1,0 +1,4 @@
+Please enter the first element (char): #input#
+Please enter the second element (int): #input#
+The first element was #output#
+The second element was #output#
