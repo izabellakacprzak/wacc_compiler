@@ -4,6 +4,15 @@ import java.util.List;
 
 public class InstructionPrinter {
 
+  public String printAnd(Register destReg, Register operand1, Register operand2) {
+    return "AND " + destReg.getRegName() + ", " +
+            operand1.getRegName() + ", " +
+            operand2.getRegName();
+  }
+
+  public String printCompare(Register operand1, Register operand2) {
+    return "CMP " + operand1.getRegName() + ", " + operand2.getRegName();
+  }
 
   public String printBranch(List<ConditionCode> conditionCodes, String label) {
     StringBuilder instruction = new StringBuilder("B");
@@ -14,6 +23,10 @@ public class InstructionPrinter {
     }
     instruction.append(" ").append(label);
     return instruction.toString();
+  }
+
+  public String printLabel(String label) {
+    return label + ":";
   }
 
   public String printLDR(Register destReg,
@@ -68,5 +81,31 @@ public class InstructionPrinter {
     return instruction;
   }
 
+  public String printOr(Register destReg, Register operand1, Register operand2) {
+    return "OR " + destReg.getRegName() + ", " +
+            operand1.getRegName() + ", " +
+            operand2.getRegName();
+  }
+
+  public String printPop(Register reg) {
+    return "POP {" + reg.getRegName() + "}";
+  }
+
+  public String printPush(Register reg) {
+    return "PUSH {" + reg.getRegName() + "}";
+  }
+
+  public String printSMull(Register destReg1, Register destReg2, Register operand1, Register operand2) {
+    return "SMULL " + destReg1.getRegName() + ", " +
+            destReg2.getRegName() + ", " +
+            operand1.getRegName() + ", " +
+            operand2.getRegName();
+  }
+
+  public String printXOr(Register destReg, Register operand1, Register operand2) {
+    return "EOR " + destReg.getRegName() + ", " +
+            operand1.getRegName() + ", " +
+            operand2.getRegName();
+  }
 
 }

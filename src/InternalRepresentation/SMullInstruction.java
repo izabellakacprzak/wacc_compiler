@@ -2,6 +2,7 @@ package InternalRepresentation;
 
 public class SMullInstruction implements Instruction {
 
+    private final InstructionPrinter printer = new InstructionPrinter();
     private final Register destReg1;
     private final Register destReg2;
     private final Register operand1;
@@ -18,9 +19,6 @@ public class SMullInstruction implements Instruction {
 
     @Override
     public String writeInstruction() {
-        return "SMULL " + destReg1.getRegName() + ", " +
-                destReg2.getRegName() + ", " +
-                operand1.getRegName() + ", " +
-                operand2.getRegName();
+        return printer.printSMull(destReg1, destReg2, operand1, operand2);
     }
 }

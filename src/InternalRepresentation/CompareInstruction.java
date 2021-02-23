@@ -2,6 +2,7 @@ package InternalRepresentation;
 
 public class CompareInstruction implements Instruction{
 
+    private final InstructionPrinter printer = new InstructionPrinter();
     private final Register operand1;
     private final Register operand2;
     // ASR / imm val compare?
@@ -13,6 +14,6 @@ public class CompareInstruction implements Instruction{
 
     @Override
     public String writeInstruction() {
-        return "CMP " + operand1.getRegName() + ", " + operand2.getRegName();
+        return printer.printCompare(operand1, operand2);
     }
 }

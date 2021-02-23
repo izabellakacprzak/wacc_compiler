@@ -2,6 +2,7 @@ package InternalRepresentation;
 
 public class LabelInstruction implements Instruction{
 
+    private final InstructionPrinter printer = new InstructionPrinter();
     private final String label;
 
     public LabelInstruction(String label) {
@@ -10,6 +11,6 @@ public class LabelInstruction implements Instruction{
 
     @Override
     public String writeInstruction() {
-        return label + ":";
+        return printer.printLabel(label);
     }
 }

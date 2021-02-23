@@ -4,6 +4,7 @@ public class PopInstruction implements Instruction{
 
     // General Pop instruction takes in a reglist but could not see such an example
     // in the WACC arm output
+    private final InstructionPrinter printer = new InstructionPrinter();
     private final Register reg;
 
     public PopInstruction(Register reg) {
@@ -12,6 +13,6 @@ public class PopInstruction implements Instruction{
 
     @Override
     public String writeInstruction() {
-        return "POP {" + reg.getRegName() + "}";
+        return printer.printPop(reg);
     }
 }

@@ -2,6 +2,7 @@ package InternalRepresentation;
 
 public class OrInstruction implements Instruction{
 
+    private final InstructionPrinter printer = new InstructionPrinter();
     private final Register destReg;
     private final Register operand1;
     private final Register operand2;
@@ -14,8 +15,6 @@ public class OrInstruction implements Instruction{
 
     @Override
     public String writeInstruction() {
-        return "OR " + destReg.getRegName() + ", " +
-                operand1.getRegName() + ", " +
-                operand2.getRegName();
+        return printer.printOr(destReg, operand1, operand2);
     }
 }

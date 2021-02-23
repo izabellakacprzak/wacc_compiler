@@ -7,7 +7,6 @@ public class ConditionCode {
     this.condition = condition;
   }
 
-
   public String getCondName() {
     return condition.name();
   }

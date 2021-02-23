@@ -2,10 +2,10 @@ package InternalRepresentation;
 
 public class XOrInstruction implements Instruction{
 
+    private final InstructionPrinter printer = new InstructionPrinter();
     private final Register destReg;
     private final Register operand1;
     private final Register operand2;
-
 
     public XOrInstruction(Register dest, Register operand1, Register operand2) {
         this.destReg = dest;
@@ -15,9 +15,7 @@ public class XOrInstruction implements Instruction{
 
     @Override
     public String writeInstruction() {
-        return "EOR " + destReg.getRegName() + ", " +
-                operand1.getRegName() + ", " +
-                operand2.getRegName();
+        return printer.printXOr(destReg, operand1, operand2);
     }
 
 }
