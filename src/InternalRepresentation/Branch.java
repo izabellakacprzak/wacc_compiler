@@ -5,10 +5,10 @@ import java.util.List;
 
 public class Branch implements Instruction {
   private final InstructionPrinter printer = new InstructionPrinter();
-  private String label;
+  private final String label;
   private List<ConditionCode> conditionCodes;
 
- //SIMPLE INSTR + LABEL
+  //SIMPLE INSTR + LABEL
   public Branch(String label) {
     this.label = label;
   }
