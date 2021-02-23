@@ -2,11 +2,11 @@ package InternalRepresentation;
 
 import java.util.Locale;
 
-public class Registers {
+public class Register {
 
     private final Reg currReg;
 
-    public Registers(Reg currReg){
+    public Register(Reg currReg){
         this.currReg = currReg;
     }
 
@@ -15,7 +15,7 @@ public class Registers {
     }
 
     public String getRegName() {
-        return currReg.name().toUpperCase(Locale.ROOT);
+        return currReg.name().toLowerCase(Locale.ROOT);
     }
 
     public enum Reg {R0, R1, R2, R3, R4, R5 , R6,
