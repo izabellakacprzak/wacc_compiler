@@ -15,7 +15,7 @@ public class Register {
     }
 
     public String getRegName() {
-        return currReg.name().toUpperCase(Locale.ROOT);
+        return currReg.name().toLowerCase(Locale.ROOT);
     }
 
     public enum Reg {R0, R1, R2, R3, R4, R5 , R6,
