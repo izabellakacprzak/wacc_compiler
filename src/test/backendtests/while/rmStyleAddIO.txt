@@ -1,3 +1,4 @@
+0
 Enter the first number: #input# Enter the second number: #input# Initial value of x: #output#
 #output#
 final value of x: #output

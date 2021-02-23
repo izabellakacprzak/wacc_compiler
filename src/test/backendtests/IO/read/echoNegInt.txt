@@ -1,3 +1,4 @@
+0
 enter an integer to echo
 #input#
 #output#

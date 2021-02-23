@@ -1,3 +1,4 @@
+0
 Please input an integer: #input#
 echo input: #output#
 Do you want to continue entering input?

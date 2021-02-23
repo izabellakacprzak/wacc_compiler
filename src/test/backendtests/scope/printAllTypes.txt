@@ -1,3 +1,4 @@
+0
 ( [1, 2, 3] , [a, b, c] )
 [ #addrs# = (a, true), #addrs# = (b, false) ]
 1, 2
