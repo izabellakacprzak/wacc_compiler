@@ -2,11 +2,11 @@ package InternalRepresentation;
 
 import java.util.Locale;
 
-public class Registers {
+public class Register {
 
     private final Reg currReg;
 
-    public Registers(Reg currReg){
+    public Register(Reg currReg){
         this.currReg = currReg;
     }
 
