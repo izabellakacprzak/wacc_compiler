@@ -1,4 +1,8 @@
-package InternalRepresentation;
+package InternalRepresentation.Instructions;
+
+import InternalRepresentation.InstructionPrinter;
+import InternalRepresentation.Instructions.Instruction;
+import InternalRepresentation.Register;
 
 public class PushInstruction implements Instruction {
 

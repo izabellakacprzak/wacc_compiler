@@ -1,4 +1,9 @@
-package InternalRepresentation;
+package InternalRepresentation.Instructions;
+
+import InternalRepresentation.ConditionCode;
+import InternalRepresentation.InstructionPrinter;
+import InternalRepresentation.Instructions.Instruction;
+import InternalRepresentation.Register;
 
 public class LDR implements Instruction {
   private final Register destReg;

@@ -4,14 +4,23 @@ import java.util.List;
 
 public class InstructionPrinter {
 
-  public String printAnd(Register destReg, Register operand1, Register operand2) {
-    return "AND " + destReg.getRegName() + ", " +
-            operand1.getRegName() + ", " +
-            operand2.getRegName();
+  public String printArithmetic(String operationType, Register destReg,
+                                Register operand1, Operand operand2, boolean setBits) {
+    StringBuilder instruction = new StringBuilder(operationType);
+    if (setBits) {
+      instruction.append("S");
+    }
+
+    instruction.append(" ").
+            append(destReg.getRegName()).
+            append(operand1.getRegName()).
+            append(operand2.toString());
+
+    return instruction.toString();
   }
 
-  public String printCompare(Register operand1, Register operand2) {
-    return "CMP " + operand1.getRegName() + ", " + operand2.getRegName();
+  public String printCompare(Register operand1, Operand operand2) {
+    return "CMP " + operand1.getRegName() + ", " + operand2.toString();
   }
 
   public String printBranch(List<ConditionCode> conditionCodes, String label) {
@@ -29,12 +38,9 @@ public class InstructionPrinter {
     return label + ":";
   }
 
-  public String printLDR(Register destReg,
-                         ConditionCode conditionCode,
-                         int immOffset,
-                         Register srcReg,
-                         String constant,
-                         boolean isLDRSB) {
+  public String printLDR(Register destReg, ConditionCode conditionCode,
+                         int immOffset, Register srcReg,
+                         String constant, boolean isLDRSB) {
     String instruction = (isLDRSB) ? "LDRSB" : "LDR";
 
     if (conditionCode != null) {
@@ -51,6 +57,13 @@ public class InstructionPrinter {
     }
 
     return instruction;
+  }
+
+  public String printLogical(String operationType, Register destReg,
+                             Register operand1, Register operand2) {
+    return operationType + " " + destReg.getRegName() + ", " +
+            operand1.getRegName() + ", " +
+            operand2.getRegName();
   }
 
   public String printMOV(ConditionCode conditionCode, Register destReg, Register srcReg,
@@ -81,12 +94,6 @@ public class InstructionPrinter {
     return instruction;
   }
 
-  public String printOr(Register destReg, Register operand1, Register operand2) {
-    return "OR " + destReg.getRegName() + ", " +
-            operand1.getRegName() + ", " +
-            operand2.getRegName();
-  }
-
   public String printPop(Register reg) {
     return "POP {" + reg.getRegName() + "}";
   }
@@ -101,11 +108,4 @@ public class InstructionPrinter {
             operand1.getRegName() + ", " +
             operand2.getRegName();
   }
-
-  public String printXOr(Register destReg, Register operand1, Register operand2) {
-    return "EOR " + destReg.getRegName() + ", " +
-            operand1.getRegName() + ", " +
-            operand2.getRegName();
-  }
-
 }

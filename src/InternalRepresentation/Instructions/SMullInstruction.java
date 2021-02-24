@@ -1,4 +1,8 @@
-package InternalRepresentation;
+package InternalRepresentation.Instructions;
+
+import InternalRepresentation.InstructionPrinter;
+import InternalRepresentation.Instructions.Instruction;
+import InternalRepresentation.Register;
 
 public class SMullInstruction implements Instruction {
 
@@ -7,7 +11,6 @@ public class SMullInstruction implements Instruction {
     private final Register destReg2;
     private final Register operand1;
     private final Register operand2;
-
 
     public SMullInstruction(Register dest1, Register dest2, Register operand1, Register operand2) {
         this.destReg1 = dest1;

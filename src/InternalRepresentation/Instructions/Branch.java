@@ -1,4 +1,7 @@
-package InternalRepresentation;
+package InternalRepresentation.Instructions;
+
+import InternalRepresentation.ConditionCode;
+import InternalRepresentation.InstructionPrinter;
 
 import java.util.ArrayList;
 import java.util.List;

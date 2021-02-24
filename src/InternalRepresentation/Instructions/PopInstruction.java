@@ -1,6 +1,10 @@
-package InternalRepresentation;
+package InternalRepresentation.Instructions;
 
-public class PopInstruction implements Instruction{
+import InternalRepresentation.InstructionPrinter;
+import InternalRepresentation.Instructions.Instruction;
+import InternalRepresentation.Register;
+
+public class PopInstruction implements Instruction {
 
     // General Pop instruction takes in a reglist but could not see such an example
     // in the WACC arm output

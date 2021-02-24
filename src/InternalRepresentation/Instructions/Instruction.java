@@ -1,4 +1,4 @@
-package InternalRepresentation;
+package InternalRepresentation.Instructions;
 
 public interface Instruction {
 
