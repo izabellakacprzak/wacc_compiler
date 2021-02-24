@@ -14,9 +14,15 @@ public class ParamListNode implements ASTNode {
   private final List<IdentifierNode> identifiers;
   private final List<TypeNode> types;
 
+  private SymbolTable currSymTable = null;
+
   public ParamListNode(List<IdentifierNode> identifiers, List<TypeNode> types) {
     this.identifiers = identifiers;
     this.types = types;
+  }
+
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
   }
 
   /* Create a new ParameterId for each parameter and add to the symbolTable.
@@ -44,5 +50,8 @@ public class ParamListNode implements ASTNode {
     for (TypeNode type : types) {
       type.semanticAnalysis(symbolTable, errorMessages);
     }
+
+    /* Set the current symbol table */
+    currSymTable = symbolTable;
   }
 }

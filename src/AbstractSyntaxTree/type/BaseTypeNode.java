@@ -12,12 +12,19 @@ public class BaseTypeNode implements TypeNode {
   /* type: BaseType.Type enum corresponding to the base type this represents */
   private final Type baseType;
 
+  private SymbolTable currSymTable = null;
+
   public BaseTypeNode(Type baseType) {
     this.baseType = baseType;
   }
 
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
+
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
   }
 
   @Override
