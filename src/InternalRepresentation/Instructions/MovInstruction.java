@@ -5,7 +5,7 @@ import InternalRepresentation.InstructionPrinter;
 import InternalRepresentation.Instructions.Instruction;
 import InternalRepresentation.Register;
 
-public class MOV implements Instruction {
+public class MovInstruction implements Instruction {
   private final Register destReg;
   private Register srcReg = null;
   private ConditionCode conditionCode = null;
@@ -19,39 +19,39 @@ public class MOV implements Instruction {
    */
 
   //SIMPLE INSTR + DEST REG + INT
-  public MOV(Register destReg, int intImmediate) {
+  public MovInstruction(Register destReg, int intImmediate) {
     this.destReg = destReg;
     this.intImmediate = intImmediate;
   }
 
   //SIMPLE INSTR + DEST REG + CHAR
-  public MOV(Register destReg, char charImmediate) {
+  public MovInstruction(Register destReg, char charImmediate) {
     this.destReg = destReg;
     this.charImmediate = charImmediate;
   }
 
   //SIMPLE INSTR + DEST REG + SRC REG
-  public MOV(Register destReg, Register srcReg) {
+  public MovInstruction(Register destReg, Register srcReg) {
     this.destReg = destReg;
     this.srcReg = srcReg;
   }
 
   //COND INSTR + DEST REG + INT
-  public MOV(ConditionCode conditionCode, Register destReg, int intImmediate) {
+  public MovInstruction(ConditionCode conditionCode, Register destReg, int intImmediate) {
     this.conditionCode = conditionCode;
     this.destReg = destReg;
     this.intImmediate = intImmediate;
   }
 
   //COND INSTR + DEST REG + CHAR
-  public MOV(ConditionCode conditionCode, Register destReg, char charImmediate) {
+  public MovInstruction(ConditionCode conditionCode, Register destReg, char charImmediate) {
     this.conditionCode = conditionCode;
     this.destReg = destReg;
     this.charImmediate = charImmediate;
   }
 
   //COND INSTR + DEST REG + SRC REG
-  public MOV(ConditionCode conditionCode, Register destReg, Register srcReg) {
+  public MovInstruction(ConditionCode conditionCode, Register destReg, Register srcReg) {
     this.conditionCode = conditionCode;
     this.destReg = destReg;
     this.srcReg = srcReg;
