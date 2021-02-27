@@ -1,5 +1,7 @@
 package InternalRepresentation;
 
+import InternalRepresentation.Enums.ShiftType;
+
 public class Shift {
 
     private final ShiftType shiftType;
@@ -25,6 +27,4 @@ public class Shift {
         }
     }
 
-    // TODO: SHOULD WE ALSO ADD RRX (RRX doesn't take registers or immedVal)
-    public enum ShiftType {LSL, LSR, ASR, ROR}
 }

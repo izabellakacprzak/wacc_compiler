@@ -1,5 +1,6 @@
 package InternalRepresentation.Instructions;
 
+import InternalRepresentation.Enums.ArithmeticOperation;
 import InternalRepresentation.InstructionPrinter;
 import InternalRepresentation.Operand;
 import InternalRepresentation.Register;
@@ -26,8 +27,7 @@ public class ArithmeticInstruction implements Instruction {
 
     @Override
     public String writeInstruction() {
-        return printer.printArithmetic(operation.name(), destReg, operand1, operand2, setBits);
+        return printer.printArithmetic(operation, destReg, operand1, operand2, setBits);
     }
 
-    public enum ArithmeticOperation {ADD, ADC, SUB, SBC, RSB, RSC}
 }

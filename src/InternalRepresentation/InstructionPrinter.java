@@ -1,12 +1,16 @@
 package InternalRepresentation;
 
+import InternalRepresentation.Enums.ArithmeticOperation;
+import InternalRepresentation.Enums.LogicalOperation;
+import InternalRepresentation.Enums.StrType;
+
 import java.util.List;
 
 public class InstructionPrinter {
 
-  public String printArithmetic(String operationType, Register destReg,
+  public String printArithmetic(ArithmeticOperation operationType, Register destReg,
                                 Register operand1, Operand operand2, boolean setBits) {
-    StringBuilder instruction = new StringBuilder(operationType);
+    StringBuilder instruction = new StringBuilder(operationType.toString());
     if (setBits) {
       instruction.append("S");
     }
@@ -59,9 +63,9 @@ public class InstructionPrinter {
     return instruction;
   }
 
-  public String printLogical(String operationType, Register destReg,
+  public String printLogical(LogicalOperation operationType, Register destReg,
                              Register operand1, Register operand2) {
-    return operationType + " " + destReg.getRegName() + ", " +
+    return operationType.toString() + " " + destReg.getRegName() + ", " +
             operand1.getRegName() + ", " +
             operand2.getRegName();
   }
@@ -108,4 +112,31 @@ public class InstructionPrinter {
             operand1.getRegName() + ", " +
             operand2.getRegName();
   }
+
+  public String printStr(StrType type, Register destReg,
+                         Register offsetReg1, Register offsetReg2, int offsetImm) {
+    StringBuilder instruction = new StringBuilder(type.toString());
+
+    instruction.append(", ").
+            append(destReg.getRegName()).
+            append("[").
+            append(offsetReg1.getRegName()).
+            append(", ");
+
+    if (offsetReg2 != null) {
+      instruction.append(offsetReg2.getRegName());
+    } else {
+      instruction.append("#");
+      switch (type) {
+        case STRB:
+          instruction.append(offsetImm);
+        case STRH:
+          instruction.append(offsetImm * 2);
+        default:
+          instruction.append(offsetImm * 4);
+      }
+    }
+
+    instruction.append("]");
+    return instruction.toString();  }
 }

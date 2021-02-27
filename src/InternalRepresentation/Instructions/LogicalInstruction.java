@@ -1,5 +1,6 @@
 package InternalRepresentation.Instructions;
 
+import InternalRepresentation.Enums.LogicalOperation;
 import InternalRepresentation.InstructionPrinter;
 import InternalRepresentation.Register;
 
@@ -21,8 +22,7 @@ public class LogicalInstruction implements Instruction{
 
     @Override
     public String writeInstruction() {
-        return printer.printLogical(operation.name(), destReg, operand1, operand2);
+        return printer.printLogical(operation, destReg, operand1, operand2);
     }
 
-    public enum LogicalOperation {AND, EOR, ORR, BIC, MVN, TST}
 }
