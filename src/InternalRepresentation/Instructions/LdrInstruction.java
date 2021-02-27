@@ -1,42 +1,46 @@
 package InternalRepresentation.Instructions;
 
 import InternalRepresentation.ConditionCode;
+import InternalRepresentation.Enums.LdrType;
 import InternalRepresentation.InstructionPrinter;
 import InternalRepresentation.Instructions.Instruction;
 import InternalRepresentation.Register;
 
 public class LdrInstruction implements Instruction {
   private final Register destReg;
+  private final InstructionPrinter printer = new InstructionPrinter();
   private ConditionCode conditionCode;
   private int immOffset;
   private Register srcReg;
   private String constant = null;
-  private boolean isLDRSB = false; //signed byte
-
-  private final InstructionPrinter printer = new InstructionPrinter();
+  private LdrType type = LdrType.LDR; //default
 
   //SIMPLE INSTR + DST REG + STRING CONSTANT
-  public LdrInstruction(Register destReg, String constant) {
+  public LdrInstruction(LdrType type, Register destReg, String constant) {
+    this.type = type;
     this.destReg = destReg;
     this.constant = constant;
   }
 
   //SIMPLE INSTR + DST REG + INT CONSTANT
-  public LdrInstruction(Register destReg, int constant) {
+  public LdrInstruction(LdrType type, Register destReg, int constant) {
+    this.type = type;
     this.destReg = destReg;
     this.constant = Integer.toString(constant);
   }
 
 
   //COND INSTR + DST REG + STRING CONSTANT
-  public LdrInstruction(ConditionCode conditionCode, Register destReg, String constant) {
+  public LdrInstruction(LdrType type, ConditionCode conditionCode, Register destReg, String constant) {
+    this.type = type;
     this.conditionCode = conditionCode;
     this.destReg = destReg;
     this.constant = constant;
   }
 
   //COND INSTR + DST REG + INT CONSTANT
-  public LdrInstruction(ConditionCode conditionCode, Register destReg, int constant) {
+  public LdrInstruction(LdrType type, ConditionCode conditionCode, Register destReg, int constant) {
+    this.type = type;
     this.conditionCode = conditionCode;
     this.destReg = destReg;
     this.constant = Integer.toString(constant);
@@ -44,14 +48,16 @@ public class LdrInstruction implements Instruction {
 
 
   //SIMPLE INSTR + DST REG + SRC REG
-  public LdrInstruction(Register destReg, Register srcReg) {
+  public LdrInstruction(LdrType type, Register destReg, Register srcReg) {
+    this.type = type;
     this.destReg = destReg;
     this.srcReg = srcReg;
     this.immOffset = 0;
   }
 
   //SIMPLE INSTR + DST REG + SRC REG + OFFSET
-  public LdrInstruction(Register destReg, Register srcReg, int immOffset) {
+  public LdrInstruction(LdrType type, Register destReg, Register srcReg, int immOffset) {
+    this.type = type;
     this.destReg = destReg;
     this.srcReg = srcReg;
     this.immOffset = immOffset;
@@ -59,7 +65,8 @@ public class LdrInstruction implements Instruction {
 
 
   //COND INSTR + DST REG + SRC REG
-  public LdrInstruction(ConditionCode conditionCode, Register destReg, Register srcReg) {
+  public LdrInstruction(LdrType type, ConditionCode conditionCode, Register destReg, Register srcReg) {
+    this.type = type;
     this.conditionCode = conditionCode;
     this.destReg = destReg;
     this.srcReg = srcReg;
@@ -67,16 +74,14 @@ public class LdrInstruction implements Instruction {
   }
 
   //COND INSTR + DST REG + SRC REG + OFFSET
-  public LdrInstruction(ConditionCode conditionCode, Register destReg, Register srcReg, int immOffset) {
+  public LdrInstruction(LdrType type, ConditionCode conditionCode, Register destReg, Register srcReg, int immOffset) {
+    this.type = type;
     this.conditionCode = conditionCode;
     this.destReg = destReg;
     this.srcReg = srcReg;
     this.immOffset = immOffset;
   }
 
-  public void setIsLDRSB() {
-    isLDRSB = true;
-  }
 
   @Override
   public String writeInstruction() {
@@ -85,6 +90,6 @@ public class LdrInstruction implements Instruction {
         immOffset,
         srcReg,
         constant,
-        isLDRSB);
+        type);
   }
 }

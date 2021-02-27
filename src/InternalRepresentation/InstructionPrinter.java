@@ -1,6 +1,7 @@
 package InternalRepresentation;
 
 import InternalRepresentation.Enums.ArithmeticOperation;
+import InternalRepresentation.Enums.LdrType;
 import InternalRepresentation.Enums.LogicalOperation;
 import InternalRepresentation.Enums.StrType;
 
@@ -44,8 +45,8 @@ public class InstructionPrinter {
 
   public String printLDR(Register destReg, ConditionCode conditionCode,
                          int immOffset, Register srcReg,
-                         String constant, boolean isLDRSB) {
-    String instruction = (isLDRSB) ? "LDRSB" : "LDR";
+                         String constant, LdrType type) {
+    String instruction = type.name();
 
     if (conditionCode != null) {
       instruction += conditionCode.getCondName();
