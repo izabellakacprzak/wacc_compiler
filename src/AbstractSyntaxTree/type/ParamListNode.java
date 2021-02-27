@@ -3,6 +3,8 @@ package AbstractSyntaxTree.type;
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Register;
+import SemanticAnalysis.Identifier;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
 import java.util.ArrayList;
@@ -58,6 +60,19 @@ public class ParamListNode implements ASTNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    Identifier entry;
+    Register curr;
+    List<Register> paramReg = internalState.getAvailableRegs();
+    for (int i = 0; i < identifiers.size(); i++) {
+      if (i >= paramReg.size()) {
+        // TODO: too many parameters
+      }
 
+      curr = paramReg.get(i);
+
+      entry = currSymTable.lookupAll(identifiers.get(i).getIdentifier());
+      entry.setRegister(curr);
+      internalState.setAsUsed(curr);
+    }
   }
 }
