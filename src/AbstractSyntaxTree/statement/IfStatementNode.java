@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
@@ -14,6 +15,7 @@ public class IfStatementNode extends StatementNode {
   private final ExpressionNode condition;
   private final StatementNode thenStatement;
   private final StatementNode elseStatement;
+  private SymbolTable currSymTable = null;
 
   public IfStatementNode(ExpressionNode condition, StatementNode thenStatement,
       StatementNode elseStatement) {
@@ -44,6 +46,12 @@ public class IfStatementNode extends StatementNode {
     /* Recursively call semanticAnalysis on statement nodes */
     thenStatement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
     elseStatement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   /* Recursively call on statement nodes */

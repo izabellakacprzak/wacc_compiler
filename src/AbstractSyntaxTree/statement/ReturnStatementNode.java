@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
@@ -11,6 +12,7 @@ public class ReturnStatementNode extends StatementNode {
    * returnType:  DataTypeId of the expected return type according to the function's declaration */
   private final ExpressionNode returnExpr;
   private DataTypeId returnType;
+  private SymbolTable currSymTable = null;
 
   public ReturnStatementNode(ExpressionNode returnExpr) {
     this.returnExpr = returnExpr;
@@ -42,6 +44,12 @@ public class ReturnStatementNode extends StatementNode {
           + " Declared return type does not match 'return' statement type."
           + " Expected: " + returnType + " Actual: " + returnExprType);
     }
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   /* Sets the function expected returnType  */

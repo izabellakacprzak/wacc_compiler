@@ -5,6 +5,7 @@ import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -20,6 +21,8 @@ public class FuncCallNode extends AssignRHSNode {
    *               passed into the function call */
   private final IdentifierNode identifier;
   private final List<ExpressionNode> arguments;
+  private SymbolTable currSymTable = null;
+
 
   public FuncCallNode(int line, int charPositionInLine, IdentifierNode identifier,
       List<ExpressionNode> arguments) {
@@ -90,6 +93,12 @@ public class FuncCallNode extends AssignRHSNode {
             + " Expected: " + currParamType + " Actual: " + currArg);
       }
     }
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   /* Return the return type of the function */

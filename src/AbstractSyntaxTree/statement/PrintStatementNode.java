@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
@@ -8,6 +9,7 @@ public class PrintStatementNode extends StatementNode {
 
   /* expression:  ExpressionNode corresponding to the expression 'print' was called with */
   private final ExpressionNode expression;
+  private SymbolTable currSymTable = null;
 
   public PrintStatementNode(ExpressionNode expression) {
     this.expression = expression;
@@ -17,5 +19,11 @@ public class PrintStatementNode extends StatementNode {
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     /* Recursively call semanticAnalysis on expression node */
     expression.semanticAnalysis(symbolTable, errorMessages);
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 }

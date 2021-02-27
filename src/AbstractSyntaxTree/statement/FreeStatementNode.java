@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.PairType;
@@ -11,6 +12,7 @@ public class FreeStatementNode extends StatementNode {
 
   /* expression:  ExpressionNode corresponding to the expression 'free' was called with */
   private final ExpressionNode expression;
+  private SymbolTable currSymTable = null;
 
   public FreeStatementNode(ExpressionNode expression) {
     this.expression = expression;
@@ -35,5 +37,11 @@ public class FreeStatementNode extends StatementNode {
           + " Incompatible type for 'free' statement." +
           " Expected: ARRAY, PAIR Actual: " + exprType);
     }
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 }

@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
@@ -12,6 +13,8 @@ public class NewPairNode extends AssignRHSNode {
    * sndExpr: ExpressionNode corresponding to the second element of this node's PAIR */
   private final ExpressionNode fstExpr;
   private final ExpressionNode sndExpr;
+  private SymbolTable currSymTable = null;
+
 
   public NewPairNode(int line, int charPositionInLine, ExpressionNode fstExpr,
       ExpressionNode sndExpr) {
@@ -25,6 +28,12 @@ public class NewPairNode extends AssignRHSNode {
     /* Recursively call semanticAnalysis on expression nodes */
     fstExpr.semanticAnalysis(symbolTable, errorMessages);
     sndExpr.semanticAnalysis(symbolTable, errorMessages);
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   @Override

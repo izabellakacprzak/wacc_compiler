@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.SymbolTable;
@@ -10,6 +11,8 @@ public class ArrayLiterNode extends AssignRHSNode {
 
   /* expressions: List of ExpressionNodes corresponding to each element of the ARRAY literal */
   private final List<ExpressionNode> expressions;
+  private SymbolTable currSymTable = null;
+
 
   public ArrayLiterNode(int line, int charPositionInLine, List<ExpressionNode> expressions) {
     super(line, charPositionInLine);
@@ -55,6 +58,11 @@ public class ArrayLiterNode extends AssignRHSNode {
       /* Recursively call semanticAnalysis on each expression node */
       currExpr.semanticAnalysis(symbolTable, errorMessages);
     }
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
 
   }
 

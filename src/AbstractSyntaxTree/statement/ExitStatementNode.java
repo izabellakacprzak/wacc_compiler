@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
@@ -10,6 +11,7 @@ public class ExitStatementNode extends StatementNode {
 
   /* expression:  ExpressionNode corresponding to the expression 'exit' was called with */
   private final ExpressionNode expression;
+  private SymbolTable currSymTable = null;
 
   public ExitStatementNode(ExpressionNode expression) {
     this.expression = expression;
@@ -32,6 +34,12 @@ public class ExitStatementNode extends StatementNode {
           + " Incompatible type for 'exit' statement."
           + " Expected: INT Actual: " + exprType);
     }
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   /* Flags that ExitStatementNode represents an exit statement. Used for syntax errors checking

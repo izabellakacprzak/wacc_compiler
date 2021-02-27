@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
@@ -12,6 +13,7 @@ public class WhileStatementNode extends StatementNode {
    * statement: StatementNode representing the body of the while loop */
   private final ExpressionNode condition;
   private final StatementNode statement;
+  private SymbolTable currSymTable = null;
 
   public WhileStatementNode(ExpressionNode condition, StatementNode statement) {
     this.condition = condition;
@@ -38,6 +40,12 @@ public class WhileStatementNode extends StatementNode {
 
     /* Recursively call semanticAnalysis on statement node */
     statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   /* Recursively traverses the AST and sets the function expected return type in the ReturnNode

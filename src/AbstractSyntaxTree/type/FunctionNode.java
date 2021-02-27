@@ -2,6 +2,7 @@ package AbstractSyntaxTree.type;
 
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
@@ -76,6 +77,11 @@ public class FunctionNode implements TypeNode {
     params.semanticAnalysis(symbolTable, errorMessages);
     bodyStatement.semanticAnalysis(symbolTable, errorMessages);
     returnType.semanticAnalysis(symbolTable, errorMessages);
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   @Override

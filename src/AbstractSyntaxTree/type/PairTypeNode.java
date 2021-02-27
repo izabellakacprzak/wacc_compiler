@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.type;
 
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.Identifier;
@@ -13,15 +14,9 @@ public class PairTypeNode implements TypeNode {
   private final TypeNode fstType;
   private final TypeNode sndType;
 
-  private SymbolTable currSymTable = null;
-
   public PairTypeNode(TypeNode fstType, TypeNode sndType) {
     this.fstType = fstType;
     this.sndType = sndType;
-  }
-
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
   }
 
   /* Returns the corresponding DataTypeId of a pair elem,
@@ -44,8 +39,11 @@ public class PairTypeNode implements TypeNode {
     if (sndType != null) {
       sndType.semanticAnalysis(symbolTable, errorMessages);
     }
+  }
 
-    currSymTable = symbolTable;
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   @Override

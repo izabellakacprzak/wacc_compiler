@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.expression;
 
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.Operator.UnOp;
@@ -12,6 +13,7 @@ public class UnaryOpExprNode extends ExpressionNode {
    * operator: UnOp enum representing the operator corresponding to this node */
   private final ExpressionNode operand;
   private final UnOp operator;
+  private SymbolTable currSymTable = null;
 
   public UnaryOpExprNode(int line, int charPositionInLine, ExpressionNode operand, UnOp operator) {
     super(line, charPositionInLine);
@@ -67,6 +69,12 @@ public class UnaryOpExprNode extends ExpressionNode {
           + " Incompatible type for '" + operator.getLabel() + "' operator."
           + " Expected: ARRAY Actual: " + opType);
     }
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   @Override

@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.expression;
 
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.Operator.BinOp;
 import SemanticAnalysis.SymbolTable;
@@ -13,6 +14,7 @@ public class BinaryOpExprNode extends ExpressionNode {
   private final ExpressionNode left;
   private final ExpressionNode right;
   private final BinOp operator;
+  private SymbolTable currSymTable = null;
 
   public BinaryOpExprNode(int line, int charPositionInLine, ExpressionNode left,
       ExpressionNode right,
@@ -102,6 +104,12 @@ public class BinaryOpExprNode extends ExpressionNode {
           + " RHS type does not match LHS type for '" + operator.getLabel() + "' operator. "
           + "Expected: " + lhsType + " Actual: " + rhsType);
     }
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   @Override

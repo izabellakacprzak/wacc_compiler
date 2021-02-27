@@ -2,6 +2,7 @@ package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
@@ -16,7 +17,7 @@ public class PairElemNode extends AssignRHSNode {
    * expression: ExpressionNode called with 'fst' or 'snd'. Should be an IdentifierNode */
   private final int position;
   private final ExpressionNode expression;
-
+  private SymbolTable currSymTable = null;
 
   public PairElemNode(int line, int charPositionInLine, int position, ExpressionNode expression) {
     super(line, charPositionInLine);
@@ -49,6 +50,12 @@ public class PairElemNode extends AssignRHSNode {
           + " Incompatible type of '" + expression + "'. "
           + " Expected: PAIR Actual: " + expectedType);
     }
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   @Override

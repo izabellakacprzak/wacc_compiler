@@ -3,6 +3,7 @@ package AbstractSyntaxTree.statement;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.TypeNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
 import SemanticAnalysis.VariableId;
@@ -16,6 +17,7 @@ public class DeclarationStatementNode extends StatementNode {
   private final TypeNode type;
   private final IdentifierNode identifier;
   private final AssignRHSNode assignment;
+  private SymbolTable currSymTable = null;
 
   public DeclarationStatementNode(TypeNode type, IdentifierNode identifier,
       AssignRHSNode assignment) {
@@ -63,5 +65,11 @@ public class DeclarationStatementNode extends StatementNode {
     /* Recursively call semanticAnalysis on stored nodes */
     identifier.semanticAnalysis(symbolTable, errorMessages);
     assignment.semanticAnalysis(symbolTable, errorMessages);
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 }

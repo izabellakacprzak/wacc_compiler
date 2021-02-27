@@ -2,6 +2,7 @@ package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
@@ -12,6 +13,7 @@ public class AssignVarNode extends StatementNode {
    * right: AssignRHSNode corresponding to the assignment for the AssignLHSNode */
   private final AssignLHSNode left;
   private final AssignRHSNode right;
+  private SymbolTable currSymTable = null;
 
   public AssignVarNode(AssignLHSNode left, AssignRHSNode right) {
     this.left = left;
@@ -58,6 +60,12 @@ public class AssignVarNode extends StatementNode {
           + " RHS type does not match LHS type for assignment. "
           + " Expected: " + leftType + " Actual: " + rightType);
     }
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 }
 

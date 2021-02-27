@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.assignment.AssignLHSNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
@@ -11,6 +12,7 @@ public class ReadStatementNode extends StatementNode {
   /* assignment:  AssignLHSNode corresponding to the IdentifierNode, ArrayElemNode
    *                or PairElemNode 'read' was called with */
   private final AssignLHSNode assignment;
+  private SymbolTable currSymTable = null;
 
   public ReadStatementNode(AssignLHSNode assignment) {
     this.assignment = assignment;
@@ -35,5 +37,11 @@ public class ReadStatementNode extends StatementNode {
           + " Incompatible type for 'read' statement."
           + " Expected: INT, CHAR Actual: " + assignmentType);
     }
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 }

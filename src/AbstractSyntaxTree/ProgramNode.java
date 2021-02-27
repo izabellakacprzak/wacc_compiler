@@ -3,6 +3,7 @@ package AbstractSyntaxTree;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.type.FunctionNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.SymbolTable;
 import java.util.ArrayList;
@@ -63,5 +64,9 @@ public class ProgramNode implements ASTNode {
 
     /* Call semanticAnalysis on the root statement node to analysis the rest of the program */
     statementNode.semanticAnalysis(topSymbolTable, errorMessages);
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
   }
 }

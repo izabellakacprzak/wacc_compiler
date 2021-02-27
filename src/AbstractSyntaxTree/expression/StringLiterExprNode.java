@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.expression;
 
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
@@ -9,6 +10,7 @@ public class StringLiterExprNode extends ExpressionNode {
 
   /* value: String representing the value of this node's STRING literal */
   private final String value;
+  private SymbolTable currSymTable = null;
 
   public StringLiterExprNode(int line, int charPositionInLine, String value) {
     super(line, charPositionInLine);
@@ -17,6 +19,12 @@ public class StringLiterExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   @Override

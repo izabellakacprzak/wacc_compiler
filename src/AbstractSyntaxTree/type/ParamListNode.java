@@ -2,6 +2,7 @@ package AbstractSyntaxTree.type;
 
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
 import java.util.ArrayList;
@@ -53,5 +54,10 @@ public class ParamListNode implements ASTNode {
 
     /* Set the current symbol table */
     currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 }

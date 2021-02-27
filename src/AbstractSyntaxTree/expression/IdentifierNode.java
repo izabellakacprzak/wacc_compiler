@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.expression;
 
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
@@ -12,6 +13,7 @@ public class IdentifierNode extends ExpressionNode {
 
   /* value: String representing the identifier of this node */
   private final String identifier;
+  private SymbolTable currSymTable = null;
 
   public IdentifierNode(int line, int charPositionInLine, String identifier) {
     super(line, charPositionInLine);
@@ -36,6 +38,12 @@ public class IdentifierNode extends ExpressionNode {
           + " Identifier '" + identifier + "' is referenced incorrectly."
           + " Expected: VARIABLE IDENTIFIER, PARAMETER IDENTIFIER");
     }
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   @Override

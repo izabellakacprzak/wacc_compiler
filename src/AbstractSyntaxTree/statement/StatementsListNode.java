@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.statement;
 
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
@@ -8,6 +9,7 @@ public class StatementsListNode extends StatementNode {
 
   /* statements: List of StatementNodes corresponding to program statements */
   private final List<StatementNode> statements;
+  private SymbolTable currSymTable = null;
 
   public StatementsListNode(List<StatementNode> statements) {
     this.statements = statements;
@@ -19,6 +21,12 @@ public class StatementsListNode extends StatementNode {
     for (StatementNode stat : statements) {
       stat.semanticAnalysis(symbolTable, errorMessages);
     }
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   /* Recursively call setReturnType on each statement to set

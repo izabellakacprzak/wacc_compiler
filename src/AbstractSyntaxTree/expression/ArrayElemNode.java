@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.expression;
 
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -13,6 +14,7 @@ public class ArrayElemNode extends ExpressionNode {
    * expressions: List of ExpressionNodes corresponding to the INT references to an array element */
   private final IdentifierNode identifier;
   private final List<ExpressionNode> expressions;
+  private SymbolTable currSymTable = null;
 
   public ArrayElemNode(int line, int charPositionInLine, IdentifierNode identifier,
       List<ExpressionNode> expressions) {
@@ -66,6 +68,12 @@ public class ArrayElemNode extends ExpressionNode {
             + " Expected: INT Actual: " + thisType);
       }
     }
+    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   /* Return the type of the elements stored in identifier array */

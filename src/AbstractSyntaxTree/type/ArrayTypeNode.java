@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.type;
 
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.Identifier;
@@ -11,21 +12,19 @@ public class ArrayTypeNode implements TypeNode {
   /* type:  TypeNode of the corresponding type of elements the array contains */
   private final TypeNode type;
 
-  private SymbolTable currSymTable = null;
-
   public ArrayTypeNode(TypeNode type) {
     this.type = type;
-  }
-
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     /* Recursively call semanticAnalysis on type */
     type.semanticAnalysis(symbolTable, errorMessages);
-    currSymTable = symbolTable;
+  }
+
+  @Override
+  public void generateAssembly(InternalState internalState) {
+
   }
 
   @Override
