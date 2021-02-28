@@ -1,6 +1,10 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.ConditionCode;
+import InternalRepresentation.Enums.Condition;
+import InternalRepresentation.Instructions.BranchInstruction;
+import InternalRepresentation.Instructions.LabelInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -51,7 +55,18 @@ public class IfStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    condition.generateAssembly(internalState);
 
+    String elseLabel = internalState.generateNewLabel();
+    String endIfLabel = internalState.generateNewLabel();
+
+    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.EQ), elseLabel));
+    thenStatement.generateAssembly(internalState);
+    internalState.addInstruction(new BranchInstruction(endIfLabel));
+
+    internalState.addInstruction(new LabelInstruction(elseLabel));
+    elseStatement.generateAssembly(internalState);
+    internalState.addInstruction(new LabelInstruction(endIfLabel));
   }
 
   /* Recursively call on statement nodes */

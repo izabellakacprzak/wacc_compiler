@@ -42,6 +42,7 @@ public class FreeStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
+    expression.generateAssembly(internalState);
+    // use built in
   }
 }

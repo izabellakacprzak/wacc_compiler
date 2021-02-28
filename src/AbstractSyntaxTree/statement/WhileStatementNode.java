@@ -1,6 +1,10 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.ConditionCode;
+import InternalRepresentation.Enums.Condition;
+import InternalRepresentation.Instructions.BranchInstruction;
+import InternalRepresentation.Instructions.LabelInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -45,7 +49,17 @@ public class WhileStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    String condLabel = internalState.generateNewLabel();
+    String statementLabel = internalState.generateNewLabel();
 
+    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.EQ), condLabel));
+
+    internalState.addInstruction(new LabelInstruction(statementLabel));
+    statement.generateAssembly(internalState);
+    internalState.addInstruction(new LabelInstruction(condLabel));
+    condition.generateAssembly(internalState);
+
+    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.EQ), statementLabel));
   }
 
   /* Recursively traverses the AST and sets the function expected return type in the ReturnNode

@@ -26,7 +26,9 @@ public class StatementsListNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
+    for (StatementNode stat : statements) {
+      stat.generateAssembly(internalState);
+    }
   }
 
   /* Recursively call setReturnType on each statement to set

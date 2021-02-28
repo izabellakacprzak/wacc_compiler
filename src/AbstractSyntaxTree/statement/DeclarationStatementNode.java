@@ -3,7 +3,10 @@ package AbstractSyntaxTree.statement;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.TypeNode;
+import InternalRepresentation.Enums.StrType;
+import InternalRepresentation.Instructions.StrInstruction;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
 import SemanticAnalysis.VariableId;
@@ -70,6 +73,12 @@ public class DeclarationStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    assignment.generateAssembly(internalState);
 
+    // get SP Offset into sym table
+    Register destReg = internalState.getFreeRegister();
+    Register stackPointer = internalState.getFreeRegister(); //GET SP
+
+    internalState.addInstruction(new StrInstruction(StrType.STR, destReg, stackPointer, 0));
   }
 }

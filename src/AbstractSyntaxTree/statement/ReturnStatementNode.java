@@ -1,7 +1,11 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.Enums.Reg;
+import InternalRepresentation.Instructions.MovInstruction;
+import InternalRepresentation.Instructions.PopInstruction;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
@@ -49,7 +53,14 @@ public class ReturnStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    Register destReg = internalState.getFreeRegister(); // get R0
+    Register returnStatReg = internalState.getFreeRegister();
 
+    returnExpr.generateAssembly(internalState);
+    Register progCounter = internalState.getFreeRegister(); // get PC
+
+    internalState.addInstruction(new MovInstruction(destReg, returnStatReg));
+    internalState.addInstruction(new PopInstruction(progCounter));
   }
 
   /* Sets the function expected returnType  */

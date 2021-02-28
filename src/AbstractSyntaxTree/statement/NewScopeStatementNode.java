@@ -24,7 +24,7 @@ public class NewScopeStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
+    statement.generateAssembly(internalState);
   }
 
   /* Recursively traverses the AST and sets the function expected return type in the ReturnNode
