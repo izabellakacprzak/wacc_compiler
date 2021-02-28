@@ -22,9 +22,13 @@ public class InternalState {
         labelCount = 0;
     }
 
-    public Register getFreeRegister() {
+    public Register popFreeRegister() {
         return null;
     }
+
+    public Register peekFreeRegister(){return null;}
+
+    public void pushFreeRegister(Register reg){}
 
     public void addInstruction(Instruction instruction) {
         generatedInstructions.add(instruction);

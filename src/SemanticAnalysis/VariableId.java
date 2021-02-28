@@ -19,6 +19,11 @@ public class VariableId extends Identifier {
   }
 
   @Override
+  public int getSize() {
+    return type.getSize();
+  }
+
+  @Override
   public String toString() {
     return type + " IDENTIFIER for '" + super.getNode() + "'";
   }

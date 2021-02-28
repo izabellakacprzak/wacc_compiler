@@ -17,9 +17,9 @@ public class InstructionPrinter {
     }
 
     instruction.append(" ").
-            append(destReg.getRegName()).
-            append(operand1.getRegName()).
-            append(operand2.toString());
+                               append(destReg.getRegName()).
+                                                               append(operand1.getRegName()).
+                                                                                                append(operand2.toString());
 
     return instruction.toString();
   }
@@ -67,8 +67,8 @@ public class InstructionPrinter {
   public String printLogical(LogicalOperation operationType, Register destReg,
                              Register operand1, Register operand2) {
     return operationType.toString() + " " + destReg.getRegName() + ", " +
-            operand1.getRegName() + ", " +
-            operand2.getRegName();
+               operand1.getRegName() + ", " +
+               operand2.getRegName();
   }
 
   public String printMOV(ConditionCode conditionCode, Register destReg, Register srcReg,
@@ -109,35 +109,40 @@ public class InstructionPrinter {
 
   public String printSMull(Register destReg1, Register destReg2, Register operand1, Register operand2) {
     return "SMULL " + destReg1.getRegName() + ", " +
-            destReg2.getRegName() + ", " +
-            operand1.getRegName() + ", " +
-            operand2.getRegName();
+               destReg2.getRegName() + ", " +
+               operand1.getRegName() + ", " +
+               operand2.getRegName();
   }
 
   public String printStr(StrType type, Register destReg,
-                         Register offsetReg1, Register offsetReg2, int offsetImm) {
+                         Register offsetReg1, Register offsetReg2, int offsetImm, boolean useExclamation) {
     StringBuilder instruction = new StringBuilder(type.toString());
 
     instruction.append(", ").
-            append(destReg.getRegName()).
-            append("[").
-            append(offsetReg1.getRegName()).
-            append(", ");
+                                append(destReg.getRegName()).
+                                                                append("[").
+                                                                               append(offsetReg1.getRegName());
+
 
     if (offsetReg2 != null) {
-      instruction.append(offsetReg2.getRegName());
+      instruction.append(", ").append(offsetReg2.getRegName());
     } else {
-      instruction.append("#");
-      switch (type) {
-        case STRB:
-          instruction.append(offsetImm);
-        case STRH:
-          instruction.append(offsetImm * 2);
-        default:
-          instruction.append(offsetImm * 4);
+      if (offsetImm != 0) {
+        instruction.append(", ").append("#");
+        switch (type) {
+          case STRB:
+            instruction.append(offsetImm);
+          case STRH:
+            instruction.append(offsetImm * 2);
+          default:
+            instruction.append(offsetImm * 4);
+        }
       }
     }
-
     instruction.append("]");
-    return instruction.toString();  }
+    if (useExclamation) {
+      instruction.append("!");
+    }
+    return instruction.toString();
+  }
 }

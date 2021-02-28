@@ -3,7 +3,7 @@ package SemanticAnalysis.DataTypes;
 import SemanticAnalysis.DataTypeId;
 
 public class ArrayType extends DataTypeId {
-
+  private static final int ARRAY_BYTES_SIZE = 4;
   /* elemType:  DataTypeId of the corresponding type of elements the array contains */
   private final DataTypeId elemType;
 
@@ -34,5 +34,10 @@ public class ArrayType extends DataTypeId {
   @Override
   public String toString() {
     return elemType + "[]";
+  }
+
+  @Override
+  public int getSize() {
+    return ARRAY_BYTES_SIZE;
   }
 }

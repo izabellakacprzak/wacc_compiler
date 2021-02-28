@@ -13,6 +13,11 @@ public abstract class DataTypeId extends Identifier {
     return this;
   }
 
+  @Override
+  public int getSize() {
+    return 0;
+  }
+
   /* All DataTypeIds must Override the equals method */
   @Override
   public abstract boolean equals(Object object);

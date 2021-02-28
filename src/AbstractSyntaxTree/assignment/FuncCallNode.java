@@ -5,13 +5,26 @@ import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import InternalRepresentation.ConditionCode;
+import InternalRepresentation.Enums.ArithmeticOperation;
+import InternalRepresentation.Enums.Condition;
+import InternalRepresentation.Enums.Reg;
+import InternalRepresentation.Enums.StrType;
+import InternalRepresentation.Instructions.ArithmeticInstruction;
+import InternalRepresentation.Instructions.BranchInstruction;
+import InternalRepresentation.Instructions.MovInstruction;
+import InternalRepresentation.Instructions.StrInstruction;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Operand;
+import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
+
+import javax.xml.crypto.Data;
 import java.util.List;
 
 public class FuncCallNode extends AssignRHSNode {
@@ -25,7 +38,7 @@ public class FuncCallNode extends AssignRHSNode {
 
 
   public FuncCallNode(int line, int charPositionInLine, IdentifierNode identifier,
-      List<ExpressionNode> arguments) {
+                      List<ExpressionNode> arguments) {
     super(line, charPositionInLine);
     this.identifier = identifier;
     this.arguments = arguments;
@@ -47,16 +60,16 @@ public class FuncCallNode extends AssignRHSNode {
 
     if (functionId == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " No declaration of '" + identifier.getIdentifier() + "' identifier."
-          + " Expected: FUNCTION IDENTIFIER");
+                            + " No declaration of '" + identifier.getIdentifier() + "' identifier."
+                            + " Expected: FUNCTION IDENTIFIER");
       return;
     }
 
     if (!(functionId instanceof FunctionId)) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
-          + " Expected: FUNCTION IDENTIFIER"
-          + " Actual: " + identifier.getType(symbolTable));
+                            + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
+                            + " Expected: FUNCTION IDENTIFIER"
+                            + " Actual: " + identifier.getType(symbolTable));
       return;
     }
 
@@ -66,9 +79,9 @@ public class FuncCallNode extends AssignRHSNode {
 
     if (paramTypes.size() > arguments.size() || paramTypes.size() < arguments.size()) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Function '" + identifier.getIdentifier()
-          + "' has been called with the incorrect number of parameters."
-          + " Expected: " + paramTypes.size() + " Actual: " + arguments.size());
+                            + " Function '" + identifier.getIdentifier()
+                            + "' has been called with the incorrect number of parameters."
+                            + " Expected: " + paramTypes.size() + " Actual: " + arguments.size());
       return;
     }
 
@@ -84,13 +97,13 @@ public class FuncCallNode extends AssignRHSNode {
 
       if (currArg == null) {
         errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-            + " Could not resolve type of parameter " + (i + 1) + " in '" + identifier
-            + "' function."
-            + " Expected: " + currParamType);
+                              + " Could not resolve type of parameter " + (i + 1) + " in '" + identifier
+                              + "' function."
+                              + " Expected: " + currParamType);
       } else if (!(currArg.equals(currParamType)) && !stringToCharArray(currParamType, currArg)) {
         errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-            + " Invalid type for parameter " + (i + 1) + " in '" + identifier + "' function."
-            + " Expected: " + currParamType + " Actual: " + currArg);
+                              + " Invalid type for parameter " + (i + 1) + " in '" + identifier + "' function."
+                              + " Expected: " + currParamType + " Actual: " + currArg);
       }
     }
     currSymTable = symbolTable;
@@ -98,7 +111,41 @@ public class FuncCallNode extends AssignRHSNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    // calculate total arguments size in argsTotalSize
+    int argsTotalSize = 0;
 
+    // TODO avoid creating a new object for the SP here, should point to the same obj in all classes!!
+    // should not be created in this class at all in the first place!!
+    Register spReg = new Register(Reg.SP);
+    // arguments are stored in decreasing order they are given in the code
+    for (int i = arguments.size() - 1; i >= 0; i--) {
+      // get argument, calculate size and add it to argsTotalSize
+      ExpressionNode currArg = arguments.get(i);
+      int argSize = currArg.getType(currSymTable).getSize();
+      argsTotalSize += argSize;
+      // generate assembly code for the current argument
+      currArg.generateAssembly(internalState);
+
+      //TODO do you need to store the argument stack offset in the symbol table??
+      StrType strInstr = (argSize == 1) ? StrType.STR : StrType.STRB;
+
+      //store currArg on the stack and decrease stack pointer (stack grows downwards)
+      internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(), spReg, -argSize));
+    }
+
+    //Branch Instruction to the callee label
+    String functionLabel = "f_" + identifier.toString();
+    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L), functionLabel));
+
+    //TODO what is stack max size? 1MB? what if argsTotalSize > stack size??
+    //deallocate stack from the function arguments
+    internalState.addInstruction(new ArithmeticInstruction(ArithmeticOperation.ADD, spReg, spReg, new Operand(argsTotalSize), false));
+
+    //TODO change this R0 declaration too...
+    Register r0Reg = new Register(Reg.R0);
+
+    //move the result stored in R0 in the first free register
+    internalState.addInstruction(new MovInstruction(internalState.peekFreeRegister(), r0Reg));
   }
 
   /* Return the return type of the function */

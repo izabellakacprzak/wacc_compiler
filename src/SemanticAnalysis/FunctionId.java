@@ -22,6 +22,11 @@ public class FunctionId extends Identifier {
     return returnType;
   }
 
+  @Override
+  public int getSize() {
+    return 0;
+  }
+
   public List<DataTypeId> getParamTypes() {
     List<DataTypeId> paramTypes = new ArrayList<>();
     for (ParameterId curr : params) {
