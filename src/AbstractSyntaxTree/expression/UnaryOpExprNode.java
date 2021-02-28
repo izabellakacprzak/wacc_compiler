@@ -1,10 +1,24 @@
 package AbstractSyntaxTree.expression;
 
+import InternalRepresentation.ConditionCode;
+import InternalRepresentation.ConditionCode.Condition;
+import InternalRepresentation.Instructions.ArithmeticInstruction;
+import InternalRepresentation.Instructions.ArithmeticInstruction.ArithmeticOperation;
+import InternalRepresentation.Instructions.BranchInstruction;
+import InternalRepresentation.Instructions.BranchInstruction.BranchOperation;
+import InternalRepresentation.Instructions.BuiltInLabelInstruction.BuiltInFunction;
+import InternalRepresentation.Instructions.LdrInstruction;
+import InternalRepresentation.Instructions.LogicalInstruction;
+import InternalRepresentation.Instructions.LogicalInstruction.LogicalOperation;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Operand;
+import InternalRepresentation.Register;
+import InternalRepresentation.Register.Reg;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.Operator.UnOp;
 import SemanticAnalysis.SymbolTable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UnaryOpExprNode extends ExpressionNode {
@@ -74,7 +88,27 @@ public class UnaryOpExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    operand.generateAssembly(internalState);
+    Register currDestination = internalState.getCurrDestination();
 
+    switch(operator) {
+      case NOT:
+        internalState.addInstruction(new LogicalInstruction(LogicalOperation.EOR,
+            currDestination, currDestination, new Operand(1)));
+        break;
+      case NEGATION:
+        internalState.addInstruction(new ArithmeticInstruction(ArithmeticOperation.RSB,
+            currDestination, currDestination, new Operand(0), true));
+        BuiltInFunction.OVERFLOW.setUsed();
+        internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.VS),
+            BuiltInFunction.OVERFLOW.getMessage(), BranchOperation.BL));
+        break;
+      case LEN:
+        internalState.addInstruction(new LdrInstruction(currDestination, currDestination));
+        break;
+      case ORD:
+      case CHR:
+    }
   }
 
   @Override

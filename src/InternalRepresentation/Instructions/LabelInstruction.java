@@ -8,6 +8,7 @@ public class LabelInstruction implements Instruction {
     private final InstructionPrinter printer = new InstructionPrinter();
     private final String label;
 
+
     public LabelInstruction(String label) {
         this.label = label;
     }

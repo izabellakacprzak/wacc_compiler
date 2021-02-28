@@ -1,6 +1,11 @@
 package AbstractSyntaxTree.expression;
 
+import InternalRepresentation.Instructions.ArithmeticInstruction;
+import InternalRepresentation.Instructions.MovInstruction;
+import InternalRepresentation.Instructions.StrInstruction;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Register;
+import InternalRepresentation.Register.Reg;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
@@ -24,7 +29,10 @@ public class BoolLiterExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
+    int intValue = value? 1 : 0;
+    Register currDestination = internalState.getFreeRegister();
+    internalState.setCurrDestination(currDestination);
+    internalState.addInstruction(new MovInstruction(currDestination, intValue));
   }
 
   @Override

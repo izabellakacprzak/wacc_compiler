@@ -1,6 +1,8 @@
 package AbstractSyntaxTree.expression;
 
+import InternalRepresentation.Instructions.LdrInstruction;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
@@ -21,7 +23,9 @@ public class PairLiterExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
+    Register currDestination = internalState.getFreeRegister();
+    internalState.setCurrDestination(currDestination);
+    internalState.addInstruction(new LdrInstruction(currDestination, 0));
   }
 
   @Override

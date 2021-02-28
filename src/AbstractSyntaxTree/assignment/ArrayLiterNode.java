@@ -6,7 +6,6 @@ import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
-
 public class ArrayLiterNode extends AssignRHSNode {
 
   /* expressions: List of ExpressionNodes corresponding to each element of the ARRAY literal */

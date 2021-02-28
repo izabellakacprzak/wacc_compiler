@@ -1,6 +1,8 @@
 package AbstractSyntaxTree.expression;
 
+import InternalRepresentation.Instructions.LdrInstruction;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
@@ -24,7 +26,10 @@ public class StringLiterExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
+    Register currDestination = internalState.getFreeRegister();
+    internalState.setCurrDestination(currDestination);
+    internalState.addInstruction(new LdrInstruction(currDestination,
+        internalState.getMsg(value)));
   }
 
   @Override
