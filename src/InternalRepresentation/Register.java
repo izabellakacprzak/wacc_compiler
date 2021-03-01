@@ -2,6 +2,8 @@ package InternalRepresentation;
 
 import InternalRepresentation.Enums.Reg;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class Register {
@@ -18,5 +20,20 @@ public class Register {
 
     public String getRegName() {
         return currReg.name().toLowerCase(Locale.ROOT);
+    }
+
+    public static Reg getDestReg() {
+        return Reg.R0;
+    }
+
+    public static List<Reg> getParamRegs() {
+        List<Reg> registers = new ArrayList<>(List.of(Reg.values()));
+
+        registers.remove(getDestReg());
+        registers.remove(Reg.SP);
+        registers.remove(Reg.LR);
+        registers.remove(Reg.PC);
+
+        return registers;
     }
 }

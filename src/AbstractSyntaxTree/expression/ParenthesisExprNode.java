@@ -25,7 +25,7 @@ public class ParenthesisExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
+    innerExpr.generateAssembly(internalState);
   }
 
   @Override

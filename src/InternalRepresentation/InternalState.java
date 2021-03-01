@@ -1,43 +1,111 @@
 package InternalRepresentation;
 
+import InternalRepresentation.Enums.BuiltInFunction;
 import InternalRepresentation.Instructions.Instruction;
-import InternalRepresentation.Instructions.LabelInstruction;
 
+import InternalRepresentation.Instructions.LabelInstruction;
+import InternalRepresentation.Instructions.MsgInstruction;
+import InternalRepresentation.Enums.Reg;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Stack;
+import java.util.Set;
 
 public class InternalState {
 
-    private Stack<Register> stack;
-    private int labelCount;
-    private final List<String> declaredLabels;
-    private final List<Instruction> generatedInstructions;
+  private List<Register> availableRegs;
+  private int labelCount;
+  private final Set<String> declaredLabels;
+  private final List<Instruction> generatedInstructions;
+  private final List<MsgInstruction> messages;
+  private Register prevResult;
+  private final List<LabelInstruction> builtInLabels;
 
-    public InternalState() {
-        // setup stack function
-        declaredLabels = new ArrayList<>();
-        generatedInstructions = new ArrayList<>();
+  public InternalState() {
+    // setup stack function
+    availableRegs = new ArrayList<>();
+    declaredLabels = new HashSet<>();
+    generatedInstructions = new ArrayList<>();
+    messages = new ArrayList<>();
+    prevResult = null;
+    builtInLabels = new ArrayList<>();
 
-        labelCount = 0;
+    labelCount = 0;
+  }
+
+  public Register peekFreeRegister(){return null;}
+
+  public void pushFreeRegister(Register reg){}
+
+  public Register popFreeRegister(){return null;}
+
+
+  public Register getFreeRegister() {
+    if (!availableRegs.isEmpty()) {
+      Register availableRegister = availableRegs.get(0);
+      availableRegs.remove(0);
+      return availableRegister;
+    } else {
+      // use stack
+      return null;
+    }
+  }
+
+  public void addInstruction(Instruction instruction) {
+    generatedInstructions.add(instruction);
+  }
+
+  public void resetAvailableRegs() {
+    List<Register> registers = new ArrayList<>();
+
+    registers.add(new Register(Register.getDestReg()));
+    for (Reg reg : Register.getParamRegs()) {
+      registers.add(new Register(reg));
     }
 
-    public Register popFreeRegister() {
-        return null;
+    this.availableRegs = registers;
+  }
+
+  public void setAvailableRegs(List<Register> availableRegs) {
+    this.availableRegs = availableRegs;
+  }
+
+  public List<Register> getAvailableRegs() {
+    return availableRegs;
+  }
+
+  public void setAsUsed(Register register) {
+    availableRegs.remove(register);
+  }
+
+  public void setAsUnused(Register register) {
+    if (!availableRegs.contains(register)) {
+      availableRegs.add(register);
     }
+  }
 
-    public Register peekFreeRegister(){return null;}
+  public String generateNewLabel() {
+    String newLabel = "L" + labelCount;
+    declaredLabels.add(newLabel);
+    labelCount++;
+    return newLabel;
+  }
 
-    public void pushFreeRegister(Register reg){}
+  public String getMsg(String value) {
+    MsgInstruction message = new MsgInstruction(value.length() + 1, value);
+    messages.add(message);
+    return "msg_" + (messages.size() - 1);
+  }
 
-    public void addInstruction(Instruction instruction) {
-        generatedInstructions.add(instruction);
-    }
+  public Register getPrevResult() {
+    return prevResult;
+  }
 
-    public String generateNewLabel() {
-        String newLabel = "L" + labelCount;
-        declaredLabels.add(newLabel);
-        labelCount++;
-        return newLabel;
-    }
+  public void setPrevResult(Register destination) {
+    prevResult = destination;
+  }
+
+  public void addBuiltInLabel(BuiltInFunction function) {
+    function.setUsed();
+  }
 }

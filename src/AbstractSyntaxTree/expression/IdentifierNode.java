@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.expression;
 
+import InternalRepresentation.Instructions.LdrInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.FunctionId;
@@ -43,7 +44,8 @@ public class IdentifierNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
+    // get offset from symbolTable of variable and store that in available reg
+    // internalState.addInstruction(new LdrInstruction());
   }
 
   @Override

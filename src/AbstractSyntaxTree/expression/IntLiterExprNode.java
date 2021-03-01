@@ -1,6 +1,8 @@
 package AbstractSyntaxTree.expression;
 
+import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
@@ -24,7 +26,9 @@ public class IntLiterExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
+    Register currDestination = internalState.getFreeRegister();
+    internalState.setPrevResult(currDestination);
+    internalState.addInstruction(new MovInstruction(currDestination, value));
   }
 
   @Override

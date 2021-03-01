@@ -6,14 +6,8 @@ import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.ConditionCode;
-import InternalRepresentation.Enums.ArithmeticOperation;
-import InternalRepresentation.Enums.Condition;
-import InternalRepresentation.Enums.Reg;
-import InternalRepresentation.Enums.StrType;
-import InternalRepresentation.Instructions.ArithmeticInstruction;
-import InternalRepresentation.Instructions.BranchInstruction;
-import InternalRepresentation.Instructions.MovInstruction;
-import InternalRepresentation.Instructions.StrInstruction;
+import InternalRepresentation.Enums.*;
+import InternalRepresentation.Instructions.*;
 import InternalRepresentation.InternalState;
 import InternalRepresentation.Operand;
 import InternalRepresentation.Register;
@@ -24,7 +18,6 @@ import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
 
-import javax.xml.crypto.Data;
 import java.util.List;
 
 public class FuncCallNode extends AssignRHSNode {
@@ -135,7 +128,7 @@ public class FuncCallNode extends AssignRHSNode {
 
     //Branch Instruction to the callee label
     String functionLabel = "f_" + identifier.toString();
-    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L), functionLabel));
+    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L), functionLabel, BranchOperation.B));
 
     //TODO what is stack max size? 1MB? what if argsTotalSize > stack size??
     //deallocate stack from the function arguments

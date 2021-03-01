@@ -1,6 +1,7 @@
 package InternalRepresentation.Instructions;
 
 import InternalRepresentation.Enums.StrType;
+
 import InternalRepresentation.InstructionPrinter;
 import InternalRepresentation.Register;
 
@@ -36,11 +37,11 @@ public class StrInstruction implements Instruction {
 
   public void useExclamation() {
     useExclamation = true;
+
   }
 
   @Override
   public String writeInstruction() {
     return printer.printStr(type, destReg, offsetReg1, offsetReg2, offsetImm, useExclamation);
   }
-
 }

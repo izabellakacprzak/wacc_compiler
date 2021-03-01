@@ -1,8 +1,16 @@
 package AbstractSyntaxTree.type;
 
+import static InternalRepresentation.Enums.Directive.LTORG;
+import static InternalRepresentation.Enums.Reg.*;
+
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
+import InternalRepresentation.Instructions.DirectiveInstruction;
+import InternalRepresentation.Instructions.LabelInstruction;
+import InternalRepresentation.Instructions.PopInstruction;
+import InternalRepresentation.Instructions.PushInstruction;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
@@ -81,7 +89,14 @@ public class FunctionNode implements TypeNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    internalState.resetAvailableRegs();
 
+    internalState.addInstruction(new LabelInstruction("f_" + identifier.getIdentifier()));
+    internalState.addInstruction(new PushInstruction(new Register(LR)));
+    params.generateAssembly(internalState);
+    bodyStatement.generateAssembly(internalState);
+    internalState.addInstruction(new PopInstruction(new Register(PC)));
+    internalState.addInstruction(new DirectiveInstruction(LTORG));
   }
 
   @Override

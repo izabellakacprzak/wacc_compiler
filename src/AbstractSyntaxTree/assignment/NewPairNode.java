@@ -2,14 +2,8 @@ package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.ConditionCode;
-import InternalRepresentation.Enums.Condition;
-import InternalRepresentation.Enums.LdrType;
-import InternalRepresentation.Enums.Reg;
-import InternalRepresentation.Enums.StrType;
-import InternalRepresentation.Instructions.BranchInstruction;
-import InternalRepresentation.Instructions.LdrInstruction;
-import InternalRepresentation.Instructions.MovInstruction;
-import InternalRepresentation.Instructions.StrInstruction;
+import InternalRepresentation.Enums.*;
+import InternalRepresentation.Instructions.*;
 import InternalRepresentation.InternalState;
 import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
@@ -50,7 +44,7 @@ public class NewPairNode extends AssignRHSNode {
 
     internalState.addInstruction(new LdrInstruction(LdrType.LDR, r0Reg, NO_OF_ELEMS * ADDRESS_BYTES_SIZE));
     //BL malloc
-    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L), "malloc"));
+    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L), "malloc", BranchOperation.B));
 
     Register reg = internalState.popFreeRegister();
 
@@ -65,7 +59,7 @@ public class NewPairNode extends AssignRHSNode {
     internalState.addInstruction(new LdrInstruction(LdrType.LDR, r0Reg, fstSize));
 
     // BL malloc
-    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L), "malloc"));
+    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L), "malloc", BranchOperation.B));
 
     StrType strInstr1 = (fstSize == 1) ? StrType.STRB : StrType.STR;
     internalState.addInstruction(new StrInstruction(strInstr1, internalState.peekFreeRegister(), r0Reg));
@@ -81,7 +75,7 @@ public class NewPairNode extends AssignRHSNode {
     internalState.addInstruction(new LdrInstruction(LdrType.LDR, r0Reg, sndSize));
 
     // BL malloc
-    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L), "malloc"));
+    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L), "malloc", BranchOperation.B));
 
     StrType strInstr2 = (fstSize == 1) ? StrType.STRB : StrType.STR;
     internalState.addInstruction(new StrInstruction(strInstr2, internalState.peekFreeRegister(), r0Reg));

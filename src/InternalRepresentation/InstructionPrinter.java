@@ -65,10 +65,10 @@ public class InstructionPrinter {
   }
 
   public String printLogical(LogicalOperation operationType, Register destReg,
-                             Register operand1, Register operand2) {
+                             Register operand1, Operand operand2) {
     return operationType.toString() + " " + destReg.getRegName() + ", " +
                operand1.getRegName() + ", " +
-               operand2.getRegName();
+               operand2.toString();
   }
 
   public String printMOV(ConditionCode conditionCode, Register destReg, Register srcReg,

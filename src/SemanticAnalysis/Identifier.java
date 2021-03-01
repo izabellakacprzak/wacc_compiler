@@ -1,11 +1,13 @@
 package SemanticAnalysis;
 
 import AbstractSyntaxTree.expression.IdentifierNode;
+import InternalRepresentation.Register;
 
 public abstract class Identifier {
 
   /* Store node associated with Identifier for accessing identifier string */
   private final IdentifierNode node;
+  private Register register = null;
 
   public Identifier(IdentifierNode node) {
     this.node = node;
@@ -13,6 +15,14 @@ public abstract class Identifier {
 
   public IdentifierNode getNode() {
     return node;
+  }
+
+  public Register getRegister() {
+    return register;
+  }
+
+  public void setRegister(Register register) {
+    this.register = register;
   }
 
   /* Returns the DataTypeId corresponding to the Identifier's type

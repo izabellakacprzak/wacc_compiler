@@ -2,6 +2,7 @@ package InternalRepresentation.Instructions;
 
 import InternalRepresentation.Enums.LogicalOperation;
 import InternalRepresentation.InstructionPrinter;
+import InternalRepresentation.Operand;
 import InternalRepresentation.Register;
 
 public class LogicalInstruction implements Instruction{
@@ -10,10 +11,10 @@ public class LogicalInstruction implements Instruction{
     private final LogicalOperation operation;
     private final Register destReg;
     private final Register operand1;
-    private final Register operand2;
+    private final Operand operand2;
 
     public LogicalInstruction(LogicalOperation operation, Register destReg,
-                              Register operand1, Register operand2) {
+                              Register operand1, Operand operand2) {
         this.operation = operation;
         this.destReg = destReg;
         this.operand1 = operand1;
