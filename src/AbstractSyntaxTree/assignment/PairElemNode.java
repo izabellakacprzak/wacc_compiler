@@ -2,10 +2,17 @@ package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import InternalRepresentation.Enums.LdrType;
+import InternalRepresentation.Enums.Reg;
+import InternalRepresentation.Enums.StrType;
+import InternalRepresentation.Instructions.LdrInstruction;
+import InternalRepresentation.Instructions.StrInstruction;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.List;
 
 public class PairElemNode extends AssignRHSNode {
@@ -33,7 +40,7 @@ public class PairElemNode extends AssignRHSNode {
     /* Check that expression is an IdentifierNode */
     if (!(expression instanceof IdentifierNode)) {
       errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-          + " Invalid identifier. Expected: PAIR IDENTIFIER Actual: '" + expression + "'");
+                            + " Invalid identifier. Expected: PAIR IDENTIFIER Actual: '" + expression + "'");
       return;
     }
 
@@ -43,19 +50,34 @@ public class PairElemNode extends AssignRHSNode {
 
     if (expectedType == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Could not resolve type of '" + pairId + "'. Expected: PAIR");
+                            + " Could not resolve type of '" + pairId + "'. Expected: PAIR");
 
     } else if (!(expectedType instanceof PairType)) {
       errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-          + " Incompatible type of '" + expression + "'. "
-          + " Expected: PAIR Actual: " + expectedType);
+                            + " Incompatible type of '" + expression + "'. "
+                            + " Expected: PAIR Actual: " + expectedType);
     }
     currSymTable = symbolTable;
   }
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    Register reg = internalState.peekFreeRegister();
+    //TODO do not create new object for R0
+    Register r0Reg = new Register(Reg.R0);
 
+    expression.generateAssembly(internalState);
+
+    //TODO insert p_check_null_pointer here + any before or after instructions
+
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR, reg, reg, position * ADDRESS_BYTES_SIZE));
+
+    PairType pair = (PairType) expression.getType(currSymTable);
+    DataTypeId type = (position == FST) ? pair.getFstType() : pair.getSndType();
+    int elemSize = type.getSize();
+    StrType strInstr = (elemSize == 1) ? StrType.STRB : StrType.STR;
+
+    internalState.addInstruction(new StrInstruction(strInstr, reg, reg));
   }
 
   @Override
@@ -75,7 +97,7 @@ public class PairElemNode extends AssignRHSNode {
 
     /* Return the type corresponding to the position and IdentifierNode pairId */
     return position == FST ? ((PairType) pairType).getFstType()
-        : ((PairType) pairType).getSndType();
+               : ((PairType) pairType).getSndType();
   }
 
   /* Returns a PairElem in the form: (fst | snd) expr */

@@ -10,6 +10,8 @@ public abstract class AssignLHSNode implements ASTNode {
    * charPositionInLine: Character position of node in the line. Used for error messages */
   private final int line;
   private final int charPositionInLine;
+  protected final int INT_BYTES_SIZE = 4;
+  protected final int ADDRESS_BYTES_SIZE = 4;
 
   protected AssignLHSNode(int line, int charPositionInLine) {
     this.line = line;

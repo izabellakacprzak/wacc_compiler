@@ -19,6 +19,7 @@ public abstract class Identifier {
    * or the type it returns */
   public abstract DataTypeId getType();
 
+  public abstract int getSize();
   /* All identifiers must Override toString for use in error messages */
   @Override
   public abstract String toString();

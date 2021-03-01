@@ -1,10 +1,22 @@
 package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.ConditionCode;
+import InternalRepresentation.Enums.Condition;
+import InternalRepresentation.Enums.LdrType;
+import InternalRepresentation.Enums.Reg;
+import InternalRepresentation.Enums.StrType;
+import InternalRepresentation.Instructions.BranchInstruction;
+import InternalRepresentation.Instructions.LdrInstruction;
+import InternalRepresentation.Instructions.MovInstruction;
+import InternalRepresentation.Instructions.StrInstruction;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
+import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.List;
 
 public class ArrayLiterNode extends AssignRHSNode {
@@ -32,7 +44,7 @@ public class ArrayLiterNode extends AssignRHSNode {
 
     if (fstType == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Could not resolve type of array assignment.");
+                            + " Could not resolve type of array assignment.");
       return;
     }
 
@@ -43,15 +55,15 @@ public class ArrayLiterNode extends AssignRHSNode {
 
       if (currType == null) {
         errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-            + " Could not resolve element type(s) in array literal."
-            + " Expected: " + fstType);
+                              + " Could not resolve element type(s) in array literal."
+                              + " Expected: " + fstType);
         break;
       }
 
       if (!(fstType.equals(currType))) {
         errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-            + " Incompatible element type(s) in array literal."
-            + " Expected: " + fstType + " Actual: " + currType);
+                              + " Incompatible element type(s) in array literal."
+                              + " Expected: " + fstType + " Actual: " + currType);
         break;
       }
 
@@ -63,7 +75,39 @@ public class ArrayLiterNode extends AssignRHSNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    // get the size of the array elements type
+    DataTypeId type = ((ArrayType) this.getType(currSymTable)).getElemType();
+    int arrElemSize = type.getSize();
 
+    // load array size in R0
+    int arrSize = expressions.size() * arrElemSize + INT_BYTES_SIZE;
+    Register regR0 = new Register(Reg.R0);
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR, regR0, arrSize));
+
+    // BL malloc
+    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L), "malloc"));
+
+    Register allocReg = internalState.popFreeRegister();
+    internalState.addInstruction(new MovInstruction(allocReg, regR0));
+
+    // if the array elem size is 1 byte, use STRB, otherwise use STR
+    StrType strInstr = (arrElemSize == 1) ? StrType.STRB : StrType.STR;
+
+    //iterate over the expressions, generate assembly for them and store them
+    int i = INT_BYTES_SIZE;
+    for (ExpressionNode expression : expressions) {
+      expression.generateAssembly(internalState);
+      internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(), allocReg, i));
+      i += arrElemSize;
+    }
+
+    //TODO decide between peek and pop
+    Register noOfArrElemsReg = internalState.peekFreeRegister();
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR, noOfArrElemsReg, expressions.size()));
+    internalState.addInstruction(new StrInstruction(StrType.STR, allocReg, noOfArrElemsReg));
+
+    //push back and free allocReg
+    internalState.pushFreeRegister(allocReg);
   }
 
   @Override

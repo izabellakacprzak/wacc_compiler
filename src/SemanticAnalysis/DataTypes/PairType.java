@@ -4,6 +4,7 @@ import SemanticAnalysis.DataTypeId;
 
 public class PairType extends DataTypeId {
 
+  private static final int PAIR_ELEM_BYTES_SIZE = 4;
   /* fstType:  DataTypeId of the first element in the pair's type
    * sndType:  DataTypeId of the second element in the pair's type */
   private final DataTypeId fstType;
@@ -38,11 +39,18 @@ public class PairType extends DataTypeId {
 
     PairType pairObject = (PairType) object;
     return equalsPairElem(pairObject.getFstType(), this.fstType) &&
-        equalsPairElem(pairObject.getSndType(), this.sndType);
+               equalsPairElem(pairObject.getSndType(), this.sndType);
   }
 
   @Override
   public String toString() {
     return "PAIR(" + fstType.toString() + ", " + sndType.toString() + ")";
   }
+
+//TODO: check if to return size * 2. Currently returning size of 1 element of the pair
+  @Override
+  public int getSize() {
+    return PAIR_ELEM_BYTES_SIZE;
+  }
+
 }
