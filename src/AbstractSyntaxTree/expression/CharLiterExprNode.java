@@ -28,7 +28,7 @@ public class CharLiterExprNode extends ExpressionNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     Register currDestination = internalState.getFreeRegister();
-    internalState.setCurrDestination(currDestination);
+    internalState.setPrevResult(currDestination);
     internalState.addInstruction(new MovInstruction(currDestination, value));
   }
 

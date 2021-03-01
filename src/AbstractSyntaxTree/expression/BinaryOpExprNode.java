@@ -1,12 +1,32 @@
 package AbstractSyntaxTree.expression;
 
+import static InternalRepresentation.Register.Reg.R0;
+import static InternalRepresentation.Register.Reg.R1;
+import static InternalRepresentation.ConditionCode.Condition.*;
+
+import InternalRepresentation.ConditionCode;
+import InternalRepresentation.ConditionCode.Condition;
+import InternalRepresentation.Instructions.*;
+import InternalRepresentation.Instructions.ArithmeticInstruction.ArithmeticOperation;
+import InternalRepresentation.Instructions.BranchInstruction.BranchOperation;
+import InternalRepresentation.Instructions.BuiltInLabelInstruction.SystemBuiltInFunction;
+import InternalRepresentation.Instructions.CustomBuiltInInstruction.BuiltInFunction;
+import InternalRepresentation.Instructions.LogicalInstruction.LogicalOperation;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Operand;
+import InternalRepresentation.Register;
+import InternalRepresentation.Shift;
+import InternalRepresentation.Shift.ShiftType;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.Operator.BinOp;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 public class BinaryOpExprNode extends ExpressionNode {
+
+  private static final int MUL_SHIFT = 31;
+  private static final int TRUE = 1;
+  private static final int FALSE = 0;
 
   /* left:     ExpressionNode corresponding to the left expression the operator was called with
    * right:    ExpressionNode corresponding to the right expression the operator was called with
@@ -109,7 +129,94 @@ public class BinaryOpExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    left.generateAssembly(internalState);
+    Register leftResult = internalState.getPrevResult();
+    right.generateAssembly(internalState);
+    Register rightResult = internalState.getPrevResult();
 
+    switch (operator) {
+      case MUL:
+        internalState.addInstruction(
+            new SMullInstruction(leftResult, rightResult, leftResult, rightResult, false));
+        internalState.addInstruction(
+            new CompareInstruction(
+                rightResult, new Operand(leftResult, new Shift(ShiftType.ASR, MUL_SHIFT))));
+        BuiltInFunction.OVERFLOW.setUsed();
+        internalState.addInstruction(new BranchInstruction(new ConditionCode(NE),
+            BuiltInFunction.OVERFLOW.getMessage(), BranchOperation.BL));
+        break;
+      case DIV:
+        internalState.addInstruction(new MovInstruction(new Register(R0), leftResult));
+        internalState.addInstruction(new MovInstruction(new Register(R1), rightResult));
+        BuiltInFunction.DIV_ZERO.setUsed();
+        internalState.addInstruction(
+            new BranchInstruction(BuiltInFunction.DIV_ZERO.getMessage(), BranchOperation.BL));
+        internalState.addInstruction(
+            new BranchInstruction(SystemBuiltInFunction.IDIV.getMessage(), BranchOperation.BL));
+        internalState.addInstruction(new MovInstruction(leftResult, new Register(R0)));
+        break;
+      case MOD:
+        internalState.addInstruction(new MovInstruction(new Register(R0), leftResult));
+        internalState.addInstruction(new MovInstruction(new Register(R1), rightResult));
+        BuiltInFunction.DIV_ZERO.setUsed();
+        internalState.addInstruction(
+            new BranchInstruction(BuiltInFunction.DIV_ZERO.getMessage(), BranchOperation.BL));
+        internalState.addInstruction(
+            new BranchInstruction(SystemBuiltInFunction.IDIVMOD.getMessage(), BranchOperation.BL));
+        internalState.addInstruction(new MovInstruction(leftResult, new Register(R1)));
+        break;
+      case PLUS:
+        internalState.addInstruction(
+            new ArithmeticInstruction(ArithmeticOperation.ADD,
+                leftResult, leftResult, new Operand(rightResult), true));
+        BuiltInFunction.OVERFLOW.setUsed();
+        internalState.addInstruction(new BranchInstruction(new ConditionCode(VS),
+            BuiltInFunction.OVERFLOW.getMessage(), BranchOperation.BL));
+        break;
+      case MINUS:
+        internalState.addInstruction(
+            new ArithmeticInstruction(ArithmeticOperation.SUB,
+                leftResult, leftResult, new Operand(rightResult), true));
+        BuiltInFunction.OVERFLOW.setUsed();
+        internalState.addInstruction(new BranchInstruction(new ConditionCode(VS),
+            BuiltInFunction.OVERFLOW.getMessage(), BranchOperation.BL));
+        break;
+      case GREATER:
+        conditionAssembly(internalState, leftResult, rightResult, GT, LE);
+        break;
+      case GEQ:
+        conditionAssembly(internalState, leftResult, rightResult, GE, LT);
+        break;
+      case LESS:
+        conditionAssembly(internalState, leftResult, rightResult, LT, GE);
+        break;
+      case LEQ:
+        conditionAssembly(internalState, leftResult, rightResult, LE, GT);
+        break;
+      case EQUAL:
+        conditionAssembly(internalState, leftResult, rightResult, EQ, NE);
+        break;
+      case NEQ:
+        conditionAssembly(internalState, leftResult, rightResult, NE, EQ);
+        break;
+      case AND:
+        internalState.addInstruction(
+            new LogicalInstruction(
+                LogicalOperation.AND, leftResult, leftResult, new Operand(rightResult)));
+        break;
+      case OR:
+        internalState.addInstruction(
+            new LogicalInstruction(
+                LogicalOperation.ORR, leftResult, leftResult, new Operand(rightResult)));
+    }
+  }
+
+  private void conditionAssembly(InternalState internalState, Register leftResult,
+      Register rightResult, Condition trueCond, Condition falseCond) {
+    internalState.addInstruction(new CompareInstruction(leftResult, new Operand(rightResult)));
+    internalState.addInstruction(new MovInstruction(new ConditionCode(trueCond), leftResult, TRUE));
+    internalState.addInstruction(
+        new MovInstruction(new ConditionCode(falseCond), leftResult, FALSE));
   }
 
   @Override

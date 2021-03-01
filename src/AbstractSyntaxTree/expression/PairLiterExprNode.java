@@ -24,7 +24,7 @@ public class PairLiterExprNode extends ExpressionNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     Register currDestination = internalState.getFreeRegister();
-    internalState.setCurrDestination(currDestination);
+    internalState.setPrevResult(currDestination);
     internalState.addInstruction(new LdrInstruction(currDestination, 0));
   }
 

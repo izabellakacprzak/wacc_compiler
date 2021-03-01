@@ -1,6 +1,6 @@
 package InternalRepresentation;
 
-import InternalRepresentation.Instructions.BuiltInLabelInstruction.BuiltInFunction;
+import InternalRepresentation.Instructions.CustomBuiltInInstruction.BuiltInFunction;
 import InternalRepresentation.Instructions.Instruction;
 
 import InternalRepresentation.Instructions.LabelInstruction;
@@ -18,7 +18,7 @@ public class InternalState {
   private final Set<String> declaredLabels;
   private final List<Instruction> generatedInstructions;
   private final List<MsgInstruction> messages;
-  private Register currDestination;
+  private Register prevResult;
   private final List<LabelInstruction> builtInLabels;
 
   public InternalState() {
@@ -27,7 +27,7 @@ public class InternalState {
     declaredLabels = new HashSet<>();
     generatedInstructions = new ArrayList<>();
     messages = new ArrayList<>();
-    currDestination = null;
+    prevResult = null;
     builtInLabels = new ArrayList<>();
 
     labelCount = 0;
@@ -90,15 +90,15 @@ public class InternalState {
     return "msg_" + (messages.size() - 1);
   }
 
-  public Register getCurrDestination() {
-      return currDestination;
+  public Register getPrevResult() {
+    return prevResult;
   }
 
-  public void setCurrDestination(Register destination) {
-      currDestination = destination;
+  public void setPrevResult(Register destination) {
+    prevResult = destination;
   }
 
   public void addBuiltInLabel(BuiltInFunction function) {
-      function.setUsed();
+    function.setUsed();
   }
 }
