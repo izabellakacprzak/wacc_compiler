@@ -1,29 +1,33 @@
 package InternalRepresentation;
 
+import static InternalRepresentation.Enums.Reg.*;
+
 import InternalRepresentation.Enums.BuiltInFunction;
 import InternalRepresentation.Instructions.Instruction;
 
 import InternalRepresentation.Instructions.LabelInstruction;
 import InternalRepresentation.Instructions.MsgInstruction;
 import InternalRepresentation.Enums.Reg;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
+import java.util.*;
 
 public class InternalState {
 
-  private List<Register> availableRegs;
-  private int labelCount;
   private final Set<String> declaredLabels;
   private final List<Instruction> generatedInstructions;
   private final List<MsgInstruction> messages;
-  private Register prevResult;
   private final List<LabelInstruction> builtInLabels;
+  private Stack<Register> availableRegs;
+  private int labelCount;
+  private Register prevResult;
+
+
 
   public InternalState() {
     // setup stack function
-    availableRegs = new ArrayList<>();
+    resetAvailableRegs();
+    //TODO check callee reserved regs => main func starts from R4
+    //TODO change this to a stack!!!!
     declaredLabels = new HashSet<>();
     generatedInstructions = new ArrayList<>();
     messages = new ArrayList<>();
@@ -33,18 +37,26 @@ public class InternalState {
     labelCount = 0;
   }
 
-  public Register peekFreeRegister(){return null;}
 
-  public void pushFreeRegister(Register reg){}
+  //TODO change the availableRegs list to a stack
+  public Register peekFreeRegister() {
+    //TODO check if we can ever run out of regs
+    return availableRegs.peek();
+  }
 
-  public Register popFreeRegister(){return null;}
+  public void pushFreeRegister(Register reg) {
+    availableRegs.push(reg);
+
+  }
+
+  //public Register popFreeRegister() {
+   // return availableRegs.pop();
+ // }
 
 
-  public Register getFreeRegister() {
+  public Register popFreeRegister() {
     if (!availableRegs.isEmpty()) {
-      Register availableRegister = availableRegs.get(0);
-      availableRegs.remove(0);
-      return availableRegister;
+      return availableRegs.pop();
     } else {
       // use stack
       return null;
@@ -56,33 +68,36 @@ public class InternalState {
   }
 
   public void resetAvailableRegs() {
-    List<Register> registers = new ArrayList<>();
-
-    registers.add(new Register(Register.getDestReg()));
-    for (Reg reg : Register.getParamRegs()) {
-      registers.add(new Register(reg));
-    }
-
+    Stack<Register> registers = new Stack<>();
+    registers.push(new Register(R12));
+    registers.push(new Register(R11));
+    registers.push(new Register(R10));
+    registers.push(new Register(R9));
+    registers.push(new Register(R8));
+    registers.push(new Register(R7));
+    registers.push(new Register(R6));
+    registers.push(new Register(R5));
+    registers.push(new Register(R4));
     this.availableRegs = registers;
   }
 
-  public void setAvailableRegs(List<Register> availableRegs) {
-    this.availableRegs = availableRegs;
-  }
-
-  public List<Register> getAvailableRegs() {
+  public Stack<Register> getAvailableRegs() {
     return availableRegs;
   }
 
-  public void setAsUsed(Register register) {
-    availableRegs.remove(register);
+  public void setAvailableRegs(Stack<Register> availableRegs) {
+    this.availableRegs = availableRegs;
   }
 
-  public void setAsUnused(Register register) {
-    if (!availableRegs.contains(register)) {
-      availableRegs.add(register);
-    }
+  /*public void setAsUsed(Register register) {
+    availableRegs.remove(register);
   }
+*/
+//  public void setAsUnused(Register register) {
+//
+//      availableRegs.push(register);
+//    }
+//  }
 
   public String generateNewLabel() {
     String newLabel = "L" + labelCount;

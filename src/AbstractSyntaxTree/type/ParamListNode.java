@@ -9,6 +9,7 @@ import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class ParamListNode implements ASTNode {
 
@@ -62,17 +63,15 @@ public class ParamListNode implements ASTNode {
   public void generateAssembly(InternalState internalState) {
     Identifier entry;
     Register curr;
-    List<Register> paramReg = internalState.getAvailableRegs();
+    Stack<Register> paramReg = internalState.getAvailableRegs();
     for (int i = 0; i < identifiers.size(); i++) {
       if (i >= paramReg.size()) {
         // TODO: too many parameters
       }
 
-      curr = paramReg.get(i);
-
       entry = currSymTable.lookupAll(identifiers.get(i).getIdentifier());
+      curr = internalState.popFreeRegister();
       entry.setRegister(curr);
-      internalState.setAsUsed(curr);
     }
   }
 }
