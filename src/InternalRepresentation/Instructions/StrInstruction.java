@@ -12,7 +12,7 @@ public class StrInstruction implements Instruction {
   private final Register offsetReg1;
   private Register offsetReg2;
   private int offsetImm;
-  private boolean useExclamatation = false;
+  private boolean useExclamation = false;
 
   public StrInstruction(StrType type, Register destReg, Register offsetReg1, Register offsetReg2) {
     this.type = type;
@@ -35,12 +35,12 @@ public class StrInstruction implements Instruction {
   }
 
   public void useExclamation() {
-    useExclamatation = true;
+    useExclamation = true;
   }
 
   @Override
   public String writeInstruction() {
-    return printer.printStr(type, destReg, offsetReg1, offsetReg2, offsetImm, useExclamatation);
+    return printer.printStr(type, destReg, offsetReg1, offsetReg2, offsetImm, useExclamation);
   }
 
 }

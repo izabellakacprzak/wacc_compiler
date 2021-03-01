@@ -53,11 +53,11 @@ public class ReturnStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    Register destReg = internalState.getFreeRegister(); // get R0
-    Register returnStatReg = internalState.getFreeRegister();
+    Register destReg = internalState.peekFreeRegister(); // get R0
+    Register returnStatReg = internalState.peekFreeRegister();
 
     returnExpr.generateAssembly(internalState);
-    Register progCounter = internalState.getFreeRegister(); // get PC
+    Register progCounter = internalState.peekFreeRegister(); // get PC
 
     internalState.addInstruction(new MovInstruction(destReg, returnStatReg));
     internalState.addInstruction(new PopInstruction(progCounter));

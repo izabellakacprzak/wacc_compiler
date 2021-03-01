@@ -76,8 +76,8 @@ public class DeclarationStatementNode extends StatementNode {
     assignment.generateAssembly(internalState);
 
     // get SP Offset into sym table
-    Register destReg = internalState.getFreeRegister();
-    Register stackPointer = internalState.getFreeRegister(); //GET SP
+    Register destReg = internalState.peekFreeRegister();
+    Register stackPointer = internalState.peekFreeRegister(); //GET SP
 
     internalState.addInstruction(new StrInstruction(StrType.STR, destReg, stackPointer, 0));
   }

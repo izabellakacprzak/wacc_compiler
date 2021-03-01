@@ -44,8 +44,8 @@ public class ExitStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    Register destReg = internalState.getFreeRegister();
-    Register exitCodeReg = internalState.getFreeRegister();
+    Register destReg = internalState.peekFreeRegister();
+    Register exitCodeReg = internalState.peekFreeRegister();
     // the exit code will be stored in the first available reg
     // to write a getReg0 func!!
     expression.generateAssembly(internalState);
