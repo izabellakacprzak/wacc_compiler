@@ -1,8 +1,10 @@
 package InternalRepresentation;
 
 import InternalRepresentation.Enums.ArithmeticOperation;
+import InternalRepresentation.Enums.ConditionCode;
 import InternalRepresentation.Enums.LdrType;
 import InternalRepresentation.Enums.LogicalOperation;
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Enums.StrType;
 
 import java.util.List;
@@ -10,16 +12,16 @@ import java.util.List;
 public class InstructionPrinter {
 
   public String printArithmetic(ArithmeticOperation operationType, Register destReg,
-                                Register operand1, Operand operand2, boolean setBits) {
+      Register operand1, Operand operand2, boolean setBits) {
     StringBuilder instruction = new StringBuilder(operationType.toString());
     if (setBits) {
       instruction.append("S");
     }
 
     instruction.append(" ").
-                               append(destReg.getRegName()).
-                                                               append(operand1.getRegName()).
-                                                                                                append(operand2.toString());
+        append(destReg.getRegName()).
+        append(operand1.getRegName()).
+        append(operand2.toString());
 
     return instruction.toString();
   }
@@ -44,8 +46,8 @@ public class InstructionPrinter {
   }
 
   public String printLDR(Register destReg, ConditionCode conditionCode,
-                         int immOffset, Register srcReg,
-                         String constant, LdrType type) {
+      int immOffset, Register srcReg,
+      String constant, LdrType type) {
     String instruction = type.name();
 
     if (conditionCode != null) {
@@ -65,14 +67,14 @@ public class InstructionPrinter {
   }
 
   public String printLogical(LogicalOperation operationType, Register destReg,
-                             Register operand1, Operand operand2) {
+      Register operand1, Operand operand2) {
     return operationType.toString() + " " + destReg.getRegName() + ", " +
-               operand1.getRegName() + ", " +
-               operand2.toString();
+        operand1.getRegName() + ", " +
+        operand2.toString();
   }
 
   public String printMOV(ConditionCode conditionCode, Register destReg, Register srcReg,
-                         int intImmediate, char charImmediate) {
+      int intImmediate, char charImmediate) {
     String instruction = "MOV";
 
     if (conditionCode != null) {
@@ -107,22 +109,22 @@ public class InstructionPrinter {
     return "PUSH {" + reg.getRegName() + "}";
   }
 
-  public String printSMull(Register destReg1, Register destReg2, Register operand1, Register operand2) {
+  public String printSMull(Register destReg1, Register destReg2, Register operand1,
+      Register operand2) {
     return "SMULL " + destReg1.getRegName() + ", " +
-               destReg2.getRegName() + ", " +
-               operand1.getRegName() + ", " +
-               operand2.getRegName();
+        destReg2.getRegName() + ", " +
+        operand1.getRegName() + ", " +
+        operand2.getRegName();
   }
 
   public String printStr(StrType type, Register destReg,
-                         Register offsetReg1, Register offsetReg2, int offsetImm, boolean useExclamation) {
+      Register offsetReg1, Register offsetReg2, int offsetImm, boolean useExclamation) {
     StringBuilder instruction = new StringBuilder(type.toString());
 
     instruction.append(", ").
-                                append(destReg.getRegName()).
-                                                                append("[").
-                                                                               append(offsetReg1.getRegName());
-
+        append(destReg.getRegName()).
+        append("[").
+        append(offsetReg1.getRegName());
 
     if (offsetReg2 != null) {
       instruction.append(", ").append(offsetReg2.getRegName());

@@ -1,8 +1,8 @@
 package AbstractSyntaxTree.expression;
 
-import InternalRepresentation.ConditionCode;
-import InternalRepresentation.Enums.Condition;
+import InternalRepresentation.Enums.ConditionCode;
 import InternalRepresentation.Enums.LdrType;
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Instructions.ArithmeticInstruction;
 import InternalRepresentation.Enums.ArithmeticOperation;
 import InternalRepresentation.Instructions.BranchInstruction;
@@ -13,7 +13,6 @@ import InternalRepresentation.Instructions.LogicalInstruction;
 import InternalRepresentation.Enums.LogicalOperation;
 import InternalRepresentation.InternalState;
 import InternalRepresentation.Operand;
-import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.Operator.UnOp;
@@ -99,7 +98,8 @@ public class UnaryOpExprNode extends ExpressionNode {
         internalState.addInstruction(new ArithmeticInstruction(ArithmeticOperation.RSB,
             operandResult, operandResult, new Operand(0), true));
         BuiltInFunction.OVERFLOW.setUsed();
-        internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.VS),
+        internalState.addInstruction(new BranchInstruction(
+            ConditionCode.VS,
             BuiltInFunction.OVERFLOW.getMessage(), BranchOperation.BL));
         break;
       case LEN:

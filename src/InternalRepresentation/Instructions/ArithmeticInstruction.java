@@ -1,9 +1,9 @@
 package InternalRepresentation.Instructions;
 
 import InternalRepresentation.Enums.ArithmeticOperation;
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.InstructionPrinter;
 import InternalRepresentation.Operand;
-import InternalRepresentation.Register;
 
 public class ArithmeticInstruction implements Instruction {
 
@@ -15,7 +15,7 @@ public class ArithmeticInstruction implements Instruction {
     private final boolean setBits;
 
     public ArithmeticInstruction(ArithmeticOperation operation, Register destReg,
-                                 Register operand1, Operand operand2, boolean setBits) {
+        Register operand1, Operand operand2, boolean setBits) {
         this.operation = operation;
 
         this.destReg = destReg;

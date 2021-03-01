@@ -2,8 +2,8 @@ package AbstractSyntaxTree.type;
 
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Register;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;

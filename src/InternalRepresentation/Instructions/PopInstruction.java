@@ -1,8 +1,7 @@
 package InternalRepresentation.Instructions;
 
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.InstructionPrinter;
-import InternalRepresentation.Instructions.Instruction;
-import InternalRepresentation.Register;
 
 public class PopInstruction implements Instruction {
 

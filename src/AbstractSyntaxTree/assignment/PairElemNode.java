@@ -3,12 +3,11 @@ package AbstractSyntaxTree.assignment;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.Enums.LdrType;
-import InternalRepresentation.Enums.Reg;
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Enums.StrType;
 import InternalRepresentation.Instructions.LdrInstruction;
 import InternalRepresentation.Instructions.StrInstruction;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
@@ -64,7 +63,7 @@ public class PairElemNode extends AssignRHSNode {
   public void generateAssembly(InternalState internalState) {
     Register reg = internalState.peekFreeRegister();
     //TODO do not create new object for R0
-    Register r0Reg = new Register(Reg.R0);
+    Register r0Reg = Register.R0;
 
     expression.generateAssembly(internalState);
 

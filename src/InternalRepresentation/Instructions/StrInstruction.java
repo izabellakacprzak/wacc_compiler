@@ -1,9 +1,9 @@
 package InternalRepresentation.Instructions;
 
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Enums.StrType;
 
 import InternalRepresentation.InstructionPrinter;
-import InternalRepresentation.Register;
 
 public class StrInstruction implements Instruction {
 

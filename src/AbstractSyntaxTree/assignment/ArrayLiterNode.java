@@ -1,11 +1,9 @@
 package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
-import InternalRepresentation.ConditionCode;
 import InternalRepresentation.Enums.*;
 import InternalRepresentation.Instructions.*;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.SymbolTable;
@@ -73,12 +71,12 @@ public class ArrayLiterNode extends AssignRHSNode {
 
     // load array size in R0
     int arrSize = expressions.size() * arrElemSize + INT_BYTES_SIZE;
-    Register regR0 = new Register(Reg.R0);
+    Register regR0 = Register.R0;
     internalState.addInstruction(new LdrInstruction(LdrType.LDR, regR0, arrSize));
 
     // BL malloc
-    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L),
-            "malloc", BranchOperation.B));
+    internalState.addInstruction(new BranchInstruction(ConditionCode.L,
+        "malloc", BranchOperation.B));
 
     Register allocReg = internalState.popFreeRegister();
     internalState.addInstruction(new MovInstruction(allocReg, regR0));

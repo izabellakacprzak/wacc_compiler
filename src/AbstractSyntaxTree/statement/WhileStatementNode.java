@@ -1,8 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
-import InternalRepresentation.ConditionCode;
-import InternalRepresentation.Enums.Condition;
+import InternalRepresentation.Enums.ConditionCode;
 import InternalRepresentation.Instructions.BranchInstruction;
 import InternalRepresentation.Enums.BranchOperation;
 import InternalRepresentation.Instructions.LabelInstruction;
@@ -53,14 +52,16 @@ public class WhileStatementNode extends StatementNode {
     String condLabel = internalState.generateNewLabel();
     String statementLabel = internalState.generateNewLabel();
 
-    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.EQ), condLabel, BranchOperation.B));
+    internalState.addInstruction(new BranchInstruction(
+        ConditionCode.EQ, condLabel, BranchOperation.B));
 
     internalState.addInstruction(new LabelInstruction(statementLabel));
     statement.generateAssembly(internalState);
     internalState.addInstruction(new LabelInstruction(condLabel));
     condition.generateAssembly(internalState);
 
-    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.EQ), statementLabel, BranchOperation.B));
+    internalState.addInstruction(new BranchInstruction(
+        ConditionCode.EQ, statementLabel, BranchOperation.B));
   }
 
   /* Recursively traverses the AST and sets the function expected return type in the ReturnNode

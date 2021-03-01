@@ -1,7 +1,7 @@
 package InternalRepresentation.Instructions;
 
-import InternalRepresentation.ConditionCode;
 import InternalRepresentation.Enums.BranchOperation;
+import InternalRepresentation.Enums.ConditionCode;
 import InternalRepresentation.InstructionPrinter;
 
 import java.util.ArrayList;

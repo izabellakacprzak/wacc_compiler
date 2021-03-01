@@ -19,6 +19,10 @@ GT Signed greater than
 LE Signed less than or equal
 AL Always
 */
-public enum Condition {
-    L, EQ, NE, CS, VS, GE, LT, GT, LE
+public enum ConditionCode {
+    L, EQ, NE, CS, VS, GE, LT, GT, LE;
+
+    public String getCondName() {
+        return name();
+    }
 }

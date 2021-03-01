@@ -5,12 +5,10 @@ import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
-import InternalRepresentation.ConditionCode;
 import InternalRepresentation.Enums.*;
 import InternalRepresentation.Instructions.*;
 import InternalRepresentation.InternalState;
 import InternalRepresentation.Operand;
-import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -109,7 +107,7 @@ public class FuncCallNode extends AssignRHSNode {
 
     // TODO avoid creating a new object for the SP here, should point to the same obj in all classes!!
     // should not be created in this class at all in the first place!!
-    Register spReg = new Register(Reg.SP);
+    Register spReg = Register.SP;
     // arguments are stored in decreasing order they are given in the code
     for (int i = arguments.size() - 1; i >= 0; i--) {
       // get argument, calculate size and add it to argsTotalSize
@@ -123,19 +121,23 @@ public class FuncCallNode extends AssignRHSNode {
       StrType strInstr = (argSize == 1) ? StrType.STR : StrType.STRB;
 
       //store currArg on the stack and decrease stack pointer (stack grows downwards)
-      internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(), spReg, -argSize));
+      internalState.addInstruction(
+          new StrInstruction(strInstr, internalState.peekFreeRegister(), spReg, -argSize));
     }
 
     //Branch Instruction to the callee label
     String functionLabel = "f_" + identifier.toString();
-    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L), functionLabel, BranchOperation.B));
+    internalState.addInstruction(new BranchInstruction(
+        ConditionCode.L, functionLabel, BranchOperation.B));
 
     //TODO what is stack max size? 1MB? what if argsTotalSize > stack size??
     //deallocate stack from the function arguments
-    internalState.addInstruction(new ArithmeticInstruction(ArithmeticOperation.ADD, spReg, spReg, new Operand(argsTotalSize), false));
+    internalState.addInstruction(
+        new ArithmeticInstruction(ArithmeticOperation.ADD, spReg, spReg, new Operand(argsTotalSize),
+            false));
 
     //TODO change this R0 declaration too...
-    Register r0Reg = new Register(Reg.R0);
+    Register r0Reg = Register.R0;
 
     //move the result stored in R0 in the first free register
     internalState.addInstruction(new MovInstruction(internalState.peekFreeRegister(), r0Reg));

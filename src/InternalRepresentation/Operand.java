@@ -1,5 +1,7 @@
 package InternalRepresentation;
 
+import InternalRepresentation.Enums.Register;
+
 public class Operand {
 
     private int immedVal;

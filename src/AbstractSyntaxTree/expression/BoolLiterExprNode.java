@@ -1,8 +1,8 @@
 package AbstractSyntaxTree.expression;
 
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;

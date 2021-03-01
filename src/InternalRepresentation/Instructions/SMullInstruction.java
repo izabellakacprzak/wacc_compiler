@@ -1,7 +1,7 @@
 package InternalRepresentation.Instructions;
 
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.InstructionPrinter;
-import InternalRepresentation.Register;
 
 public class SMullInstruction implements Instruction {
 

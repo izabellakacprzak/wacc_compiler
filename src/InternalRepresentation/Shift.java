@@ -1,5 +1,6 @@
 package InternalRepresentation;
 
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Enums.ShiftType;
 
 public class Shift {

@@ -1,11 +1,9 @@
 package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
-import InternalRepresentation.ConditionCode;
 import InternalRepresentation.Enums.*;
 import InternalRepresentation.Instructions.*;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
@@ -40,11 +38,13 @@ public class NewPairNode extends AssignRHSNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     //TODO don't create new obj for R0
-    Register r0Reg = new Register(Reg.R0);
+    Register r0Reg = Register.R0;
 
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, r0Reg, NO_OF_ELEMS * ADDRESS_BYTES_SIZE));
+    internalState
+        .addInstruction(new LdrInstruction(LdrType.LDR, r0Reg, NO_OF_ELEMS * ADDRESS_BYTES_SIZE));
     //BL malloc
-    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L), "malloc", BranchOperation.B));
+    internalState.addInstruction(new BranchInstruction(
+        ConditionCode.L, "malloc", BranchOperation.B));
 
     Register reg = internalState.popFreeRegister();
 
@@ -53,18 +53,20 @@ public class NewPairNode extends AssignRHSNode {
     /* begin fstExpr code generation */
     fstExpr.generateAssembly(internalState);
 
-
     // load fstExpr type size into R0
     int fstSize = fstExpr.getType(currSymTable).getSize();
     internalState.addInstruction(new LdrInstruction(LdrType.LDR, r0Reg, fstSize));
 
     // BL malloc
-    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L), "malloc", BranchOperation.B));
+    internalState.addInstruction(new BranchInstruction(
+        ConditionCode.L, "malloc", BranchOperation.B));
 
     StrType strInstr1 = (fstSize == 1) ? StrType.STRB : StrType.STR;
-    internalState.addInstruction(new StrInstruction(strInstr1, internalState.peekFreeRegister(), r0Reg));
+    internalState
+        .addInstruction(new StrInstruction(strInstr1, internalState.peekFreeRegister(), r0Reg));
 
-    internalState.addInstruction(new StrInstruction(StrType.STR, r0Reg, internalState.peekFreeRegister(), 0));
+    internalState.addInstruction(
+        new StrInstruction(StrType.STR, r0Reg, internalState.peekFreeRegister(), 0));
     /* end fstExpr code generation */
 
     /* begin sndExpr code generation */
@@ -75,12 +77,16 @@ public class NewPairNode extends AssignRHSNode {
     internalState.addInstruction(new LdrInstruction(LdrType.LDR, r0Reg, sndSize));
 
     // BL malloc
-    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.L), "malloc", BranchOperation.B));
+    internalState.addInstruction(new BranchInstruction(
+        ConditionCode.L, "malloc", BranchOperation.B));
 
     StrType strInstr2 = (fstSize == 1) ? StrType.STRB : StrType.STR;
-    internalState.addInstruction(new StrInstruction(strInstr2, internalState.peekFreeRegister(), r0Reg));
+    internalState
+        .addInstruction(new StrInstruction(strInstr2, internalState.peekFreeRegister(), r0Reg));
 
-    internalState.addInstruction(new StrInstruction(StrType.STR, r0Reg, internalState.peekFreeRegister(), ADDRESS_BYTES_SIZE));
+    internalState.addInstruction(
+        new StrInstruction(StrType.STR, r0Reg, internalState.peekFreeRegister(),
+            ADDRESS_BYTES_SIZE));
     /* end sndExpr code generation */
 
     internalState.pushFreeRegister(reg);

@@ -1,8 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
-import InternalRepresentation.ConditionCode;
-import InternalRepresentation.Enums.Condition;
+import InternalRepresentation.Enums.ConditionCode;
 import InternalRepresentation.Instructions.BranchInstruction;
 import InternalRepresentation.Enums.BranchOperation;
 import InternalRepresentation.Instructions.LabelInstruction;
@@ -61,7 +60,8 @@ public class IfStatementNode extends StatementNode {
     String elseLabel = internalState.generateNewLabel();
     String endIfLabel = internalState.generateNewLabel();
 
-    internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.EQ), elseLabel, BranchOperation.B));
+    internalState.addInstruction(new BranchInstruction(
+        ConditionCode.EQ, elseLabel, BranchOperation.B));
     thenStatement.generateAssembly(internalState);
     internalState.addInstruction(new BranchInstruction(endIfLabel, BranchOperation.B));
 

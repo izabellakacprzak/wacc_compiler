@@ -1,13 +1,13 @@
 package InternalRepresentation;
 
-import static InternalRepresentation.Enums.Reg.*;
+import static InternalRepresentation.Enums.Register.*;
 
 import InternalRepresentation.Enums.BuiltInFunction;
 import InternalRepresentation.Instructions.Instruction;
 
 import InternalRepresentation.Instructions.LabelInstruction;
 import InternalRepresentation.Instructions.MsgInstruction;
-import InternalRepresentation.Enums.Reg;
+import InternalRepresentation.Enums.Register;
 
 import java.util.*;
 
@@ -69,15 +69,15 @@ public class InternalState {
 
   public void resetAvailableRegs() {
     Stack<Register> registers = new Stack<>();
-    registers.push(new Register(R12));
-    registers.push(new Register(R11));
-    registers.push(new Register(R10));
-    registers.push(new Register(R9));
-    registers.push(new Register(R8));
-    registers.push(new Register(R7));
-    registers.push(new Register(R6));
-    registers.push(new Register(R5));
-    registers.push(new Register(R4));
+    registers.push(R12);
+    registers.push(R11);
+    registers.push(R10);
+    registers.push(R9);
+    registers.push(R8);
+    registers.push(R7);
+    registers.push(R6);
+    registers.push(R5);
+    registers.push(R4);
     this.availableRegs = registers;
   }
 

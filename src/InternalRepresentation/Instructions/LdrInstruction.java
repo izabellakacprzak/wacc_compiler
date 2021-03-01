@@ -1,10 +1,9 @@
 package InternalRepresentation.Instructions;
 
-import InternalRepresentation.ConditionCode;
+import InternalRepresentation.Enums.ConditionCode;
 import InternalRepresentation.Enums.LdrType;
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.InstructionPrinter;
-import InternalRepresentation.Instructions.Instruction;
-import InternalRepresentation.Register;
 
 public class LdrInstruction implements Instruction {
   private final Register destReg;

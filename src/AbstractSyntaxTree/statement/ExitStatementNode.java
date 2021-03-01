@@ -1,11 +1,11 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Instructions.BranchInstruction;
 import InternalRepresentation.Enums.BranchOperation;
 import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;

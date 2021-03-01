@@ -1,10 +1,10 @@
 package AbstractSyntaxTree.expression;
 
-import static InternalRepresentation.Enums.Reg.*;
-import static InternalRepresentation.Enums.Condition.*;
+import static InternalRepresentation.Enums.Register.*;
+import static InternalRepresentation.Enums.ConditionCode.*;
 
-import InternalRepresentation.ConditionCode;
-import InternalRepresentation.Enums.Condition;
+import InternalRepresentation.Enums.ConditionCode;
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Enums.ShiftType;
 import InternalRepresentation.Instructions.*;
 import InternalRepresentation.Enums.ArithmeticOperation;
@@ -14,7 +14,6 @@ import InternalRepresentation.Enums.BuiltInFunction;
 import InternalRepresentation.Enums.LogicalOperation;
 import InternalRepresentation.InternalState;
 import InternalRepresentation.Operand;
-import InternalRepresentation.Register;
 import InternalRepresentation.Shift;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.Operator.BinOp;
@@ -141,35 +140,36 @@ public class BinaryOpExprNode extends ExpressionNode {
             new CompareInstruction(
                 rightResult, new Operand(leftResult, new Shift(ShiftType.ASR, MUL_SHIFT))));
         BuiltInFunction.OVERFLOW.setUsed();
-        internalState.addInstruction(new BranchInstruction(new ConditionCode(Condition.NE),
+        internalState.addInstruction(new BranchInstruction(
+            ConditionCode.NE,
             BuiltInFunction.OVERFLOW.getMessage(), BranchOperation.BL));
         break;
       case DIV:
-        internalState.addInstruction(new MovInstruction(new Register(R0), leftResult));
-        internalState.addInstruction(new MovInstruction(new Register(R1), rightResult));
+        internalState.addInstruction(new MovInstruction(R0, leftResult));
+        internalState.addInstruction(new MovInstruction(R1, rightResult));
         BuiltInFunction.DIV_ZERO.setUsed();
         internalState.addInstruction(
             new BranchInstruction(BuiltInFunction.DIV_ZERO.getMessage(), BranchOperation.BL));
         internalState.addInstruction(
             new BranchInstruction(SystemBuiltInFunction.IDIV.getMessage(), BranchOperation.BL));
-        internalState.addInstruction(new MovInstruction(leftResult, new Register(R0)));
+        internalState.addInstruction(new MovInstruction(leftResult, R0));
         break;
       case MOD:
-        internalState.addInstruction(new MovInstruction(new Register(R0), leftResult));
-        internalState.addInstruction(new MovInstruction(new Register(R1), rightResult));
+        internalState.addInstruction(new MovInstruction(R0, leftResult));
+        internalState.addInstruction(new MovInstruction(R1, rightResult));
         BuiltInFunction.DIV_ZERO.setUsed();
         internalState.addInstruction(
             new BranchInstruction(BuiltInFunction.DIV_ZERO.getMessage(), BranchOperation.BL));
         internalState.addInstruction(
             new BranchInstruction(SystemBuiltInFunction.IDIVMOD.getMessage(), BranchOperation.BL));
-        internalState.addInstruction(new MovInstruction(leftResult, new Register(R1)));
+        internalState.addInstruction(new MovInstruction(leftResult, R1));
         break;
       case PLUS:
         internalState.addInstruction(
             new ArithmeticInstruction(ArithmeticOperation.ADD,
                 leftResult, leftResult, new Operand(rightResult), true));
         BuiltInFunction.OVERFLOW.setUsed();
-        internalState.addInstruction(new BranchInstruction(new ConditionCode(VS),
+        internalState.addInstruction(new BranchInstruction(VS,
             BuiltInFunction.OVERFLOW.getMessage(), BranchOperation.BL));
         break;
       case MINUS:
@@ -177,7 +177,7 @@ public class BinaryOpExprNode extends ExpressionNode {
             new ArithmeticInstruction(ArithmeticOperation.SUB,
                 leftResult, leftResult, new Operand(rightResult), true));
         BuiltInFunction.OVERFLOW.setUsed();
-        internalState.addInstruction(new BranchInstruction(new ConditionCode(VS),
+        internalState.addInstruction(new BranchInstruction(VS,
             BuiltInFunction.OVERFLOW.getMessage(), BranchOperation.BL));
         break;
       case GREATER:
@@ -211,11 +211,11 @@ public class BinaryOpExprNode extends ExpressionNode {
   }
 
   private void conditionAssembly(InternalState internalState, Register leftResult,
-      Register rightResult, Condition trueCond, Condition falseCond) {
+      Register rightResult, ConditionCode trueCond, ConditionCode falseCond) {
     internalState.addInstruction(new CompareInstruction(leftResult, new Operand(rightResult)));
-    internalState.addInstruction(new MovInstruction(new ConditionCode(trueCond), leftResult, TRUE));
+    internalState.addInstruction(new MovInstruction(trueCond, leftResult, TRUE));
     internalState.addInstruction(
-        new MovInstruction(new ConditionCode(falseCond), leftResult, FALSE));
+        new MovInstruction(falseCond, leftResult, FALSE));
   }
 
   @Override
