@@ -1,6 +1,6 @@
 package InternalRepresentation;
 
-import static InternalRepresentation.Enums.BranchOperation.BL;
+import static InternalRepresentation.Enums.BranchOperation.*;
 import static InternalRepresentation.Enums.BuiltInFunction.*;
 import static InternalRepresentation.Enums.ConditionCode.*;
 import static InternalRepresentation.Enums.LdrType.LDR;
@@ -113,21 +113,83 @@ public class CustomBuiltInFunctions {
   }
 
   private void generateArrayBounds(List<Instruction> instructions) {
+    instructions.add(new PushInstruction(LR));
+    instructions.add(new CompareInstruction(R0, new Operand(0)));
+    instructions.add(
+        new LdrInstruction(LDR, LT, R0, "ArrayIndexOutOfBoundsError: negative index\n"));
+    instructions.add(new BranchInstruction(LT, BL, RUNTIME.getMessage()));
+    RUNTIME.setUsed();
+    instructions.add(new LdrInstruction(LDR, R1, R1));
+    instructions.add(new CompareInstruction(R0, new Operand(R1)));
+    instructions.add(new LdrInstruction(LDR, CS, R0,
+        "ArrayIndexOutOfBoundsError: index too large\n"));
+    instructions.add(new BranchInstruction(CS, BL, RUNTIME.getMessage()));
+    instructions.add(new PopInstruction(PC));
   }
 
   private void generateDivZero(List<Instruction> instructions) {
+    instructions.add(new PushInstruction(LR));
+    instructions.add(new CompareInstruction(R1, new Operand(0)));
+    instructions.add(new LdrInstruction(LDR, EQ, R0,
+        "DivideByZeroError: divide or modulo by zero\n"));
+    instructions.add(new BranchInstruction(EQ, BL, RUNTIME.getMessage()));
+    RUNTIME.setUsed();
+    instructions.add(new PopInstruction(PC));
   }
 
   private void generateNullPointer(List<Instruction> instructions) {
+    instructions.add(new PushInstruction(LR));
+    instructions.add(new CompareInstruction(R0, new Operand(0)));
+    instructions.add(new LdrInstruction(LDR, EQ, R0,
+        "NullReferenceError: dereference a null reference\n"));
+    instructions.add(new BranchInstruction(EQ, BL, RUNTIME.getMessage()));
+    RUNTIME.setUsed();
+    instructions.add(new PopInstruction(PC));
   }
 
   private void generateFreePair(List<Instruction> instructions) {
+    instructions.add(new PushInstruction(LR));
+    instructions.add(new CompareInstruction(R0, new Operand(0)));
+    instructions.add(
+        new LdrInstruction(LDR, EQ, R0, "NullReferenceError: dereference a null reference\\n"));
+    instructions.add(new BranchInstruction(EQ, B, RUNTIME.getMessage()));
+    RUNTIME.setUsed();
+    instructions.add(new PushInstruction(R0));
+    instructions.add(new LdrInstruction(LDR, R0, R0));
+    instructions.add(new BranchInstruction(BL, FREE.getMessage()));
+    instructions.add(new LdrInstruction(LDR, R0, SP));
+    instructions.add(new LdrInstruction(LDR, R0, R0, 4));
+    instructions.add(new BranchInstruction(BL, FREE.getMessage()));
+    instructions.add(new PopInstruction(R0));
+    instructions.add(new BranchInstruction(BL, FREE.getMessage()));
+    instructions.add(new PopInstruction(PC));
   }
 
   private void generateReadChar(List<Instruction> instructions) {
+    generateRead(instructions, READ_CHAR);
+  }
+  
+  private void generateReadInt(List<Instruction> instructions) {
+    generateRead(instructions, READ_INT);
   }
 
-  private void generateReadInt(List<Instruction> instructions) {
+  private void generateRead(List<Instruction> instructions, BuiltInFunction type) {
+    instructions.add(new PushInstruction(LR));
+    instructions.add(new MovInstruction(R1, R0));
+    switch (type) {
+      case READ_CHAR:
+        instructions.add(new LdrInstruction(LDR, R0, " %c"));
+        break;
+      case READ_INT:
+        instructions.add(new LdrInstruction(LDR, R0, "%d"));
+        break;
+      default:
+        throw new IllegalStateException("Unexpected non-read BuiltInFunction: " + type);
+    }
+
+    instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
+    instructions.add(new BranchInstruction(BL, SCANF.getMessage()));
+    instructions.add(new PopInstruction(PC));
   }
 
   private void generatePrintString(List<Instruction> instructions) {
