@@ -1,4 +1,5 @@
 import AbstractSyntaxTree.ProgramNode;
+import InternalRepresentation.InternalState;
 import SemanticAnalysis.SymbolTable;
 import antlr.WACCLexer;
 import antlr.WACCParser;
@@ -96,7 +97,10 @@ public class Compiler {
 
     File assemblyFile = new File(args[0].replaceFirst(".wacc", ".s"));
     try {
-      assemblyFile.createNewFile();
+      InternalState state = new InternalState();
+      if (assemblyFile.createNewFile()) {
+        state.generateAssembly(assemblyFile, prog);
+      }
     } catch (IOException e) {
       System.out.println("Could not create new file");
     }

@@ -14,12 +14,12 @@ public class DirectiveInstruction implements Instruction {
 
   public DirectiveInstruction(Directive type) {
     this.type = type;
-    this.value = null;
+    this.value = "";
   }
-
+ //TODO: MOVE TO PRINTER
   @Override
   public String writeInstruction() {
-    return "." + type.name().toLowerCase() + " " + value;
+    return "." + type.name().toLowerCase() + " " + value + "\n";
   }
 
 }
