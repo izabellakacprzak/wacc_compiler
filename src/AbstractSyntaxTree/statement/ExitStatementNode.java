@@ -43,13 +43,11 @@ public class ExitStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    Register destReg = internalState.peekFreeRegister();
     Register exitCodeReg = internalState.peekFreeRegister();
-    // the exit code will be stored in the first available reg
-    // to write a getReg0 func!!
+
     expression.generateAssembly(internalState);
 
-    internalState.addInstruction(new MovInstruction(destReg, exitCodeReg));
+    internalState.addInstruction(new MovInstruction(Register.R0, exitCodeReg));
     internalState.addInstruction(new BranchInstruction(("exit"), BranchOperation.BL));
   }
 

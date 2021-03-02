@@ -31,6 +31,18 @@ public class PairElemNode extends AssignRHSNode {
     this.expression = expression;
   }
 
+  public int getPosition() {
+    return position;
+  }
+
+  public String getIdentifier() {
+
+    if (!(expression instanceof IdentifierNode)) {
+      return null;
+    }
+    return ((IdentifierNode) expression).getIdentifier();
+  }
+
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     /* Recursively call semanticAnalysis on expression node */

@@ -24,7 +24,7 @@ public class InternalState {
   private Stack<Register> availableRegs;
   private int labelCount;
   private Register prevResult;
-
+  int argStackOffset = 0;
 
   public InternalState() {
     // setup stack function
@@ -143,5 +143,13 @@ public class InternalState {
           new Operand(Math.min(size, MAX_STACK_ARITHMETIC_SIZE)), false));
       size -= Math.min(size, MAX_STACK_ARITHMETIC_SIZE);
     }
+  }
+
+  public void incrementArgStackOffset(int argSize) {
+    argStackOffset += argSize;
+  }
+
+  public int getArgStackOffset() {
+    return argStackOffset;
   }
 }

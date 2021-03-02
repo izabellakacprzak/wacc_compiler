@@ -42,9 +42,4 @@ public class StringLiterExprNode extends ExpressionNode {
   public String toString() {
     return value;
   }
-
-  @Override
-  public void incrementStackOffset(int size) {
-    currSymTable.incrementArgStackOffset(size);
-  }
 }

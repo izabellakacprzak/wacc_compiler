@@ -14,6 +14,8 @@ import java.util.List;
 
 public class DeclarationStatementNode extends StatementNode {
 
+  private static final int BYTE_SIZE = 1;
+
   /* type:       TypeNode corresponding to the type of the new variable
    * identifier: Name identifier given to the new variable
    * assignment: AssignRHSNode corresponding to the value assigned to the new variable */
@@ -75,11 +77,14 @@ public class DeclarationStatementNode extends StatementNode {
   public void generateAssembly(InternalState internalState) {
     assignment.generateAssembly(internalState);
 
-    // get SP Offset into sym table
-    Register destReg = internalState.peekFreeRegister();
-    Register stackPointer = internalState.peekFreeRegister(); //GET SP
+    int offsetSize = type.getType().getSize();
+    StrType storeType = offsetSize == BYTE_SIZE ? StrType.STRB : StrType.STR;
 
-    internalState.addInstruction(new StrInstruction(StrType.STR, destReg, stackPointer, 0));
+    currSymTable.setOffset(identifier.getIdentifier(), internalState.getArgStackOffset());
+    internalState.incrementArgStackOffset(offsetSize);
+    Register destReg = internalState.peekFreeRegister();
+
+    internalState.addInstruction(new StrInstruction(storeType, destReg, Register.SP, 0));
   }
 
   @Override

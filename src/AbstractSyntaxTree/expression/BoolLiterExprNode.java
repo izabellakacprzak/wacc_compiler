@@ -41,9 +41,4 @@ public class BoolLiterExprNode extends ExpressionNode {
   public String toString() {
     return Boolean.toString(value);
   }
-
-  @Override
-  public void incrementStackOffset(int size) {
-    currSymTable.incrementArgStackOffset(size);
-  }
 }

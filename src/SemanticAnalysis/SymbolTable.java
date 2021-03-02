@@ -7,7 +7,7 @@ public class SymbolTable {
 
   private final SymbolTable parentSymTable;
   private final Map<String, Identifier> dictionary = new HashMap<>();
-  int argStackOffset = 0;
+  private final Map<String, Integer> offsetPerVar = new HashMap<>();
 
   public SymbolTable(SymbolTable parentSymTable) {
     this.parentSymTable = parentSymTable;
@@ -38,8 +38,12 @@ public class SymbolTable {
     return parentSymTable == null;
   }
 
-  public void incrementArgStackOffset(int argSize) {
-    argStackOffset += argSize;
+  public void setOffset (String id, Integer offset) {
+    offsetPerVar.put(id, offset);
+  }
+
+  public int getOffset (String id) {
+    return offsetPerVar.get(id);
   }
 
   //TODO in case size is not correct, check values() vs keys()

@@ -74,12 +74,4 @@ public class IdentifierNode extends ExpressionNode {
   public String toString() {
     return identifier;
   }
-
-  @Override
-  public void incrementStackOffset(int size) {
-    currSymTable.incrementArgStackOffset(size);
-  }
-
-
-
 }

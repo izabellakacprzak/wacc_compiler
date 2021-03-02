@@ -18,5 +18,4 @@ public abstract class ExpressionNode extends AssignRHSNode {
   @Override
   public abstract String toString();
 
-  public abstract void incrementStackOffset(int size);
 }

@@ -40,9 +40,4 @@ public class IntLiterExprNode extends ExpressionNode {
   public String toString() {
     return Integer.toString(value);
   }
-
-  @Override
-  public void incrementStackOffset(int size) {
-    currSymTable.incrementArgStackOffset(size);
-  }
 }
