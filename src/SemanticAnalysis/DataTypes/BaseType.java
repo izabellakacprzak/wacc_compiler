@@ -6,6 +6,7 @@ public class BaseType extends DataTypeId {
   private static final int INT_BYTES_SIZE = 4;
   private static final int BOOL_BYTES_SIZE = 1;
   private static final int CHAR_BYTES_SIZE = 1;
+  private static final int ADDRESS_BYTES_SIZE = 4;
   /* type: BaseType.Type enum corresponding to the base type this represents */
   private final Type type;
 
@@ -43,8 +44,7 @@ public class BaseType extends DataTypeId {
       case CHAR:
         return CHAR_BYTES_SIZE;
       case STRING:
-        //TODO do you need to eval string size tho?string array[] = char array[][] ??
-        return 0;
+        return ADDRESS_BYTES_SIZE;
       default:
         return 0;
     }

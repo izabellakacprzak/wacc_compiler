@@ -25,8 +25,8 @@ public class FuncCallNode extends AssignRHSNode {
    *               passed into the function call */
   private final IdentifierNode identifier;
   private final List<ExpressionNode> arguments;
+  private final int MAX_DEALLOCATION_SIZE = 1024;
   private SymbolTable currSymTable = null;
-
 
   public FuncCallNode(int line, int charPositionInLine, IdentifierNode identifier,
                       List<ExpressionNode> arguments) {
@@ -105,42 +105,42 @@ public class FuncCallNode extends AssignRHSNode {
     // calculate total arguments size in argsTotalSize
     int argsTotalSize = 0;
 
-    // TODO avoid creating a new object for the SP here, should point to the same obj in all classes!!
-    // should not be created in this class at all in the first place!!
-    Register spReg = Register.SP;
     // arguments are stored in decreasing order they are given in the code
     for (int i = arguments.size() - 1; i >= 0; i--) {
       // get argument, calculate size and add it to argsTotalSize
       ExpressionNode currArg = arguments.get(i);
       int argSize = currArg.getType(currSymTable).getSize();
       argsTotalSize += argSize;
+
+      internalState.incrementArgStackOffset(argSize);
       // generate assembly code for the current argument
       currArg.generateAssembly(internalState);
 
-      //TODO do you need to store the argument stack offset in the symbol table??
       StrType strInstr = (argSize == 1) ? StrType.STR : StrType.STRB;
 
       //store currArg on the stack and decrease stack pointer (stack grows downwards)
-      internalState.addInstruction(
-          new StrInstruction(strInstr, internalState.peekFreeRegister(), spReg, -argSize));
+      StrInstruction strInstruction = new StrInstruction(strInstr, internalState.peekFreeRegister(),
+          Register.SP, -argSize);
+      strInstruction.useExclamation();
+      internalState.addInstruction(strInstruction);
     }
+
 
     //Branch Instruction to the callee label
     String functionLabel = "f_" + identifier.toString();
     internalState.addInstruction(new BranchInstruction(
         ConditionCode.L, BranchOperation.B, functionLabel));
 
-    //TODO what is stack max size? 1MB? what if argsTotalSize > stack size??
-    //deallocate stack from the function arguments
-    internalState.addInstruction(
-        new ArithmeticInstruction(ArithmeticOperation.ADD, spReg, spReg, new Operand(argsTotalSize),
-            false));
-
-    //TODO change this R0 declaration too...
-    Register r0Reg = Register.R0;
+    //de-allocate stack from the function arguments. Max size for one de-allocation is 1024B
+    while (argsTotalSize > 0) {
+      internalState.addInstruction(
+          new ArithmeticInstruction(ArithmeticOperation.ADD, Register.SP, Register.SP, new Operand(Math.min(argsTotalSize, MAX_DEALLOCATION_SIZE)),
+              false));
+      argsTotalSize -= Math.min(argsTotalSize, MAX_DEALLOCATION_SIZE);
+    }
 
     //move the result stored in R0 in the first free register
-    internalState.addInstruction(new MovInstruction(internalState.peekFreeRegister(), r0Reg));
+    internalState.addInstruction(new MovInstruction(internalState.peekFreeRegister(), Register.R0));
   }
 
   /* Return the return type of the function */

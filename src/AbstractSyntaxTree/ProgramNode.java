@@ -13,10 +13,13 @@ import InternalRepresentation.Instructions.LabelInstruction;
 import InternalRepresentation.Instructions.LdrInstruction;
 import InternalRepresentation.Instructions.PopInstruction;
 import InternalRepresentation.Instructions.PushInstruction;
+import InternalRepresentation.Enums.Directive;
+import InternalRepresentation.Enums.LdrType;
 import InternalRepresentation.InternalState;
 import InternalRepresentation.Operand;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +62,7 @@ public class ProgramNode implements ASTNode {
         /* A function with the same name has already been declared */
         IdentifierNode id = func.getIdentifierNode();
         errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
-            + " Function '" + func + "' has already been declared.");
+                              + " Function '" + func + "' has already been declared.");
 
       } else {
         /* Create function identifier and add it to the topSymbolTable */
@@ -79,18 +82,25 @@ public class ProgramNode implements ASTNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    for(FunctionNode function : functionNodes) {
-      function.generateAssembly(internalState);
+    // generate assembly code for all function nodes
+    for (FunctionNode functionNode : functionNodes) {
+      functionNode.generateAssembly(internalState);
     }
 
+    // add main label and push Link Register
     internalState.addInstruction(new LabelInstruction("main"));
-    // TODO: subtract offset from SP
-    internalState.addInstruction(new PushInstruction(LR));
-    statementNode.generateAssembly(internalState);
-    // TODO: add offset to SP
+    internalState.addInstruction(new PushInstruction(Register.LR));
 
-    internalState.addInstruction(new LdrInstruction(LDR, R0, 0));
-    internalState.addInstruction(new PopInstruction(PC));
-    internalState.addInstruction(new DirectiveInstruction(LTORG));
+    //TODO allocate stack space for variables. How to get the var symbol table??
+    // TODO size should include function calls params sizes ???????
+    internalState.allocateStackSpace(statementNode.getCurrSymTable());
+
+    statementNode.generateAssembly(internalState);
+
+    internalState.deallocateStackSpace(statementNode.getCurrSymTable());
+
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR, Register.R0, 0));
+    internalState.addInstruction(new PopInstruction(Register.PC));
+    internalState.addInstruction(new DirectiveInstruction(Directive.LTORG));
   }
 }

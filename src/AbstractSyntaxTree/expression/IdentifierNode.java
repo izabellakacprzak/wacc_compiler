@@ -8,6 +8,7 @@ import SemanticAnalysis.Identifier;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
 import SemanticAnalysis.VariableId;
+
 import java.util.List;
 
 public class IdentifierNode extends ExpressionNode {
@@ -33,11 +34,11 @@ public class IdentifierNode extends ExpressionNode {
 
     if (id == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Identifier '" + identifier + "' has not been declared.");
+                            + " Identifier '" + identifier + "' has not been declared.");
     } else if (!(id instanceof VariableId) && !(id instanceof ParameterId)) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Identifier '" + identifier + "' is referenced incorrectly."
-          + " Expected: VARIABLE IDENTIFIER, PARAMETER IDENTIFIER");
+                            + " Identifier '" + identifier + "' is referenced incorrectly."
+                            + " Expected: VARIABLE IDENTIFIER, PARAMETER IDENTIFIER");
     }
     currSymTable = symbolTable;
   }

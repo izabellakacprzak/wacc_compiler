@@ -63,4 +63,9 @@ public class StatementsListNode extends StatementNode {
     }
     return true;
   }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
 }

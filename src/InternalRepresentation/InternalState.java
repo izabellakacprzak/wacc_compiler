@@ -7,12 +7,15 @@ import AbstractSyntaxTree.ProgramNode;
 import InternalRepresentation.Enums.BuiltInFunction;
 import InternalRepresentation.Instructions.BuiltInLabelInstruction;
 import InternalRepresentation.Instructions.DirectiveInstruction;
+import InternalRepresentation.Enums.ArithmeticOperation;
+import InternalRepresentation.Instructions.ArithmeticInstruction;
 import InternalRepresentation.Instructions.Instruction;
 
 import InternalRepresentation.Instructions.LabelInstruction;
 import InternalRepresentation.Instructions.LineBreak;
 import InternalRepresentation.Instructions.MsgInstruction;
 import InternalRepresentation.Enums.Register;
+import SemanticAnalysis.SymbolTable;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -24,11 +27,11 @@ public class InternalState {
   private final Set<String> declaredLabels;
   private final List<Instruction> generatedInstructions;
   private final List<BuiltInLabelInstruction> builtInLabels;
+  private final int MAX_STACK_ARITHMETIC_SIZE = 1024;
   private Stack<Register> availableRegs;
   private int labelCount;
   private Register prevResult;
-
-
+  int argStackOffset = 0;
 
   public InternalState() {
     // setup stack function
@@ -101,8 +104,8 @@ public class InternalState {
   }
 
   //public Register popFreeRegister() {
-   // return availableRegs.pop();
- // }
+  // return availableRegs.pop();
+  // }
 
 
   public Register popFreeRegister() {
@@ -167,5 +170,31 @@ public class InternalState {
 
   public void addBuiltInLabel(BuiltInFunction function) {
     function.setUsed();
+  }
+
+  public void allocateStackSpace(SymbolTable symbolTable) {
+    int size = symbolTable.getVarsSize();
+    while (size > 0) {
+      addInstruction(new ArithmeticInstruction(ArithmeticOperation.SUB, SP, SP,
+          new Operand(Math.min(size, MAX_STACK_ARITHMETIC_SIZE)), false));
+      size -= Math.min(size, MAX_STACK_ARITHMETIC_SIZE);
+    }
+  }
+
+  public void deallocateStackSpace(SymbolTable symbolTable) {
+    int size = symbolTable.getVarsSize();
+    while (size > 0) {
+      addInstruction(new ArithmeticInstruction(ArithmeticOperation.ADD, SP, SP,
+          new Operand(Math.min(size, MAX_STACK_ARITHMETIC_SIZE)), false));
+      size -= Math.min(size, MAX_STACK_ARITHMETIC_SIZE);
+    }
+  }
+
+  public void incrementArgStackOffset(int argSize) {
+    argStackOffset += argSize;
+  }
+
+  public int getArgStackOffset() {
+    return argStackOffset;
   }
 }

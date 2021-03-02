@@ -9,6 +9,7 @@ import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.List;
 
 public class WhileStatementNode extends StatementNode {
@@ -33,13 +34,13 @@ public class WhileStatementNode extends StatementNode {
 
     if (conditionType == null) {
       errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
-          + " Could not resolve type of '" + condition + "'."
-          + " Expected: BOOL");
+                            + " Could not resolve type of '" + condition + "'."
+                            + " Expected: BOOL");
 
     } else if (!conditionType.equals(new BaseType(BaseType.Type.BOOL))) {
       errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
-          + " Incompatible type for 'If' condition."
-          + " Expected: BOOL Actual: " + conditionType);
+                            + " Incompatible type for 'If' condition."
+                            + " Expected: BOOL Actual: " + conditionType);
     }
 
     /* Recursively call semanticAnalysis on statement node */
@@ -84,5 +85,10 @@ public class WhileStatementNode extends StatementNode {
   @Override
   public boolean hasExitStatement() {
     return statement.hasExitStatement();
+  }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
   }
 }

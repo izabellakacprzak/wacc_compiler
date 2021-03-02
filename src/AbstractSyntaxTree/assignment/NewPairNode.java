@@ -37,25 +37,25 @@ public class NewPairNode extends AssignRHSNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    //TODO don't create new obj for R0
-    Register r0Reg = Register.R0;
 
     internalState
-        .addInstruction(new LdrInstruction(LdrType.LDR, r0Reg, NO_OF_ELEMS * ADDRESS_BYTES_SIZE));
+        .addInstruction(new LdrInstruction(LdrType.LDR,  Register.R0, NO_OF_ELEMS * ADDRESS_BYTES_SIZE));
     //BL malloc
     internalState.addInstruction(new BranchInstruction(
         ConditionCode.L, BranchOperation.B, "malloc"));
 
     Register reg = internalState.popFreeRegister();
 
-    internalState.addInstruction(new MovInstruction(reg, r0Reg));
+    internalState.addInstruction(new MovInstruction(reg,  Register.R0));
+
+    //TODO move duplicate code to a new func after moving all generating assembly funcs to a new class
 
     /* begin fstExpr code generation */
     fstExpr.generateAssembly(internalState);
 
     // load fstExpr type size into R0
     int fstSize = fstExpr.getType(currSymTable).getSize();
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, r0Reg, fstSize));
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR,  Register.R0, fstSize));
 
     // BL malloc
     internalState.addInstruction(new BranchInstruction(
@@ -63,10 +63,10 @@ public class NewPairNode extends AssignRHSNode {
 
     StrType strInstr1 = (fstSize == 1) ? StrType.STRB : StrType.STR;
     internalState
-        .addInstruction(new StrInstruction(strInstr1, internalState.peekFreeRegister(), r0Reg));
+        .addInstruction(new StrInstruction(strInstr1, internalState.peekFreeRegister(),  Register.R0));
 
     internalState.addInstruction(
-        new StrInstruction(StrType.STR, r0Reg, internalState.peekFreeRegister(), 0));
+        new StrInstruction(StrType.STR,  Register.R0, internalState.peekFreeRegister(), 0));
     /* end fstExpr code generation */
 
     /* begin sndExpr code generation */
@@ -74,7 +74,7 @@ public class NewPairNode extends AssignRHSNode {
 
     // load fstExpr type size into R0
     int sndSize = sndExpr.getType(currSymTable).getSize();
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, r0Reg, sndSize));
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR,  Register.R0, sndSize));
 
     // BL malloc
     internalState.addInstruction(new BranchInstruction(
@@ -82,10 +82,10 @@ public class NewPairNode extends AssignRHSNode {
 
     StrType strInstr2 = (fstSize == 1) ? StrType.STRB : StrType.STR;
     internalState
-        .addInstruction(new StrInstruction(strInstr2, internalState.peekFreeRegister(), r0Reg));
+        .addInstruction(new StrInstruction(strInstr2, internalState.peekFreeRegister(),  Register.R0));
 
     internalState.addInstruction(
-        new StrInstruction(StrType.STR, r0Reg, internalState.peekFreeRegister(),
+        new StrInstruction(StrType.STR,  Register.R0, internalState.peekFreeRegister(),
             ADDRESS_BYTES_SIZE));
     /* end sndExpr code generation */
 

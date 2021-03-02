@@ -52,14 +52,11 @@ public class ReturnStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    Register destReg = internalState.peekFreeRegister(); // get R0
     Register returnStatReg = internalState.peekFreeRegister();
-
     returnExpr.generateAssembly(internalState);
-    Register progCounter = internalState.peekFreeRegister(); // get PC
 
-    internalState.addInstruction(new MovInstruction(destReg, returnStatReg));
-    internalState.addInstruction(new PopInstruction(progCounter));
+    internalState.addInstruction(new MovInstruction(Register.R0, returnStatReg));
+    internalState.addInstruction(new PopInstruction(Register.PC));
   }
 
   /* Sets the function expected returnType  */
@@ -73,5 +70,10 @@ public class ReturnStatementNode extends StatementNode {
   @Override
   public boolean hasReturnStatement() {
     return true;
+  }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
   }
 }

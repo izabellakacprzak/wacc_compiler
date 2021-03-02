@@ -45,4 +45,9 @@ public class FreeStatementNode extends StatementNode {
     expression.generateAssembly(internalState);
     // use built in
   }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
 }
