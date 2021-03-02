@@ -32,6 +32,7 @@ public class ReadStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Recursively call semanticAnalysis on assignment node */
     assignment.semanticAnalysis(symbolTable, errorMessages);
 
@@ -49,7 +50,6 @@ public class ReadStatementNode extends StatementNode {
           + " Incompatible type for 'read' statement."
           + " Expected: INT, CHAR Actual: " + assignmentType);
     }
-    currSymTable = symbolTable;
   }
 
   @Override

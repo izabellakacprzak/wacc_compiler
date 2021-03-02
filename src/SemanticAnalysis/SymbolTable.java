@@ -38,11 +38,17 @@ public class SymbolTable {
     return parentSymTable == null;
   }
 
-  public void setOffset (String id, Integer offset) {
+  public void setOffset(String id, Integer offset) {
     offsetPerVar.put(id, offset);
   }
 
-  public int getOffset (String id) {
+  public int getOffset(String id) {
+    if (parentSymTable == null && !offsetPerVar.containsKey(id)) {
+      return 0;
+    }
+    if (!offsetPerVar.containsKey(id)) {
+      return parentSymTable.getOffset(id);
+    }
     return offsetPerVar.get(id);
   }
 

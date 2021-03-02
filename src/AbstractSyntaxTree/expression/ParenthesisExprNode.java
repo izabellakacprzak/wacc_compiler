@@ -18,9 +18,9 @@ public class ParenthesisExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Recursively call semanticAnalysis on expression node */
     innerExpr.semanticAnalysis(symbolTable, errorMessages);
-    currSymTable = symbolTable;
   }
 
   @Override

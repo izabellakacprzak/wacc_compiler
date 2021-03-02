@@ -17,9 +17,9 @@ public class NewScopeStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Recursively call semanticAnalysis on statement node */
     statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
-    currSymTable = symbolTable;
   }
 
   @Override

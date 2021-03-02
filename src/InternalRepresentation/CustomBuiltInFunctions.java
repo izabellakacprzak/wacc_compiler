@@ -54,9 +54,6 @@ public class CustomBuiltInFunctions {
         generatePrint(type, instructions);
     }
 
-    instructions.add(new MovInstruction(R0, 0));
-    instructions.add(new BranchInstruction(BL, FFLUSH.getMessage()));
-    instructions.add(new PopInstruction(PC));
     return instructions;
   }
 
@@ -189,7 +186,7 @@ public class CustomBuiltInFunctions {
 
   private void generatePrintString(List<Instruction> instructions) {
     instructions.add(new LdrInstruction(LDR, R1, R0));
-    instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
+    instructions.add(new ArithmeticInstruction(ADD, R2, R0, new Operand(4), false));
     instructions.add(new LdrInstruction(LDR, R0, new MsgInstruction("%.*s\\0")));
     instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
     instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));

@@ -45,6 +45,7 @@ public class PairElemNode extends AssignRHSNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Recursively call semanticAnalysis on expression node */
     expression.semanticAnalysis(symbolTable, errorMessages);
 
@@ -68,7 +69,6 @@ public class PairElemNode extends AssignRHSNode {
                             + " Incompatible type of '" + expression + "'. "
                             + " Expected: PAIR Actual: " + expectedType);
     }
-    currSymTable = symbolTable;
   }
 
   @Override

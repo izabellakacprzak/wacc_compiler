@@ -15,8 +15,8 @@ public class MsgInstruction implements Instruction{
   public MsgInstruction(int length, String value) {
     this.length = new DirectiveInstruction(Directive.WORD, String.valueOf(length));
     this.value = new DirectiveInstruction(Directive.ASCII, value);
-    MsgInstruction.messages.add(this);
     this.index = messages.size();
+    MsgInstruction.messages.add(this);
   }
 
   public MsgInstruction(String value) {

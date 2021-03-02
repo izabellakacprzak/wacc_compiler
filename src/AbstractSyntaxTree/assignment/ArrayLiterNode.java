@@ -23,6 +23,7 @@ public class ArrayLiterNode extends AssignRHSNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* If there are no expressions, then ARRAY literal is empty */
     if (expressions.isEmpty()) {
       return;
@@ -60,14 +61,14 @@ public class ArrayLiterNode extends AssignRHSNode {
       /* Recursively call semanticAnalysis on each expression node */
       currExpr.semanticAnalysis(symbolTable, errorMessages);
     }
-    currSymTable = symbolTable;
+
   }
 
   @Override
   public void generateAssembly(InternalState internalState) {
     // get the size of the array elements type
     DataTypeId type = ((ArrayType) this.getType(currSymTable)).getElemType();
-    int arrElemSize = type.getSize();
+    int arrElemSize = (type != null ) ? type.getSize() : 0;
 
     // load array size in R0
     int arrSize = expressions.size() * arrElemSize + INT_BYTES_SIZE;

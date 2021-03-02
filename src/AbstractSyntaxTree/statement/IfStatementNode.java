@@ -30,6 +30,7 @@ public class IfStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Recursively call semanticAnalysis on condition node */
     condition.semanticAnalysis(symbolTable, errorMessages);
 
@@ -50,7 +51,6 @@ public class IfStatementNode extends StatementNode {
     /* Recursively call semanticAnalysis on statement nodes */
     thenStatement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
     elseStatement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
-    currSymTable = symbolTable;
   }
 
   @Override

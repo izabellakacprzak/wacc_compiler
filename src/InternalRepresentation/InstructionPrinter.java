@@ -1,11 +1,6 @@
 package InternalRepresentation;
 
-import InternalRepresentation.Enums.ArithmeticOperation;
-import InternalRepresentation.Enums.ConditionCode;
-import InternalRepresentation.Enums.LdrType;
-import InternalRepresentation.Enums.LogicalOperation;
-import InternalRepresentation.Enums.Register;
-import InternalRepresentation.Enums.StrType;
+import InternalRepresentation.Enums.*;
 
 import java.util.List;
 
@@ -32,8 +27,8 @@ public class InstructionPrinter {
     return "CMP " + operand1.getRegName() + ", " + operand2.toString() + "\n";
   }
 
-  public String printBranch(List<ConditionCode> conditionCodes, String label) {
-    StringBuilder instruction = new StringBuilder("B");
+  public String printBranch(BranchOperation operation, List<ConditionCode> conditionCodes, String label) {
+    StringBuilder instruction = new StringBuilder(operation.toString());
     if (conditionCodes != null) {
       for (ConditionCode conditionCode : conditionCodes) {
         instruction.append(conditionCode.getCondName());

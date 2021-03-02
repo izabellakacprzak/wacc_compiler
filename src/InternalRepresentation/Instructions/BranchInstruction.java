@@ -37,7 +37,7 @@ public class BranchInstruction implements Instruction {
 
   @Override
   public String writeInstruction() {
-    return printer.printBranch(conditionCodes, label);
+    return printer.printBranch(operation, conditionCodes, label);
   }
 
 }

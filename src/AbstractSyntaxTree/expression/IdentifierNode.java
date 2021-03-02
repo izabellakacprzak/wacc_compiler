@@ -1,5 +1,7 @@
 package AbstractSyntaxTree.expression;
 
+import InternalRepresentation.Enums.LdrType;
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Instructions.LdrInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
@@ -28,6 +30,7 @@ public class IdentifierNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Check that the identifier has been declared as either a ParameterId or VariableId.
      * FunctionId identifiers do not call this function */
     Identifier id = symbolTable.lookupAll(identifier);
@@ -40,13 +43,22 @@ public class IdentifierNode extends ExpressionNode {
                             + " Identifier '" + identifier + "' is referenced incorrectly."
                             + " Expected: VARIABLE IDENTIFIER, PARAMETER IDENTIFIER");
     }
-    currSymTable = symbolTable;
   }
 
   @Override
   public void generateAssembly(InternalState internalState) {
     // get offset from symbolTable of variable and store that in available reg
-    // internalState.addInstruction(new LdrInstruction());
+    if (currSymTable == null) {
+      return;
+    }
+    Identifier id = currSymTable.lookupAll(identifier);
+    if (id == null) {
+      return;
+    }
+    int offset = currSymTable.getOffset(getIdentifier());
+    Register reg = internalState.peekFreeRegister();
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR, reg, Register.SP, offset));
+    internalState.setPrevResult(reg);
   }
 
   @Override

@@ -26,6 +26,7 @@ public class WhileStatementNode extends StatementNode {
   }
 
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Recursively call semanticAnalysis on condition node */
     condition.semanticAnalysis(symbolTable, errorMessages);
 
@@ -45,7 +46,6 @@ public class WhileStatementNode extends StatementNode {
 
     /* Recursively call semanticAnalysis on statement node */
     statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
-    currSymTable = symbolTable;
   }
 
   @Override

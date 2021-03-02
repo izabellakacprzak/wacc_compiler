@@ -44,6 +44,7 @@ public class UnaryOpExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Recursively call semanticAnalysis on operand node */
     operand.semanticAnalysis(symbolTable, errorMessages);
 
@@ -81,7 +82,6 @@ public class UnaryOpExprNode extends ExpressionNode {
           + " Incompatible type for '" + operator.getLabel() + "' operator."
           + " Expected: ARRAY Actual: " + opType);
     }
-    currSymTable = symbolTable;
   }
 
   @Override

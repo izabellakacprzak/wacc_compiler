@@ -17,11 +17,11 @@ public class StatementsListNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Recursively call semanticAnalysis on each stored statement node */
     for (StatementNode stat : statements) {
       stat.semanticAnalysis(symbolTable, errorMessages);
     }
-    currSymTable = symbolTable;
   }
 
   @Override

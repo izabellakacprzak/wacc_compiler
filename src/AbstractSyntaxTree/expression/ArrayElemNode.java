@@ -20,6 +20,7 @@ import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.List;
 
 public class ArrayElemNode extends ExpressionNode {
@@ -31,7 +32,7 @@ public class ArrayElemNode extends ExpressionNode {
   private SymbolTable currSymTable = null;
 
   public ArrayElemNode(int line, int charPositionInLine, IdentifierNode identifier,
-      List<ExpressionNode> expressions) {
+                       List<ExpressionNode> expressions) {
     super(line, charPositionInLine);
     this.identifier = identifier;
     this.expressions = expressions;
@@ -39,6 +40,7 @@ public class ArrayElemNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Recursively call semanticAnalysis on stored nodes */
     identifier.semanticAnalysis(symbolTable, errorMessages);
 
@@ -51,16 +53,16 @@ public class ArrayElemNode extends ExpressionNode {
 
     if (idType == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " No declaration of '" + identifier.getIdentifier() + "' identifier."
-          + " Expected: ARRAY IDENTIFIER.");
+                            + " No declaration of '" + identifier.getIdentifier() + "' identifier."
+                            + " Expected: ARRAY IDENTIFIER.");
       return;
     }
 
     if (!(identifier.getType(symbolTable) instanceof ArrayType)) {
       System.out.println(identifier);
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
-          + " Expected: ARRAY IDENTIFIER Actual: " + idType);
+                            + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
+                            + " Expected: ARRAY IDENTIFIER Actual: " + idType);
       return;
     }
 
@@ -71,18 +73,17 @@ public class ArrayElemNode extends ExpressionNode {
 
       if (thisType == null) {
         errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-            + " Could not resolve type of '" + expression + "' in ARRAY ELEM."
-            + " Expected: INT");
+                              + " Could not resolve type of '" + expression + "' in ARRAY ELEM."
+                              + " Expected: INT");
         break;
       }
 
       if (!thisType.equals(new BaseType(BaseType.Type.INT))) {
         errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-            + " Incompatible type of '" + expression + "' in ARRAY ELEM."
-            + " Expected: INT Actual: " + thisType);
+                              + " Incompatible type of '" + expression + "' in ARRAY ELEM."
+                              + " Expected: INT Actual: " + thisType);
       }
     }
-    currSymTable = symbolTable;
   }
 
   @Override
@@ -91,17 +92,18 @@ public class ArrayElemNode extends ExpressionNode {
     Register arrayReg = internalState.popFreeRegister();
     // put address of array into register
     // TODO: get offset of array
-    Operand offset = null;
-    internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, SP, offset, false));
+    int offset = currSymTable.getOffset(identifier.getIdentifier());
+    internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, SP, new Operand(offset), false));
     // evaluate each index expression
     Register exprReg = null;
-    for(ExpressionNode expression : expressions) {
+    for (ExpressionNode expression : expressions) {
       generateElemAddr(internalState, expression, arrayReg);
     }
+    internalState.pushFreeRegister(arrayReg);
   }
 
   private void generateElemAddr(InternalState internalState, ExpressionNode expression,
-      Register arrayReg) {
+                                Register arrayReg) {
     expression.generateAssembly(internalState);
     Register exprReg = internalState.getPrevResult();
     internalState.addInstruction(new LdrInstruction(LDR, arrayReg, arrayReg));

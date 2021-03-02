@@ -33,6 +33,7 @@ public class DeclarationStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Check whether identifier has been previously declared as another variable in the current scope.
      * If not, add a new VariableId to the symbol table under identifier */
     if (symbolTable.lookup(identifier.getIdentifier()) != null) {
@@ -70,7 +71,6 @@ public class DeclarationStatementNode extends StatementNode {
     /* Recursively call semanticAnalysis on stored nodes */
     identifier.semanticAnalysis(symbolTable, errorMessages);
     assignment.semanticAnalysis(symbolTable, errorMessages);
-    currSymTable = symbolTable;
   }
 
   @Override

@@ -50,6 +50,7 @@ public class AssignVarNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Recursively call semanticAnalysis on LHS node */
     left.semanticAnalysis(symbolTable, errorMessages);
     right.semanticAnalysis(symbolTable, errorMessages);
@@ -74,7 +75,6 @@ public class AssignVarNode extends StatementNode {
                             + " RHS type does not match LHS type for assignment. "
                             + " Expected: " + leftType + " Actual: " + rightType);
     }
-    currSymTable = symbolTable;
   }
 
   @Override

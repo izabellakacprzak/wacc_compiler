@@ -23,6 +23,7 @@ public class ReturnStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Recursively call semanticAnalysis on expression node */
     returnExpr.semanticAnalysis(symbolTable, errorMessages);
 
@@ -47,7 +48,6 @@ public class ReturnStatementNode extends StatementNode {
           + " Declared return type does not match 'return' statement type."
           + " Expected: " + returnType + " Actual: " + returnExprType);
     }
-    currSymTable = symbolTable;
   }
 
   @Override

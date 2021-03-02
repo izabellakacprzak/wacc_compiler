@@ -93,11 +93,13 @@ public class ProgramNode implements ASTNode {
 
     //TODO allocate stack space for variables. How to get the var symbol table??
     // TODO size should include function calls params sizes ???????
-    internalState.allocateStackSpace(statementNode.getCurrSymTable());
+    if (statementNode.getCurrSymTable() != null)
+      internalState.allocateStackSpace(statementNode.getCurrSymTable());
 
     statementNode.generateAssembly(internalState);
 
-    internalState.deallocateStackSpace(statementNode.getCurrSymTable());
+    if (statementNode.getCurrSymTable() != null)
+      internalState.deallocateStackSpace(statementNode.getCurrSymTable());
 
     internalState.addInstruction(new LdrInstruction(LdrType.LDR, Register.R0, 0));
     internalState.addInstruction(new PopInstruction(Register.PC));

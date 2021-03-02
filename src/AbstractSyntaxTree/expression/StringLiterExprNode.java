@@ -28,7 +28,7 @@ public class StringLiterExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    Register currDestination = internalState.popFreeRegister();
+    Register currDestination = internalState.peekFreeRegister();
     internalState.setPrevResult(currDestination);
     internalState.addInstruction(new LdrInstruction(LdrType.LDR, currDestination,
         new MsgInstruction(value)));

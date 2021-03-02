@@ -54,6 +54,7 @@ public class BinaryOpExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Recursively call semanticAnalysis on assignment nodes */
     left.semanticAnalysis(symbolTable, errorMessages);
     right.semanticAnalysis(symbolTable, errorMessages);
@@ -122,7 +123,6 @@ public class BinaryOpExprNode extends ExpressionNode {
           + " RHS type does not match LHS type for '" + operator.getLabel() + "' operator. "
           + "Expected: " + lhsType + " Actual: " + rhsType);
     }
-    currSymTable = symbolTable;
   }
 
   @Override

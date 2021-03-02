@@ -26,9 +26,9 @@ public class PrintLineStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Recursively call semanticAnalysis on expression node */
     expression.semanticAnalysis(symbolTable, errorMessages);
-    currSymTable = symbolTable;
   }
 
   @Override

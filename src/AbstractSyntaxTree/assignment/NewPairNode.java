@@ -29,10 +29,10 @@ public class NewPairNode extends AssignRHSNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Recursively call semanticAnalysis on expression nodes */
     fstExpr.semanticAnalysis(symbolTable, errorMessages);
     sndExpr.semanticAnalysis(symbolTable, errorMessages);
-    currSymTable = symbolTable;
   }
 
   @Override

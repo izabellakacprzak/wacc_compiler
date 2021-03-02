@@ -46,6 +46,7 @@ public class FuncCallNode extends AssignRHSNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
     /* Check that the function has been previously declared as a FunctionId with its identifier */
     Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
 
@@ -97,7 +98,7 @@ public class FuncCallNode extends AssignRHSNode {
                               + " Expected: " + currParamType + " Actual: " + currArg);
       }
     }
-    currSymTable = symbolTable;
+
   }
 
   @Override
