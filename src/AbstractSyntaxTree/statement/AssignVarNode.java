@@ -5,9 +5,8 @@ import AbstractSyntaxTree.assignment.AssignRHSNode;
 import AbstractSyntaxTree.assignment.PairElemNode;
 import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
-import InternalRepresentation.Enums.LdrType;
-import InternalRepresentation.Enums.Register;
-import InternalRepresentation.Enums.StrType;
+import InternalRepresentation.Enums.*;
+import InternalRepresentation.Instructions.BranchInstruction;
 import InternalRepresentation.Instructions.LdrInstruction;
 import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.Instructions.StrInstruction;
@@ -16,6 +15,8 @@ import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
+
+import static InternalRepresentation.Enums.ConditionCode.VS;
 
 public class AssignVarNode extends StatementNode {
 
@@ -97,7 +98,9 @@ public class AssignVarNode extends StatementNode {
 
       internalState.addInstruction(new LdrInstruction(LdrType.LDR, leftNodeResult, Register.SP, offset));
       internalState.addInstruction(new MovInstruction(Register.R0, leftNodeResult));
-      // TODO: BUILT IN NULL PTR CHECK
+
+      BuiltInFunction.NULL_POINTER.setUsed();
+      internalState.addInstruction(new BranchInstruction(BranchOperation.BL, BuiltInFunction.NULL_POINTER.getLabel()));
 
       internalState.addInstruction(new LdrInstruction(LdrType.LDR, leftNodeResult, leftNodeResult,
               pairElem.getPosition() * ADDRESS_BYTE_SIZE));
@@ -112,7 +115,7 @@ public class AssignVarNode extends StatementNode {
       Register rightNodeResult = internalState.popFreeRegister();
       Register arrayReg = internalState.popFreeRegister();
 
-      // TODO: get ARRAY ELEM ADDR
+      // TODO: arrayElem.generateElemAddr(internalState, left, arrayReg);
 
       StrType strType = arrayElem.getType(currSymTable).getSize() == BYTE_SIZE ? StrType.STRB : StrType.STR;
       internalState.addInstruction(new StrInstruction(strType, rightNodeResult, arrayReg));

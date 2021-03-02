@@ -1,12 +1,17 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.Enums.BranchOperation;
+import InternalRepresentation.Enums.BuiltInFunction;
+import InternalRepresentation.Instructions.BranchInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
+
+import static InternalRepresentation.Enums.ConditionCode.VS;
 
 public class FreeStatementNode extends StatementNode {
 
@@ -43,7 +48,8 @@ public class FreeStatementNode extends StatementNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     expression.generateAssembly(internalState);
-    // use built in
+    BuiltInFunction.FREE_PAIR.setUsed();
+    internalState.addInstruction(new BranchInstruction(BranchOperation.BL, BuiltInFunction.FREE_PAIR.getLabel()));
   }
 
   @Override

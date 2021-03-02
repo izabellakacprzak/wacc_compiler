@@ -1,7 +1,16 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
+import InternalRepresentation.Enums.BranchOperation;
+import InternalRepresentation.Enums.BuiltInFunction;
+import InternalRepresentation.Enums.Register;
+import InternalRepresentation.Instructions.BranchInstruction;
+import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
+import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.ArrayType;
+import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
@@ -24,7 +33,50 @@ public class PrintLineStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    Register nextAvailable = internalState.peekFreeRegister();
+    // TODO: ABSTRACT IN A FUNCTION IN VISITOR
+    internalState.addInstruction(new MovInstruction(Register.R0, nextAvailable));
+    DataTypeId type = expression.getType(currSymTable);
 
+    if (type instanceof ArrayType) {
+      if (((ArrayType) type).getElemType().equals(new BaseType(BaseType.Type.CHAR))) {
+        BuiltInFunction.PRINT_STRING.setUsed();
+        internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
+                BuiltInFunction.PRINT_STRING.getLabel()));
+      } else {
+        BuiltInFunction.PRINT_REFERENCE.setUsed();
+        internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
+                BuiltInFunction.PRINT_REFERENCE.getLabel()));
+      }
+    } else if (type instanceof PairType) {
+      BuiltInFunction.PRINT_REFERENCE.setUsed();
+      internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
+              BuiltInFunction.PRINT_REFERENCE.getLabel()));
+    } else if (type instanceof BaseType) {
+      BaseType.Type baseType = ((BaseType) type).getBaseType();
+      switch (baseType) {
+        case CHAR:
+        case STRING:
+          BuiltInFunction.PRINT_STRING.setUsed();
+          internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
+                  BuiltInFunction.PRINT_STRING.getLabel()));
+          break;
+        case BOOL:
+          BuiltInFunction.PRINT_BOOL.setUsed();
+          internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
+                  BuiltInFunction.PRINT_BOOL.getLabel()));
+          break;
+        case INT:
+          BuiltInFunction.PRINT_INT.setUsed();
+          internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
+                  BuiltInFunction.PRINT_INT.getLabel()));
+          break;
+      }
+    }
+
+    BuiltInFunction.PRINT_LN.setUsed();
+    internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
+            BuiltInFunction.PRINT_LN.getLabel()));
   }
 
   @Override

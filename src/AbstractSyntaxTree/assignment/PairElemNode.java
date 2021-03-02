@@ -2,10 +2,10 @@ package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
-import InternalRepresentation.Enums.LdrType;
-import InternalRepresentation.Enums.Register;
-import InternalRepresentation.Enums.StrType;
+import InternalRepresentation.Enums.*;
+import InternalRepresentation.Instructions.BranchInstruction;
 import InternalRepresentation.Instructions.LdrInstruction;
+import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.Instructions.StrInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
@@ -74,10 +74,12 @@ public class PairElemNode extends AssignRHSNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     expression.generateAssembly(internalState);
-
-    //TODO insert p_check_null_pointer here + any before or after instructions
-
     Register reg = internalState.peekFreeRegister();
+
+    internalState.addInstruction(new MovInstruction(Register.R0, reg));
+
+    BuiltInFunction.NULL_POINTER.setUsed();
+    internalState.addInstruction(new BranchInstruction(BranchOperation.BL, BuiltInFunction.NULL_POINTER.getLabel()));
     internalState.addInstruction(new LdrInstruction(LdrType.LDR, reg, reg, position * ADDRESS_BYTES_SIZE));
 
     PairType pair = (PairType) expression.getType(currSymTable);
