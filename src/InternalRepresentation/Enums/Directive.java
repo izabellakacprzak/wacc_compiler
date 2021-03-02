@@ -1,3 +1,3 @@
 package InternalRepresentation.Enums;
 
-public enum Directive {LTORG, WORD, ASCII}
+public enum Directive {LTORG, WORD, ASCII, DATA, TEXT, GLOBAL}

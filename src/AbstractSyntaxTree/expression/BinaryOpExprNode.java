@@ -142,14 +142,14 @@ public class BinaryOpExprNode extends ExpressionNode {
         BuiltInFunction.OVERFLOW.setUsed();
         internalState.addInstruction(new BranchInstruction(
             ConditionCode.NE,
-            BranchOperation.BL, BuiltInFunction.OVERFLOW.getMessage()));
+            BranchOperation.BL, BuiltInFunction.OVERFLOW.getLabel()));
         break;
       case DIV:
         internalState.addInstruction(new MovInstruction(R0, leftResult));
         internalState.addInstruction(new MovInstruction(R1, rightResult));
         BuiltInFunction.DIV_ZERO.setUsed();
         internalState.addInstruction(
-            new BranchInstruction(BranchOperation.BL, BuiltInFunction.DIV_ZERO.getMessage()));
+            new BranchInstruction(BranchOperation.BL, BuiltInFunction.DIV_ZERO.getLabel()));
         internalState.addInstruction(
             new BranchInstruction(BranchOperation.BL, SystemBuiltInFunction.IDIV.getMessage()));
         internalState.addInstruction(new MovInstruction(leftResult, R0));
@@ -159,7 +159,7 @@ public class BinaryOpExprNode extends ExpressionNode {
         internalState.addInstruction(new MovInstruction(R1, rightResult));
         BuiltInFunction.DIV_ZERO.setUsed();
         internalState.addInstruction(
-            new BranchInstruction(BranchOperation.BL, BuiltInFunction.DIV_ZERO.getMessage()));
+            new BranchInstruction(BranchOperation.BL, BuiltInFunction.DIV_ZERO.getLabel()));
         internalState.addInstruction(
             new BranchInstruction(BranchOperation.BL, SystemBuiltInFunction.IDIVMOD.getMessage()));
         internalState.addInstruction(new MovInstruction(leftResult, R1));
@@ -170,7 +170,7 @@ public class BinaryOpExprNode extends ExpressionNode {
                 leftResult, leftResult, new Operand(rightResult), true));
         BuiltInFunction.OVERFLOW.setUsed();
         internalState.addInstruction(new BranchInstruction(VS,
-            BranchOperation.BL, BuiltInFunction.OVERFLOW.getMessage()));
+            BranchOperation.BL, BuiltInFunction.OVERFLOW.getLabel()));
         break;
       case MINUS:
         internalState.addInstruction(
@@ -178,7 +178,7 @@ public class BinaryOpExprNode extends ExpressionNode {
                 leftResult, leftResult, new Operand(rightResult), true));
         BuiltInFunction.OVERFLOW.setUsed();
         internalState.addInstruction(new BranchInstruction(VS,
-            BranchOperation.BL, BuiltInFunction.OVERFLOW.getMessage()));
+            BranchOperation.BL, BuiltInFunction.OVERFLOW.getLabel()));
         break;
       case GREATER:
         conditionAssembly(internalState, leftResult, rightResult, GT, LE);

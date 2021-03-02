@@ -1,22 +1,29 @@
 package InternalRepresentation;
 
+import static InternalRepresentation.Enums.Directive.*;
 import static InternalRepresentation.Enums.Register.*;
 
+import AbstractSyntaxTree.ProgramNode;
 import InternalRepresentation.Enums.BuiltInFunction;
+import InternalRepresentation.Instructions.BuiltInLabelInstruction;
+import InternalRepresentation.Instructions.DirectiveInstruction;
 import InternalRepresentation.Instructions.Instruction;
 
 import InternalRepresentation.Instructions.LabelInstruction;
+import InternalRepresentation.Instructions.LineBreak;
 import InternalRepresentation.Instructions.MsgInstruction;
 import InternalRepresentation.Enums.Register;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class InternalState {
 
   private final Set<String> declaredLabels;
   private final List<Instruction> generatedInstructions;
-  private final List<MsgInstruction> messages;
-  private final List<LabelInstruction> builtInLabels;
+  private final List<BuiltInLabelInstruction> builtInLabels;
   private Stack<Register> availableRegs;
   private int labelCount;
   private Register prevResult;
@@ -30,13 +37,57 @@ public class InternalState {
     //TODO change this to a stack!!!!
     declaredLabels = new HashSet<>();
     generatedInstructions = new ArrayList<>();
-    messages = new ArrayList<>();
     prevResult = null;
     builtInLabels = new ArrayList<>();
 
     labelCount = 0;
   }
 
+  public void generateAssembly(File output, ProgramNode programNode) {
+    try {
+      FileWriter writer = new FileWriter(output);
+
+      writer.write(new DirectiveInstruction(DATA).writeInstruction());
+      writer.write(new LineBreak().writeInstruction());
+
+      programNode.generateAssembly(this);
+
+      // add all generated messages
+      for(MsgInstruction msg : MsgInstruction.getMessages()) {
+        writer.write(msg.toString());
+        writer.write(msg.writeInstruction());
+        writer.write(new LineBreak().writeInstruction());
+      }
+
+      writer.write(new LineBreak().writeInstruction());
+      writer.write(new DirectiveInstruction(TEXT).writeInstruction());
+      writer.write(new LineBreak().writeInstruction());
+
+      writer.write(new DirectiveInstruction(GLOBAL, "main").writeInstruction());
+
+      // add all generated instructions
+      for(Instruction instruction : generatedInstructions) {
+        writer.write(instruction.writeInstruction());
+      }
+
+      // add all used built in functions
+      CustomBuiltInFunctions customBuiltInFunctions = new CustomBuiltInFunctions();
+      List<Instruction> instructions;
+
+      for(BuiltInLabelInstruction label : builtInLabels) {
+        writer.write(label.writeInstruction());
+        instructions = customBuiltInFunctions.generateAssembly(label.getFunction());
+        for(Instruction instruction : instructions) {
+          writer.write(instruction.writeInstruction());
+        }
+      }
+
+      writer.close();
+
+    } catch (IOException e) {
+      System.out.println("Could not write to file: " + output.getName());
+    }
+  }
 
   //TODO change the availableRegs list to a stack
   public Register peekFreeRegister() {
@@ -104,12 +155,6 @@ public class InternalState {
     declaredLabels.add(newLabel);
     labelCount++;
     return newLabel;
-  }
-
-  public String getMsg(String value) {
-    MsgInstruction message = new MsgInstruction(value.length() + 1, value);
-    messages.add(message);
-    return "msg_" + (messages.size() - 1);
   }
 
   public Register getPrevResult() {

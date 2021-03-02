@@ -19,7 +19,7 @@ public class DirectiveInstruction implements Instruction {
 
   @Override
   public String writeInstruction() {
-    return "." + type.name().toLowerCase();
+    return "." + type.name().toLowerCase() + " " + value;
   }
 
 }

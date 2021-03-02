@@ -15,10 +15,10 @@ public class LdrInstruction implements Instruction {
   private LdrType type = LdrType.LDR; //default
 
   //SIMPLE INSTR + DST REG + STRING CONSTANT
-  public LdrInstruction(LdrType type, Register destReg, String constant) {
+  public LdrInstruction(LdrType type, Register destReg, MsgInstruction message) {
     this.type = type;
     this.destReg = destReg;
-    this.constant = constant;
+    this.constant = message.toString();
   }
 
   //SIMPLE INSTR + DST REG + INT CONSTANT
@@ -30,11 +30,11 @@ public class LdrInstruction implements Instruction {
 
 
   //COND INSTR + DST REG + STRING CONSTANT
-  public LdrInstruction(LdrType type, ConditionCode conditionCode, Register destReg, String constant) {
+  public LdrInstruction(LdrType type, ConditionCode conditionCode, Register destReg, MsgInstruction message) {
     this.type = type;
     this.conditionCode = conditionCode;
     this.destReg = destReg;
-    this.constant = constant;
+    this.constant = message.toString();
   }
 
   //COND INSTR + DST REG + INT CONSTANT

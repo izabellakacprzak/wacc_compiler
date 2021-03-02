@@ -109,7 +109,7 @@ public class ArrayElemNode extends ExpressionNode {
     internalState.addInstruction(new MovInstruction(R0, exprReg));
     // move result of array to R1
     internalState.addInstruction(new MovInstruction(R1, arrayReg));
-    internalState.addInstruction(new BranchInstruction(BL, ARRAY_BOUNDS.getMessage()));
+    internalState.addInstruction(new BranchInstruction(BL, ARRAY_BOUNDS.getLabel()));
     internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
         new Operand(INT_BYTES_SIZE), false));
     internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,

@@ -100,7 +100,7 @@ public class UnaryOpExprNode extends ExpressionNode {
         BuiltInFunction.OVERFLOW.setUsed();
         internalState.addInstruction(new BranchInstruction(
             ConditionCode.VS,
-            BranchOperation.BL, BuiltInFunction.OVERFLOW.getMessage()));
+            BranchOperation.BL, BuiltInFunction.OVERFLOW.getLabel()));
         break;
       case LEN:
         internalState.addInstruction(new LdrInstruction(LdrType.LDR, operandResult, operandResult));

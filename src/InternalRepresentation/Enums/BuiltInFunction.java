@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public enum BuiltInFunction {
-    OVERFLOW("p_throw_overflow_error"),
+  OVERFLOW(
+      "p_throw_overflow_error"),
     RUNTIME("p_throw_runtime_error"),
     ARRAY_BOUNDS("p_check_array_bounds"),
     DIV_ZERO("p_check_divide_by_zero"),
@@ -19,11 +20,11 @@ public enum BuiltInFunction {
     PRINT_REFERENCE("p_print_reference"),
     PRINT_LN("p_print_ln");
 
-    private final String message;
+    private final String label;
     private boolean used;
 
-    BuiltInFunction(String message) {
-        this.message = message;
+    BuiltInFunction(String label) {
+        this.label = label;
         this.used = false;
     }
 
@@ -31,8 +32,8 @@ public enum BuiltInFunction {
         this.used = true;
     }
 
-    public String getMessage() {
-        return message;
+    public String getLabel() {
+        return label;
     }
 
     public static List<BuiltInFunction> getUsed() {

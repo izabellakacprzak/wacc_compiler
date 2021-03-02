@@ -17,17 +17,7 @@ public class CustomBuiltInFunctions {
 
   private static final int FALSE = 0;
 
-  private final BuiltInFunction type;
-
-  public CustomBuiltInFunctions(BuiltInFunction type) {
-    this.type = type;
-  }
-
-  public String getLabel() {
-    return type.getMessage();
-  }
-
-  public List<Instruction> generateAssembly() {
+  public List<Instruction> generateAssembly(BuiltInFunction type) {
     List<Instruction> instructions = new ArrayList<>();
 
     switch (type) {
@@ -99,14 +89,16 @@ public class CustomBuiltInFunctions {
   }
 
   private void generateOverflow(List<Instruction> instructions) {
-    instructions.add(new LdrInstruction(LDR, R0,
-        "OverflowError: the result is too small/large to store in a 4-byte signed-integer.\n"));
-    instructions.add(new BranchInstruction(BL, RUNTIME.getMessage()));
+
+    instructions.add(new LdrInstruction(
+        LDR, R0, new MsgInstruction("OverflowError: the result is too small/large to store in"
+        + "a 4-byte signed-integer.\\n")));
+    instructions.add(new BranchInstruction(BL, RUNTIME.getLabel()));
     RUNTIME.setUsed();
   }
 
   private void generateRuntime(List<Instruction> instructions) {
-    instructions.add(new BranchInstruction(BL, PRINT_STRING.getMessage()));
+    instructions.add(new BranchInstruction(BL, PRINT_STRING.getLabel()));
     PRINT_STRING.setUsed();
     instructions.add(new MovInstruction(R0, -1));
     instructions.add(new BranchInstruction(BL, EXIT.getMessage()));
@@ -116,14 +108,15 @@ public class CustomBuiltInFunctions {
     instructions.add(new PushInstruction(LR));
     instructions.add(new CompareInstruction(R0, new Operand(0)));
     instructions.add(
-        new LdrInstruction(LDR, LT, R0, "ArrayIndexOutOfBoundsError: negative index\n"));
-    instructions.add(new BranchInstruction(LT, BL, RUNTIME.getMessage()));
+        new LdrInstruction(LDR, LT, R0,
+            new MsgInstruction("ArrayIndexOutOfBoundsError: negative index\\n\\0")));
+    instructions.add(new BranchInstruction(LT, BL, RUNTIME.getLabel()));
     RUNTIME.setUsed();
     instructions.add(new LdrInstruction(LDR, R1, R1));
     instructions.add(new CompareInstruction(R0, new Operand(R1)));
     instructions.add(new LdrInstruction(LDR, CS, R0,
-        "ArrayIndexOutOfBoundsError: index too large\n"));
-    instructions.add(new BranchInstruction(CS, BL, RUNTIME.getMessage()));
+        new MsgInstruction("ArrayIndexOutOfBoundsError: index too large\\n\\0")));
+    instructions.add(new BranchInstruction(CS, BL, RUNTIME.getLabel()));
     instructions.add(new PopInstruction(PC));
   }
 
@@ -131,8 +124,8 @@ public class CustomBuiltInFunctions {
     instructions.add(new PushInstruction(LR));
     instructions.add(new CompareInstruction(R1, new Operand(0)));
     instructions.add(new LdrInstruction(LDR, EQ, R0,
-        "DivideByZeroError: divide or modulo by zero\n"));
-    instructions.add(new BranchInstruction(EQ, BL, RUNTIME.getMessage()));
+        new MsgInstruction("DivideByZeroError: divide or modulo by zero\n")));
+    instructions.add(new BranchInstruction(EQ, BL, RUNTIME.getLabel()));
     RUNTIME.setUsed();
     instructions.add(new PopInstruction(PC));
   }
@@ -141,8 +134,8 @@ public class CustomBuiltInFunctions {
     instructions.add(new PushInstruction(LR));
     instructions.add(new CompareInstruction(R0, new Operand(0)));
     instructions.add(new LdrInstruction(LDR, EQ, R0,
-        "NullReferenceError: dereference a null reference\n"));
-    instructions.add(new BranchInstruction(EQ, BL, RUNTIME.getMessage()));
+        new MsgInstruction("NullReferenceError: dereference a null reference\\n\\0")));
+    instructions.add(new BranchInstruction(EQ, BL, RUNTIME.getLabel()));
     RUNTIME.setUsed();
     instructions.add(new PopInstruction(PC));
   }
@@ -151,8 +144,9 @@ public class CustomBuiltInFunctions {
     instructions.add(new PushInstruction(LR));
     instructions.add(new CompareInstruction(R0, new Operand(0)));
     instructions.add(
-        new LdrInstruction(LDR, EQ, R0, "NullReferenceError: dereference a null reference\\n"));
-    instructions.add(new BranchInstruction(EQ, B, RUNTIME.getMessage()));
+        new LdrInstruction(LDR, EQ, R0,
+            new MsgInstruction("NullReferenceError: dereference a null reference\\n\\0")));
+    instructions.add(new BranchInstruction(EQ, B, RUNTIME.getLabel()));
     RUNTIME.setUsed();
     instructions.add(new PushInstruction(R0));
     instructions.add(new LdrInstruction(LDR, R0, R0));
@@ -178,10 +172,10 @@ public class CustomBuiltInFunctions {
     instructions.add(new MovInstruction(R1, R0));
     switch (type) {
       case READ_CHAR:
-        instructions.add(new LdrInstruction(LDR, R0, " %c"));
+        instructions.add(new LdrInstruction(LDR, R0, new MsgInstruction(" %c\\0")));
         break;
       case READ_INT:
-        instructions.add(new LdrInstruction(LDR, R0, "%d"));
+        instructions.add(new LdrInstruction(LDR, R0, new MsgInstruction("%d\\0")));
         break;
       default:
         throw new IllegalStateException("Unexpected non-read BuiltInFunction: " + type);
@@ -195,22 +189,22 @@ public class CustomBuiltInFunctions {
   private void generatePrintString(List<Instruction> instructions) {
     instructions.add(new LdrInstruction(LDR, R1, R0));
     instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
-    instructions.add(new LdrInstruction(LDR, R0, "%.*s"));
+    instructions.add(new LdrInstruction(LDR, R0, new MsgInstruction("%.*s\\0")));
     instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
     instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
   }
 
   private void generatePrintInt(List<Instruction> instructions) {
     instructions.add(new MovInstruction(R1, R0));
-    instructions.add(new LdrInstruction(LDR, R0, "%d"));
+    instructions.add(new LdrInstruction(LDR, R0, new MsgInstruction("%d\\0")));
     instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
     instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
   }
 
   private void generatePrintBool(List<Instruction> instructions) {
     instructions.add(new CompareInstruction(R0, new Operand(FALSE)));
-    instructions.add(new LdrInstruction(LDR, NE, R0, "true"));
-    instructions.add(new LdrInstruction(LDR, EQ, R0, "false"));
+    instructions.add(new LdrInstruction(LDR, NE, R0, new MsgInstruction("true")));
+    instructions.add(new LdrInstruction(LDR, EQ, R0, new MsgInstruction("false")));
     instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
     instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
   }
@@ -226,14 +220,14 @@ public class CustomBuiltInFunctions {
   */
   private void generatePrintReference(List<Instruction> instructions) {
     instructions.add(new MovInstruction(R1, R0));
-    instructions.add(new LdrInstruction(LDR, R0, "%p"));
+    instructions.add(new LdrInstruction(LDR, R0, new MsgInstruction("%p\\0")));
     instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
     instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
 
   }
 
   private void generatePrintLn(List<Instruction> instructions) {
-    instructions.add(new LdrInstruction(LDR, R0, ""));
+    instructions.add(new LdrInstruction(LDR, R0, new MsgInstruction("\\0")));
     instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
     instructions.add(new BranchInstruction(BL, PUTS.getMessage()));
   }

@@ -3,6 +3,7 @@ package AbstractSyntaxTree.expression;
 import InternalRepresentation.Enums.LdrType;
 import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Instructions.LdrInstruction;
+import InternalRepresentation.Instructions.MsgInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -30,7 +31,7 @@ public class StringLiterExprNode extends ExpressionNode {
     Register currDestination = internalState.popFreeRegister();
     internalState.setPrevResult(currDestination);
     internalState.addInstruction(new LdrInstruction(LdrType.LDR, currDestination,
-        internalState.getMsg(value)));
+        new MsgInstruction(value)));
   }
 
   @Override

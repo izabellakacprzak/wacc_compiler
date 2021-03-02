@@ -1,9 +1,20 @@
 package AbstractSyntaxTree;
 
+import static InternalRepresentation.Enums.Directive.LTORG;
+import static InternalRepresentation.Enums.LdrType.*;
+import static InternalRepresentation.Enums.Register.*;
+
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.type.FunctionNode;
+import InternalRepresentation.Enums.Register;
+import InternalRepresentation.Instructions.DirectiveInstruction;
+import InternalRepresentation.Instructions.LabelInstruction;
+import InternalRepresentation.Instructions.LdrInstruction;
+import InternalRepresentation.Instructions.PopInstruction;
+import InternalRepresentation.Instructions.PushInstruction;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Operand;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.SymbolTable;
 import java.util.ArrayList;
@@ -68,5 +79,18 @@ public class ProgramNode implements ASTNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    for(FunctionNode function : functionNodes) {
+      function.generateAssembly(internalState);
+    }
+
+    internalState.addInstruction(new LabelInstruction("main"));
+    // TODO: subtract offset from SP
+    internalState.addInstruction(new PushInstruction(LR));
+    statementNode.generateAssembly(internalState);
+    // TODO: add offset to SP
+
+    internalState.addInstruction(new LdrInstruction(LDR, R0, 0));
+    internalState.addInstruction(new PopInstruction(PC));
+    internalState.addInstruction(new DirectiveInstruction(LTORG));
   }
 }

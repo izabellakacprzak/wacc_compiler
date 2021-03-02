@@ -1,14 +1,18 @@
 package InternalRepresentation.Instructions;
 
-import InternalRepresentation.Enums.SystemBuiltInFunction;
+import InternalRepresentation.Enums.BuiltInFunction;
 
 public class BuiltInLabelInstruction extends LabelInstruction {
 
-  private final SystemBuiltInFunction function;
+  private final BuiltInFunction function;
 
-  public BuiltInLabelInstruction(SystemBuiltInFunction function) {
-    super(function.getMessage());
+  public BuiltInLabelInstruction(BuiltInFunction function) {
+    super(function.getLabel());
     this.function = function;
+  }
+
+  public BuiltInFunction getFunction(){
+    return function;
   }
 
 }

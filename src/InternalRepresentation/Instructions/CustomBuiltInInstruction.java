@@ -7,7 +7,7 @@ public class CustomBuiltInInstruction extends LabelInstruction {
   private final BuiltInFunction function;
 
   public CustomBuiltInInstruction(BuiltInFunction function) {
-    super(function.getMessage());
+    super(function.getLabel());
     this.function = function;
   }
 
