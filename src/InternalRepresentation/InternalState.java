@@ -26,12 +26,12 @@ public class InternalState {
 
   private final Set<String> declaredLabels;
   private final List<Instruction> generatedInstructions;
-  private final List<BuiltInLabelInstruction> builtInLabels;
   private final int MAX_STACK_ARITHMETIC_SIZE = 1024;
+  int argStackOffset = 0;
+  private List<BuiltInFunction> builtInLabels;
   private Stack<Register> availableRegs;
   private int labelCount;
   private Register prevResult;
-  int argStackOffset = 0;
 
   public InternalState() {
     // setup stack function
@@ -41,7 +41,7 @@ public class InternalState {
     declaredLabels = new HashSet<>();
     generatedInstructions = new ArrayList<>();
     prevResult = null;
-    builtInLabels = new ArrayList<>();
+    builtInLabels = BuiltInFunction.getUsed();
 
     labelCount = 0;
   }
@@ -55,9 +55,15 @@ public class InternalState {
 
       programNode.generateAssembly(this);
 
+      CustomBuiltInFunctions customBuiltInFunctions = new CustomBuiltInFunctions();
+      List<Instruction> instructions = new ArrayList<>();
+      builtInLabels = BuiltInFunction.getUsed();
+      for (BuiltInFunction label : builtInLabels) {
+        instructions.addAll(customBuiltInFunctions.generateAssembly(label));
+      }
       // add all generated messages
-      for(MsgInstruction msg : MsgInstruction.getMessages()) {
-        writer.write(msg.toString());
+      for (MsgInstruction msg : MsgInstruction.getMessages()) {
+        writer.write(msg.toString() + ":\n");
         writer.write(msg.writeInstruction());
         writer.write(new LineBreak().writeInstruction());
       }
@@ -69,20 +75,13 @@ public class InternalState {
       writer.write(new DirectiveInstruction(GLOBAL, "main").writeInstruction());
 
       // add all generated instructions
-      for(Instruction instruction : generatedInstructions) {
+      for (Instruction instruction : generatedInstructions) {
         writer.write(instruction.writeInstruction());
       }
-
       // add all used built in functions
-      CustomBuiltInFunctions customBuiltInFunctions = new CustomBuiltInFunctions();
-      List<Instruction> instructions;
 
-      for(BuiltInLabelInstruction label : builtInLabels) {
-        writer.write(label.writeInstruction());
-        instructions = customBuiltInFunctions.generateAssembly(label.getFunction());
-        for(Instruction instruction : instructions) {
+        for (Instruction instruction : instructions) {
           writer.write(instruction.writeInstruction());
-        }
       }
 
       writer.close();

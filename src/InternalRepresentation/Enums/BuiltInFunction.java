@@ -21,7 +21,12 @@ public enum BuiltInFunction {
     PRINT_LN("p_print_ln");
 
     private final String label;
-    private boolean used;
+
+  public boolean isUsed() {
+    return used;
+  }
+
+  private boolean used;
 
     BuiltInFunction(String label) {
         this.label = label;
@@ -37,7 +42,7 @@ public enum BuiltInFunction {
     }
 
     public static List<BuiltInFunction> getUsed() {
-        return Arrays.stream(BuiltInFunction.values()).filter(c -> c.used)
+        return Arrays.stream(BuiltInFunction.values()).filter(BuiltInFunction::isUsed)
                 .collect(Collectors.toList());
     }
 }

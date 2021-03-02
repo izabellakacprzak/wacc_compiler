@@ -98,9 +98,10 @@ public class Compiler {
     File assemblyFile = new File(args[0].replaceFirst(".wacc", ".s"));
     try {
       InternalState state = new InternalState();
+      assemblyFile.delete();
       if (assemblyFile.createNewFile()) {
         state.generateAssembly(assemblyFile, prog);
-      }
+    }
     } catch (IOException e) {
       System.out.println("Could not create new file");
     }

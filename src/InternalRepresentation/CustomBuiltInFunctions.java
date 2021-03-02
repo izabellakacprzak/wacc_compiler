@@ -10,6 +10,7 @@ import static InternalRepresentation.Enums.SystemBuiltInFunction.*;
 
 import InternalRepresentation.Enums.BuiltInFunction;
 import InternalRepresentation.Instructions.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,7 +93,7 @@ public class CustomBuiltInFunctions {
 
     instructions.add(new LdrInstruction(
         LDR, R0, new MsgInstruction("OverflowError: the result is too small/large to store in"
-        + "a 4-byte signed-integer.\\n")));
+                                        + "a 4-byte signed-integer.\\n")));
     instructions.add(new BranchInstruction(BL, RUNTIME.getLabel()));
     RUNTIME.setUsed();
   }

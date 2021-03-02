@@ -20,7 +20,9 @@ public class InstructionPrinter {
 
     instruction.append(" ").
         append(destReg.getRegName()).
+        append(", ").
         append(operand1.getRegName()).
+        append(", ").
         append(operand2.toString());
 
     return instruction.toString() + "\n";

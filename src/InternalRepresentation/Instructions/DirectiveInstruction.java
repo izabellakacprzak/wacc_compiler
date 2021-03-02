@@ -16,9 +16,13 @@ public class DirectiveInstruction implements Instruction {
     this.type = type;
     this.value = "";
   }
- //TODO: MOVE TO PRINTER
+
+  //TODO: MOVE TO PRINTER
   @Override
   public String writeInstruction() {
+    if (type == Directive.ASCII) {
+      return "." + type.name().toLowerCase() + " \"" + value + "\"\n";
+    }
     return "." + type.name().toLowerCase() + " " + value + "\n";
   }
 
