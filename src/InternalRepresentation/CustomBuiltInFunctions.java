@@ -168,7 +168,7 @@ public class CustomBuiltInFunctions {
   private void generateReadChar(List<Instruction> instructions) {
     generateRead(instructions, READ_CHAR);
   }
-  
+
   private void generateReadInt(List<Instruction> instructions) {
     generateRead(instructions, READ_INT);
   }

@@ -1,6 +1,20 @@
 package AbstractSyntaxTree.expression;
 
+import static InternalRepresentation.Enums.ArithmeticOperation.*;
+import static InternalRepresentation.Enums.BranchOperation.*;
+import static InternalRepresentation.Enums.Register.*;
+import static InternalRepresentation.Enums.LdrType.*;
+import static InternalRepresentation.Enums.BuiltInFunction.*;
+import static InternalRepresentation.Enums.ShiftType.LSL;
+
+import InternalRepresentation.Enums.Register;
+import InternalRepresentation.Instructions.ArithmeticInstruction;
+import InternalRepresentation.Instructions.BranchInstruction;
+import InternalRepresentation.Instructions.LdrInstruction;
+import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Operand;
+import InternalRepresentation.Shift;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -73,7 +87,33 @@ public class ArrayElemNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    // get available register
+    Register arrayReg = internalState.popFreeRegister();
+    // put address of array into register
+    // TODO: get offset of array
+    Operand offset = null;
+    internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, SP, offset, false));
+    // evaluate each index expression
+    Register exprReg = null;
+    for(ExpressionNode expression : expressions) {
+      generateElemAddr(internalState, expression, arrayReg);
+    }
+  }
 
+  private void generateElemAddr(InternalState internalState, ExpressionNode expression,
+      Register arrayReg) {
+    expression.generateAssembly(internalState);
+    Register exprReg = internalState.getPrevResult();
+    internalState.addInstruction(new LdrInstruction(LDR, arrayReg, arrayReg));
+    // move result of expression to R0
+    internalState.addInstruction(new MovInstruction(R0, exprReg));
+    // move result of array to R1
+    internalState.addInstruction(new MovInstruction(R1, arrayReg));
+    internalState.addInstruction(new BranchInstruction(BL, ARRAY_BOUNDS.getMessage()));
+    internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
+        new Operand(INT_BYTES_SIZE), false));
+    internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
+        new Operand(exprReg, new Shift(LSL, 2)), false));
   }
 
   /* Return the type of the elements stored in identifier array */
