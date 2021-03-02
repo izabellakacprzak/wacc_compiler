@@ -61,9 +61,9 @@ public class IfStatementNode extends StatementNode {
     String endIfLabel = internalState.generateNewLabel();
 
     internalState.addInstruction(new BranchInstruction(
-        ConditionCode.EQ, elseLabel, BranchOperation.B));
+        ConditionCode.EQ, BranchOperation.B, elseLabel));
     thenStatement.generateAssembly(internalState);
-    internalState.addInstruction(new BranchInstruction(endIfLabel, BranchOperation.B));
+    internalState.addInstruction(new BranchInstruction(BranchOperation.B, endIfLabel));
 
     internalState.addInstruction(new LabelInstruction(elseLabel));
     elseStatement.generateAssembly(internalState);

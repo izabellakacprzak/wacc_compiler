@@ -53,7 +53,7 @@ public class WhileStatementNode extends StatementNode {
     String statementLabel = internalState.generateNewLabel();
 
     internalState.addInstruction(new BranchInstruction(
-        ConditionCode.EQ, condLabel, BranchOperation.B));
+        ConditionCode.EQ, BranchOperation.B, condLabel));
 
     internalState.addInstruction(new LabelInstruction(statementLabel));
     statement.generateAssembly(internalState);
@@ -61,7 +61,7 @@ public class WhileStatementNode extends StatementNode {
     condition.generateAssembly(internalState);
 
     internalState.addInstruction(new BranchInstruction(
-        ConditionCode.EQ, statementLabel, BranchOperation.B));
+        ConditionCode.EQ, BranchOperation.B, statementLabel));
   }
 
   /* Recursively traverses the AST and sets the function expected return type in the ReturnNode

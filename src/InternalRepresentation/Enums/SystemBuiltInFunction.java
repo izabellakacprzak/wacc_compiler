@@ -1,10 +1,13 @@
-package InternalRepresentation.Instructions;
+package InternalRepresentation.Enums;
 
 public enum SystemBuiltInFunction {
     MALLOC("malloc"),
     PRINTF("printf"),
     IDIV("__aeabi_idiv"),
-    IDIVMOD("__aeabi_idivmod");
+    IDIVMOD("__aeabi_idivmod"),
+    FFLUSH("fflush"),
+    PUTS("puts"),
+    EXIT("exit");
 
     private final String message;
 

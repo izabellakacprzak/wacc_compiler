@@ -50,7 +50,7 @@ public class ExitStatementNode extends StatementNode {
     expression.generateAssembly(internalState);
 
     internalState.addInstruction(new MovInstruction(destReg, exitCodeReg));
-    internalState.addInstruction(new BranchInstruction(("exit"), BranchOperation.BL));
+    internalState.addInstruction(new BranchInstruction(BranchOperation.BL, ("exit")));
   }
 
   /* Flags that ExitStatementNode represents an exit statement. Used for syntax errors checking

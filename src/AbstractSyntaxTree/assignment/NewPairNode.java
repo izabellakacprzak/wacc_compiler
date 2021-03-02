@@ -44,7 +44,7 @@ public class NewPairNode extends AssignRHSNode {
         .addInstruction(new LdrInstruction(LdrType.LDR, r0Reg, NO_OF_ELEMS * ADDRESS_BYTES_SIZE));
     //BL malloc
     internalState.addInstruction(new BranchInstruction(
-        ConditionCode.L, "malloc", BranchOperation.B));
+        ConditionCode.L, BranchOperation.B, "malloc"));
 
     Register reg = internalState.popFreeRegister();
 
@@ -59,7 +59,7 @@ public class NewPairNode extends AssignRHSNode {
 
     // BL malloc
     internalState.addInstruction(new BranchInstruction(
-        ConditionCode.L, "malloc", BranchOperation.B));
+        ConditionCode.L, BranchOperation.B, "malloc"));
 
     StrType strInstr1 = (fstSize == 1) ? StrType.STRB : StrType.STR;
     internalState
@@ -78,7 +78,7 @@ public class NewPairNode extends AssignRHSNode {
 
     // BL malloc
     internalState.addInstruction(new BranchInstruction(
-        ConditionCode.L, "malloc", BranchOperation.B));
+        ConditionCode.L, BranchOperation.B, "malloc"));
 
     StrType strInstr2 = (fstSize == 1) ? StrType.STRB : StrType.STR;
     internalState

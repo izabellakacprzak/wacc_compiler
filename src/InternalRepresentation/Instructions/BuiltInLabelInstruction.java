@@ -1,5 +1,7 @@
 package InternalRepresentation.Instructions;
 
+import InternalRepresentation.Enums.SystemBuiltInFunction;
+
 public class BuiltInLabelInstruction extends LabelInstruction {
 
   private final SystemBuiltInFunction function;

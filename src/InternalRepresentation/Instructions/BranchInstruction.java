@@ -14,14 +14,13 @@ public class BranchInstruction implements Instruction {
   private final BranchOperation operation;
 
   //SIMPLE INSTR + LABEL
-  public BranchInstruction(String label,
-      BranchOperation operation) {
+  public BranchInstruction(BranchOperation operation, String label) {
     this.label = label;
     this.operation = operation;
   }
 
   //1 COND INSTR + LABEL
-  public BranchInstruction(ConditionCode conditionCode, String label, BranchOperation operation) {
+  public BranchInstruction(ConditionCode conditionCode, BranchOperation operation, String label) {
     this.label = label;
     conditionCodes = new ArrayList<>();
     conditionCodes.add(conditionCode);
@@ -29,8 +28,8 @@ public class BranchInstruction implements Instruction {
   }
 
   //MULTIPLE COND INSTR + LABEL
-  public BranchInstruction(List<ConditionCode> conditionCodes, String label,
-      BranchOperation operation) {
+  public BranchInstruction(List<ConditionCode> conditionCodes, BranchOperation operation,
+      String label) {
     this.label = label;
     this.conditionCodes = conditionCodes;
     this.operation = operation;

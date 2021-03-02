@@ -76,7 +76,7 @@ public class ArrayLiterNode extends AssignRHSNode {
 
     // BL malloc
     internalState.addInstruction(new BranchInstruction(ConditionCode.L,
-        "malloc", BranchOperation.B));
+        BranchOperation.B, "malloc"));
 
     Register allocReg = internalState.popFreeRegister();
     internalState.addInstruction(new MovInstruction(allocReg, regR0));

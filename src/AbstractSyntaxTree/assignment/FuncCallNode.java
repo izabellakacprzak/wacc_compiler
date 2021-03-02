@@ -128,7 +128,7 @@ public class FuncCallNode extends AssignRHSNode {
     //Branch Instruction to the callee label
     String functionLabel = "f_" + identifier.toString();
     internalState.addInstruction(new BranchInstruction(
-        ConditionCode.L, functionLabel, BranchOperation.B));
+        ConditionCode.L, BranchOperation.B, functionLabel));
 
     //TODO what is stack max size? 1MB? what if argsTotalSize > stack size??
     //deallocate stack from the function arguments
