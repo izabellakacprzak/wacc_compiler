@@ -38,4 +38,9 @@ public class PairLiterExprNode extends ExpressionNode {
   public String toString() {
     return "null";
   }
+
+  @Override
+  public void incrementStackOffset(int size) {
+    currSymTable.incrementArgStackOffset(size);
+  }
 }

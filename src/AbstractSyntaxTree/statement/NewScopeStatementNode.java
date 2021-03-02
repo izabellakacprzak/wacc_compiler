@@ -47,4 +47,9 @@ public class NewScopeStatementNode extends StatementNode {
   public boolean hasExitStatement() {
     return statement.hasExitStatement();
   }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
 }

@@ -37,4 +37,9 @@ public class ParenthesisExprNode extends ExpressionNode {
   public String toString() {
     return "(" + innerExpr + ")";
   }
+
+  @Override
+  public void incrementStackOffset(int size) {
+    currSymTable.incrementArgStackOffset(size);
+  }
 }

@@ -102,4 +102,9 @@ public class ArrayElemNode extends ExpressionNode {
 
     return str.toString();
   }
+
+  @Override
+  public void incrementStackOffset(int size) {
+    currSymTable.incrementArgStackOffset(size);
+  }
 }

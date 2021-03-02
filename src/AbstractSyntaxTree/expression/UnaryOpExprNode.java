@@ -120,4 +120,9 @@ public class UnaryOpExprNode extends ExpressionNode {
   public String toString() {
     return operator.getLabel() + " " + operand;
   }
+
+  @Override
+  public void incrementStackOffset(int size) {
+    currSymTable.incrementArgStackOffset(size);
+  }
 }

@@ -17,4 +17,6 @@ public abstract class ExpressionNode extends AssignRHSNode {
   /* All ExpressionNodes must Override toString for use in error messages */
   @Override
   public abstract String toString();
+
+  public abstract void incrementStackOffset(int size);
 }

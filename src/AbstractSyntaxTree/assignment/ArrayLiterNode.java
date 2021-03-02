@@ -71,15 +71,14 @@ public class ArrayLiterNode extends AssignRHSNode {
 
     // load array size in R0
     int arrSize = expressions.size() * arrElemSize + INT_BYTES_SIZE;
-    Register regR0 = Register.R0;
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, regR0, arrSize));
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR, Register.R0, arrSize));
 
     // BL malloc
     internalState.addInstruction(new BranchInstruction(ConditionCode.L,
         "malloc", BranchOperation.B));
 
-    Register allocReg = internalState.popFreeRegister();
-    internalState.addInstruction(new MovInstruction(allocReg, regR0));
+    Register reg = internalState.popFreeRegister();
+    internalState.addInstruction(new MovInstruction(reg, Register.R0));
 
     // if the array elem size is 1 byte, use STRB, otherwise use STR
     StrType strInstr = (arrElemSize == 1) ? StrType.STRB : StrType.STR;
@@ -89,17 +88,16 @@ public class ArrayLiterNode extends AssignRHSNode {
     int i = INT_BYTES_SIZE;
     for (ExpressionNode expression : expressions) {
       expression.generateAssembly(internalState);
-      internalState.addInstruction(new StrInstruction(strInstr, nextAvailable, allocReg, i));
+      internalState.addInstruction(new StrInstruction(strInstr, nextAvailable, reg, i));
       i += arrElemSize;
     }
 
-    //TODO decide between peek and pop
     Register noOfArrElemsReg = internalState.peekFreeRegister();
     internalState.addInstruction(new LdrInstruction(LdrType.LDR, noOfArrElemsReg, expressions.size()));
-    internalState.addInstruction(new StrInstruction(StrType.STR, allocReg, noOfArrElemsReg));
+    internalState.addInstruction(new StrInstruction(StrType.STR, reg, noOfArrElemsReg));
 
-    //push back and free allocReg
-    internalState.pushFreeRegister(allocReg);
+    //push back and free nextAvailable allocation register
+    internalState.pushFreeRegister(reg);
   }
 
   @Override

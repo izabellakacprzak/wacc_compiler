@@ -74,4 +74,9 @@ public class ReturnStatementNode extends StatementNode {
   public boolean hasReturnStatement() {
     return true;
   }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
 }

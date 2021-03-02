@@ -2,12 +2,15 @@ package InternalRepresentation;
 
 import static InternalRepresentation.Enums.Register.*;
 
+import InternalRepresentation.Enums.ArithmeticOperation;
 import InternalRepresentation.Enums.BuiltInFunction;
+import InternalRepresentation.Instructions.ArithmeticInstruction;
 import InternalRepresentation.Instructions.Instruction;
 
 import InternalRepresentation.Instructions.LabelInstruction;
 import InternalRepresentation.Instructions.MsgInstruction;
 import InternalRepresentation.Enums.Register;
+import SemanticAnalysis.SymbolTable;
 
 import java.util.*;
 
@@ -17,10 +20,10 @@ public class InternalState {
   private final List<Instruction> generatedInstructions;
   private final List<MsgInstruction> messages;
   private final List<LabelInstruction> builtInLabels;
+  private final int MAX_STACK_ARITHMETIC_SIZE = 1024;
   private Stack<Register> availableRegs;
   private int labelCount;
   private Register prevResult;
-
 
 
   public InternalState() {
@@ -50,8 +53,8 @@ public class InternalState {
   }
 
   //public Register popFreeRegister() {
-   // return availableRegs.pop();
- // }
+  // return availableRegs.pop();
+  // }
 
 
   public Register popFreeRegister() {
@@ -122,5 +125,23 @@ public class InternalState {
 
   public void addBuiltInLabel(BuiltInFunction function) {
     function.setUsed();
+  }
+
+  public void allocateStackSpace(SymbolTable symbolTable) {
+    int size = symbolTable.getVarsSize();
+    while (size > 0) {
+      addInstruction(new ArithmeticInstruction(ArithmeticOperation.SUB, SP, SP,
+          new Operand(Math.min(size, MAX_STACK_ARITHMETIC_SIZE)), false));
+      size -= Math.min(size, MAX_STACK_ARITHMETIC_SIZE);
+    }
+  }
+
+  public void deallocateStackSpace(SymbolTable symbolTable) {
+    int size = symbolTable.getVarsSize();
+    while (size > 0) {
+      addInstruction(new ArithmeticInstruction(ArithmeticOperation.ADD, SP, SP,
+          new Operand(Math.min(size, MAX_STACK_ARITHMETIC_SIZE)), false));
+      size -= Math.min(size, MAX_STACK_ARITHMETIC_SIZE);
+    }
   }
 }

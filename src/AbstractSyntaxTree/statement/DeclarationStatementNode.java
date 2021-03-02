@@ -81,4 +81,9 @@ public class DeclarationStatementNode extends StatementNode {
 
     internalState.addInstruction(new StrInstruction(StrType.STR, destReg, stackPointer, 0));
   }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
 }

@@ -61,14 +61,11 @@ public class PairElemNode extends AssignRHSNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    Register reg = internalState.peekFreeRegister();
-    //TODO do not create new object for R0
-    Register r0Reg = Register.R0;
-
     expression.generateAssembly(internalState);
 
     //TODO insert p_check_null_pointer here + any before or after instructions
 
+    Register reg = internalState.peekFreeRegister();
     internalState.addInstruction(new LdrInstruction(LdrType.LDR, reg, reg, position * ADDRESS_BYTES_SIZE));
 
     PairType pair = (PairType) expression.getType(currSymTable);

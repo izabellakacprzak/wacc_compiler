@@ -5,6 +5,7 @@ import AbstractSyntaxTree.assignment.AssignRHSNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.List;
 
 public class AssignVarNode extends StatementNode {
@@ -48,17 +49,17 @@ public class AssignVarNode extends StatementNode {
     if (leftType == null) {
       if (varHasBeenDeclared(errorMessages, left)) {
         errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
-            + " Could not resolve type of LHS assignment '" + left + "'.");
+                              + " Could not resolve type of LHS assignment '" + left + "'.");
       }
     } else if (rightType == null) {
       if (varHasBeenDeclared(errorMessages, right)) {
         errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
-            + " Could not resolve type of RHS assignment'" + right + "'.");
+                              + " Could not resolve type of RHS assignment'" + right + "'.");
       }
     } else if (!leftType.equals(rightType) && !stringToCharArray(leftType, rightType)) {
       errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
-          + " RHS type does not match LHS type for assignment. "
-          + " Expected: " + leftType + " Actual: " + rightType);
+                            + " RHS type does not match LHS type for assignment. "
+                            + " Expected: " + leftType + " Actual: " + rightType);
     }
     currSymTable = symbolTable;
   }
@@ -66,6 +67,11 @@ public class AssignVarNode extends StatementNode {
   @Override
   public void generateAssembly(InternalState internalState) {
 
+  }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
   }
 }
 

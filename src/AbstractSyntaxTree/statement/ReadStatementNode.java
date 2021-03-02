@@ -44,4 +44,9 @@ public class ReadStatementNode extends StatementNode {
   public void generateAssembly(InternalState internalState) {
 
   }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
 }

@@ -59,4 +59,9 @@ public class ExitStatementNode extends StatementNode {
   public boolean hasExitStatement() {
     return true;
   }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
 }

@@ -18,4 +18,5 @@ public class SkipStatementNode extends StatementNode {
   public void generateAssembly(InternalState internalState) {
 
   }
+
 }

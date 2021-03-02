@@ -7,6 +7,7 @@ public class SymbolTable {
 
   private final SymbolTable parentSymTable;
   private final Map<String, Identifier> dictionary = new HashMap<>();
+  int argStackOffset = 0;
 
   public SymbolTable(SymbolTable parentSymTable) {
     this.parentSymTable = parentSymTable;
@@ -35,5 +36,21 @@ public class SymbolTable {
 
   public boolean isTopSymTable() {
     return parentSymTable == null;
+  }
+
+  public void incrementArgStackOffset(int argSize) {
+    argStackOffset += argSize;
+  }
+
+  //TODO in case size is not correct, check values() vs keys()
+  // TODO size should include function calls params sizes ???????
+  public int getVarsSize() {
+    int totalSize = 0;
+    for (Identifier identifier : dictionary.values()) {
+      if (identifier instanceof VariableId) {
+        totalSize += identifier.getSize();
+      }
+    }
+    return totalSize;
   }
 }

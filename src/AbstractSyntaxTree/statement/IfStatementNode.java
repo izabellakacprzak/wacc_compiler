@@ -89,4 +89,9 @@ public class IfStatementNode extends StatementNode {
   public boolean hasExitStatement() {
     return this.hasReturnStatement();
   }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
 }

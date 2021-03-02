@@ -26,4 +26,9 @@ public class PrintLineStatementNode extends StatementNode {
   public void generateAssembly(InternalState internalState) {
 
   }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
 }

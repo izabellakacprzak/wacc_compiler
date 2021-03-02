@@ -228,4 +228,9 @@ public class BinaryOpExprNode extends ExpressionNode {
   public String toString() {
     return left + " " + operator.getLabel() + " " + right;
   }
+
+  @Override
+  public void incrementStackOffset(int size) {
+    currSymTable.incrementArgStackOffset(size);
+  }
 }
