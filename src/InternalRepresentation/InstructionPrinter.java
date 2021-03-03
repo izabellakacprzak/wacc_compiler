@@ -78,7 +78,7 @@ public class InstructionPrinter {
       instruction += conditionCode.getCondName();
     }
 
-    instruction += " " + destReg + ", ";
+    instruction += " " + destReg.getRegName() + ", ";
 
     if (srcReg != null) {
       instruction += srcReg.getRegName();
@@ -118,9 +118,9 @@ public class InstructionPrinter {
       Register offsetReg1, Register offsetReg2, int offsetImm, boolean useExclamation) {
     StringBuilder instruction = new StringBuilder(type.toString());
 
-    instruction.append(", ").
+    instruction.append(" ").
         append(destReg.getRegName()).
-        append("[").
+        append(", [").
         append(offsetReg1.getRegName());
 
     if (offsetReg2 != null) {
@@ -132,9 +132,9 @@ public class InstructionPrinter {
           case STRB:
             instruction.append(offsetImm);
           case STRH:
-            instruction.append(offsetImm * 2);
+            instruction.append(offsetImm);
           default:
-            instruction.append(offsetImm * 4);
+            instruction.append(offsetImm);
         }
       }
     }

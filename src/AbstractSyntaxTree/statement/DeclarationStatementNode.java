@@ -77,14 +77,15 @@ public class DeclarationStatementNode extends StatementNode {
   public void generateAssembly(InternalState internalState) {
     assignment.generateAssembly(internalState);
 
-    int offsetSize = type.getType().getSize();
-    StrType storeType = offsetSize == BYTE_SIZE ? StrType.STRB : StrType.STR;
+    int typeSize = type.getType().getSize();
+    StrType storeType = typeSize == BYTE_SIZE ? StrType.STRB : StrType.STR;
 
+    internalState.decrementArgStackOffset(typeSize);
     currSymTable.setOffset(identifier.getIdentifier(), internalState.getArgStackOffset());
-    internalState.incrementArgStackOffset(offsetSize);
+
     Register destReg = internalState.peekFreeRegister();
 
-    internalState.addInstruction(new StrInstruction(storeType, destReg, Register.SP, 0));
+    internalState.addInstruction(new StrInstruction(storeType, destReg, Register.SP, currSymTable.getOffset(identifier.getIdentifier())));
   }
 
   @Override

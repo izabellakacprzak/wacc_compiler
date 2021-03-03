@@ -50,8 +50,6 @@ public class InternalState {
     try {
       FileWriter writer = new FileWriter(output);
 
-      writer.write(new DirectiveInstruction(DATA).writeInstruction());
-      writer.write(new LineBreak().writeInstruction());
 
       programNode.generateAssembly(this);
 
@@ -61,14 +59,19 @@ public class InternalState {
       for (BuiltInFunction label : builtInLabels) {
         instructions.addAll(customBuiltInFunctions.generateAssembly(label));
       }
-      // add all generated messages
-      for (MsgInstruction msg : MsgInstruction.getMessages()) {
-        writer.write(msg.toString() + ":\n");
-        writer.write(msg.writeInstruction());
+
+      if (!MsgInstruction.getMessages().isEmpty()) {
+        writer.write(new DirectiveInstruction(DATA).writeInstruction());
         writer.write(new LineBreak().writeInstruction());
+        writer.write(new LineBreak().writeInstruction());
+        // add all generated messages
+        for (MsgInstruction msg : MsgInstruction.getMessages()) {
+          writer.write(msg.toString() + ":\n");
+          writer.write(msg.writeInstruction());
+          writer.write(new LineBreak().writeInstruction());
+        }
       }
 
-      writer.write(new LineBreak().writeInstruction());
       writer.write(new DirectiveInstruction(TEXT).writeInstruction());
       writer.write(new LineBreak().writeInstruction());
 
@@ -80,8 +83,8 @@ public class InternalState {
       }
       // add all used built in functions
 
-        for (Instruction instruction : instructions) {
-          writer.write(instruction.writeInstruction());
+      for (Instruction instruction : instructions) {
+        writer.write(instruction.writeInstruction());
       }
 
       writer.close();
@@ -173,6 +176,7 @@ public class InternalState {
 
   public void allocateStackSpace(SymbolTable symbolTable) {
     int size = symbolTable.getVarsSize();
+    argStackOffset = symbolTable.getVarsSize();
     while (size > 0) {
       addInstruction(new ArithmeticInstruction(ArithmeticOperation.SUB, SP, SP,
           new Operand(Math.min(size, MAX_STACK_ARITHMETIC_SIZE)), false));
@@ -189,8 +193,8 @@ public class InternalState {
     }
   }
 
-  public void incrementArgStackOffset(int argSize) {
-    argStackOffset += argSize;
+  public void decrementArgStackOffset(int argSize) {
+    argStackOffset -= argSize;
   }
 
   public int getArgStackOffset() {

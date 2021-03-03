@@ -21,9 +21,12 @@ public class DirectiveInstruction implements Instruction {
   @Override
   public String writeInstruction() {
     if (type == Directive.ASCII) {
-      return "." + type.name().toLowerCase() + " \"" + value + "\"\n";
+      return "." + type.name().toLowerCase() + " \"" + value + "\"";
     }
-    return "." + type.name().toLowerCase() + " " + value + "\n";
+    if (value.equals("")) {
+      return "." + type.name().toLowerCase();
+    }
+    return "." + type.name().toLowerCase() + " " + value;
   }
 
 }

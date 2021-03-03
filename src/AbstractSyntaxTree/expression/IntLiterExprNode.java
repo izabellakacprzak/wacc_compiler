@@ -1,6 +1,8 @@
 package AbstractSyntaxTree.expression;
 
+import InternalRepresentation.Enums.LdrType;
 import InternalRepresentation.Enums.Register;
+import InternalRepresentation.Instructions.LdrInstruction;
 import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
@@ -28,7 +30,7 @@ public class IntLiterExprNode extends ExpressionNode {
   public void generateAssembly(InternalState internalState) {
     Register currDestination = internalState.peekFreeRegister();
     internalState.setPrevResult(currDestination);
-    internalState.addInstruction(new MovInstruction(currDestination, value));
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR, currDestination, value));
   }
 
   @Override

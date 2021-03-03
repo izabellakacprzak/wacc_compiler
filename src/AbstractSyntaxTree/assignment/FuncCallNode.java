@@ -113,7 +113,7 @@ public class FuncCallNode extends AssignRHSNode {
       int argSize = currArg.getType(currSymTable).getSize();
       argsTotalSize += argSize;
 
-      internalState.incrementArgStackOffset(argSize);
+      internalState.decrementArgStackOffset(argSize);
       // generate assembly code for the current argument
       currArg.generateAssembly(internalState);
 
