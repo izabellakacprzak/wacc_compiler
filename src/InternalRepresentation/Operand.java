@@ -24,7 +24,7 @@ public class Operand {
     @Override
     public String toString() {
         if (reg != null && shift != null) {
-            return reg.getRegName() + " " + shift.toString();
+            return reg.getRegName() + ", " + shift.toString();
         } else if (reg != null) {
             return reg.getRegName();
         } else {

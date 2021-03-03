@@ -20,11 +20,11 @@ public class InstructionPrinter {
         append(", ").
         append(operand2.toString());
 
-    return instruction.toString() + "\n";
+    return instruction.toString();
   }
 
   public String printCompare(Register operand1, Operand operand2) {
-    return "CMP " + operand1.getRegName() + ", " + operand2.toString() + "\n";
+    return "CMP " + operand1.getRegName() + ", " + operand2.toString();
   }
 
   public String printBranch(BranchOperation operation, List<ConditionCode> conditionCodes, String label) {
@@ -35,11 +35,11 @@ public class InstructionPrinter {
       }
     }
     instruction.append(" ").append(label);
-    return instruction.toString() + "\n";
+    return instruction.toString();
   }
 
   public String printLabel(String label) {
-    return label + ": \n" ;
+    return label + ":";
   }
 
   public String printLDR(Register destReg, ConditionCode conditionCode,
@@ -60,14 +60,14 @@ public class InstructionPrinter {
       instruction += "=" + constant;
     }
 
-    return instruction + "\n";
+    return instruction;
   }
 
   public String printLogical(LogicalOperation operationType, Register destReg,
       Register operand1, Operand operand2) {
     return operationType.toString() + " " + destReg.getRegName() + ", " +
         operand1.getRegName() + ", " +
-        operand2.toString() + "\n";
+        operand2.toString();
   }
 
   public String printMOV(ConditionCode conditionCode, Register destReg, Register srcReg,
@@ -82,28 +82,28 @@ public class InstructionPrinter {
 
     if (srcReg != null) {
       instruction += srcReg.getRegName();
-      return instruction + "\n";
+      return instruction;
     }
     if (intImmediate != -1) {
       instruction += '#' + Integer.toString(intImmediate);
-      return instruction + "\n";
+      return instruction;
     }
 
     if (charImmediate == '\0') {
       instruction += "#0";
-      return instruction + "\n";
+      return instruction;
     }
 
     instruction += "#'" + charImmediate + "'";
-    return instruction + "\n";
+    return instruction;
   }
 
   public String printPop(Register reg) {
-    return "POP {" + reg.getRegName() + "}" + "\n";
+    return "POP {" + reg.getRegName() + "}";
   }
 
   public String printPush(Register reg) {
-    return "PUSH {" + reg.getRegName() + "}" + "\n";
+    return "PUSH {" + reg.getRegName() + "}";
   }
 
   public String printSMull(Register destReg1, Register destReg2, Register operand1,
@@ -111,7 +111,7 @@ public class InstructionPrinter {
     return "SMULL " + destReg1.getRegName() + ", " +
         destReg2.getRegName() + ", " +
         operand1.getRegName() + ", " +
-        operand2.getRegName() + "\n";
+        operand2.getRegName();
   }
 
   public String printStr(StrType type, Register destReg,
@@ -142,6 +142,6 @@ public class InstructionPrinter {
     if (useExclamation) {
       instruction.append("!");
     }
-    return instruction.toString() + "\n";
+    return instruction.toString();
   }
 }

@@ -29,7 +29,7 @@ public class MsgInstruction implements Instruction{
 
   @Override
   public String writeInstruction() {
-    return length.writeInstruction() + "\n" + value.writeInstruction();
+    return length.writeInstruction() + "\n\t" + value.writeInstruction();
   }
 
   @Override

@@ -5,14 +5,11 @@ import static InternalRepresentation.Enums.Register.*;
 
 import AbstractSyntaxTree.ProgramNode;
 import InternalRepresentation.Enums.BuiltInFunction;
-import InternalRepresentation.Instructions.BuiltInLabelInstruction;
 import InternalRepresentation.Instructions.DirectiveInstruction;
 import InternalRepresentation.Enums.ArithmeticOperation;
 import InternalRepresentation.Instructions.ArithmeticInstruction;
 import InternalRepresentation.Instructions.Instruction;
-
 import InternalRepresentation.Instructions.LabelInstruction;
-import InternalRepresentation.Instructions.LineBreak;
 import InternalRepresentation.Instructions.MsgInstruction;
 import InternalRepresentation.Enums.Register;
 import SemanticAnalysis.SymbolTable;
@@ -23,6 +20,10 @@ import java.io.IOException;
 import java.util.*;
 
 public class InternalState {
+
+  private static final String LINE_BREAK = "\n";
+  private static final String TAB = "\t";
+
 
   private final Set<String> declaredLabels;
   private final List<Instruction> generatedInstructions;
@@ -50,7 +51,6 @@ public class InternalState {
     try {
       FileWriter writer = new FileWriter(output);
 
-
       programNode.generateAssembly(this);
 
       CustomBuiltInFunctions customBuiltInFunctions = new CustomBuiltInFunctions();
@@ -62,29 +62,42 @@ public class InternalState {
 
       if (!MsgInstruction.getMessages().isEmpty()) {
         writer.write(new DirectiveInstruction(DATA).writeInstruction());
-        writer.write(new LineBreak().writeInstruction());
-        writer.write(new LineBreak().writeInstruction());
+        writer.write(LINE_BREAK);
+        writer.write(LINE_BREAK);
         // add all generated messages
         for (MsgInstruction msg : MsgInstruction.getMessages()) {
-          writer.write(msg.toString() + ":\n");
+          writer.write(msg.toString() + ":\n\t");
           writer.write(msg.writeInstruction());
-          writer.write(new LineBreak().writeInstruction());
+          writer.write(LINE_BREAK);
         }
       }
 
+      writer.write("\n");
       writer.write(new DirectiveInstruction(TEXT).writeInstruction());
-      writer.write(new LineBreak().writeInstruction());
+      writer.write(LINE_BREAK);
+      writer.write(LINE_BREAK);
 
       writer.write(new DirectiveInstruction(GLOBAL, "main").writeInstruction());
+      writer.write(LINE_BREAK);
 
       // add all generated instructions
       for (Instruction instruction : generatedInstructions) {
+        if (!(instruction instanceof LabelInstruction)) {
+          writer.write(TAB);
+        }
+
         writer.write(instruction.writeInstruction());
+        writer.write(LINE_BREAK);
       }
       // add all used built in functions
 
       for (Instruction instruction : instructions) {
+        if (!(instruction instanceof LabelInstruction)) {
+          writer.write(TAB);
+        }
+
         writer.write(instruction.writeInstruction());
+        writer.write(LINE_BREAK);
       }
 
       writer.close();
