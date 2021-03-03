@@ -8,11 +8,11 @@ run_test_in_dir() {
             case "$pathname" in
                 *.wacc)
                   echo running test $runTests "$pathname"
-                  output=${pathname/valid/backendtests}
-                  refLine=$(head -n 1 ${output/.wacc/.txt})
-                  refCode=$((refLine))
+                  output=${pathname/valid/backendTests}
                   flag=true
-                  ./compile "$pathname" >/dev/null 2>&1
+		  refOutput=${pathname/valid/backendTests}
+		  ./refCompile "-x" "$pathname" > ${refOutput/.wacc/.txt}
+                  ./compile "$pathname" "-a">/dev/null 2>&1
                   arm-linux-gnueabi-gcc -o ${pathname/.wacc/} -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
                   qemu-arm -L /usr/arm-linux-gnueabi/ ${pathname/.wacc/} > output.txt
                   rm ${pathname/.wacc/.s}
@@ -21,7 +21,7 @@ run_test_in_dir() {
                     { read -r;
                     while read -r refLine && $flag;
                     do
-                      ourLine=$(read -r ${pathname/valid/backendtests});
+                      ourLine=$(read -r ${pathname/valid/backendTests});
                       if not[ "$refLine" -eq "$ourLine" ]; then
                         flag=false
                       fi
@@ -47,20 +47,20 @@ run_tests () {
             case "$pathname" in
                 *.wacc)
                   echo running test $runTests "$pathname"
-                  output=${pathname/valid/backendtests}
+                  output=${pathname/valid/backendTests}
                   refLine=$(head -n 1 ${output/.wacc/.txt})
                   refCode=$((refLine))
                   flag=true
-                  ./compile "$pathname" >/dev/null 2>&1
+                  ./compile "$pathname" "-a">/dev/null 2>&1
                   arm-linux-gnueabi-gcc -o ${pathname/.wacc/} -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
-                  qemu-arm -L /usr/arm-linux-gnueabi/ ${pathname/.wacc/}
+                  qemu-arm -L /usr/arm-linux-gnueabi/ ${pathname/.wacc/} > output.txt
                   rm ${pathname/.wacc/.s}
                   rm ${pathname/.wacc/}
                   if [ "$refCode" -eq $? ]; then
                     { read -r;
                     while read -r refLine && $flag;
                     do
-                      ourLine=$(read -r ${pathname/valid/backendtests});
+                      ourLine=$(read -r ${pathname/valid/backendTests});
                       if not[ "$refLine" -eq "$ourLine" ]; then
                         flag=false
                       fi
