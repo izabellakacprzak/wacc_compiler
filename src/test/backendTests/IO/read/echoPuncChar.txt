@@ -1,4 +1,0 @@
-0
-enter a character to echo
-#input#
-#output#

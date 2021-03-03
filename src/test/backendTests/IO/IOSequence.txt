@@ -1,3 +1,0 @@
-0
-Please input an integer: #input#
-You input: #output#

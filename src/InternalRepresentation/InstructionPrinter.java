@@ -118,9 +118,9 @@ public class InstructionPrinter {
       Register offsetReg1, Register offsetReg2, int offsetImm, boolean useExclamation) {
     StringBuilder instruction = new StringBuilder(type.toString());
 
-    instruction.append(", ").
+    instruction.append(" ").
         append(destReg.getRegName()).
-        append("[").
+        append(" [").
         append(offsetReg1.getRegName());
 
     if (offsetReg2 != null) {
