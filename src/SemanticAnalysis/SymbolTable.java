@@ -8,7 +8,6 @@ public class SymbolTable {
   private final SymbolTable parentSymTable;
   private final Map<String, Identifier> dictionary = new HashMap<>();
   private final Map<String, Integer> offsetPerVar = new HashMap<>();
-  private int sizeOfCurrScope = 0;
 
   public SymbolTable(SymbolTable parentSymTable) {
     this.parentSymTable = parentSymTable;
@@ -47,9 +46,11 @@ public class SymbolTable {
     if (parentSymTable == null && !offsetPerVar.containsKey(id)) {
       return 0;
     }
+
     if (!offsetPerVar.containsKey(id)) {
-      return parentSymTable.getOffset(id);
+      return parentSymTable.getOffset(id) + getVarsSize();
     }
+
     return offsetPerVar.get(id);
   }
 
@@ -62,7 +63,7 @@ public class SymbolTable {
         totalSize += identifier.getSize();
       }
     }
-    sizeOfCurrScope = totalSize;
+
     return totalSize;
   }
 }

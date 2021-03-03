@@ -34,7 +34,19 @@ public enum BuiltInFunction {
     }
 
     public void setUsed() {
-        this.used = true;
+      this.used = true;
+
+      switch (this) {
+        case OVERFLOW:
+        case ARRAY_BOUNDS:
+        case DIV_ZERO:
+        case NULL_POINTER:
+        case FREE_PAIR:
+          RUNTIME.setUsed();
+          break;
+        case RUNTIME:
+          PRINT_STRING.setUsed();
+      }
     }
 
     public String getLabel() {

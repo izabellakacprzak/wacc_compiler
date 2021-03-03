@@ -21,16 +21,13 @@ import java.util.*;
 
 public class InternalState {
 
+  private static final int MAX_STACK_ARITHMETIC_SIZE = 1024;
   private static final String LINE_BREAK = "\n";
   private static final String TAB = "\t";
 
-
-  private final Set<String> declaredLabels;
   private final List<Instruction> generatedInstructions;
-  private final int MAX_STACK_ARITHMETIC_SIZE = 1024;
-  int argStackOffset = 0;
-  private List<BuiltInFunction> builtInLabels;
   private Stack<Register> availableRegs;
+  private int argStackOffset = 0;
   private int labelCount;
 
   public InternalState() {
@@ -38,10 +35,7 @@ public class InternalState {
     resetAvailableRegs();
     //TODO check callee reserved regs => main func starts from R4
     //TODO change this to a stack!!!!
-    declaredLabels = new HashSet<>();
     generatedInstructions = new ArrayList<>();
-    builtInLabels = BuiltInFunction.getUsed();
-
     labelCount = 0;
   }
 
@@ -54,24 +48,8 @@ public class InternalState {
       CustomBuiltInFunctions customBuiltInFunctions = new CustomBuiltInFunctions();
       List<Instruction> instructions = new ArrayList<>();
 
-      builtInLabels = BuiltInFunction.getUsed();
-
-      if (!builtInLabels.isEmpty()) {
-        //TODO: don't generate things twice if u can
-        List<Instruction> builtIns;
-        int size;
-        do {
-          builtIns = new ArrayList<>();
-
-          for (BuiltInFunction label : builtInLabels) {
-            builtIns.addAll(customBuiltInFunctions.generateAssembly(label));
-          }
-
-          size = builtInLabels.size();
-          builtInLabels = BuiltInFunction.getUsed();
-        } while (size < builtInLabels.size());
-
-        instructions.addAll(builtIns);
+      for (BuiltInFunction label : BuiltInFunction.getUsed()) {
+        instructions.addAll(customBuiltInFunctions.generateAssembly(label));
       }
 
       if (!MsgInstruction.getMessages().isEmpty()) {
@@ -84,9 +62,10 @@ public class InternalState {
           writer.write(msg.writeInstruction());
           writer.write(LINE_BREAK);
         }
+
+        writer.write(LINE_BREAK);
       }
 
-      writer.write("\n");
       writer.write(new DirectiveInstruction(TEXT).writeInstruction());
       writer.write(LINE_BREAK);
       writer.write(LINE_BREAK);
@@ -184,7 +163,6 @@ public class InternalState {
 
   public String generateNewLabel() {
     String newLabel = "L" + labelCount;
-    declaredLabels.add(newLabel);
     labelCount++;
     return newLabel;
   }

@@ -66,11 +66,17 @@ public class IfStatementNode extends StatementNode {
         new CompareInstruction(internalState.peekFreeRegister(), new Operand(0)));
     internalState.addInstruction(
         new BranchInstruction(ConditionCode.EQ, BranchOperation.B, elseLabel));
+
+    internalState.allocateStackSpace(thenStatement.getCurrSymTable());
     thenStatement.generateAssembly(internalState);
+    internalState.deallocateStackSpace(thenStatement.getCurrSymTable());
+
     internalState.addInstruction(new BranchInstruction(BranchOperation.B, endIfLabel));
 
     internalState.addInstruction(new LabelInstruction(elseLabel));
+    internalState.allocateStackSpace(elseStatement.getCurrSymTable());
     elseStatement.generateAssembly(internalState);
+    internalState.deallocateStackSpace(elseStatement.getCurrSymTable());
     internalState.addInstruction(new LabelInstruction(endIfLabel));
   }
 
