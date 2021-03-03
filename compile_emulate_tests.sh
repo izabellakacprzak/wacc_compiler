@@ -27,36 +27,37 @@ run_test_in_dir() {
                   correctFlag=true
                   while read -r refLine;
                     do
-                     if "$flag" && [ "$refLine" -eq "===========================================================" ]; then
+                     if "$flag" && [ "$refLine" = "===========================================================" ]; then
                         flag=false
                       fi
                       flag=true
                       { read -r;
                       while "$correctFlag" && "$flag" && read -r refLine;
                         do
-                          if "$flag" && [ "$refLine" -eq "===========================================================" ]; then
+                          if "$flag" && [ "$refLine" = "===========================================================" ]; then
                             flag=false
+                            read -r refLine
                           fi
-                          if not[ $flag ]; then
+                          if [ ! $flag ]; then
                             #compare outputs
                             ourLine=$(read -r ${pathname/valid/backendTests});
-                            if not[ refLine -eq ourLine ]; then
+                            if [ "$refLine" != "$ourLine" ]; then
                               correctFlag=false
                             fi
                           fi
                         done; } < ${refOutput/.wacc/.txt}
 
                       #compare exit code
-                      if not[refLine -eq "The exit code is ${ourExitCode}."]; then
+                      if [ "$refLine" != "The exit code is ${ourExitCode}." ] ; then
                         correctFlag=false
                       fi
                     done; } < ${refOutput/.wacc/.txt}
 
-                    if [ $correctFlag ]; then
+                   if [ $correctFlag ]; then
                       passedTests=$((passedTests + 1))
-                      echo ${GREEN}passed${NC}: test $runTests "$pathname"
+                      echo -e "$GREEN"passed"$NC": test "$runTests" "$pathname"
                     else
-                      echo ${RED}failed${NC}: test $runTests "$pathname"
+                      echo -e "$RED"failed"$NC": test "$runTests" "$pathname"
                     fi
                     runTests=$((runTests + 1))
             esac
@@ -89,36 +90,37 @@ run_tests () {
                   correctFlag=true
                   while read -r refLine;
                     do
-                      if "$flag" && [ "$refLine" -eq "===========================================================" ]; then
+                      if "$flag" && [ "$refLine" = "===========================================================" ]; then
                         flag=false
                       fi
                       flag=true
                       { read -r;
                       while "$correctFlag" && "$flag" && read -r refLine;
                         do
-                          if "$flag" && [ "$refLine" -eq "===========================================================" ]; then
+                          if "$flag" && [ "$refLine" = "===========================================================" ]; then
                             flag=false
+                            read -r refLine
                           fi
-                          if not[ $flag ]; then
+                          if [ ! $flag ]; then
                             #compare outputs
                             ourLine=$(read -r ${pathname/valid/backendTests});
-                            if not[ refLine -eq ourLine ]; then
+                            if [ "$refLine" != "$ourLine" ]; then
                               correctFlag=false
                             fi
                           fi
                         done; } < ${refOutput/.wacc/.txt}
 
                       #compare exit code
-                      if not[ refLine -eq "The exit code is ${ourExitCode}."]; then
+                      if [ "$refLine" != "The exit code is ${ourExitCode}." ] ; then
                         correctFlag=false
                       fi
                     done; } < ${refOutput/.wacc/.txt}
 
                     if [ $correctFlag ]; then
                       passedTests=$((passedTests + 1))
-                      echo ${GREEN}passed${NC}: test $runTests "$pathname"
+                      echo -e "$GREEN"passed"$NC": test "$runTests" "$pathname"
                     else
-                      echo ${RED}failed${NC}: test $runTests "$pathname"
+                      echo -e "$RED"failed"$NC": test "$runTests" "$pathname"
                     fi
                     runTests=$((runTests + 1))
             esac
@@ -126,9 +128,9 @@ run_tests () {
     done
 }
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-NC='\033[0m' # No Color
+RED='\e[31m'
+GREEN='\e[32m'
+NC='\e[39m' # No Color
 runTests=0
 passedTests=0
 touch output.txt

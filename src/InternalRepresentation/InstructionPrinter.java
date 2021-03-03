@@ -120,7 +120,7 @@ public class InstructionPrinter {
 
     instruction.append(" ").
         append(destReg.getRegName()).
-        append(" [").
+        append(", [").
         append(offsetReg1.getRegName());
 
     if (offsetReg2 != null) {
