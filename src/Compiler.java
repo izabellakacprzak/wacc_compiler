@@ -17,13 +17,31 @@ public class Compiler {
   private static final int INPUT_FILE_ERROR = 1;
   private static final int SEMANTIC_ERROR_CODE = 200;
 
-
   public static void main(String[] args) {
 
     /* Checks the number of arguments of the program and gets as input
      * the path to the .wacc file to compile. */
-    if (args.length != 1) {
+    if (args.length > 2) {
       throw new IllegalArgumentException("Incorrect number of arguments received");
+    }
+
+    /* if mode is -p then perform syntax check
+     * if mode is -s then perform syntax and semantic check
+     * if mode is -a then perform syntax and semantic check, generate assembly and save to .s file
+     * if mode is -h then print help message */
+    String mode = "-h";
+    if (args.length == 2) {
+      mode = args[1];
+    }
+
+    if(mode.equals("-h")) {
+      System.out.println(
+          "if mode is -p then perform syntax check\n"
+              + "if mode is -s then perform syntax and semantic check\n"
+              + "if mode is -a then perform syntax and semantic check, "
+              + "generate assembly and save to .s file\n"
+              + "if mode is -h then print help message");
+      return;
     }
 
     CharStream input = null;
@@ -52,14 +70,13 @@ public class Compiler {
 
     ParseTree tree = parser.program();
 
-
     /* If the  syntax error listener has been notified of error during parsing, then the
      * accumulated errors are printed after parsing and the program exits with the syntax
      * error code. */
     if (syntaxErrorListener.hasSyntaxErrors()) {
       syntaxErrorListener.printAllErrors();
-      System.out
-          .println(syntaxErrorListener.syntaxErrorsCount() + " syntax errors detected, exiting...");
+      System.out.println(
+          syntaxErrorListener.syntaxErrorsCount() + " syntax errors detected, exiting...");
       System.exit(SYNTAX_ERROR_CODE);
     }
 
@@ -78,32 +95,36 @@ public class Compiler {
       System.exit(SYNTAX_ERROR_CODE);
     }
 
-    /* If there are no syntax errors, it proceeds to semantic error checking and creates a new
-     * semanticErrorListener object. */
-    SemanticErrorListener semanticErrorListener = new SemanticErrorListener();
-    SymbolTable topSymbolTable = new SymbolTable(null);
+    if (mode.equals("-s") || mode.equals("-a")) {
+      /* If there are no syntax errors, it proceeds to semantic error checking and creates a new
+       * semanticErrorListener object. */
+      SemanticErrorListener semanticErrorListener = new SemanticErrorListener();
+      SymbolTable topSymbolTable = new SymbolTable(null);
 
-    prog.semanticAnalysis(topSymbolTable, semanticErrorListener.getList());
+      prog.semanticAnalysis(topSymbolTable, semanticErrorListener.getList());
 
-    /* If the  semantic error listener has been notified of error during semantic checking ,
-     * then the accumulated errors are printed after and the program exits with the semantic
-     * error code. */
-    if (semanticErrorListener.hasSemanticErrors()) {
-      semanticErrorListener.printAllErrors();
-      System.out.println(
-          semanticErrorListener.semanticErrorsCount() + " semantic errors detected, exiting...");
-      System.exit(SEMANTIC_ERROR_CODE);
-    }
+      /* If the  semantic error listener has been notified of error during semantic checking ,
+       * then the accumulated errors are printed after and the program exits with the semantic
+       * error code. */
+      if (semanticErrorListener.hasSemanticErrors()) {
+        semanticErrorListener.printAllErrors();
+        System.out.println(
+            semanticErrorListener.semanticErrorsCount() + " semantic errors detected, exiting...");
+        System.exit(SEMANTIC_ERROR_CODE);
+      }
 
-    File assemblyFile = new File(args[0].replaceFirst(".wacc", ".s"));
-    try {
-      InternalState state = new InternalState();
-      assemblyFile.delete();
-      if (assemblyFile.createNewFile()) {
-        state.generateAssembly(assemblyFile, prog);
-    }
-    } catch (IOException e) {
-      System.out.println("Could not create new file");
+      if (mode.equals("-a")) {
+        File assemblyFile = new File(args[0].replaceFirst(".wacc", ".s"));
+        try {
+          InternalState state = new InternalState();
+          assemblyFile.delete();
+          if (assemblyFile.createNewFile()) {
+            state.generateAssembly(assemblyFile, prog);
+          }
+        } catch (IOException e) {
+          System.out.println("Could not create new file");
+        }
+      }
     }
   }
 }
