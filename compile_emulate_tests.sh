@@ -8,32 +8,57 @@ run_test_in_dir() {
             case "$pathname" in
                 *.wacc)
                   echo running test $runTests "$pathname"
-                  output=${pathname/valid/backendTests}
                   flag=true
-		  refOutput=${pathname/valid/backendTests}
-		  ./refCompile "-x" "$pathname" > ${refOutput/.wacc/.txt}
+
+		              refOutput=${pathname/valid/backendTests}
+
+		              if not test -f ${refOutput/.wacc/.txt}; then
+		                ./refCompile "-x" "$pathname" > ${refOutput/.wacc/.txt}
+		              fi
+
                   ./compile "$pathname" "-a">/dev/null 2>&1
                   arm-linux-gnueabi-gcc -o ${pathname/.wacc/} -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
                   qemu-arm -L /usr/arm-linux-gnueabi/ ${pathname/.wacc/} > output.txt
+                  ourExitCode=$?
                   rm ${pathname/.wacc/.s}
                   rm ${pathname/.wacc/}
-                  if [ "$refCode" -eq $? ]; then
-                    { read -r;
-                    while read -r refLine && $flag;
+
+                  { read -r;
+                  correctFlag=true
+                  while read -r refLine;
                     do
-                      ourLine=$(read -r ${pathname/valid/backendTests});
-                      if not[ "$refLine" -eq "$ourLine" ]; then
+                      if flag && [ "$refLine" -eq "===========================================================" ]; then
                         flag=false
                       fi
-                    done; } < output.txt
-                    if [ $flag ]; then
+                      flag=true
+                      { read -r;
+                      while correctFlag && flag && read -r refLine;
+                        do
+                          if flag && [ "$refLine" -eq "===========================================================" ]; then
+                            flag=false
+                          fi
+                          if not flag; then
+                            #compare outputs
+                            ourLine=$(read -r ${pathname/valid/backendTests});
+                            if not[ refLine -eq ourLine ]; then
+                              correctFlag=false
+                            fi
+                          fi
+                        done; } < ${refOutput/.wacc/.txt}
+
+                      #compare exit code
+                      if not[refLine -eq "The exit code is ${ourExitCode}."]; then
+                        correctFlag=false
+                      fi
+                    done; } < ${refOutput/.wacc/.txt}
+
+                    if [ $correctFlag ]; then
                       passedTests=$((passedTests + 1))
                       echo ${GREEN}passed${NC}: test $runTests "$pathname"
                     else
                       echo ${RED}failed${NC}: test $runTests "$pathname"
                     fi
-                  fi
-                  runTests=$((runTests + 1))
+                    runTests=$((runTests + 1))
             esac
         fi
     done
@@ -47,32 +72,55 @@ run_tests () {
             case "$pathname" in
                 *.wacc)
                   echo running test $runTests "$pathname"
-                  output=${pathname/valid/backendTests}
-                  refLine=$(head -n 1 ${output/.wacc/.txt})
-                  refCode=$((refLine))
                   flag=true
+
+                  if not test -f ${refOutput/.wacc/.txt}; then
+		                ./refCompile "-x" "$pathname" > ${refOutput/.wacc/.txt}
+		              fi
+
                   ./compile "$pathname" "-a">/dev/null 2>&1
                   arm-linux-gnueabi-gcc -o ${pathname/.wacc/} -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
                   qemu-arm -L /usr/arm-linux-gnueabi/ ${pathname/.wacc/} > output.txt
+                  ourExitCode=$?
                   rm ${pathname/.wacc/.s}
                   rm ${pathname/.wacc/}
-                  if [ "$refCode" -eq $? ]; then
-                    { read -r;
-                    while read -r refLine && $flag;
+
+                  { read -r;
+                  correctFlag=true
+                  while read -r refLine;
                     do
-                      ourLine=$(read -r ${pathname/valid/backendTests});
-                      if not[ "$refLine" -eq "$ourLine" ]; then
+                      if flag && [ "$refLine" -eq "===========================================================" ]; then
                         flag=false
                       fi
-                    done; } < output.txt
-                    if [ $flag ]; then
+                      flag=true
+                      { read -r;
+                      while correctFlag && flag && read -r refLine;
+                        do
+                          if flag && [ "$refLine" -eq "===========================================================" ]; then
+                            flag=false
+                          fi
+                          if not flag; then
+                            #compare outputs
+                            ourLine=$(read -r ${pathname/valid/backendTests});
+                            if not[ refLine -eq ourLine ]; then
+                              correctFlag=false
+                            fi
+                          fi
+                        done; } < ${refOutput/.wacc/.txt}
+
+                      #compare exit code
+                      if not[refLine -eq "The exit code is ${ourExitCode}."]; then
+                        correctFlag=false
+                      fi
+                    done; } < ${refOutput/.wacc/.txt}
+
+                    if [ $correctFlag ]; then
                       passedTests=$((passedTests + 1))
                       echo ${GREEN}passed${NC}: test $runTests "$pathname"
                     else
                       echo ${RED}failed${NC}: test $runTests "$pathname"
                     fi
-                  fi
-                  runTests=$((runTests + 1))
+                    runTests=$((runTests + 1))
             esac
         fi
     done
