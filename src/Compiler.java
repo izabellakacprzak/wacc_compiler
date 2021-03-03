@@ -29,7 +29,7 @@ public class Compiler {
      * if mode is -s then perform syntax and semantic check
      * if mode is -a then perform syntax and semantic check, generate assembly and save to .s file
      * if mode is -h then print help message */
-    String mode = "-h";
+    String mode = "-a";
     if (args.length == 2) {
       mode = args[1];
     }
@@ -114,10 +114,13 @@ public class Compiler {
       }
 
       if (mode.equals("-a")) {
-        File assemblyFile = new File(args[0].replaceFirst(".wacc", ".s"));
+        String[] path = args[0].split("/");
+
+        File assemblyFile = new File(path[path.length - 1].replaceFirst(".wacc", ".s"));
         try {
           InternalState state = new InternalState();
           assemblyFile.delete();
+
           if (assemblyFile.createNewFile()) {
             state.generateAssembly(assemblyFile, prog);
           }
