@@ -26,9 +26,14 @@ public class BoolLiterExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    int intValue = value? 1 : 0;
+    int intValue = value ? 1 : 0;
     Register currDestination = internalState.peekFreeRegister();
     internalState.addInstruction(new MovInstruction(currDestination, intValue));
+  }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
   }
 
   @Override

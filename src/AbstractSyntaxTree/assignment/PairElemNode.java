@@ -92,6 +92,11 @@ public class PairElemNode extends AssignRHSNode {
   }
 
   @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
+
+  @Override
   public DataTypeId getType(SymbolTable symbolTable) {
     /* Check that expression is an IdentifierNode */
     if (!(expression instanceof IdentifierNode)) {

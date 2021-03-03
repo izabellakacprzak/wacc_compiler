@@ -41,8 +41,4 @@ public abstract class StatementNode implements ASTNode {
 
     return false;
   }
-
-  public SymbolTable getCurrSymTable() {
-    return null;
-  }
 }

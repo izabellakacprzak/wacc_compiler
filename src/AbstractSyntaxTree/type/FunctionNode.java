@@ -40,10 +40,6 @@ public class FunctionNode implements TypeNode {
     this.bodyStatement = bodyStatement;
   }
 
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
-  }
-
   public void setCurrSymTable(SymbolTable currSymTable) {
     this.currSymTable = currSymTable;
   }
@@ -76,6 +72,8 @@ public class FunctionNode implements TypeNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
+
     /* Set the expected return type in the corresponding ReturnStatementNode of the
      * function body */
     bodyStatement.setReturnType(returnType.getType());
@@ -102,6 +100,11 @@ public class FunctionNode implements TypeNode {
   public Identifier getIdentifier(SymbolTable symbolTable) {
     return new FunctionId(identifier, returnType.getType(),
         params.getIdentifiers(symbolTable));
+  }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
   }
 
   @Override

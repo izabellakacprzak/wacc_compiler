@@ -29,6 +29,11 @@ public class ParenthesisExprNode extends ExpressionNode {
   }
 
   @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
+
+  @Override
   public DataTypeId getType(SymbolTable symbolTable) {
     return innerExpr.getType(symbolTable);
   }

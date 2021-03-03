@@ -94,11 +94,17 @@ public class ArrayLiterNode extends AssignRHSNode {
     }
 
     Register noOfArrElemsReg = internalState.peekFreeRegister();
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, noOfArrElemsReg, expressions.size()));
-    internalState.addInstruction(new StrInstruction(StrType.STR, reg, noOfArrElemsReg));
+    internalState
+        .addInstruction(new LdrInstruction(LdrType.LDR, noOfArrElemsReg, expressions.size()));
+    internalState.addInstruction(new StrInstruction(StrType.STR, noOfArrElemsReg, reg));
 
     //push back and free nextAvailable allocation register
     internalState.pushFreeRegister(reg);
+  }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
   }
 
   @Override

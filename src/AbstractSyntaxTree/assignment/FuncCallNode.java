@@ -135,13 +135,19 @@ public class FuncCallNode extends AssignRHSNode {
     //de-allocate stack from the function arguments. Max size for one de-allocation is 1024B
     while (argsTotalSize > 0) {
       internalState.addInstruction(
-          new ArithmeticInstruction(ArithmeticOperation.ADD, Register.SP, Register.SP, new Operand(Math.min(argsTotalSize, MAX_DEALLOCATION_SIZE)),
+          new ArithmeticInstruction(ArithmeticOperation.ADD, Register.SP, Register.SP,
+              new Operand(Math.min(argsTotalSize, MAX_DEALLOCATION_SIZE)),
               false));
       argsTotalSize -= Math.min(argsTotalSize, MAX_DEALLOCATION_SIZE);
     }
 
     //move the result stored in R0 in the first free register
     internalState.addInstruction(new MovInstruction(internalState.peekFreeRegister(), Register.R0));
+  }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
   }
 
   /* Return the return type of the function */

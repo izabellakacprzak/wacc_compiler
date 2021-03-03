@@ -17,6 +17,7 @@ import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 import static InternalRepresentation.Enums.ConditionCode.VS;
+import static InternalRepresentation.Enums.LdrType.LDR;
 
 public class AssignVarNode extends StatementNode {
 
@@ -63,66 +64,69 @@ public class AssignVarNode extends StatementNode {
     if (leftType == null) {
       if (varHasBeenDeclared(errorMessages, left)) {
         errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
-                              + " Could not resolve type of LHS assignment '" + left + "'.");
+            + " Could not resolve type of LHS assignment '" + left + "'.");
       }
     } else if (rightType == null) {
       if (varHasBeenDeclared(errorMessages, right)) {
         errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
-                              + " Could not resolve type of RHS assignment'" + right + "'.");
+            + " Could not resolve type of RHS assignment'" + right + "'.");
       }
     } else if (!leftType.equals(rightType) && !stringToCharArray(leftType, rightType)) {
       errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
-                            + " RHS type does not match LHS type for assignment. "
-                            + " Expected: " + leftType + " Actual: " + rightType);
+          + " RHS type does not match LHS type for assignment. "
+          + " Expected: " + leftType + " Actual: " + rightType);
     }
   }
 
   @Override
   public void generateAssembly(InternalState internalState) {
     right.generateAssembly(internalState);
+    Register rightNodeResult = internalState.popFreeRegister();
 
     if (left instanceof IdentifierNode) {
-      Register nextReg = internalState.peekFreeRegister();
       int typeSize = left.getType(currSymTable).getSize();
-
       int offset = currSymTable.getOffset(((IdentifierNode) left).getIdentifier());
+
       StrType strType = typeSize == BYTE_SIZE ? StrType.STRB : StrType.STR;
-      internalState.addInstruction(new StrInstruction(strType, nextReg, Register.SP, offset));
+      internalState
+          .addInstruction(new StrInstruction(strType, rightNodeResult, Register.SP, offset));
+
     } else if (left instanceof PairElemNode) {
       PairElemNode pairElem = (PairElemNode) left;
-      Register rightNodeResult = internalState.popFreeRegister();
       Register leftNodeResult = internalState.peekFreeRegister();
 
       String pairID = pairElem.getIdentifier();
       int offset = currSymTable.getOffset(pairID) + pairElem.getPosition() * ADDRESS_BYTE_SIZE;
 
-      internalState.addInstruction(new LdrInstruction(LdrType.LDR, leftNodeResult, Register.SP, offset));
+      internalState
+          .addInstruction(new LdrInstruction(LdrType.LDR, leftNodeResult, Register.SP, offset));
       internalState.addInstruction(new MovInstruction(Register.R0, leftNodeResult));
 
       internalState
           .addInstruction(new BranchInstruction(BranchOperation.BL, BuiltInFunction.NULL_POINTER));
 
       internalState.addInstruction(new LdrInstruction(LdrType.LDR, leftNodeResult, leftNodeResult,
-              pairElem.getPosition() * ADDRESS_BYTE_SIZE));
+          pairElem.getPosition() * ADDRESS_BYTE_SIZE));
 
-      StrType strType = pairElem.getType(currSymTable).getSize() == BYTE_SIZE ? StrType.STRB : StrType.STR;
+      StrType strType =
+          pairElem.getType(currSymTable).getSize() == BYTE_SIZE ? StrType.STRB : StrType.STR;
       internalState.addInstruction(new StrInstruction(strType, rightNodeResult, leftNodeResult));
 
-      internalState.pushFreeRegister(rightNodeResult);
-    } else if ( left instanceof ArrayElemNode) {
-      ArrayElemNode arrayElem = (ArrayElemNode) left;
-
-      Register rightNodeResult = internalState.popFreeRegister();
+    } else if (left instanceof ArrayElemNode) {
       Register arrayReg = internalState.popFreeRegister();
 
-      // TODO: arrayElem.generateElemAddr(internalState, left, arrayReg);
+      ArrayElemNode arrayElem = (ArrayElemNode) left;
+      arrayElem.generateElemAddr(internalState, arrayReg);
 
-      StrType strType = arrayElem.getType(currSymTable).getSize() == BYTE_SIZE ? StrType.STRB : StrType.STR;
-      internalState.addInstruction(new StrInstruction(strType, rightNodeResult, arrayReg));
+      StrType strType =
+          arrayElem.getType(currSymTable).getSize() == BYTE_SIZE ? StrType.STRB : StrType.STR;
+      internalState.addInstruction(
+          new StrInstruction(strType, rightNodeResult, arrayReg));
 
       internalState.pushFreeRegister(arrayReg);
-      internalState.pushFreeRegister(rightNodeResult);
     }
+
+    internalState.pushFreeRegister(rightNodeResult);
   }
 
   @Override

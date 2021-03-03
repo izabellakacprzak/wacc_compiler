@@ -82,16 +82,21 @@ public class NewPairNode extends AssignRHSNode {
 
     StrType strInstr2 = (fstSize == 1) ? StrType.STRB : StrType.STR;
     internalState
-        .addInstruction(new StrInstruction(strInstr2, internalState.peekFreeRegister(),  Register.R0));
+        .addInstruction(
+            new StrInstruction(strInstr2, internalState.peekFreeRegister(), Register.R0));
 
     internalState.addInstruction(
-        new StrInstruction(StrType.STR,  Register.R0, internalState.peekFreeRegister(),
+        new StrInstruction(StrType.STR, Register.R0, internalState.peekFreeRegister(),
             ADDRESS_BYTES_SIZE));
     /* end sndExpr code generation */
 
     internalState.pushFreeRegister(reg);
   }
 
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
 
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {

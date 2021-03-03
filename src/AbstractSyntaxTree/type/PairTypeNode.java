@@ -13,6 +13,7 @@ public class PairTypeNode implements TypeNode {
    * sndType:  TypeNode of the second element in the pair's type */
   private final TypeNode fstType;
   private final TypeNode sndType;
+  private SymbolTable currSymTable;
 
   public PairTypeNode(TypeNode fstType, TypeNode sndType) {
     this.fstType = fstType;
@@ -31,6 +32,8 @@ public class PairTypeNode implements TypeNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
+
     /* Recursively call semanticAnalysis on each type */
     if (fstType != null) {
       fstType.semanticAnalysis(symbolTable, errorMessages);
@@ -44,6 +47,11 @@ public class PairTypeNode implements TypeNode {
   @Override
   public void generateAssembly(InternalState internalState) {
 
+  }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
   }
 
   @Override

@@ -90,32 +90,39 @@ public class ArrayElemNode extends ExpressionNode {
   public void generateAssembly(InternalState internalState) {
     // get available register
     Register arrayReg = internalState.popFreeRegister();
-    // put address of array into register
-    // TODO: get offset of array
-    int offset = currSymTable.getOffset(identifier.getIdentifier());
-    internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, SP, new Operand(offset), false));
-    // evaluate each index expression
-    Register exprReg = null;
-    for (ExpressionNode expression : expressions) {
-      generateElemAddr(internalState, expression, arrayReg);
-    }
+
+    generateElemAddr(internalState, arrayReg);
+    internalState.addInstruction(new LdrInstruction(LDR, arrayReg, arrayReg));
+
     internalState.pushFreeRegister(arrayReg);
   }
 
-  private void generateElemAddr(InternalState internalState, ExpressionNode expression,
-                                Register arrayReg) {
-    expression.generateAssembly(internalState);
-    Register exprReg = internalState.peekFreeRegister();
-    internalState.addInstruction(new LdrInstruction(LDR, arrayReg, arrayReg));
-    // move result of expression to R0
-    internalState.addInstruction(new MovInstruction(R0, exprReg));
-    // move result of array to R1
-    internalState.addInstruction(new MovInstruction(R1, arrayReg));
-    internalState.addInstruction(new BranchInstruction(BL, ARRAY_BOUNDS));
-    internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
-        new Operand(INT_BYTES_SIZE), false));
-    internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
-        new Operand(exprReg, new Shift(LSL, 2)), false));
+  public void generateElemAddr(InternalState internalState, Register arrayReg) {
+    // put address of array into register
+    int offset = currSymTable.getOffset(identifier.getIdentifier());
+    internalState
+        .addInstruction(new ArithmeticInstruction(ADD, arrayReg, SP, new Operand(offset), false));
+
+    // evaluate each index expression
+    for (ExpressionNode expression : expressions) {
+      expression.generateAssembly(internalState);
+      Register exprReg = internalState.peekFreeRegister();
+      internalState.addInstruction(new LdrInstruction(LDR, arrayReg, arrayReg));
+      // move result of expression to R0
+      internalState.addInstruction(new MovInstruction(R0, exprReg));
+      // move result of array to R1
+      internalState.addInstruction(new MovInstruction(R1, arrayReg));
+      internalState.addInstruction(new BranchInstruction(BL, ARRAY_BOUNDS));
+      internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
+          new Operand(INT_BYTES_SIZE), false));
+      internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
+          new Operand(exprReg, new Shift(LSL, 2)), false));
+    }
+  }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
   }
 
   /* Return the type of the elements stored in identifier array */

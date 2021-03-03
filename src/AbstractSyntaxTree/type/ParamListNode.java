@@ -45,6 +45,8 @@ public class ParamListNode implements ASTNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
+
     /* Recursively call semanticAnalysis on each identifier */
     for (IdentifierNode identifier : identifiers) {
       identifier.semanticAnalysis(symbolTable, errorMessages);

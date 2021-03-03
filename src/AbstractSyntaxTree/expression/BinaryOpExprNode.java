@@ -217,6 +217,11 @@ public class BinaryOpExprNode extends ExpressionNode {
   }
 
   @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
+
+  @Override
   public DataTypeId getType(SymbolTable symTable) {
     return operator.getReturnType();
   }

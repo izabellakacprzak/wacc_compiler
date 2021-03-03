@@ -11,6 +11,7 @@ public class ArrayTypeNode implements TypeNode {
 
   /* type:  TypeNode of the corresponding type of elements the array contains */
   private final TypeNode type;
+  private SymbolTable currSymTable = null;
 
   public ArrayTypeNode(TypeNode type) {
     this.type = type;
@@ -18,6 +19,8 @@ public class ArrayTypeNode implements TypeNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    currSymTable = symbolTable;
+
     /* Recursively call semanticAnalysis on type */
     type.semanticAnalysis(symbolTable, errorMessages);
   }
@@ -25,6 +28,11 @@ public class ArrayTypeNode implements TypeNode {
   @Override
   public void generateAssembly(InternalState internalState) {
 
+  }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
   }
 
   @Override

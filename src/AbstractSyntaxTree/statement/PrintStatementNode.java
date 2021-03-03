@@ -3,8 +3,10 @@ package AbstractSyntaxTree.statement;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.Enums.BranchOperation;
 import InternalRepresentation.Enums.BuiltInFunction;
+import InternalRepresentation.Enums.LdrType;
 import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Instructions.BranchInstruction;
+import InternalRepresentation.Instructions.LdrInstruction;
 import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
@@ -38,6 +40,7 @@ public class PrintStatementNode extends StatementNode {
     Register nextAvailable = internalState.peekFreeRegister();
 
     internalState.addInstruction(new MovInstruction(Register.R0, nextAvailable));
+
     DataTypeId type = expression.getType(currSymTable);
 
     if (type instanceof ArrayType) {

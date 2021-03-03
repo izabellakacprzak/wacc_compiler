@@ -1,9 +1,5 @@
 package AbstractSyntaxTree;
 
-import static InternalRepresentation.Enums.Directive.LTORG;
-import static InternalRepresentation.Enums.LdrType.*;
-import static InternalRepresentation.Enums.Register.*;
-
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.type.FunctionNode;
@@ -16,7 +12,6 @@ import InternalRepresentation.Instructions.PushInstruction;
 import InternalRepresentation.Enums.Directive;
 import InternalRepresentation.Enums.LdrType;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Operand;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.SymbolTable;
 
@@ -31,6 +26,7 @@ public class ProgramNode implements ASTNode {
   private final StatementNode statementNode;
   private final List<FunctionNode> functionNodes;
   private final List<String> syntaxErrors;
+  private SymbolTable currSymTable;
 
 
   public ProgramNode(StatementNode statementNode, List<FunctionNode> functionNodes) {
@@ -54,6 +50,8 @@ public class ProgramNode implements ASTNode {
 
   @Override
   public void semanticAnalysis(SymbolTable topSymbolTable, List<String> errorMessages) {
+    currSymTable = topSymbolTable;
+
     for (FunctionNode func : functionNodes) {
       /* Create a new SymbolTable for the function's scope */
       func.setCurrSymTable(new SymbolTable(topSymbolTable));
@@ -62,7 +60,7 @@ public class ProgramNode implements ASTNode {
         /* A function with the same name has already been declared */
         IdentifierNode id = func.getIdentifierNode();
         errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
-                              + " Function '" + func + "' has already been declared.");
+            + " Function '" + func + "' has already been declared.");
 
       } else {
         /* Create function identifier and add it to the topSymbolTable */
@@ -98,11 +96,17 @@ public class ProgramNode implements ASTNode {
 
     statementNode.generateAssembly(internalState);
 
-    if (statementNode.getCurrSymTable() != null)
+    if (statementNode.getCurrSymTable() != null) {
       internalState.deallocateStackSpace(statementNode.getCurrSymTable());
+    }
 
     internalState.addInstruction(new LdrInstruction(LdrType.LDR, Register.R0, 0));
     internalState.addInstruction(new PopInstruction(Register.PC));
     internalState.addInstruction(new DirectiveInstruction(Directive.LTORG));
+  }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
   }
 }

@@ -61,6 +61,11 @@ public class IdentifierNode extends ExpressionNode {
   }
 
   @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
+
+  @Override
   public DataTypeId getType(SymbolTable symbolTable) {
     /* Check whether identifier is declared as a VariableId, ParameterId or FunctionId
      * and return the type if so */
