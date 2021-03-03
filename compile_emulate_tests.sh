@@ -12,8 +12,8 @@ run_test_in_dir() {
 
 		              refOutput=${pathname/valid/backendTests}
 
-		              if not test -f ${refOutput/.wacc/.txt}; then
-		                ./refCompile "-x" "$pathname" > ${refOutput/.wacc/.txt}
+		              if [ ! -e ${refOutput/.wacc/.txt} ]; then
+		                echo $'\n' | ./refCompile "-x" "$pathname" > ${refOutput/.wacc/.txt}
 		              fi
 
                   ./compile "$pathname" "-a">/dev/null 2>&1
@@ -27,17 +27,17 @@ run_test_in_dir() {
                   correctFlag=true
                   while read -r refLine;
                     do
-                      if flag && [ "$refLine" -eq "===========================================================" ]; then
+                     if "$flag" && [ "$refLine" -eq "===========================================================" ]; then
                         flag=false
                       fi
                       flag=true
                       { read -r;
-                      while correctFlag && flag && read -r refLine;
+                      while "$correctFlag" && "$flag" && read -r refLine;
                         do
-                          if flag && [ "$refLine" -eq "===========================================================" ]; then
+                          if "$flag" && [ "$refLine" -eq "===========================================================" ]; then
                             flag=false
                           fi
-                          if not flag; then
+                          if not[ $flag ]; then
                             #compare outputs
                             ourLine=$(read -r ${pathname/valid/backendTests});
                             if not[ refLine -eq ourLine ]; then
@@ -74,7 +74,7 @@ run_tests () {
                   echo running test $runTests "$pathname"
                   flag=true
 
-                  if not test -f ${refOutput/.wacc/.txt}; then
+		              if not[ -e ${refOutput/.wacc/.txt} ]; then
 		                ./refCompile "-x" "$pathname" > ${refOutput/.wacc/.txt}
 		              fi
 
@@ -89,17 +89,17 @@ run_tests () {
                   correctFlag=true
                   while read -r refLine;
                     do
-                      if flag && [ "$refLine" -eq "===========================================================" ]; then
+                      if "$flag" && [ "$refLine" -eq "===========================================================" ]; then
                         flag=false
                       fi
                       flag=true
                       { read -r;
-                      while correctFlag && flag && read -r refLine;
+                      while "$correctFlag" && "$flag" && read -r refLine;
                         do
-                          if flag && [ "$refLine" -eq "===========================================================" ]; then
+                          if "$flag" && [ "$refLine" -eq "===========================================================" ]; then
                             flag=false
                           fi
-                          if not flag; then
+                          if not[ $flag ]; then
                             #compare outputs
                             ourLine=$(read -r ${pathname/valid/backendTests});
                             if not[ refLine -eq ourLine ]; then
@@ -109,7 +109,7 @@ run_tests () {
                         done; } < ${refOutput/.wacc/.txt}
 
                       #compare exit code
-                      if not[refLine -eq "The exit code is ${ourExitCode}."]; then
+                      if not[ refLine -eq "The exit code is ${ourExitCode}."]; then
                         correctFlag=false
                       fi
                     done; } < ${refOutput/.wacc/.txt}
