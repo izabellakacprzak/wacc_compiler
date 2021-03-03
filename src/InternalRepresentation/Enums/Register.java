@@ -19,8 +19,7 @@ public enum Register {
 
 
   public static List<Register> getParamRegs() {
-    List<Register> registers = new ArrayList<>(List.of(
-        Register.values()));
+    List<Register> registers = new ArrayList<>(List.of(Register.values()));
 
     registers.remove(getDestReg());
     registers.remove(Register.SP);

@@ -8,7 +8,7 @@ run_test_in_dir() {
             case "$pathname" in
                 *.wacc)
                   echo running test $runTests "$pathname"
-                  ./compile "$pathname" >/dev/null 2>&1
+                  ./compile "$pathname" "-s" >/dev/null 2>&1
                   if [ $? -eq $(($2)) ]; then
                     passedTests=$((passedTests + 1))
                     echo ${GREEN}passed${NC}: test $runTests "$pathname"
@@ -30,7 +30,7 @@ run_tests () {
             case "$pathname" in
                 *.wacc)
                   echo running test $runTests "$pathname"
-                  ./compile "$pathname" >/dev/null 2>&1
+                  ./compile "$pathname" "-s" >/dev/null 2>&1
                   if [ $? -eq $(($2)) ]; then
                     passedTests=$((passedTests + 1))
                     echo ${GREEN}passed${NC}: test $runTests "$pathname"

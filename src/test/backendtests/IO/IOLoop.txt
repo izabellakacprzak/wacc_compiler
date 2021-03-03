@@ -1,7 +1,0 @@
-0
-Please input an integer: #input#
-echo input: #output#
-Do you want to continue entering input?
-(enter Y for 'yes' and N for 'no')
-#input#
-...

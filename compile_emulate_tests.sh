@@ -1,5 +1,62 @@
 #!/bin/bash
 
+execute() {
+  pathname=$1
+  echo running test $runTests "$pathname"
+  flag=true
+
+	refOutput=${pathname/valid/backendTests}
+
+	if [ ! -e ${refOutput/.wacc/.txt} ]; then
+	  echo $'\n' | ./refCompile "-x" "$pathname" > ${refOutput/.wacc/.txt}
+	  fi
+
+  ./compile "$pathname" "-a" >/dev/null 2>&1
+  arm-linux-gnueabi-gcc -o ${pathname/.wacc/} -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
+  qemu-arm -L /usr/arm-linux-gnueabi/ ${pathname/.wacc/} > output.txt
+  ourExitCode=$?
+  rm ${pathname/.wacc/.s}
+  rm ${pathname/.wacc/}
+
+  { read -r;
+    correctFlag=false
+    while read -r refLine;
+      do
+        if "$flag" && [ "$refLine" = "===========================================================" ]; then
+          flag=false
+        fi
+        flag=true
+        { read -r;
+        while "$correctFlag" && "$flag" && read -r refLine;
+        do
+          if "$flag" && [ "$refLine" = "===========================================================" ]; then
+            flag=false
+            read -r refLine
+          fi
+          if [ ! $flag ]; then
+            #compare outputs
+            ourLine=$(read -r ${pathname/valid/backendTests});
+            if [ "$refLine" != "$ourLine" ]; then
+              correctFlag=false
+            fi
+          fi
+        done; } < ${refOutput/.wacc/.txt}
+
+        #compare exit code
+        if [ "$refLine" = "The exit code is ${ourExitCode}." ] ; then
+          correctFlag=true
+        fi
+      done; } < ${refOutput/.wacc/.txt}
+
+      if [ $correctFlag ]; then
+        passedTests=$((passedTests + 1))
+        echo -e "$GREEN"passed"$NC": test "$runTests" "$pathname"
+      else
+        echo -e "$RED"failed"$NC": test "$runTests" "$pathname"
+      fi
+      runTests=$((runTests + 1))
+}
+
 run_test_in_dir() {
   for pathname in "$1"/*; do
         if [ -d "$pathname" ]; then
@@ -7,33 +64,7 @@ run_test_in_dir() {
         else
             case "$pathname" in
                 *.wacc)
-                  echo running test $runTests "$pathname"
-                  output=${pathname/valid/backendtests}
-                  refLine=$(head -n 1 ${output/.wacc/.txt})
-                  refCode=$((refLine))
-                  flag=true
-                  ./compile "$pathname" >/dev/null 2>&1
-                  arm-linux-gnueabi-gcc -o ${pathname/.wacc/} -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
-                  qemu-arm -L /usr/arm-linux-gnueabi/ ${pathname/.wacc/} > output.txt
-                  rm ${pathname/.wacc/.s}
-                  rm ${pathname/.wacc/}
-                  if [ "$refCode" -eq $? ]; then
-                    { read -r;
-                    while read -r refLine && $flag;
-                    do
-                      ourLine=$(read -r ${pathname/valid/backendtests});
-                      if not[ "$refLine" -eq "$ourLine" ]; then
-                        flag=false
-                      fi
-                    done; } < output.txt
-                    if [ $flag ]; then
-                      passedTests=$((passedTests + 1))
-                      echo ${GREEN}passed${NC}: test $runTests "$pathname"
-                    else
-                      echo ${RED}failed${NC}: test $runTests "$pathname"
-                    fi
-                  fi
-                  runTests=$((runTests + 1))
+                  execute "$pathname"
             esac
         fi
     done
@@ -46,41 +77,15 @@ run_tests () {
         else
             case "$pathname" in
                 *.wacc)
-                  echo running test $runTests "$pathname"
-                  output=${pathname/valid/backendtests}
-                  refLine=$(head -n 1 ${output/.wacc/.txt})
-                  refCode=$((refLine))
-                  flag=true
-                  ./compile "$pathname" >/dev/null 2>&1
-                  arm-linux-gnueabi-gcc -o ${pathname/.wacc/} -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
-                  qemu-arm -L /usr/arm-linux-gnueabi/ ${pathname/.wacc/}
-                  rm ${pathname/.wacc/.s}
-                  rm ${pathname/.wacc/}
-                  if [ "$refCode" -eq $? ]; then
-                    { read -r;
-                    while read -r refLine && $flag;
-                    do
-                      ourLine=$(read -r ${pathname/valid/backendtests});
-                      if not[ "$refLine" -eq "$ourLine" ]; then
-                        flag=false
-                      fi
-                    done; } < output.txt
-                    if [ $flag ]; then
-                      passedTests=$((passedTests + 1))
-                      echo ${GREEN}passed${NC}: test $runTests "$pathname"
-                    else
-                      echo ${RED}failed${NC}: test $runTests "$pathname"
-                    fi
-                  fi
-                  runTests=$((runTests + 1))
+                  execute "$pathname"
             esac
         fi
     done
 }
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-NC='\033[0m' # No Color
+RED='\e[31m'
+GREEN='\e[32m'
+NC='\e[39m' # No Color
 runTests=0
 passedTests=0
 touch output.txt
