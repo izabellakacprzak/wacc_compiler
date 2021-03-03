@@ -76,14 +76,12 @@ public class ReadStatementNode extends StatementNode {
 
       switch (baseType) {
         case INT:
-          BuiltInFunction.READ_INT.setUsed();
           internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
-                  BuiltInFunction.READ_INT.getLabel()));
+              BuiltInFunction.READ_INT));
           break;
         case CHAR:
-          BuiltInFunction.READ_CHAR.setUsed();
           internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
-                  BuiltInFunction.READ_CHAR.getLabel()));
+              BuiltInFunction.READ_CHAR));
           break;
       }
     }

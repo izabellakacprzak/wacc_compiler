@@ -48,8 +48,8 @@ public class FreeStatementNode extends StatementNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     expression.generateAssembly(internalState);
-    BuiltInFunction.FREE_PAIR.setUsed();
-    internalState.addInstruction(new BranchInstruction(BranchOperation.BL, BuiltInFunction.FREE_PAIR.getLabel()));
+    internalState
+        .addInstruction(new BranchInstruction(BranchOperation.BL, BuiltInFunction.FREE_PAIR));
   }
 
   @Override

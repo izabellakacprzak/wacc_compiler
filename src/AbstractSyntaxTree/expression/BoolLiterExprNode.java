@@ -28,7 +28,6 @@ public class BoolLiterExprNode extends ExpressionNode {
   public void generateAssembly(InternalState internalState) {
     int intValue = value? 1 : 0;
     Register currDestination = internalState.peekFreeRegister();
-    internalState.setPrevResult(currDestination);
     internalState.addInstruction(new MovInstruction(currDestination, intValue));
   }
 

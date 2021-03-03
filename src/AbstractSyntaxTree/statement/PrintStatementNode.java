@@ -15,8 +15,6 @@ import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
 
-import static InternalRepresentation.Enums.ConditionCode.VS;
-
 public class PrintStatementNode extends StatementNode {
 
   /* expression:  ExpressionNode corresponding to the expression 'print' was called with */
@@ -44,36 +42,30 @@ public class PrintStatementNode extends StatementNode {
 
     if (type instanceof ArrayType) {
       if (((ArrayType) type).getElemType().equals(new BaseType(BaseType.Type.CHAR))) {
-        BuiltInFunction.PRINT_STRING.setUsed();
         internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
-            BuiltInFunction.PRINT_STRING.getLabel()));
+            BuiltInFunction.PRINT_STRING));
       } else {
-        BuiltInFunction.PRINT_REFERENCE.setUsed();
         internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
-            BuiltInFunction.PRINT_REFERENCE.getLabel()));
+            BuiltInFunction.PRINT_REFERENCE));
       }
     } else if (type instanceof PairType) {
-      BuiltInFunction.PRINT_REFERENCE.setUsed();
       internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
-          BuiltInFunction.PRINT_REFERENCE.getLabel()));
+          BuiltInFunction.PRINT_REFERENCE));
     } else if (type instanceof BaseType) {
       BaseType.Type baseType = ((BaseType) type).getBaseType();
       switch (baseType) {
         case CHAR:
         case STRING:
-          BuiltInFunction.PRINT_STRING.setUsed();
           internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
-              BuiltInFunction.PRINT_STRING.getLabel()));
+              BuiltInFunction.PRINT_STRING));
           break;
         case BOOL:
-          BuiltInFunction.PRINT_BOOL.setUsed();
           internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
-              BuiltInFunction.PRINT_BOOL.getLabel()));
+              BuiltInFunction.PRINT_BOOL));
           break;
         case INT:
-          BuiltInFunction.PRINT_INT.setUsed();
           internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
-              BuiltInFunction.PRINT_INT.getLabel()));
+              BuiltInFunction.PRINT_INT));
           break;
       }
     }

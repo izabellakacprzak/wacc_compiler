@@ -78,9 +78,10 @@ public class PairElemNode extends AssignRHSNode {
 
     internalState.addInstruction(new MovInstruction(Register.R0, reg));
 
-    BuiltInFunction.NULL_POINTER.setUsed();
-    internalState.addInstruction(new BranchInstruction(BranchOperation.BL, BuiltInFunction.NULL_POINTER.getLabel()));
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, reg, reg, position * ADDRESS_BYTES_SIZE));
+    internalState
+        .addInstruction(new BranchInstruction(BranchOperation.BL, BuiltInFunction.NULL_POINTER));
+    internalState
+        .addInstruction(new LdrInstruction(LdrType.LDR, reg, reg, position * ADDRESS_BYTES_SIZE));
 
     PairType pair = (PairType) expression.getType(currSymTable);
     DataTypeId type = (position == FST) ? pair.getFstType() : pair.getSndType();

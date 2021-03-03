@@ -87,7 +87,7 @@ public class UnaryOpExprNode extends ExpressionNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     operand.generateAssembly(internalState);
-    Register operandResult = internalState.getPrevResult();
+    Register operandResult = internalState.popFreeRegister();
 
     switch(operator) {
       case NOT:
@@ -97,10 +97,9 @@ public class UnaryOpExprNode extends ExpressionNode {
       case NEGATION:
         internalState.addInstruction(new ArithmeticInstruction(ArithmeticOperation.RSB,
             operandResult, operandResult, new Operand(0), true));
-        BuiltInFunction.OVERFLOW.setUsed();
         internalState.addInstruction(new BranchInstruction(
             ConditionCode.VS,
-            BranchOperation.BL, BuiltInFunction.OVERFLOW.getLabel()));
+            BranchOperation.BL, BuiltInFunction.OVERFLOW));
         break;
       case LEN:
         internalState.addInstruction(new LdrInstruction(LdrType.LDR, operandResult, operandResult));
@@ -108,6 +107,8 @@ public class UnaryOpExprNode extends ExpressionNode {
       case ORD:
       case CHR:
     }
+
+    internalState.pushFreeRegister(operandResult);
   }
 
   @Override

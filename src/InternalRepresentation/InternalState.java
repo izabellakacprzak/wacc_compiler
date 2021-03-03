@@ -32,7 +32,6 @@ public class InternalState {
   private List<BuiltInFunction> builtInLabels;
   private Stack<Register> availableRegs;
   private int labelCount;
-  private Register prevResult;
 
   public InternalState() {
     // setup stack function
@@ -41,7 +40,6 @@ public class InternalState {
     //TODO change this to a stack!!!!
     declaredLabels = new HashSet<>();
     generatedInstructions = new ArrayList<>();
-    prevResult = null;
     builtInLabels = BuiltInFunction.getUsed();
 
     labelCount = 0;
@@ -55,9 +53,25 @@ public class InternalState {
 
       CustomBuiltInFunctions customBuiltInFunctions = new CustomBuiltInFunctions();
       List<Instruction> instructions = new ArrayList<>();
+
       builtInLabels = BuiltInFunction.getUsed();
-      for (BuiltInFunction label : builtInLabels) {
-        instructions.addAll(customBuiltInFunctions.generateAssembly(label));
+
+      if (!builtInLabels.isEmpty()) {
+        //TODO: don't generate things twice if u can
+        List<Instruction> builtIns;
+        int size;
+        do {
+          builtIns = new ArrayList<>();
+
+          for (BuiltInFunction label : builtInLabels) {
+            builtIns.addAll(customBuiltInFunctions.generateAssembly(label));
+          }
+
+          size = builtInLabels.size();
+          builtInLabels = BuiltInFunction.getUsed();
+        } while (size < builtInLabels.size());
+
+        instructions.addAll(builtIns);
       }
 
       if (!MsgInstruction.getMessages().isEmpty()) {
@@ -89,8 +103,8 @@ public class InternalState {
         writer.write(instruction.writeInstruction());
         writer.write(LINE_BREAK);
       }
-      // add all used built in functions
 
+      // add all used built in functions
       for (Instruction instruction : instructions) {
         if (!(instruction instanceof LabelInstruction)) {
           writer.write(TAB);
@@ -173,14 +187,6 @@ public class InternalState {
     declaredLabels.add(newLabel);
     labelCount++;
     return newLabel;
-  }
-
-  public Register getPrevResult() {
-    return prevResult;
-  }
-
-  public void setPrevResult(Register destination) {
-    prevResult = destination;
   }
 
   public void addBuiltInLabel(BuiltInFunction function) {

@@ -4,8 +4,10 @@ import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.Enums.ConditionCode;
 import InternalRepresentation.Instructions.BranchInstruction;
 import InternalRepresentation.Enums.BranchOperation;
+import InternalRepresentation.Instructions.CompareInstruction;
 import InternalRepresentation.Instructions.LabelInstruction;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Operand;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
@@ -60,8 +62,10 @@ public class IfStatementNode extends StatementNode {
     String elseLabel = internalState.generateNewLabel();
     String endIfLabel = internalState.generateNewLabel();
 
-    internalState.addInstruction(new BranchInstruction(
-        ConditionCode.EQ, BranchOperation.B, elseLabel));
+    internalState.addInstruction(
+        new CompareInstruction(internalState.peekFreeRegister(), new Operand(0)));
+    internalState.addInstruction(
+        new BranchInstruction(ConditionCode.EQ, BranchOperation.B, elseLabel));
     thenStatement.generateAssembly(internalState);
     internalState.addInstruction(new BranchInstruction(BranchOperation.B, endIfLabel));
 

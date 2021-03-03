@@ -58,7 +58,6 @@ public class IdentifierNode extends ExpressionNode {
     int offset = currSymTable.getOffset(getIdentifier());
     Register reg = internalState.peekFreeRegister();
     internalState.addInstruction(new LdrInstruction(LdrType.LDR, reg, Register.SP, offset));
-    internalState.setPrevResult(reg);
   }
 
   @Override

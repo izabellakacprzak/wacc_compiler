@@ -20,6 +20,7 @@ public class CustomBuiltInFunctions {
 
   public List<Instruction> generateAssembly(BuiltInFunction type) {
     List<Instruction> instructions = new ArrayList<>();
+    instructions.add(new CustomBuiltInInstruction(type));
 
     switch (type) {
       case OVERFLOW:
@@ -58,7 +59,6 @@ public class CustomBuiltInFunctions {
   }
 
   private void generatePrint(BuiltInFunction type, List<Instruction> instructions) {
-    instructions.add(new CustomBuiltInInstruction(type));
     instructions.add(new PushInstruction(LR));
 
     switch (type) {
@@ -87,17 +87,14 @@ public class CustomBuiltInFunctions {
   }
 
   private void generateOverflow(List<Instruction> instructions) {
-
     instructions.add(new LdrInstruction(
         LDR, R0, new MsgInstruction("OverflowError: the result is too small/large to store in"
-                                        + "a 4-byte signed-integer.\\n")));
-    instructions.add(new BranchInstruction(BL, RUNTIME.getLabel()));
-    RUNTIME.setUsed();
+        + " a 4-byte signed-integer.\\n")));
+    instructions.add(new BranchInstruction(BL, RUNTIME));
   }
 
   private void generateRuntime(List<Instruction> instructions) {
-    instructions.add(new BranchInstruction(BL, PRINT_STRING.getLabel()));
-    PRINT_STRING.setUsed();
+    instructions.add(new BranchInstruction(BL, PRINT_STRING));
     instructions.add(new MovInstruction(R0, -1));
     instructions.add(new BranchInstruction(BL, EXIT.getMessage()));
   }
@@ -108,13 +105,12 @@ public class CustomBuiltInFunctions {
     instructions.add(
         new LdrInstruction(LDR, LT, R0,
             new MsgInstruction("ArrayIndexOutOfBoundsError: negative index\\n\\0")));
-    instructions.add(new BranchInstruction(LT, BL, RUNTIME.getLabel()));
-    RUNTIME.setUsed();
+    instructions.add(new BranchInstruction(LT, BL, RUNTIME));
     instructions.add(new LdrInstruction(LDR, R1, R1));
     instructions.add(new CompareInstruction(R0, new Operand(R1)));
     instructions.add(new LdrInstruction(LDR, CS, R0,
         new MsgInstruction("ArrayIndexOutOfBoundsError: index too large\\n\\0")));
-    instructions.add(new BranchInstruction(CS, BL, RUNTIME.getLabel()));
+    instructions.add(new BranchInstruction(CS, BL, RUNTIME));
     instructions.add(new PopInstruction(PC));
   }
 
@@ -123,8 +119,7 @@ public class CustomBuiltInFunctions {
     instructions.add(new CompareInstruction(R1, new Operand(0)));
     instructions.add(new LdrInstruction(LDR, EQ, R0,
         new MsgInstruction("DivideByZeroError: divide or modulo by zero\n")));
-    instructions.add(new BranchInstruction(EQ, BL, RUNTIME.getLabel()));
-    RUNTIME.setUsed();
+    instructions.add(new BranchInstruction(EQ, BL, RUNTIME));
     instructions.add(new PopInstruction(PC));
   }
 
@@ -133,8 +128,7 @@ public class CustomBuiltInFunctions {
     instructions.add(new CompareInstruction(R0, new Operand(0)));
     instructions.add(new LdrInstruction(LDR, EQ, R0,
         new MsgInstruction("NullReferenceError: dereference a null reference\\n\\0")));
-    instructions.add(new BranchInstruction(EQ, BL, RUNTIME.getLabel()));
-    RUNTIME.setUsed();
+    instructions.add(new BranchInstruction(EQ, BL, RUNTIME));
     instructions.add(new PopInstruction(PC));
   }
 
@@ -144,8 +138,7 @@ public class CustomBuiltInFunctions {
     instructions.add(
         new LdrInstruction(LDR, EQ, R0,
             new MsgInstruction("NullReferenceError: dereference a null reference\\n\\0")));
-    instructions.add(new BranchInstruction(EQ, B, RUNTIME.getLabel()));
-    RUNTIME.setUsed();
+    instructions.add(new BranchInstruction(EQ, B, RUNTIME));
     instructions.add(new PushInstruction(R0));
     instructions.add(new LdrInstruction(LDR, R0, R0));
     instructions.add(new BranchInstruction(BL, FREE.getMessage()));

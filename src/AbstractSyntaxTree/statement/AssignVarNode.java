@@ -99,8 +99,8 @@ public class AssignVarNode extends StatementNode {
       internalState.addInstruction(new LdrInstruction(LdrType.LDR, leftNodeResult, Register.SP, offset));
       internalState.addInstruction(new MovInstruction(Register.R0, leftNodeResult));
 
-      BuiltInFunction.NULL_POINTER.setUsed();
-      internalState.addInstruction(new BranchInstruction(BranchOperation.BL, BuiltInFunction.NULL_POINTER.getLabel()));
+      internalState
+          .addInstruction(new BranchInstruction(BranchOperation.BL, BuiltInFunction.NULL_POINTER));
 
       internalState.addInstruction(new LdrInstruction(LdrType.LDR, leftNodeResult, leftNodeResult,
               pairElem.getPosition() * ADDRESS_BYTE_SIZE));

@@ -105,13 +105,13 @@ public class ArrayElemNode extends ExpressionNode {
   private void generateElemAddr(InternalState internalState, ExpressionNode expression,
                                 Register arrayReg) {
     expression.generateAssembly(internalState);
-    Register exprReg = internalState.getPrevResult();
+    Register exprReg = internalState.peekFreeRegister();
     internalState.addInstruction(new LdrInstruction(LDR, arrayReg, arrayReg));
     // move result of expression to R0
     internalState.addInstruction(new MovInstruction(R0, exprReg));
     // move result of array to R1
     internalState.addInstruction(new MovInstruction(R1, arrayReg));
-    internalState.addInstruction(new BranchInstruction(BL, ARRAY_BOUNDS.getLabel()));
+    internalState.addInstruction(new BranchInstruction(BL, ARRAY_BOUNDS));
     internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
         new Operand(INT_BYTES_SIZE), false));
     internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,

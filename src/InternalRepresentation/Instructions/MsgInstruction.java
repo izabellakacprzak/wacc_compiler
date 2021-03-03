@@ -5,22 +5,20 @@ import InternalRepresentation.Enums.Directive;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MsgInstruction implements Instruction{
+public class MsgInstruction implements Instruction {
+
   private static final List<MsgInstruction> messages = new ArrayList<>();
 
   private final DirectiveInstruction length;
   private final DirectiveInstruction value;
-  private int index;
+  private final int index;
 
-  public MsgInstruction(int length, String value) {
+  public MsgInstruction(String value) {
+    int length = value.replace("\\0", "\0").replace("\\n", "\n").length();
     this.length = new DirectiveInstruction(Directive.WORD, String.valueOf(length));
     this.value = new DirectiveInstruction(Directive.ASCII, value);
     this.index = messages.size();
     MsgInstruction.messages.add(this);
-  }
-
-  public MsgInstruction(String value) {
-    this(value.length(), value);
   }
 
   public static List<MsgInstruction> getMessages() {
