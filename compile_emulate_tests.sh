@@ -3,26 +3,33 @@
 execute() {
   pathname=$1
   echo running test $runTests "$pathname"
-  stage1=true
 
 	refOutput=${pathname/valid/backendTests}
+  FILE_PATH=$(basename "$pathname")
+  customInputPath="src/test/backendTests/testInput/${FILE_PATH/.wacc/.txt}"  #text file of custom user input
 
-	if [ ! -e ${refOutput/.wacc/.txt} ]; then
-	  echo $'\n' | ./refCompile "-x" "$pathname" > ${refOutput/.wacc/.txt}
-	  fi
+  customInput="\n"
+  if [  -e "$customInputPath" ]; then
+    read -r customInput<"$customInputPath";
+  fi
 
-	FILE_PATH=$(basename "$pathname")
+
+	if [ ! -e ${refOutput/.wacc/.txt} ]; then  # check for the existence of a cached file
+	  # MAKE CHECK FOR TIME OF CACHING
+	  echo "$customInput" | ./refCompile "-x" "$pathname" > ${refOutput/.wacc/.txt}
+	fi
 
 
   ./compile "$pathname" "-a" >/dev/null 2>&1
   arm-linux-gnueabi-gcc -o ${FILE_PATH/.wacc/} -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${FILE_PATH/.wacc/.s}
-  echo $'\n' | qemu-arm -L /usr/arm-linux-gnueabi/ ${FILE_PATH/.wacc/} > output.txt
-  ourExitCode="${PIPESTATUS[0]}"
+  echo "$customInput" | qemu-arm -L /usr/arm-linux-gnueabi/ ${FILE_PATH/.wacc/} > output.txt
+  ourExitCode=$?
   rm ${FILE_PATH/.wacc/.s}
   rm ${FILE_PATH/.wacc/}
 
   {
     correctFlag=true
+    stage1=true
     stage2=false
     while read -r refLine;
       do
