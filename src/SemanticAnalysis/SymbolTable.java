@@ -13,6 +13,10 @@ public class SymbolTable {
     this.parentSymTable = parentSymTable;
   }
 
+  public SymbolTable getParentSymTable() {
+    return parentSymTable;
+  }
+
   /* Add a name and object to the symbol table */
   public void add(String name, Identifier object) {
     dictionary.put(name, object);

@@ -173,7 +173,7 @@ public class InternalState {
 
   public void allocateStackSpace(SymbolTable symbolTable) {
     int size = symbolTable.getVarsSize();
-    argStackOffset = symbolTable.getVarsSize();
+    argStackOffset += symbolTable.getVarsSize();
     while (size > 0) {
       addInstruction(new ArithmeticInstruction(ArithmeticOperation.SUB, SP, SP,
           new Operand(Math.min(size, MAX_STACK_ARITHMETIC_SIZE)), false));
