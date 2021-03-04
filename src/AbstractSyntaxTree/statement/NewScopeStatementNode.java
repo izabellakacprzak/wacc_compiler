@@ -17,14 +17,16 @@ public class NewScopeStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    currSymTable = new SymbolTable(symbolTable);
     /* Recursively call semanticAnalysis on statement node */
-    statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
+    statement.semanticAnalysis(currSymTable, errorMessages);
   }
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    internalState.allocateStackSpace(statement.getCurrSymTable());
     statement.generateAssembly(internalState);
+    internalState.deallocateStackSpace(statement.getCurrSymTable());
   }
 
   /* Recursively traverses the AST and sets the function expected return type in the ReturnNode
