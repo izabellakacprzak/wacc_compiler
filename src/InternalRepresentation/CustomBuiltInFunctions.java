@@ -194,8 +194,8 @@ public class CustomBuiltInFunctions {
 
   private void generatePrintBool(List<Instruction> instructions) {
     instructions.add(new CompareInstruction(R0, new Operand(FALSE)));
-    instructions.add(new LdrInstruction(LDR, NE, R0, new MsgInstruction("true")));
-    instructions.add(new LdrInstruction(LDR, EQ, R0, new MsgInstruction("false")));
+    instructions.add(new LdrInstruction(LDR, NE, R0, new MsgInstruction("true\\0")));
+    instructions.add(new LdrInstruction(LDR, EQ, R0, new MsgInstruction("false\\0")));
     instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
     instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
   }
