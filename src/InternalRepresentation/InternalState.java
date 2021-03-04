@@ -153,32 +153,10 @@ public class InternalState {
     this.availableRegs = registers;
   }
 
-  public Stack<Register> getAvailableRegs() {
-    return availableRegs;
-  }
-
-  public void setAvailableRegs(Stack<Register> availableRegs) {
-    this.availableRegs = availableRegs;
-  }
-
-  /*public void setAsUsed(Register register) {
-    availableRegs.remove(register);
-  }
-*/
-//  public void setAsUnused(Register register) {
-//
-//      availableRegs.push(register);
-//    }
-//  }
-
   public String generateNewLabel() {
     String newLabel = "L" + labelCount;
     labelCount++;
     return newLabel;
-  }
-
-  public void addBuiltInLabel(BuiltInFunction function) {
-    function.setUsed();
   }
 
   public void allocateStackSpace(SymbolTable symbolTable) {

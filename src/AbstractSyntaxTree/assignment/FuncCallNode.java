@@ -25,7 +25,7 @@ public class FuncCallNode extends AssignRHSNode {
    *               passed into the function call */
   private final IdentifierNode identifier;
   private final List<ExpressionNode> arguments;
-  private final int MAX_DEALLOCATION_SIZE = 1024;
+  private final static int MAX_DEALLOCATION_SIZE = 1024;
   private SymbolTable currSymTable = null;
 
   public FuncCallNode(int line, int charPositionInLine, IdentifierNode identifier,

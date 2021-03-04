@@ -86,9 +86,9 @@ public class PairElemNode extends AssignRHSNode {
     PairType pair = (PairType) expression.getType(currSymTable);
     DataTypeId type = (position == FST) ? pair.getFstType() : pair.getSndType();
     int elemSize = type.getSize();
-    StrType strInstr = (elemSize == 1) ? StrType.STRB : StrType.STR;
+    LdrType ldrInstr = (elemSize == 1) ? LdrType.LDRSB : LdrType.LDR;
 
-    internalState.addInstruction(new StrInstruction(strInstr, reg, reg));
+    internalState.addInstruction(new LdrInstruction(ldrInstr, reg, reg));
   }
 
   @Override
