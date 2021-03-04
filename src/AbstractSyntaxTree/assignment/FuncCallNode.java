@@ -97,7 +97,9 @@ public class FuncCallNode extends AssignRHSNode {
                               + " Invalid type for parameter " + (i + 1) + " in '" + identifier + "' function."
                               + " Expected: " + currParamType + " Actual: " + currArg);
       }
+      arguments.get(i).semanticAnalysis(symbolTable, errorMessages);
     }
+
 
   }
 
@@ -105,26 +107,28 @@ public class FuncCallNode extends AssignRHSNode {
   public void generateAssembly(InternalState internalState) {
     // calculate total arguments size in argsTotalSize
     int argsTotalSize = 0;
-
+    int argStackOffset = internalState.getArgStackOffset();
     // arguments are stored in decreasing order they are given in the code
     for (int i = arguments.size() - 1; i >= 0; i--) {
       // get argument, calculate size and add it to argsTotalSize
       ExpressionNode currArg = arguments.get(i);
       int argSize = currArg.getType(currSymTable).getSize();
-      argsTotalSize += argSize;
 
-      internalState.decrementArgStackOffset(argSize);
       // generate assembly code for the current argument
       currArg.generateAssembly(internalState);
 
-      StrType strInstr = (argSize == 1) ? StrType.STR : StrType.STRB;
+      StrType strInstr = (argSize == 1) ? StrType.STRB : StrType.STR;
 
       //store currArg on the stack and decrease stack pointer (stack grows downwards)
       StrInstruction strInstruction = new StrInstruction(strInstr, internalState.peekFreeRegister(),
           Register.SP, -argSize);
       strInstruction.useExclamation();
       internalState.addInstruction(strInstruction);
+      argsTotalSize += argSize;
+      internalState.decrementArgStackOffset(argSize);
+
     }
+    internalState.resetArgStackOffset(argStackOffset);
 
 
     //Branch Instruction to the callee label

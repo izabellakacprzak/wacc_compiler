@@ -18,10 +18,10 @@ import static InternalRepresentation.Enums.LdrType.LDRSB;
 
 public class IdentifierNode extends ExpressionNode {
 
+  private final static int BYTE_SIZE = 1;
   /* value: String representing the identifier of this node */
   private final String identifier;
   private SymbolTable currSymTable = null;
-  private final static int BYTE_SIZE = 1;
 
   public IdentifierNode(int line, int charPositionInLine, String identifier) {
     super(line, charPositionInLine);

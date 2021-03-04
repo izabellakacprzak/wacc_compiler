@@ -194,7 +194,15 @@ public class InternalState {
     argStackOffset -= argSize;
   }
 
+  public void incrementArgStackOffset(int argSize) {
+    argStackOffset += argSize;
+  }
+
   public int getArgStackOffset() {
     return argStackOffset;
+  }
+
+  public void resetArgStackOffset(int argStackOffset) {
+    this.argStackOffset = argStackOffset;
   }
 }

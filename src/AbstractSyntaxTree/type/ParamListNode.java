@@ -7,6 +7,7 @@ import InternalRepresentation.InternalState;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -63,17 +64,24 @@ public class ParamListNode implements ASTNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    Identifier entry;
-    Register curr;
-    Stack<Register> paramReg = internalState.getAvailableRegs();
-    for (int i = 0; i < identifiers.size(); i++) {
-      if (i >= paramReg.size()) {
-        // TODO: too many parameters
-      }
 
-      entry = currSymTable.lookupAll(identifiers.get(i).getIdentifier());
-      curr = internalState.popFreeRegister();
-      entry.setRegister(curr);
+    for (int i = 0; i < identifiers.size(); i++) {
+      int paramSize = identifiers.get(i).getType(currSymTable).getSize();
+      currSymTable.setOffset(identifiers.get(i).getIdentifier(), internalState.getArgStackOffset() + 4);
+      internalState.incrementArgStackOffset(paramSize);
     }
+
+//    Identifier entry;
+//    Register curr;
+//    Stack<Register> paramReg = internalState.getAvailableRegs();
+//    for (int i = 0; i < identifiers.size(); i++) {
+//      if (i >= paramReg.size()) {
+//        // TODO: too many parameters
+//      }
+//
+//      entry = currSymTable.lookupAll(identifiers.get(i).getIdentifier());
+//      curr = internalState.popFreeRegister();
+//      entry.setRegister(curr);
+//    }
   }
 }
