@@ -28,7 +28,8 @@ public class ArrayType extends DataTypeId {
     }
 
     ArrayType arrayObject = (ArrayType) object;
-    return arrayObject.getElemType() == null || arrayObject.getElemType().equals(this.elemType);
+    return arrayObject.getElemType() == null
+        || arrayObject.getElemType().equals(this.elemType);
   }
 
   @Override

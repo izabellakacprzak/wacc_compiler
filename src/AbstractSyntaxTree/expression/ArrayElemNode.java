@@ -133,7 +133,20 @@ public class ArrayElemNode extends ExpressionNode {
       return null;
     }
 
-    return ((ArrayType) idType).getElemType();
+    DataTypeId elemType = idType;
+    int size = expressions.size();
+    while (size > 0) {
+      if (!(elemType instanceof ArrayType)) {
+        elemType = null;
+        break;
+      }
+
+      elemType = ((ArrayType) elemType).getElemType();
+
+      size--;
+    }
+
+    return elemType;
   }
 
   /* Returns a ArrayElem in the form: array_id[expr1][expr2]...[exprN] */

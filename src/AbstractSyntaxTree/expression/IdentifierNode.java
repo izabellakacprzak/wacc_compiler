@@ -31,6 +31,7 @@ public class IdentifierNode extends ExpressionNode {
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     currSymTable = symbolTable;
+
     /* Check that the identifier has been declared as either a ParameterId or VariableId.
      * FunctionId identifiers do not call this function */
     Identifier id = symbolTable.lookupAll(identifier);

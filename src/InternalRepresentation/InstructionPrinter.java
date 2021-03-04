@@ -128,14 +128,7 @@ public class InstructionPrinter {
     } else {
       if (offsetImm != 0) {
         instruction.append(", ").append("#");
-        switch (type) {
-          case STRB:
-            instruction.append(offsetImm);
-          case STRH:
-            instruction.append(offsetImm);
-          default:
-            instruction.append(offsetImm);
-        }
+        instruction.append(offsetImm);
       }
     }
     instruction.append("]");

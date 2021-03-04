@@ -35,9 +35,11 @@ public class ArrayLiterNode extends AssignRHSNode {
 
     if (fstType == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " Could not resolve type of array assignment.");
+          + " Could not resolve type of array assignment.");
       return;
     }
+
+    fstExpr.semanticAnalysis(symbolTable, errorMessages);
 
     /* Check if the other elements' types can be resolved and match the first element's type */
     for (int i = 1; i < expressions.size(); i++) {
@@ -46,8 +48,8 @@ public class ArrayLiterNode extends AssignRHSNode {
 
       if (currType == null) {
         errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                              + " Could not resolve element type(s) in array literal."
-                              + " Expected: " + fstType);
+            + " Could not resolve element type(s) in array literal."
+            + " Expected: " + fstType);
         break;
       }
 
