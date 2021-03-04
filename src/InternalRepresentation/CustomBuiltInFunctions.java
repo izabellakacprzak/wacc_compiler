@@ -118,7 +118,7 @@ public class CustomBuiltInFunctions {
     instructions.add(new PushInstruction(LR));
     instructions.add(new CompareInstruction(R1, new Operand(0)));
     instructions.add(new LdrInstruction(LDR, EQ, R0,
-        new MsgInstruction("DivideByZeroError: divide or modulo by zero\n")));
+        new MsgInstruction("DivideByZeroError: divide or modulo by zero\\n\\0")));
     instructions.add(new BranchInstruction(EQ, BL, RUNTIME));
     instructions.add(new PopInstruction(PC));
   }

@@ -71,7 +71,7 @@ public class InstructionPrinter {
   }
 
   public String printMOV(ConditionCode conditionCode, Register destReg, Register srcReg,
-      int intImmediate, char charImmediate) {
+     Integer intImmediate, char charImmediate) {
     String instruction = "MOV";
 
     if (conditionCode != null) {
@@ -84,7 +84,7 @@ public class InstructionPrinter {
       instruction += srcReg.getRegName();
       return instruction;
     }
-    if (intImmediate != -1) {
+    if (intImmediate != null) {
       instruction += '#' + Integer.toString(intImmediate);
       return instruction;
     }

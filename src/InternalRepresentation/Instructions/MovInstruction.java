@@ -8,7 +8,7 @@ public class MovInstruction implements Instruction {
   private final Register destReg;
   private Register srcReg = null;
   private ConditionCode conditionCode = null;
-  private int intImmediate = -1;
+  private Integer intImmediate = null;
   private char charImmediate = '\u0000';
 
   private final InstructionPrinter printer = new InstructionPrinter();

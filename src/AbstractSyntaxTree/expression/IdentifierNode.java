@@ -13,11 +13,15 @@ import SemanticAnalysis.VariableId;
 
 import java.util.List;
 
+import static InternalRepresentation.Enums.LdrType.LDR;
+import static InternalRepresentation.Enums.LdrType.LDRSB;
+
 public class IdentifierNode extends ExpressionNode {
 
   /* value: String representing the identifier of this node */
   private final String identifier;
   private SymbolTable currSymTable = null;
+  private final static int BYTE_SIZE = 1;
 
   public IdentifierNode(int line, int charPositionInLine, String identifier) {
     super(line, charPositionInLine);
@@ -58,7 +62,8 @@ public class IdentifierNode extends ExpressionNode {
     }
     int offset = currSymTable.getOffset(getIdentifier());
     Register reg = internalState.peekFreeRegister();
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, reg, Register.SP, offset));
+    LdrType ldrInstr = (getType(currSymTable).getSize() == BYTE_SIZE) ? LDRSB : LDR;
+    internalState.addInstruction(new LdrInstruction(ldrInstr, reg, Register.SP, offset));
   }
 
   @Override
