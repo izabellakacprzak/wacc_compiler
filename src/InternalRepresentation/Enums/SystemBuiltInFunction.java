@@ -9,7 +9,8 @@ public enum SystemBuiltInFunction {
     FFLUSH("fflush"),
     PUTS("puts"),
     EXIT("exit"),
-    FREE("free");
+    FREE("free"),
+    PUTCHAR("putchar");
 
     private final String message;
 

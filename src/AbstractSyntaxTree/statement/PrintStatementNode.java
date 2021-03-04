@@ -4,6 +4,7 @@ import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.Enums.BranchOperation;
 import InternalRepresentation.Enums.BuiltInFunction;
 import InternalRepresentation.Enums.Register;
+import InternalRepresentation.Enums.SystemBuiltInFunction;
 import InternalRepresentation.Instructions.BranchInstruction;
 import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
@@ -56,6 +57,9 @@ public class PrintStatementNode extends StatementNode {
       BaseType.Type baseType = ((BaseType) type).getBaseType();
       switch (baseType) {
         case CHAR:
+          internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
+              SystemBuiltInFunction.PUTCHAR.getMessage()));
+          break;
         case STRING:
           internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
               BuiltInFunction.PRINT_STRING));

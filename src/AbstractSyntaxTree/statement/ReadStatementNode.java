@@ -60,11 +60,11 @@ public class ReadStatementNode extends StatementNode {
       String identifier = ((IdentifierNode) assignment).getIdentifier();
 
       int offset = currSymTable.getOffset(identifier);
-      internalState.addInstruction(new ArithmeticInstruction(ArithmeticOperation.ADD, nextAvailable, Register.R0,
+      internalState.addInstruction(new ArithmeticInstruction(ArithmeticOperation.ADD, nextAvailable, Register.SP,
               new Operand(offset), !SET_BITS));
     } else {
       assignment.generateAssembly(internalState);
-      internalState.addInstruction(new ArithmeticInstruction(ArithmeticOperation.ADD, nextAvailable, Register.R0,
+      internalState.addInstruction(new ArithmeticInstruction(ArithmeticOperation.ADD, nextAvailable, Register.SP,
               new Operand(0), !SET_BITS));
     }
 

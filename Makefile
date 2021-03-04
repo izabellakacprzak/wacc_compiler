@@ -30,7 +30,7 @@ rules:
 
 clean:
 	$(RM) rules $(OUTPUT_DIR) $(SOURCE_DIR)/antlr
-	$(FIND) $(SOURCE_DIR) -name "*.s" -delete
+	$(FIND) -name "*.s" -delete
 
 .PHONY: all rules clean
 
