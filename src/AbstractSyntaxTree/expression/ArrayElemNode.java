@@ -109,7 +109,7 @@ public class ArrayElemNode extends ExpressionNode {
       Register exprReg = internalState.peekFreeRegister();
       internalState.addInstruction(new LdrInstruction(LDR, arrayReg, arrayReg));
       // move result of expression to R0
-      internalState.addInstruction(new MovInstruction(R0, exprReg));
+      internalState.addInstruction(new MovInstruction(Register.DEST_REG, exprReg));
       // move result of array to R1
       internalState.addInstruction(new MovInstruction(R1, arrayReg));
       internalState.addInstruction(new BranchInstruction(BL, ARRAY_BOUNDS));

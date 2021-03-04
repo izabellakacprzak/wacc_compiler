@@ -39,7 +39,7 @@ public class PrintLineStatementNode extends StatementNode {
 
     Register nextAvailable = internalState.peekFreeRegister();
     // TODO: ABSTRACT IN A FUNCTION IN VISITOR
-    internalState.addInstruction(new MovInstruction(Register.R0, nextAvailable));
+    internalState.addInstruction(new MovInstruction(Register.DEST_REG, nextAvailable));
     DataTypeId type = expression.getType(currSymTable);
 
     if (type instanceof ArrayType) {

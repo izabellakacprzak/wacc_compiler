@@ -55,7 +55,7 @@ public class ReturnStatementNode extends StatementNode {
     Register returnStatReg = internalState.peekFreeRegister();
     returnExpr.generateAssembly(internalState);
 
-    internalState.addInstruction(new MovInstruction(Register.R0, returnStatReg));
+    internalState.addInstruction(new MovInstruction(Register.DEST_REG, returnStatReg));
     internalState.addInstruction(new PopInstruction(Register.PC));
   }
 

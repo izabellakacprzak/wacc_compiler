@@ -142,7 +142,8 @@ public class FuncCallNode extends AssignRHSNode {
     }
 
     //move the result stored in R0 in the first free register
-    internalState.addInstruction(new MovInstruction(internalState.peekFreeRegister(), Register.R0));
+    internalState
+        .addInstruction(new MovInstruction(internalState.peekFreeRegister(), Register.DEST_REG));
   }
 
   @Override

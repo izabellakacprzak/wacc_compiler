@@ -38,7 +38,7 @@ public class PrintStatementNode extends StatementNode {
     expression.generateAssembly(internalState);
     Register nextAvailable = internalState.peekFreeRegister();
 
-    internalState.addInstruction(new MovInstruction(Register.R0, nextAvailable));
+    internalState.addInstruction(new MovInstruction(Register.DEST_REG, nextAvailable));
 
     DataTypeId type = expression.getType(currSymTable);
 

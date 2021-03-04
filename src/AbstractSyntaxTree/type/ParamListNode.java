@@ -65,13 +65,9 @@ public class ParamListNode implements ASTNode {
   public void generateAssembly(InternalState internalState) {
     Identifier entry;
     Register curr;
-    Stack<Register> paramReg = internalState.getAvailableRegs();
-    for (int i = 0; i < identifiers.size(); i++) {
-      if (i >= paramReg.size()) {
-        // TODO: too many parameters
-      }
-
-      entry = currSymTable.lookupAll(identifiers.get(i).getIdentifier());
+    //TODO: too many parameters for registers
+    for (IdentifierNode identifier : identifiers) {
+      entry = currSymTable.lookupAll(identifier.getIdentifier());
       curr = internalState.popFreeRegister();
       entry.setRegister(curr);
     }

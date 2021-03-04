@@ -74,14 +74,14 @@ public class ArrayLiterNode extends AssignRHSNode {
 
     // load array size in R0
     int arrSize = expressions.size() * arrElemSize + INT_BYTES_SIZE;
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, Register.R0, arrSize));
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR, Register.DEST_REG, arrSize));
 
     // BL malloc
     internalState.addInstruction(new BranchInstruction(ConditionCode.L,
         BranchOperation.B, "malloc"));
 
     Register reg = internalState.popFreeRegister();
-    internalState.addInstruction(new MovInstruction(reg, Register.R0));
+    internalState.addInstruction(new MovInstruction(reg, Register.DEST_REG));
 
     // if the array elem size is 1 byte, use STRB, otherwise use STR
     StrType strInstr = (arrElemSize == 1) ? StrType.STRB : StrType.STR;

@@ -76,7 +76,7 @@ public class PairElemNode extends AssignRHSNode {
     expression.generateAssembly(internalState);
     Register reg = internalState.peekFreeRegister();
 
-    internalState.addInstruction(new MovInstruction(Register.R0, reg));
+    internalState.addInstruction(new MovInstruction(Register.DEST_REG, reg));
 
     internalState
         .addInstruction(new BranchInstruction(BranchOperation.BL, BuiltInFunction.NULL_POINTER));
