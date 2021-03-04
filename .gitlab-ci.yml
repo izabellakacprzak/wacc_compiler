@@ -31,7 +31,7 @@ test-valid-job:
     - make
     - mvn -Dtest=FrontEndCompilerTest#runValidTests test
     
-test-backend-job
+test-backend-job:
   stage: test-backend
   script:
     - make
