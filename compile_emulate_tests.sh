@@ -3,52 +3,65 @@
 execute() {
   pathname=$1
   echo running test $runTests "$pathname"
-  flag=true
 
 	refOutput=${pathname/valid/backendTests}
+  FILE_PATH=$(basename "$pathname")
+  customInputPath="src/test/backendTests/testInput/${FILE_PATH/.wacc/.txt}"  #text file of custom user input
 
-	if [ ! -e ${refOutput/.wacc/.txt} ]; then
-	  echo $'\n' | ./refCompile "-x" "$pathname" > ${refOutput/.wacc/.txt}
-	  fi
+  customInput="\n"
+  if [  -e "$customInputPath" ]; then
+    read -r customInput<"$customInputPath";
+  fi
+
+
+	if [ ! -e ${refOutput/.wacc/.txt} ]; then  # check for the existence of a cached file
+	  # MAKE CHECK FOR TIME OF CACHING
+	  echo "$customInput" | ./refCompile "-x" "$pathname" > ${refOutput/.wacc/.txt}
+	fi
+
 
   ./compile "$pathname" "-a" >/dev/null 2>&1
-  arm-linux-gnueabi-gcc -o ${pathname/.wacc/} -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${pathname/.wacc/.s}
-  qemu-arm -L /usr/arm-linux-gnueabi/ ${pathname/.wacc/} > output.txt
+  arm-linux-gnueabi-gcc -o ${FILE_PATH/.wacc/} -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${FILE_PATH/.wacc/.s}
+  echo "$customInput" | qemu-arm -L /usr/arm-linux-gnueabi/ ${FILE_PATH/.wacc/} > output.txt
   ourExitCode=$?
-  rm ${pathname/.wacc/.s}
-  rm ${pathname/.wacc/}
+  rm ${FILE_PATH/.wacc/.s}
+  rm ${FILE_PATH/.wacc/}
 
-  { read -r;
-    correctFlag=false
+  {
+    correctFlag=true
+    stage1=true
+    stage2=false
     while read -r refLine;
       do
-        if "$flag" && [ "$refLine" = "===========================================================" ]; then
-          flag=false
+        if [ "$stage1" = true ] && [ "$refLine" = "===========================================================" ]; then
+          stage1=false
+          stage2=true
+          read -r refLine
         fi
-        flag=true
-        { read -r;
-        while "$correctFlag" && "$flag" && read -r refLine;
-        do
-          if "$flag" && [ "$refLine" = "===========================================================" ]; then
-            flag=false
-            read -r refLine
-          fi
-          if [ ! $flag ]; then
-            #compare outputs
-            ourLine=$(read -r ${pathname/valid/backendTests});
-            if [ "$refLine" != "$ourLine" ]; then
+
+        if [ "$stage2" = true ] && [ "$refLine" = "===========================================================" ]; then
+          read -r refLine
+          break
+          else
+            if [ "$stage2" = true ]; then
+             read -r ourLine<output.txt;
+             refLine=${refLine/0x*/addr}
+             ourLine=${ourLine/0x*/addr}
+              if [ "$refLine" != "$ourLine" ]; then
               correctFlag=false
+              read -r refLine
+              break
+              fi
             fi
-          fi
-        done; } < ${refOutput/.wacc/.txt}
+        fi
+      done; }  < "${refOutput/.wacc/.txt}"
 
         #compare exit code
-        if [ "$refLine" = "The exit code is ${ourExitCode}." ] ; then
-          correctFlag=true
+        if [ "$refLine" != "The exit code is ${ourExitCode}." ] ; then
+          correctFlag=false
         fi
-      done; } < ${refOutput/.wacc/.txt}
 
-      if [ $correctFlag ]; then
+      if [ "$correctFlag" = true ]; then
         passedTests=$((passedTests + 1))
         echo -e "$GREEN"passed"$NC": test "$runTests" "$pathname"
       else
@@ -90,4 +103,7 @@ runTests=0
 passedTests=0
 touch output.txt
 run_tests "src/test/valid"
-rm output.txt
+echo =======================
+echo SUMMARY
+echo passed $passedTests / $runTests "$TESTS_TYPE" tests
+

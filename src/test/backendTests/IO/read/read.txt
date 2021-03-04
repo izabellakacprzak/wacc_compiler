@@ -1,0 +1,32 @@
+src/test/valid/IO/read/read.wacc
+calling the reference compiler on src/test/valid/IO/read/read.wacc
+please provide a stdin stream to use when executing the program:
+-- Test: read.wacc
+
+-- Uploaded file: 
+---------------------------------------------------------------
+# simple read statement
+
+# Output:
+# input an integer to continue...
+# #input#
+
+# Program:
+
+begin
+	int x = 10;
+  println "input an integer to continue..." ;
+	read x
+end
+---------------------------------------------------------------
+
+-- Compiler Output:
+-- Compiling...
+-- Assembling and Linking...
+-- Executing...
+===========================================================
+input an integer to continue...
+===========================================================
+The exit code is 0.
+-- Finished
+

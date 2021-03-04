@@ -1,0 +1,28 @@
+src/test/valid/variables/capCharDeclaration.wacc
+calling the reference compiler on src/test/valid/variables/capCharDeclaration.wacc
+please provide a stdin stream to use when executing the program:
+-- Test: capCharDeclaration.wacc
+
+-- Uploaded file: 
+---------------------------------------------------------------
+# simple capital character variable declaration
+
+# Output:
+# #empty#
+
+# Program:
+
+begin
+  char c = 'M'
+end
+---------------------------------------------------------------
+
+-- Compiler Output:
+-- Compiling...
+-- Assembling and Linking...
+-- Executing...
+===========================================================
+===========================================================
+The exit code is 0.
+-- Finished
+
