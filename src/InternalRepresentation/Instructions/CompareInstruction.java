@@ -4,7 +4,7 @@ import InternalRepresentation.Enums.Register;
 import InternalRepresentation.InstructionPrinter;
 import InternalRepresentation.Operand;
 
-public class CompareInstruction implements Instruction {
+public final class CompareInstruction implements Instruction {
 
     private final InstructionPrinter printer = new InstructionPrinter();
     private final Register operand1;

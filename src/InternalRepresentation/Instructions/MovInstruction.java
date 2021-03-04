@@ -4,7 +4,7 @@ import InternalRepresentation.Enums.ConditionCode;
 import InternalRepresentation.Enums.Register;
 import InternalRepresentation.InstructionPrinter;
 
-public class MovInstruction implements Instruction {
+public final class MovInstruction implements Instruction {
   private final Register destReg;
   private Register srcReg = null;
   private ConditionCode conditionCode = null;

@@ -25,7 +25,7 @@ public class FuncCallNode extends AssignRHSNode {
    *               passed into the function call */
   private final IdentifierNode identifier;
   private final List<ExpressionNode> arguments;
-  private final int MAX_DEALLOCATION_SIZE = 1024;
+  private final static int MAX_DEALLOCATION_SIZE = 1024;
   private SymbolTable currSymTable = null;
 
   public FuncCallNode(int line, int charPositionInLine, IdentifierNode identifier,
@@ -146,7 +146,8 @@ public class FuncCallNode extends AssignRHSNode {
     }
 
     //move the result stored in R0 in the first free register
-    internalState.addInstruction(new MovInstruction(internalState.peekFreeRegister(), Register.R0));
+    internalState
+        .addInstruction(new MovInstruction(internalState.peekFreeRegister(), Register.DEST_REG));
   }
 
   @Override

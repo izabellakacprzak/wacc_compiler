@@ -2,7 +2,7 @@ package InternalRepresentation.Instructions;
 
 import InternalRepresentation.Enums.Directive;
 
-public class DirectiveInstruction implements Instruction {
+public final class DirectiveInstruction implements Instruction {
 
   private final Directive type;
   private final String value;

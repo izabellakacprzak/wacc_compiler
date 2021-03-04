@@ -31,6 +31,7 @@ execute() {
     correctFlag=true
     stage1=true
     stage2=false
+    readLines=1
     while read -r refLine;
       do
         if [ "$stage1" = true ] && [ "$refLine" = "===========================================================" ]; then
@@ -44,9 +45,14 @@ execute() {
           break
           else
             if [ "$stage2" = true ]; then
-             read -r ourLine<output.txt;
+
+             ourLine=$(sed "${readLines}q;d" output.txt)
+
+             readLines=$(("$readLines"+1))
+
              refLine=${refLine/0x*/addr}
              ourLine=${ourLine/0x*/addr}
+
               if [ "$refLine" != "$ourLine" ]; then
               correctFlag=false
               read -r refLine
@@ -103,7 +109,7 @@ runTests=0
 passedTests=0
 touch output.txt
 run_tests "src/test/valid"
+rm output.txt
 echo =======================
 echo SUMMARY
 echo passed $passedTests / $runTests "$TESTS_TYPE" tests
-

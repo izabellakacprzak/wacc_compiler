@@ -12,6 +12,8 @@ import InternalRepresentation.Instructions.Instruction;
 import InternalRepresentation.Instructions.LabelInstruction;
 import InternalRepresentation.Instructions.MsgInstruction;
 import InternalRepresentation.Enums.Register;
+import InternalRepresentation.Instructions.PopInstruction;
+import InternalRepresentation.Instructions.PushInstruction;
 import SemanticAnalysis.SymbolTable;
 
 import java.io.File;
@@ -100,29 +102,37 @@ public class InternalState {
     }
   }
 
-  //TODO change the availableRegs list to a stack
   public Register peekFreeRegister() {
-    //TODO check if we can ever run out of regs
-    return availableRegs.peek();
+    Register nextReg = availableRegs.peek();
+
+    if (availableRegs.size() <= NUM_STACK_REGS) {
+      addInstruction(new PushInstruction(LAST_LOAD_REG));
+      availableRegs.push(LAST_LOAD_REG);
+      return LAST_LOAD_REG;
+    }
+
+    return nextReg;
   }
 
   public void pushFreeRegister(Register reg) {
     availableRegs.push(reg);
-
   }
 
-  //public Register popFreeRegister() {
-  // return availableRegs.pop();
-  // }
-
-
   public Register popFreeRegister() {
-    if (!availableRegs.isEmpty()) {
-      return availableRegs.pop();
-    } else {
-      // use stack
-      return null;
+    if (availableRegs.size() <= NUM_STACK_REGS) {
+      addInstruction(new PushInstruction(LAST_LOAD_REG));
+      return LAST_LOAD_REG;
     }
+
+    return availableRegs.pop();
+  }
+
+  public Register popRegFromStack() {
+    //TODO: is this check meaningless?: if (availableRegs.isEmpty())
+    Register popReg = availableRegs.pop();
+
+    addInstruction(new PopInstruction(popReg));
+    return popReg;
   }
 
   public void addInstruction(Instruction instruction) {
@@ -143,32 +153,10 @@ public class InternalState {
     this.availableRegs = registers;
   }
 
-  public Stack<Register> getAvailableRegs() {
-    return availableRegs;
-  }
-
-  public void setAvailableRegs(Stack<Register> availableRegs) {
-    this.availableRegs = availableRegs;
-  }
-
-  /*public void setAsUsed(Register register) {
-    availableRegs.remove(register);
-  }
-*/
-//  public void setAsUnused(Register register) {
-//
-//      availableRegs.push(register);
-//    }
-//  }
-
   public String generateNewLabel() {
     String newLabel = "L" + labelCount;
     labelCount++;
     return newLabel;
-  }
-
-  public void addBuiltInLabel(BuiltInFunction function) {
-    function.setUsed();
   }
 
   public void allocateStackSpace(SymbolTable symbolTable) {

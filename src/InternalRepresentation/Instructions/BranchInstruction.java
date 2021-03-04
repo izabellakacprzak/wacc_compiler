@@ -8,10 +8,10 @@ import InternalRepresentation.InstructionPrinter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BranchInstruction implements Instruction {
+public final class BranchInstruction implements Instruction {
   private final InstructionPrinter printer = new InstructionPrinter();
   private final String label;
-  private List<ConditionCode> conditionCodes;
+  private final List<ConditionCode> conditionCodes = new ArrayList<>();;
   private final BranchOperation operation;
 
   // TODO: simplify constructors into this() calls
@@ -24,7 +24,6 @@ public class BranchInstruction implements Instruction {
   //1 COND INSTR + LABEL
   public BranchInstruction(ConditionCode conditionCode, BranchOperation operation, String label) {
     this.label = label;
-    conditionCodes = new ArrayList<>();
     conditionCodes.add(conditionCode);
     this.operation = operation;
   }
@@ -33,7 +32,7 @@ public class BranchInstruction implements Instruction {
   public BranchInstruction(List<ConditionCode> conditionCodes, BranchOperation operation,
       String label) {
     this.label = label;
-    this.conditionCodes = conditionCodes;
+    this.conditionCodes.addAll(conditionCodes);
     this.operation = operation;
   }
 

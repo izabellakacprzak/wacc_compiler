@@ -132,88 +132,99 @@ public class BinaryOpExprNode extends ExpressionNode {
     right.generateAssembly(internalState);
     Register rightResult = internalState.popFreeRegister();
 
+    Register destReg = leftResult;
+    if (leftResult == rightResult) {
+      leftResult = internalState.popRegFromStack();
+      destReg = rightResult;
+    }
+
     switch (operator) {
       case MUL:
         internalState.addInstruction(
-            new SMullInstruction(leftResult, rightResult, leftResult, rightResult, false));
+            new SMullInstruction(destReg, rightResult, leftResult, rightResult, false));
         internalState.addInstruction(
             new CompareInstruction(
-                rightResult, new Operand(leftResult, new Shift(ShiftType.ASR, MUL_SHIFT))));
+                rightResult, new Operand(destReg, new Shift(ShiftType.ASR, MUL_SHIFT))));
         internalState.addInstruction(new BranchInstruction(
             ConditionCode.NE,
             BranchOperation.BL, BuiltInFunction.OVERFLOW));
         break;
       case DIV:
-        internalState.addInstruction(new MovInstruction(R0, leftResult));
+        internalState.addInstruction(new MovInstruction(Register.DEST_REG, leftResult));
         internalState.addInstruction(new MovInstruction(R1, rightResult));
         internalState.addInstruction(
             new BranchInstruction(BranchOperation.BL, BuiltInFunction.DIV_ZERO));
         internalState.addInstruction(
             new BranchInstruction(BranchOperation.BL, SystemBuiltInFunction.IDIV.getMessage()));
-        internalState.addInstruction(new MovInstruction(leftResult, R0));
+        internalState.addInstruction(new MovInstruction(destReg, Register.DEST_REG));
         break;
       case MOD:
-        internalState.addInstruction(new MovInstruction(R0, leftResult));
+        internalState.addInstruction(new MovInstruction(Register.DEST_REG, leftResult));
         internalState.addInstruction(new MovInstruction(R1, rightResult));
         internalState.addInstruction(
             new BranchInstruction(BranchOperation.BL, BuiltInFunction.DIV_ZERO));
         internalState.addInstruction(
             new BranchInstruction(BranchOperation.BL, SystemBuiltInFunction.IDIVMOD.getMessage()));
-        internalState.addInstruction(new MovInstruction(leftResult, R1));
+        internalState.addInstruction(new MovInstruction(destReg, R1));
         break;
       case PLUS:
         internalState.addInstruction(
             new ArithmeticInstruction(ArithmeticOperation.ADD,
-                leftResult, leftResult, new Operand(rightResult), true));
+                destReg, leftResult, new Operand(rightResult), true));
         internalState.addInstruction(new BranchInstruction(VS,
             BranchOperation.BL, BuiltInFunction.OVERFLOW));
         break;
       case MINUS:
         internalState.addInstruction(
             new ArithmeticInstruction(ArithmeticOperation.SUB,
-                leftResult, leftResult, new Operand(rightResult), true));
+                destReg, leftResult, new Operand(rightResult), true));
         internalState.addInstruction(new BranchInstruction(VS,
             BranchOperation.BL, BuiltInFunction.OVERFLOW));
         break;
       case GREATER:
-        conditionAssembly(internalState, leftResult, rightResult, GT, LE);
+        conditionAssembly(internalState, destReg, leftResult, rightResult, GT, LE);
         break;
       case GEQ:
-        conditionAssembly(internalState, leftResult, rightResult, GE, LT);
+        conditionAssembly(internalState, destReg, leftResult, rightResult, GE, LT);
         break;
       case LESS:
-        conditionAssembly(internalState, leftResult, rightResult, LT, GE);
+        conditionAssembly(internalState, destReg, leftResult, rightResult, LT, GE);
         break;
       case LEQ:
-        conditionAssembly(internalState, leftResult, rightResult, LE, GT);
+        conditionAssembly(internalState, destReg, leftResult, rightResult, LE, GT);
         break;
       case EQUAL:
-        conditionAssembly(internalState, leftResult, rightResult, EQ, NE);
+        conditionAssembly(internalState, destReg, leftResult, rightResult, EQ, NE);
         break;
       case NEQ:
-        conditionAssembly(internalState, leftResult, rightResult, NE, EQ);
+        conditionAssembly(internalState, destReg, leftResult, rightResult, NE, EQ);
         break;
       case AND:
         internalState.addInstruction(
             new LogicalInstruction(
-                LogicalOperation.AND, leftResult, leftResult, new Operand(rightResult)));
+                LogicalOperation.AND, destReg, leftResult, new Operand(rightResult)));
         break;
       case OR:
         internalState.addInstruction(
             new LogicalInstruction(
-                LogicalOperation.ORR, leftResult, leftResult, new Operand(rightResult)));
+                LogicalOperation.ORR, destReg, leftResult, new Operand(rightResult)));
     }
 
-    internalState.pushFreeRegister(rightResult);
-    internalState.pushFreeRegister(leftResult);
+    if (destReg == rightResult) {
+      internalState.pushFreeRegister(leftResult);
+      internalState.pushFreeRegister(rightResult);
+    } else {
+      internalState.pushFreeRegister(rightResult);
+      internalState.pushFreeRegister(leftResult);
+    }
   }
 
-  private void conditionAssembly(InternalState internalState, Register leftResult,
+  private void conditionAssembly(InternalState internalState, Register destReg, Register leftResult,
       Register rightResult, ConditionCode trueCond, ConditionCode falseCond) {
     internalState.addInstruction(new CompareInstruction(leftResult, new Operand(rightResult)));
-    internalState.addInstruction(new MovInstruction(trueCond, leftResult, TRUE));
+    internalState.addInstruction(new MovInstruction(trueCond, destReg, TRUE));
     internalState.addInstruction(
-        new MovInstruction(falseCond, leftResult, FALSE));
+        new MovInstruction(falseCond, destReg, FALSE));
   }
 
   @Override

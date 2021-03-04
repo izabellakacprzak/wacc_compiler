@@ -5,7 +5,7 @@ import InternalRepresentation.Enums.Directive;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MsgInstruction implements Instruction {
+public final class MsgInstruction implements Instruction {
 
   private static final List<MsgInstruction> messages = new ArrayList<>();
 
