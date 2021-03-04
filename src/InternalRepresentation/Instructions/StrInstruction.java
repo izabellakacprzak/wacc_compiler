@@ -5,8 +5,9 @@ import InternalRepresentation.Enums.StrType;
 
 import InternalRepresentation.InstructionPrinter;
 
-public class StrInstruction implements Instruction {
+public final class StrInstruction implements Instruction {
 
+  // TODO: MAKE THIS CONSTRUCTORS - UNA KNOWS
   private final InstructionPrinter printer = new InstructionPrinter();
   private final StrType type;
   private final Register destReg;

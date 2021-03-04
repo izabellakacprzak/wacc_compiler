@@ -3,7 +3,7 @@ package InternalRepresentation.Instructions;
 import InternalRepresentation.Enums.Register;
 import InternalRepresentation.InstructionPrinter;
 
-public class SMullInstruction implements Instruction {
+public final class SMullInstruction implements Instruction {
 
     private final InstructionPrinter printer = new InstructionPrinter();
     private final Register destReg1;

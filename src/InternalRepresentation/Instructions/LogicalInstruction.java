@@ -5,7 +5,7 @@ import InternalRepresentation.Enums.Register;
 import InternalRepresentation.InstructionPrinter;
 import InternalRepresentation.Operand;
 
-public class LogicalInstruction implements Instruction{
+public final class LogicalInstruction implements Instruction{
 
     private final InstructionPrinter printer = new InstructionPrinter();
     private final LogicalOperation operation;

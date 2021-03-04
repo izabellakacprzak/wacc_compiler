@@ -3,7 +3,7 @@ package InternalRepresentation.Instructions;
 import InternalRepresentation.Enums.Register;
 import InternalRepresentation.InstructionPrinter;
 
-public class PopInstruction implements Instruction {
+public final class PopInstruction implements Instruction {
 
     // General Pop instruction takes in a reglist but could not see such an example
     // in the WACC arm output

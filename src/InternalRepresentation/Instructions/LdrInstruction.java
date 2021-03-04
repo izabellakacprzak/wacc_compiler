@@ -5,7 +5,7 @@ import InternalRepresentation.Enums.LdrType;
 import InternalRepresentation.Enums.Register;
 import InternalRepresentation.InstructionPrinter;
 
-public class LdrInstruction implements Instruction {
+public final class LdrInstruction implements Instruction {
   private final Register destReg;
   private final InstructionPrinter printer = new InstructionPrinter();
   private ConditionCode conditionCode;
