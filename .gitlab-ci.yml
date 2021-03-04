@@ -2,7 +2,8 @@ image: maven:3-jdk-11
 
 stages:
   - compile
-  - test
+  - test-frontend
+  - test-backend
   - clean
 
 compile-job:
@@ -11,11 +12,30 @@ compile-job:
     - make
     - mvn compile
 
-test-job:
-  stage: test
+test-syntax-job:
+  stage: test-frontend
   script:
     - make
-    - mvn test
+    - mvn -Dtest=FrontEndCompilerTest#runSyntaxErrorTests test
+    
+test-semantics-job:
+  stage: test-frontend
+  script:
+    - make
+    - mvn -Dtest=FrontEndCompilerTest#runSemanticErrorTests test
+
+
+test-valid-job:
+  stage: test-frontend
+  script:
+    - make
+    - mvn -Dtest=FrontEndCompilerTest#runValidTests test
+    
+test-backend-job
+  stage: test-backend
+  script:
+    - make
+    - mvn -Dtest=BackEndCompilerTest test             
 
 clean-job:
   stage: clean
