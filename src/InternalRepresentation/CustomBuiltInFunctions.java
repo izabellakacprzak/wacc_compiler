@@ -9,6 +9,7 @@ import static InternalRepresentation.Enums.ArithmeticOperation.*;
 import static InternalRepresentation.Enums.SystemBuiltInFunction.*;
 
 import InternalRepresentation.Enums.BuiltInFunction;
+import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Instructions.*;
 
 import java.util.ArrayList;
@@ -81,34 +82,35 @@ public class CustomBuiltInFunctions {
         throw new IllegalStateException("Unexpected non-print BuiltInFunction: " + type);
     }
 
-    instructions.add(new MovInstruction(R0, 0));
+    instructions.add(new MovInstruction(Register.DEST_REG, 0));
     instructions.add(new BranchInstruction(BL, FFLUSH.getMessage()));
     instructions.add(new PopInstruction(PC));
   }
 
   private void generateOverflow(List<Instruction> instructions) {
     instructions.add(new LdrInstruction(
-        LDR, R0, new MsgInstruction("OverflowError: the result is too small/large to store in"
-        + " a 4-byte signed-integer.\\n")));
+        LDR, Register.DEST_REG,
+        new MsgInstruction("OverflowError: the result is too small/large to store in"
+            + " a 4-byte signed-integer.\\n")));
     instructions.add(new BranchInstruction(BL, RUNTIME));
   }
 
   private void generateRuntime(List<Instruction> instructions) {
     instructions.add(new BranchInstruction(BL, PRINT_STRING));
-    instructions.add(new MovInstruction(R0, -1));
+    instructions.add(new MovInstruction(Register.DEST_REG, -1));
     instructions.add(new BranchInstruction(BL, EXIT.getMessage()));
   }
 
   private void generateArrayBounds(List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
-    instructions.add(new CompareInstruction(R0, new Operand(0)));
+    instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(0)));
     instructions.add(
-        new LdrInstruction(LDR, LT, R0,
+        new LdrInstruction(LDR, LT, Register.DEST_REG,
             new MsgInstruction("ArrayIndexOutOfBoundsError: negative index\\n\\0")));
     instructions.add(new BranchInstruction(LT, BL, RUNTIME));
     instructions.add(new LdrInstruction(LDR, R1, R1));
-    instructions.add(new CompareInstruction(R0, new Operand(R1)));
-    instructions.add(new LdrInstruction(LDR, CS, R0,
+    instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(R1)));
+    instructions.add(new LdrInstruction(LDR, CS, Register.DEST_REG,
         new MsgInstruction("ArrayIndexOutOfBoundsError: index too large\\n\\0")));
     instructions.add(new BranchInstruction(CS, BL, RUNTIME));
     instructions.add(new PopInstruction(PC));
@@ -117,7 +119,7 @@ public class CustomBuiltInFunctions {
   private void generateDivZero(List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
     instructions.add(new CompareInstruction(R1, new Operand(0)));
-    instructions.add(new LdrInstruction(LDR, EQ, R0,
+    instructions.add(new LdrInstruction(LDR, EQ, Register.DEST_REG,
         new MsgInstruction("DivideByZeroError: divide or modulo by zero\\n\\0")));
     instructions.add(new BranchInstruction(EQ, BL, RUNTIME));
     instructions.add(new PopInstruction(PC));
@@ -125,8 +127,8 @@ public class CustomBuiltInFunctions {
 
   private void generateNullPointer(List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
-    instructions.add(new CompareInstruction(R0, new Operand(0)));
-    instructions.add(new LdrInstruction(LDR, EQ, R0,
+    instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(0)));
+    instructions.add(new LdrInstruction(LDR, EQ, Register.DEST_REG,
         new MsgInstruction("NullReferenceError: dereference a null reference\\n\\0")));
     instructions.add(new BranchInstruction(EQ, BL, RUNTIME));
     instructions.add(new PopInstruction(PC));
@@ -134,18 +136,18 @@ public class CustomBuiltInFunctions {
 
   private void generateFreePair(List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
-    instructions.add(new CompareInstruction(R0, new Operand(0)));
+    instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(0)));
     instructions.add(
-        new LdrInstruction(LDR, EQ, R0,
+        new LdrInstruction(LDR, EQ, Register.DEST_REG,
             new MsgInstruction("NullReferenceError: dereference a null reference\\n\\0")));
     instructions.add(new BranchInstruction(EQ, B, RUNTIME));
-    instructions.add(new PushInstruction(R0));
-    instructions.add(new LdrInstruction(LDR, R0, R0));
+    instructions.add(new PushInstruction(Register.DEST_REG));
+    instructions.add(new LdrInstruction(LDR, Register.DEST_REG, Register.DEST_REG));
     instructions.add(new BranchInstruction(BL, FREE.getMessage()));
-    instructions.add(new LdrInstruction(LDR, R0, SP));
-    instructions.add(new LdrInstruction(LDR, R0, R0, 4));
+    instructions.add(new LdrInstruction(LDR, Register.DEST_REG, SP));
+    instructions.add(new LdrInstruction(LDR, Register.DEST_REG, Register.DEST_REG, 4));
     instructions.add(new BranchInstruction(BL, FREE.getMessage()));
-    instructions.add(new PopInstruction(R0));
+    instructions.add(new PopInstruction(Register.DEST_REG));
     instructions.add(new BranchInstruction(BL, FREE.getMessage()));
     instructions.add(new PopInstruction(PC));
   }
@@ -160,43 +162,52 @@ public class CustomBuiltInFunctions {
 
   private void generateRead(List<Instruction> instructions, BuiltInFunction type) {
     instructions.add(new PushInstruction(LR));
-    instructions.add(new MovInstruction(R1, R0));
+    instructions.add(new MovInstruction(R1, Register.DEST_REG));
     switch (type) {
       case READ_CHAR:
-        instructions.add(new LdrInstruction(LDR, R0, new MsgInstruction(" %c\\0")));
+        instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction(" %c\\0")));
         break;
       case READ_INT:
-        instructions.add(new LdrInstruction(LDR, R0, new MsgInstruction("%d\\0")));
+        instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction("%d\\0")));
         break;
       default:
         throw new IllegalStateException("Unexpected non-read BuiltInFunction: " + type);
     }
 
-    instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
+    instructions.add(
+        new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),
+            false));
     instructions.add(new BranchInstruction(BL, SCANF.getMessage()));
     instructions.add(new PopInstruction(PC));
   }
 
   private void generatePrintString(List<Instruction> instructions) {
-    instructions.add(new LdrInstruction(LDR, R1, R0));
-    instructions.add(new ArithmeticInstruction(ADD, R2, R0, new Operand(4), false));
-    instructions.add(new LdrInstruction(LDR, R0, new MsgInstruction("%.*s\\0")));
-    instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
+    instructions.add(new LdrInstruction(LDR, R1, Register.DEST_REG));
+    instructions.add(new ArithmeticInstruction(ADD, R2, Register.DEST_REG, new Operand(4), false));
+    instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction("%.*s\\0")));
+    instructions.add(
+        new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),
+            false));
     instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
   }
 
   private void generatePrintInt(List<Instruction> instructions) {
-    instructions.add(new MovInstruction(R1, R0));
-    instructions.add(new LdrInstruction(LDR, R0, new MsgInstruction("%d\\0")));
-    instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
+    instructions.add(new MovInstruction(R1, Register.DEST_REG));
+    instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction("%d\\0")));
+    instructions.add(
+        new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),
+            false));
     instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
   }
 
   private void generatePrintBool(List<Instruction> instructions) {
-    instructions.add(new CompareInstruction(R0, new Operand(FALSE)));
-    instructions.add(new LdrInstruction(LDR, NE, R0, new MsgInstruction("true\\0")));
-    instructions.add(new LdrInstruction(LDR, EQ, R0, new MsgInstruction("false\\0")));
-    instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
+    instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(FALSE)));
+    instructions.add(new LdrInstruction(LDR, NE, Register.DEST_REG, new MsgInstruction("true\\0")));
+    instructions
+        .add(new LdrInstruction(LDR, EQ, Register.DEST_REG, new MsgInstruction("false\\0")));
+    instructions.add(
+        new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),
+            false));
     instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
   }
 
@@ -210,16 +221,20 @@ public class CustomBuiltInFunctions {
       but idk when these are for
   */
   private void generatePrintReference(List<Instruction> instructions) {
-    instructions.add(new MovInstruction(R1, R0));
-    instructions.add(new LdrInstruction(LDR, R0, new MsgInstruction("%p\\0")));
-    instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
+    instructions.add(new MovInstruction(R1, Register.DEST_REG));
+    instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction("%p\\0")));
+    instructions.add(
+        new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),
+            false));
     instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
 
   }
 
   private void generatePrintLn(List<Instruction> instructions) {
-    instructions.add(new LdrInstruction(LDR, R0, new MsgInstruction("\\0")));
-    instructions.add(new ArithmeticInstruction(ADD, R0, R0, new Operand(4), false));
+    instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction("\\0")));
+    instructions.add(
+        new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),
+            false));
     instructions.add(new BranchInstruction(BL, PUTS.getMessage()));
   }
 }

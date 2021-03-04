@@ -5,6 +5,8 @@ import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Instructions.LdrInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.DataTypes.BaseType.Type;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.ParameterId;
@@ -60,6 +62,7 @@ public class IdentifierNode extends ExpressionNode {
     if (id == null) {
       return;
     }
+
     int offset = currSymTable.getOffset(getIdentifier());
     Register reg = internalState.peekFreeRegister();
     LdrType ldrInstr = (getType(currSymTable).getSize() == BYTE_SIZE) ? LDRSB : LDR;

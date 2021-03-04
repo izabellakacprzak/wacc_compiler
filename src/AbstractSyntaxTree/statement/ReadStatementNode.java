@@ -68,7 +68,7 @@ public class ReadStatementNode extends StatementNode {
               new Operand(0), !SET_BITS));
     }
 
-    internalState.addInstruction(new MovInstruction(Register.R0, nextAvailable));
+    internalState.addInstruction(new MovInstruction(Register.DEST_REG, nextAvailable));
     DataTypeId type = assignment.getType(currSymTable);
 
     if (type instanceof BaseType) {

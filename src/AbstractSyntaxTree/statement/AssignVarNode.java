@@ -16,9 +16,6 @@ import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
 
-import static InternalRepresentation.Enums.ConditionCode.VS;
-import static InternalRepresentation.Enums.LdrType.LDR;
-
 public class AssignVarNode extends StatementNode {
 
   private static final int BYTE_SIZE = 1;
@@ -100,7 +97,7 @@ public class AssignVarNode extends StatementNode {
 
       internalState
           .addInstruction(new LdrInstruction(LdrType.LDR, leftNodeResult, Register.SP, offset));
-      internalState.addInstruction(new MovInstruction(Register.R0, leftNodeResult));
+      internalState.addInstruction(new MovInstruction(Register.DEST_REG, leftNodeResult));
 
       internalState
           .addInstruction(new BranchInstruction(BranchOperation.BL, BuiltInFunction.NULL_POINTER));

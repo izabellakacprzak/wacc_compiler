@@ -100,7 +100,7 @@ public class ProgramNode implements ASTNode {
       internalState.deallocateStackSpace(statementNode.getCurrSymTable());
     }
 
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, Register.R0, 0));
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR, Register.DEST_REG, 0));
     internalState.addInstruction(new PopInstruction(Register.PC));
     internalState.addInstruction(new DirectiveInstruction(Directive.LTORG));
   }

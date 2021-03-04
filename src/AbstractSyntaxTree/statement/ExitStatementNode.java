@@ -46,7 +46,7 @@ public class ExitStatementNode extends StatementNode {
     Register exitCodeReg = internalState.peekFreeRegister();
 
     expression.generateAssembly(internalState);
-    internalState.addInstruction(new MovInstruction(Register.R0, exitCodeReg));
+    internalState.addInstruction(new MovInstruction(Register.DEST_REG, exitCodeReg));
     internalState.addInstruction(new BranchInstruction(BranchOperation.BL, "exit"));
   }
 
