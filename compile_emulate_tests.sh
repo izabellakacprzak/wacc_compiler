@@ -73,87 +73,96 @@ execute() {
   runTests=$((runTests + 1))
 }
 
+# goes through all progress files in the temp_progress directory
+# and outputs appropriate summaries for each feature
 check_progress() {
-  for progressFile in temp_progress/* ; do
+  for progressFile in temp_progress/*; do
 
-    failedTests=$(($(grep "" -c "$progressFile")-1))
-    numTests=$(head -n 1 "$progressFile")
-    progress=$((100 * (numTests - failedTests)/numTests))
-    name=$( sed 's:.*/::' <<< "$progressFile")
+    failedTests=$(($(grep "" -c "$progressFile") - 1)) # number of lines in file - 1
+    numTests=$(head -n 1 "$progressFile") # first line of progress file holds number of tests for this feature
+    progress=$((100 * (numTests - failedTests) / numTests))
+    name=$(sed 's:.*/::' <<<"$progressFile")
 
     echo "======================="
 
     errorMessage=$(pickErrorMessage "$name")
 
-  if [ "$progress" = 100 ]; then
-    echo -e "$GREEN""$errorMessage""$NC"
-  else
-    echo -e "$RED""$errorMessage""$NC"
-    echo -e "$RED""Failing tests for :""$NC"
-    {
-      read  -r    # read past first line as it indicates number of tests altogether
-      while read -r currLine ; do
-        echo "$currLine" # print failing tests for this feature
-      done
-    } <"$progressFile"
-  fi
-    done
+    if [ "$progress" = 100 ]; then
+      echo -e "$GREEN""$errorMessage""$NC"
+    else
+      echo -e "$RED""$errorMessage""$NC"
+      echo -e "$RED""Failing tests for :""$NC"
+      {
+        read -r # read past first line as it indicates number of tests altogether
+        while read -r currLine; do
+          echo "$currLine" # print failing tests for this feature from progress file
+        done
+      } <"$progressFile"
+    fi
+  done
 }
 
-pickErrorMessage() {
+# picks an appropriate message for each implemented feature
+pickFeatureMessage() {
   name=$1
   case $name in
-    advanced | basic | expressions | array | function )
+  advanced | basic | expressions | array | function)
     echo "Progress for $name features: $progress%"
-      ;;
-    variables)
+    ;;
+  variables)
     echo "Progress for variable declarations: $progress%"
-      ;;
-    if | while)
+    ;;
+  if | while)
     echo "Progress for $name statements: $progress%"
-      ;;
-    pairs)
+    ;;
+  pairs)
     echo "Progress for pair features: $progress%"
-      ;;
-    sequence)
+    ;;
+  sequence)
     echo "Progress for sequential composition: $progress%"
-      ;;
-    scope)
+    ;;
+  scope)
     echo "Progress for scoping: $progress%"
-      ;;
-    IO)
+    ;;
+  IO)
     echo "Progress for advanced $name : $progress%"
-      ;;
-    print | read)
+    ;;
+  print | read)
     echo "Progress for IO:$name feature: $progress%"
-      ;;
-    runtimeErr)
+    ;;
+  runtimeErr)
     echo "Progress for runtime errors: $progress%"
     ;;
-    arrayOutOfBounds | divideByZero | integerOverflow | nullDereference)
+  arrayOutOfBounds | divideByZero | integerOverflow | nullDereference)
     echo "Progress for runtime errors feature: $name: $progress%"
     ;;
-    *)
+  *)
     echo "Progress for $name: $progress%"
-    esac
+    ;;
+  esac
 }
 
+# runs a test whilst keeping track of the failing tests per feature
 run_test_with_progress() {
   pathname=$1
 
+  # finds the path of the directory the test is in
   baseDir=$(readlink -f "$pathname" | sed 's|\(.*\)/.*|\1|')
-  progressFile="temp_progress/"$(readlink -f "$pathname" | sed 's|\(.*\)/.*|\1|' | sed 's:.*/::')
-  if [ ! -e "$progressFile" ]; then
-    (find "$baseDir" -maxdepth 1 -type f | wc -l) >"$progressFile" # number of tests of this feature
-  fi
-  tempRunTests="$passedTests"
 
+  # finds the name of the progress file which holds the progress for the specific feature
+  progressFile="temp_progress/"$(readlink -f "$pathname" | sed 's|\(.*\)/.*|\1|' | sed 's:.*/::')
+
+  if [ ! -e "$progressFile" ]; then
+    (find "$baseDir" -maxdepth 1 -type f | wc -l) >"$progressFile" # creates a new file with the first line being set
+                                                                   # to the number of tests implemented for this feature
+  fi
+
+  tempRunTests="$passedTests"
   execute "$pathname"
 
   if [ "$tempRunTests" == "$passedTests" ]; then
-    echo "$pathname" >>"$progressFile"
+    echo "$pathname" >>"$progressFile"   # put the path of the failing test in the progress file
   fi
-
 }
 
 run_test_in_dir() {
@@ -163,7 +172,8 @@ run_test_in_dir() {
     else
       case "$pathname" in
       *.wacc)
-          run_test_with_progress "$pathname"
+        run_test_with_progress "$pathname"
+        ;;
       esac
     fi
   done
@@ -176,7 +186,8 @@ run_tests() {
     else
       case "$pathname" in
       *.wacc)
-       run_test_with_progress "$pathname"
+        run_test_with_progress "$pathname"
+        ;;
       esac
     fi
   done
