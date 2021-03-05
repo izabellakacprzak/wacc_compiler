@@ -338,7 +338,8 @@ public class CodeGenVisitor {
         Register arrayReg = internalState.popFreeRegister();
 
         node.generateElemAddr(internalState, arrayReg);
-        internalState.addInstruction(new LdrInstruction(LDR, arrayReg, arrayReg));
+        LdrType ldrType = (node.getType(node.getCurrSymTable()).getSize() == BYTE_SIZE) ? LDRSB : LDR;
+        internalState.addInstruction(new LdrInstruction(ldrType, arrayReg, arrayReg));
 
         internalState.pushFreeRegister(arrayReg);
     }

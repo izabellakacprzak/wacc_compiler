@@ -6,6 +6,8 @@ import static InternalRepresentation.Enums.Register.*;
 import static InternalRepresentation.Enums.LdrType.*;
 import static InternalRepresentation.Enums.BuiltInFunction.*;
 import static InternalRepresentation.Enums.ShiftType.LSL;
+
+import InternalRepresentation.Enums.LdrType;
 import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Instructions.ArithmeticInstruction;
 import InternalRepresentation.Instructions.BranchInstruction;
@@ -41,11 +43,12 @@ public class ArrayElemNode extends ExpressionNode {
     // put address of array into register
     int offset = currSymTable.getOffset(identifier.getIdentifier());
     internalState
-            .addInstruction(new ArithmeticInstruction(ADD, arrayReg, SP, new Operand(offset), false));
+        .addInstruction(new ArithmeticInstruction(ADD, arrayReg, SP, new Operand(offset), false));
     // evaluate each index expression
     for (ExpressionNode expression : expressions) {
       expression.generateAssembly(internalState);
       Register exprReg = internalState.peekFreeRegister();
+      ArrayType arrayType = (ArrayType) identifier.getType(currSymTable);
       internalState.addInstruction(new LdrInstruction(LDR, arrayReg, arrayReg));
       // move result of expression to R0
       internalState.addInstruction(new MovInstruction(Register.DEST_REG, exprReg));
@@ -53,9 +56,18 @@ public class ArrayElemNode extends ExpressionNode {
       internalState.addInstruction(new MovInstruction(R1, arrayReg));
       internalState.addInstruction(new BranchInstruction(BL, ARRAY_BOUNDS));
       internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
-              new Operand(INT_BYTES_SIZE), false));
-      internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
-              new Operand(exprReg, new Shift(LSL, 2)), false));
+          new Operand(INT_BYTES_SIZE), false));
+
+      DataTypeId arrayElemType = ((ArrayType) identifier.getType(currSymTable)).getElemType();
+      if (arrayElemType instanceof BaseType && ((BaseType) arrayElemType).getBaseType() == BaseType.Type.CHAR) {
+
+        internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
+            new Operand(exprReg), false));
+      } else {
+        internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
+            new Operand(exprReg, new Shift(LSL, 2)), false));
+        
+      }
     }
   }
 
@@ -110,7 +122,7 @@ public class ArrayElemNode extends ExpressionNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
-            visitArrayElemNode(internalState, this);
+                                         visitArrayElemNode(internalState, this);
   }
 
   @Override

@@ -6,6 +6,7 @@ import SemanticAnalysis.SymbolTable;
 
 public abstract class ExpressionNode extends AssignRHSNode {
 
+  protected int BYTE_SIZE = 1;
   public ExpressionNode(int line, int charPositionInLine) {
     super(line, charPositionInLine);
   }

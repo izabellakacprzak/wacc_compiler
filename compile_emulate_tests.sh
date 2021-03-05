@@ -50,8 +50,8 @@ execute() {
              ourLine=$(sed "${readLines}q;d" output.txt)
              readLines=$(("$readLines"+1))
 
-             refLine=$(sed 's/\b0x[^ ]*/#addr#/' <<< "$refLine") # substitute any addresses with #addr#
-             ourLine=$(sed 's/\b0x[^ ]*/#addr#/' <<< "$ourLine")
+             refLine=$(sed 's/\b0x[^ ]*/#addr#/g' <<< "$refLine") # substitute any addresses with #addr#
+             ourLine=$(sed 's/\b0x[^ ]*/#addr#/g' <<< "$ourLine")
 
               if [ "$refLine" != "$ourLine" ]; then
               correctFlag=false
