@@ -6,6 +6,10 @@ import InternalRepresentation.Utils.Operand;
 
 public final class CompareInstruction implements Instruction {
 
+    /* printer:     instruction printer used for generating String representations of instructions
+     * operand1:    left operand of compare instruction
+     * operand2:    right operand of compare instruction
+     */
     private final InstructionPrinter printer = new InstructionPrinter();
     private final Register operand1;
     private final Operand operand2;
@@ -19,6 +23,7 @@ public final class CompareInstruction implements Instruction {
         this.operand2 = operand2;
     }
 
+    /* Generates string representation of ARM instruction */
     @Override
     public String writeInstruction() {
         return printer.printCompare(operand1, operand2);

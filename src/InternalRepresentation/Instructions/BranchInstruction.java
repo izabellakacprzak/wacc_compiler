@@ -9,12 +9,17 @@ import java.util.Collections;
 import java.util.List;
 
 public final class BranchInstruction implements Instruction {
+  /* printer:         instruction printer used for generating String representations of instructions
+   * label:           destination label of the branch instruction
+   * conditionCodes:  condition codes for the branch instruction
+   * operation:       type of branch instruction
+   */
   private final InstructionPrinter printer = new InstructionPrinter();
   private final String label;
   private final List<ConditionCode> conditionCodes;
   private final BranchOperation operation;
 
-  //MULTIPLE COND INSTR + LABEL
+  /* MULTIPLE CONDITIONS INSTRUCTION + LABEL */
   public BranchInstruction(List<ConditionCode> conditionCodes, BranchOperation operation,
       String label) {
 
@@ -27,31 +32,35 @@ public final class BranchInstruction implements Instruction {
     this.operation = operation;
   }
 
-  //SIMPLE INSTR + LABEL
+  /* SIMPLE INSTRUCTION + LABEL */
   public BranchInstruction(BranchOperation operation, String label) {
     this(new ArrayList<>(), operation, label);
   }
 
-  //1 COND INSTR + LABEL
+  /* ONE CONDITION INSTRUCTION + LABEL */
   public BranchInstruction(ConditionCode conditionCode, BranchOperation operation, String label) {
     this(new ArrayList<>(Collections.singleton(conditionCode)), operation, label);
   }
 
+  /* ONE CONDITION INSTRUCTION + BUILTIN FUNCTION BRANCH */
   public BranchInstruction(ConditionCode conditionCode, BranchOperation operation,
       CustomBuiltIn function) {
     this(conditionCode, operation, function.getLabel());
     function.setUsed();
   }
 
+  /* SIMPLE BUILTIN BRANCH */
   public BranchInstruction(BranchOperation operation, CustomBuiltIn function) {
     this(operation, function.getLabel());
     function.setUsed();
   }
 
+  /* Generates string representation of ARM instruction */
   @Override
   public String writeInstruction() {
     return printer.printBranch(operation, conditionCodes, label);
   }
 
-  public enum BranchOperation {B, BL, BX, SWI}
+  /* Type of branch instruction */
+  public enum BranchOperation {B, BL}
 }

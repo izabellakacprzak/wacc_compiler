@@ -1,6 +1,0 @@
-p_check_null_pointer:
-      PUSH {lr}
-      CMP r0, #0
-      LDREQ r0, =msg_4
-      BLEQ p_throw_runtime_error
-      POP {pc}
