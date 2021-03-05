@@ -119,7 +119,7 @@ public class CodeGenVisitor {
 
             String pairID = pairElem.getIdentifier();
             int offset = currSymTable
-                    .getOffset(pairID); 
+                    .getOffset(pairID);
 
             internalState
                     .addInstruction(new LdrInstruction(LdrType.LDR, leftNodeResult, Register.SP, offset));
