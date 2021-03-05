@@ -11,8 +11,6 @@ import static InternalRepresentation.Utils.BuiltInFunction.SystemBuiltIn.*;
 import InternalRepresentation.Utils.BuiltInFunction.CustomBuiltIn;
 import InternalRepresentation.Instructions.*;
 
-import InternalRepresentation.Utils.Operand;
-import InternalRepresentation.Utils.Register;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +85,7 @@ public class CustomBuiltInGenerator {
     }
 
     instructions.add(new MovInstruction(Register.DEST_REG, 0));
-    instructions.add(new BranchInstruction(BL, FFLUSH.getMessage()));
+    instructions.add(new BranchInstruction(BL, FFLUSH.getLabel()));
     instructions.add(new PopInstruction(PC));
   }
 
@@ -102,7 +100,7 @@ public class CustomBuiltInGenerator {
   private static void generateRuntime(List<Instruction> instructions) {
     instructions.add(new BranchInstruction(BL, PRINT_STRING));
     instructions.add(new MovInstruction(Register.DEST_REG, -1));
-    instructions.add(new BranchInstruction(BL, EXIT.getMessage()));
+    instructions.add(new BranchInstruction(BL, EXIT.getLabel()));
   }
 
   private static void generateArrayBounds(List<Instruction> instructions) {
@@ -147,12 +145,12 @@ public class CustomBuiltInGenerator {
     instructions.add(new BranchInstruction(EQ, B, RUNTIME));
     instructions.add(new PushInstruction(Register.DEST_REG));
     instructions.add(new LdrInstruction(LDR, Register.DEST_REG, Register.DEST_REG));
-    instructions.add(new BranchInstruction(BL, FREE.getMessage()));
+    instructions.add(new BranchInstruction(BL, FREE.getLabel()));
     instructions.add(new LdrInstruction(LDR, Register.DEST_REG, SP));
     instructions.add(new LdrInstruction(LDR, Register.DEST_REG, Register.DEST_REG, 4));
-    instructions.add(new BranchInstruction(BL, FREE.getMessage()));
+    instructions.add(new BranchInstruction(BL, FREE.getLabel()));
     instructions.add(new PopInstruction(Register.DEST_REG));
-    instructions.add(new BranchInstruction(BL, FREE.getMessage()));
+    instructions.add(new BranchInstruction(BL, FREE.getLabel()));
     instructions.add(new PopInstruction(PC));
   }
 
@@ -173,7 +171,7 @@ public class CustomBuiltInGenerator {
     instructions.add(
         new ArithmeticInstruction(
             ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4), false));
-    instructions.add(new BranchInstruction(BL, SCANF.getMessage()));
+    instructions.add(new BranchInstruction(BL, SCANF.getLabel()));
     instructions.add(new PopInstruction(PC));
   }
 
@@ -186,7 +184,7 @@ public class CustomBuiltInGenerator {
     instructions.add(
         new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),
             false));
-    instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
+    instructions.add(new BranchInstruction(BL, PRINTF.getLabel()));
   }
 
   private static void generatePrintInt(List<Instruction> instructions) {
@@ -195,7 +193,7 @@ public class CustomBuiltInGenerator {
     instructions.add(
         new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),
             false));
-    instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
+    instructions.add(new BranchInstruction(BL, PRINTF.getLabel()));
   }
 
   private static void generatePrintBool(List<Instruction> instructions) {
@@ -206,7 +204,7 @@ public class CustomBuiltInGenerator {
     instructions.add(
         new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),
             false));
-    instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
+    instructions.add(new BranchInstruction(BL, PRINTF.getLabel()));
   }
 
   private static void generatePrintReference(List<Instruction> instructions) {
@@ -215,7 +213,7 @@ public class CustomBuiltInGenerator {
     instructions.add(
         new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),
             false));
-    instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
+    instructions.add(new BranchInstruction(BL, PRINTF.getLabel()));
 
   }
 
@@ -224,6 +222,6 @@ public class CustomBuiltInGenerator {
     instructions.add(
         new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),
             false));
-    instructions.add(new BranchInstruction(BL, PUTS.getMessage()));
+    instructions.add(new BranchInstruction(BL, PUTS.getLabel()));
   }
 }

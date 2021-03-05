@@ -18,20 +18,19 @@ public class BuiltInFunction {
     FREE("free"),
     PUTCHAR("putchar");
 
-    private final String message;
+    private final String label;
 
-    SystemBuiltIn(String message) {
-      this.message = message;
+    SystemBuiltIn(String label) {
+      this.label = label;
     }
 
-    public String getMessage() {
-      return message;
+    public String getLabel() {
+      return label;
     }
   }
 
   public enum CustomBuiltIn {
-    OVERFLOW(
-        "p_throw_overflow_error"),
+    OVERFLOW("p_throw_overflow_error"),
     RUNTIME("p_throw_runtime_error"),
     ARRAY_BOUNDS("p_check_array_bounds"),
     DIV_ZERO("p_check_divide_by_zero"),

@@ -1,20 +1,6 @@
 package AbstractSyntaxTree.expression;
 
-import static InternalRepresentation.Instructions.ArithmeticInstruction.ArithmeticOperation.*;
-import static InternalRepresentation.Instructions.BranchInstruction.BranchOperation.*;
-import static InternalRepresentation.Utils.Register.*;
-import static InternalRepresentation.Instructions.LdrInstruction.LdrType.*;
-import static InternalRepresentation.Utils.BuiltInFunction.CustomBuiltIn.*;
-import static InternalRepresentation.Utils.Shift.ShiftType.LSL;
-
-import InternalRepresentation.Utils.Register;
-import InternalRepresentation.Instructions.ArithmeticInstruction;
-import InternalRepresentation.Instructions.BranchInstruction;
-import InternalRepresentation.Instructions.LdrInstruction;
-import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Utils.Operand;
-import InternalRepresentation.Utils.Shift;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -38,36 +24,12 @@ public class ArrayElemNode extends ExpressionNode {
     this.expressions = expressions;
   }
 
-  public void generateElemAddr(InternalState internalState, Register arrayReg) {
-    // put address of array into register
-    int offset = getCurrSymTable().getOffset(identifier.getIdentifier());
-    internalState
-        .addInstruction(new ArithmeticInstruction(ADD, arrayReg, SP, new Operand(offset), false));
-    // evaluate each index expression
-    for (ExpressionNode expression : expressions) {
-      expression.generateAssembly(internalState);
-      Register exprReg = internalState.peekFreeRegister();
-      internalState.addInstruction(new LdrInstruction(LDR, arrayReg, arrayReg));
-      // move result of expression to R0
-      internalState.addInstruction(new MovInstruction(Register.DEST_REG, exprReg));
-      // move result of array to R1
-      internalState.addInstruction(new MovInstruction(Register.ARG_REG_1, arrayReg));
-      internalState.addInstruction(new BranchInstruction(BL, ARRAY_BOUNDS));
-      internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
-          new Operand(INT_BYTES_SIZE), false));
+  public IdentifierNode getIdentifier() {
+    return identifier;
+  }
 
-      DataTypeId arrayElemType = ((ArrayType) identifier.getType(getCurrSymTable())).getElemType();
-      if (arrayElemType instanceof BaseType
-          && ((BaseType) arrayElemType).getBaseType() == BaseType.Type.CHAR) {
-
-        internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
-            new Operand(exprReg), false));
-      } else {
-        internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
-            new Operand(exprReg, new Shift(LSL, 2)), false));
-
-      }
-    }
+  public List<ExpressionNode> getExpressions() {
+    return expressions;
   }
 
   @Override

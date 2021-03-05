@@ -39,7 +39,6 @@ public class InternalState {
   private SymbolTable funcSymTable;
 
   public InternalState() {
-    // setup stack function
     resetAvailableRegs();
     generatedInstructions = new ArrayList<>();
     codeGenVisitor = new CodeGenVisitor();
