@@ -38,6 +38,13 @@ public class SymbolTable {
     return currentObject;
   }
 
+  public void updateOffsetPerVar(int newOffset) {
+    for(String key : offsetPerVar.keySet()) {
+      Integer value = offsetPerVar.get(key);
+      offsetPerVar.put(key, value + newOffset);
+    }
+  }
+
   public boolean isTopSymTable() {
     return parentSymTable == null;
   }
