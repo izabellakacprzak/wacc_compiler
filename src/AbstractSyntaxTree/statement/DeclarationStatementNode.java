@@ -72,9 +72,7 @@ public class DeclarationStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-        visitDeclarationStatementNode(internalState, assignment, type, identifier,
-            getCurrSymTable());
+    internalState.getCodeGenVisitor().visitDeclarationStatementNode(
+        internalState, assignment, type, identifier, getCurrSymTable());
   }
-
 }

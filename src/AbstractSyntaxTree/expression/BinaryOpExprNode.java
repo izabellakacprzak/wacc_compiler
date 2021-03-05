@@ -8,9 +8,9 @@ import java.util.List;
 
 public class BinaryOpExprNode extends ExpressionNode {
 
-  /* left:         ExpressionNode corresponding to the left expression the operator was called with
-   * right:        ExpressionNode corresponding to the right expression the operator was called with
-   * operator:     BinOp enum representing the operator corresponding to this node */
+  /* left:     ExpressionNode corresponding to the left expression the operator was called with
+   * right:    ExpressionNode corresponding to the right expression the operator was called with
+   * operator: BinOp enum representing the operator corresponding to this node */
   private final ExpressionNode left;
   private final ExpressionNode right;
   private final BinOp operator;

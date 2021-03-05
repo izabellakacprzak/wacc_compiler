@@ -37,18 +37,12 @@ public class WhileStatementNode extends StatementNode {
 
     } else if (!conditionType.equals(new BaseType(BaseType.Type.BOOL))) {
       errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
-                            + " Incompatible type for 'If' condition."
-                            + " Expected: BOOL Actual: " + conditionType);
+          + " Incompatible type for 'If' condition."
+          + " Expected: BOOL Actual: " + conditionType);
     }
 
     /* Recursively call semanticAnalysis on statement node */
     statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
-  }
-
-  @Override
-  public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-            visitWhileStatementNode(internalState, condition, statement);
   }
 
   /* Recursively traverses the AST and sets the function expected return type in the ReturnNode
@@ -73,4 +67,8 @@ public class WhileStatementNode extends StatementNode {
     return statement.hasExitStatement();
   }
 
+  @Override
+  public void generateAssembly(InternalState internalState) {
+    internalState.getCodeGenVisitor().visitWhileStatementNode(internalState, condition, statement);
+  }
 }

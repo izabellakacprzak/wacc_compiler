@@ -49,12 +49,6 @@ public class ReturnStatementNode extends StatementNode {
     }
   }
 
-  @Override
-  public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-            visitReturnStatementNode(internalState, returnExpr);
-  }
-
   /* Sets the function expected returnType  */
   @Override
   public void setReturnType(DataTypeId returnType) {
@@ -68,4 +62,8 @@ public class ReturnStatementNode extends StatementNode {
     return true;
   }
 
+  @Override
+  public void generateAssembly(InternalState internalState) {
+    internalState.getCodeGenVisitor().visitReturnStatementNode(internalState, returnExpr);
+  }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class BoolLiterExprNode extends ExpressionNode {
 
-  /* value:        boolean representing the value of this node's BOOL literal */
+  /* value: boolean representing the value of this node's BOOL literal */
   private final boolean value;
 
   public BoolLiterExprNode(int line, int charPositionInLine, boolean value) {
@@ -24,8 +24,7 @@ public class BoolLiterExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-            visitBoolLiterExprNode(internalState, value);
+    internalState.getCodeGenVisitor().visitBoolLiterExprNode(internalState, value);
   }
 
   @Override

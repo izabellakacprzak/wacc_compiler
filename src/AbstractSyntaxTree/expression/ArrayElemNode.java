@@ -25,9 +25,9 @@ import java.util.List;
 
 public class ArrayElemNode extends ExpressionNode {
 
-  /* identifier:   IdentifierNode representing the identifier of this node
-   * expressions:  List of ExpressionNodes corresponding to the INT references to
-   *                 an array element */
+  /* identifier:  IdentifierNode representing the identifier of this node
+   * expressions: List of ExpressionNodes corresponding to the INT references to
+   *                an array element */
   private final IdentifierNode identifier;
   private final List<ExpressionNode> expressions;
 
@@ -87,16 +87,16 @@ public class ArrayElemNode extends ExpressionNode {
 
     if (idType == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " No declaration of '" + identifier.getIdentifier() + "' identifier."
-                            + " Expected: ARRAY IDENTIFIER.");
+          + " No declaration of '" + identifier.getIdentifier() + "' identifier."
+          + " Expected: ARRAY IDENTIFIER.");
       return;
     }
 
     if (!(identifier.getType(symbolTable) instanceof ArrayType)) {
       System.out.println(identifier);
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
-                            + " Expected: ARRAY IDENTIFIER Actual: " + idType);
+          + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
+          + " Expected: ARRAY IDENTIFIER Actual: " + idType);
       return;
     }
 
@@ -107,23 +107,22 @@ public class ArrayElemNode extends ExpressionNode {
 
       if (thisType == null) {
         errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-                              + " Could not resolve type of '" + expression + "' in ARRAY ELEM."
-                              + " Expected: INT");
+            + " Could not resolve type of '" + expression + "' in ARRAY ELEM."
+            + " Expected: INT");
         break;
       }
 
       if (!thisType.equals(new BaseType(BaseType.Type.INT))) {
         errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-                              + " Incompatible type of '" + expression + "' in ARRAY ELEM."
-                              + " Expected: INT Actual: " + thisType);
+            + " Incompatible type of '" + expression + "' in ARRAY ELEM."
+            + " Expected: INT Actual: " + thisType);
       }
     }
   }
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-        visitArrayElemNode(internalState, this);
+    internalState.getCodeGenVisitor().visitArrayElemNode(internalState, this);
   }
 
   /* Return the type of the elements stored in identifier array */

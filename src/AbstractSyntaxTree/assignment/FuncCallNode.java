@@ -18,7 +18,6 @@ import java.util.Map;
 
 public class FuncCallNode extends AssignRHSNode {
 
-  private final static int MAX_DEALLOCATION_SIZE = 1024;
   /* identifier:   IdentifierNode corresponding to the function's name identifier
    * arguments:    List of ExpressionNodes corresponding to the arguments
    *                 passed into the function call */
@@ -58,9 +57,9 @@ public class FuncCallNode extends AssignRHSNode {
 
     if (!(functionId instanceof FunctionId)) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
-                            + " Expected: FUNCTION IDENTIFIER"
-                            + " Actual: " + identifier.getType(symbolTable));
+          + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
+          + " Expected: FUNCTION IDENTIFIER"
+          + " Actual: " + identifier.getType(symbolTable));
       return;
     }
 
@@ -70,9 +69,9 @@ public class FuncCallNode extends AssignRHSNode {
 
     if (paramTypes.size() > arguments.size() || paramTypes.size() < arguments.size()) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " Function '" + identifier.getIdentifier()
-                            + "' has been called with the incorrect number of parameters."
-                            + " Expected: " + paramTypes.size() + " Actual: " + arguments.size());
+          + " Function '" + identifier.getIdentifier()
+          + "' has been called with the incorrect number of parameters."
+          + " Expected: " + paramTypes.size() + " Actual: " + arguments.size());
       return;
     }
 
@@ -88,13 +87,13 @@ public class FuncCallNode extends AssignRHSNode {
 
       if (currArg == null) {
         errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                              + " Could not resolve type of parameter " + (i + 1) + " in '" + identifier
-                              + "' function."
-                              + " Expected: " + currParamType);
+            + " Could not resolve type of parameter " + (i + 1) + " in '" + identifier
+            + "' function."
+            + " Expected: " + currParamType);
       } else if (!(currArg.equals(currParamType)) && !stringToCharArray(currParamType, currArg)) {
         errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                              + " Invalid type for parameter " + (i + 1) + " in '" + identifier + "' function."
-                              + " Expected: " + currParamType + " Actual: " + currArg);
+            + " Invalid type for parameter " + (i + 1) + " in '" + identifier + "' function."
+            + " Expected: " + currParamType + " Actual: " + currArg);
       }
       arguments.get(i).semanticAnalysis(symbolTable, errorMessages);
     }

@@ -51,12 +51,6 @@ public class IfStatementNode extends StatementNode {
     elseStatement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
   }
 
-  @Override
-  public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-            visitIfStatementNode(internalState, condition, thenStatement, elseStatement);
-  }
-
   /* Recursively call on statement nodes */
   @Override
   public void setReturnType(DataTypeId returnType) {
@@ -77,4 +71,9 @@ public class IfStatementNode extends StatementNode {
     return this.hasReturnStatement();
   }
 
+  @Override
+  public void generateAssembly(InternalState internalState) {
+    internalState.getCodeGenVisitor().
+        visitIfStatementNode(internalState, condition, thenStatement, elseStatement);
+  }
 }

@@ -11,9 +11,10 @@ import java.util.List;
 
 public class BaseTypeNode implements TypeNode {
 
-  /* type: BaseType.Type enum corresponding to the base type this represents */
+  /* type:         BaseType.Type enum corresponding to the base type this represents
+   * currSymTable: set to the node's SymbolTable for the current scope during semanticAnalysis */
   private final Type baseType;
-  private SymbolTable currSymTable;
+  private SymbolTable currSymTable = null;
 
   public BaseTypeNode(Type baseType) {
     this.baseType = baseType;

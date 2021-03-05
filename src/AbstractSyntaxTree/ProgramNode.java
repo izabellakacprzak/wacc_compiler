@@ -72,8 +72,7 @@ public class ProgramNode implements ASTNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-        visitProgramNode(internalState, statementNode, functionNodes);
+    internalState.getCodeGenVisitor().visitProgramNode(internalState, statementNode, functionNodes);
   }
 
   @Override

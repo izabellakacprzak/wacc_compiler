@@ -11,11 +11,11 @@ import java.util.List;
 
 public class ParamListNode implements ASTNode {
 
-  /* identifiers: List of IdentifierNodes corresponding to each of a function's parameters
-   * types:       List of TypeNodes corresponding to each of a function's parameters */
+  /* identifiers:  List of IdentifierNodes corresponding to each of a function's parameters
+   * types:        List of TypeNodes corresponding to each of a function's parameters
+   * currSymTable: set to the node's SymbolTable for the current scope during semanticAnalysis */
   private final List<IdentifierNode> identifiers;
   private final List<TypeNode> types;
-
   private SymbolTable currSymTable = null;
 
   public ParamListNode(List<IdentifierNode> identifiers, List<TypeNode> types) {
@@ -58,8 +58,7 @@ public class ParamListNode implements ASTNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-        visitParamListNode(internalState, identifiers, currSymTable);
+    internalState.getCodeGenVisitor().visitParamListNode(internalState, identifiers, currSymTable);
   }
 
   @Override

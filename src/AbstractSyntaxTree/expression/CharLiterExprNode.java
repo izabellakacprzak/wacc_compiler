@@ -9,7 +9,7 @@ import java.util.List;
 
 public class CharLiterExprNode extends ExpressionNode {
 
-  /* value:        char representing the value of this node's CHAR literal */
+  /* value: char representing the value of this node's CHAR literal */
   private final char value;
 
   public CharLiterExprNode(int line, int charPositionInLine, char value) {
@@ -25,8 +25,7 @@ public class CharLiterExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-            visitCharLiterExprNode(internalState, value);
+    internalState.getCodeGenVisitor().visitCharLiterExprNode(internalState, value);
   }
 
   @Override

@@ -24,11 +24,6 @@ public class NewScopeStatementNode extends StatementNode {
     statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
   }
 
-  @Override
-  public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().visitNewScopeStatementNode(internalState, statement);
-  }
-
   /* Recursively traverses the AST and sets the function expected return type in the ReturnNode
    * that it reaches. */
   @Override
@@ -50,4 +45,8 @@ public class NewScopeStatementNode extends StatementNode {
     return statement.hasExitStatement();
   }
 
+  @Override
+  public void generateAssembly(InternalState internalState) {
+    internalState.getCodeGenVisitor().visitNewScopeStatementNode(internalState, statement);
+  }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class StringLiterExprNode extends ExpressionNode {
 
-  /* value:        String representing the value of this node's STRING literal */
+  /* value: String representing the value of this node's STRING literal */
   private final String value;
 
   public StringLiterExprNode(int line, int charPositionInLine, String value) {
@@ -24,8 +24,7 @@ public class StringLiterExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-            visitStringLiterNode(internalState, value);
+    internalState.getCodeGenVisitor().visitStringLiterNode(internalState, value);
   }
 
   @Override

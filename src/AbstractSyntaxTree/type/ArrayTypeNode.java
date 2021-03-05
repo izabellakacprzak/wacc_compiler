@@ -10,7 +10,8 @@ import java.util.List;
 
 public class ArrayTypeNode implements TypeNode {
 
-  /* type:  TypeNode of the corresponding type of elements the array contains */
+  /* type:         TypeNode of the corresponding type of elements the array contains
+   * currSymTable: set to the node's SymbolTable for the current scope during semanticAnalysis */
   private final TypeNode type;
   private SymbolTable currSymTable = null;
 
@@ -29,7 +30,6 @@ public class ArrayTypeNode implements TypeNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
   }
 
   @Override

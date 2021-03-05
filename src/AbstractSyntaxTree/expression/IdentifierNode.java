@@ -38,8 +38,8 @@ public class IdentifierNode extends ExpressionNode {
           + " Identifier '" + identifier + "' has not been declared.");
     } else if (!(id instanceof VariableId) && !(id instanceof ParameterId)) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " Identifier '" + identifier + "' is referenced incorrectly."
-                            + " Expected: VARIABLE IDENTIFIER, PARAMETER IDENTIFIER");
+          + " Identifier '" + identifier + "' is referenced incorrectly."
+          + " Expected: VARIABLE IDENTIFIER, PARAMETER IDENTIFIER");
     }
   }
 

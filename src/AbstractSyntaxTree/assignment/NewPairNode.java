@@ -35,8 +35,8 @@ public class NewPairNode extends AssignRHSNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().visitNewPairNode(internalState, fstExpr, sndExpr,
-        getCurrSymTable());
+    internalState.getCodeGenVisitor()
+        .visitNewPairNode(internalState, fstExpr, sndExpr, getCurrSymTable());
   }
 
   @Override

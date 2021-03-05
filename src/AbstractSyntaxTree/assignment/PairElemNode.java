@@ -14,8 +14,8 @@ public class PairElemNode extends AssignRHSNode {
   /* Used to check if position is for 'fst' or 'snd' */
   private static final int FST = 0;
 
-  /* position:     0 if 'fst' was called, otherwise 'snd' was called.
-   * expression:   ExpressionNode called with 'fst' or 'snd'. Should be an IdentifierNode */
+  /* position:   0 if 'fst' was called, otherwise 'snd' was called.
+   * expression: ExpressionNode called with 'fst' or 'snd'. Should be an IdentifierNode */
   private final int position;
   private final ExpressionNode expression;
 
@@ -58,12 +58,12 @@ public class PairElemNode extends AssignRHSNode {
 
     if (expectedType == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " Could not resolve type of '" + pairId + "'. Expected: PAIR");
+          + " Could not resolve type of '" + pairId + "'. Expected: PAIR");
 
     } else if (!(expectedType instanceof PairType)) {
       errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-                            + " Incompatible type of '" + expression + "'. "
-                            + " Expected: PAIR Actual: " + expectedType);
+          + " Incompatible type of '" + expression + "'. "
+          + " Expected: PAIR Actual: " + expectedType);
     }
   }
 
@@ -90,7 +90,7 @@ public class PairElemNode extends AssignRHSNode {
 
     /* Return the type corresponding to the position and IdentifierNode pairId */
     return position == FST ? ((PairType) pairType).getFstType()
-               : ((PairType) pairType).getSndType();
+        : ((PairType) pairType).getSndType();
   }
 
   /* Returns a PairElem in the form: (fst | snd) expr */

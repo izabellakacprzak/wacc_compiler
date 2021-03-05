@@ -21,7 +21,7 @@ public class PairLiterExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-   internalState.getCodeGenVisitor().visitPairLiterExprNode(internalState);
+    internalState.getCodeGenVisitor().visitPairLiterExprNode(internalState);
   }
 
   @Override

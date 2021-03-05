@@ -9,7 +9,7 @@ import java.util.List;
 
 public class IntLiterExprNode extends ExpressionNode {
 
-  /* value:        int representing the value of this node's INT literal */
+  /* value: int representing the value of this node's INT literal */
   private final int value;
 
   public IntLiterExprNode(int line, int charPositionInLine, int value) {
@@ -21,7 +21,6 @@ public class IntLiterExprNode extends ExpressionNode {
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
-
   }
 
   @Override

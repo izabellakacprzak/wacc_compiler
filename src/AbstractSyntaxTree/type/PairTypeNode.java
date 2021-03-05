@@ -10,8 +10,9 @@ import java.util.List;
 
 public class PairTypeNode implements TypeNode {
 
-  /* fstType:  TypeNode of the first element in the pair's type
-   * sndType:  TypeNode of the second element in the pair's type */
+  /* fstType:      TypeNode of the first element in the pair's type
+   * sndType:      TypeNode of the second element in the pair's type
+   * currSymTable: set to the node's SymbolTable for the current scope during semanticAnalysis */
   private final TypeNode fstType;
   private final TypeNode sndType;
   private SymbolTable currSymTable;
@@ -48,7 +49,6 @@ public class PairTypeNode implements TypeNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
   }
 
   @Override

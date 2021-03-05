@@ -13,7 +13,6 @@ public class ArrayLiterNode extends AssignRHSNode {
   /* expressions:  List of ExpressionNodes corresponding to each element of the ARRAY literal */
   private final List<ExpressionNode> expressions;
 
-
   public ArrayLiterNode(int line, int charPositionInLine, List<ExpressionNode> expressions) {
     super(line, charPositionInLine);
     this.expressions = expressions;
@@ -55,8 +54,8 @@ public class ArrayLiterNode extends AssignRHSNode {
 
       if (!(fstType.equals(currType))) {
         errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                              + " Incompatible element type(s) in array literal."
-                              + " Expected: " + fstType + " Actual: " + currType);
+            + " Incompatible element type(s) in array literal."
+            + " Expected: " + fstType + " Actual: " + currType);
         break;
       }
 
@@ -68,8 +67,7 @@ public class ArrayLiterNode extends AssignRHSNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-            visitArrayLiterNode(internalState, expressions, this);
+    internalState.getCodeGenVisitor().visitArrayLiterNode(internalState, expressions, this);
   }
 
   @Override

@@ -26,12 +26,6 @@ public class StatementsListNode extends StatementNode {
     }
   }
 
-  @Override
-  public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-            visitStatementsListNode(internalState,statements);
-  }
-
   /* Recursively call setReturnType on each statement to set
    * the expected return type of a ReturnStatementNode */
   @Override
@@ -65,4 +59,8 @@ public class StatementsListNode extends StatementNode {
     return true;
   }
 
+  @Override
+  public void generateAssembly(InternalState internalState) {
+    internalState.getCodeGenVisitor().visitStatementsListNode(internalState, statements);
+  }
 }

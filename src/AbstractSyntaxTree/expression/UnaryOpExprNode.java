@@ -10,8 +10,8 @@ import java.util.List;
 
 public class UnaryOpExprNode extends ExpressionNode {
 
-  /* operand:       ExpressionNode corresponding to the expression the operator was called with
-   * operator:      UnOp enum representing the operator corresponding to this node */
+  /* operand:  ExpressionNode corresponding to the expression the operator was called with
+   * operator: UnOp enum representing the operator corresponding to this node */
   private final ExpressionNode operand;
   private final UnOp operator;
 
@@ -76,8 +76,7 @@ public class UnaryOpExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-            visitUnaryOpExprNode(internalState, operand, operator);
+    internalState.getCodeGenVisitor().visitUnaryOpExprNode(internalState, operand, operator);
   }
 
   @Override

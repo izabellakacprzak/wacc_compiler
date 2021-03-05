@@ -39,12 +39,6 @@ public class ExitStatementNode extends StatementNode {
     }
   }
 
-  @Override
-  public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-            visitExitStatementNode(internalState, expression);
-  }
-
   /* Flags that ExitStatementNode represents an exit statement. Used for syntax errors checking
    * when traversing the AST. */
   @Override
@@ -52,4 +46,8 @@ public class ExitStatementNode extends StatementNode {
     return true;
   }
 
+  @Override
+  public void generateAssembly(InternalState internalState) {
+    internalState.getCodeGenVisitor().visitExitStatementNode(internalState, expression);
+  }
 }

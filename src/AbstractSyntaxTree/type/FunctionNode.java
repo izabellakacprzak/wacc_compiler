@@ -16,7 +16,8 @@ public class FunctionNode implements TypeNode {
    * identifier:    IdentifierNode of the function's declaration
    * params:        ParamListNode containing a list of the function's parameter
    *                  IdentifierNodes and TypeNodes
-   * bodyStatement: Root node for the statement tree of the function's body */
+   * bodyStatement: Root node for the statement tree of the function's body
+   * currSymTable:  set to the node's SymbolTable for the current scope during semanticAnalysis */
   private final TypeNode returnType;
   private final IdentifierNode identifier;
   private final ParamListNode params;
@@ -83,8 +84,7 @@ public class FunctionNode implements TypeNode {
 
   @Override
   public Identifier getIdentifier(SymbolTable symbolTable) {
-    return new FunctionId(identifier, returnType.getType(),
-        params.getIdentifiers(symbolTable));
+    return new FunctionId(identifier, returnType.getType(), params.getIdentifiers(symbolTable));
   }
 
   @Override

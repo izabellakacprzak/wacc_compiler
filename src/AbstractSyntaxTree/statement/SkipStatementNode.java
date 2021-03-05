@@ -19,7 +19,6 @@ public class SkipStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
   }
 
 }
