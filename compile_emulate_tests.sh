@@ -73,6 +73,71 @@ execute() {
   runTests=$((runTests + 1))
 }
 
+check_progress() {
+  for progressFile in temp_progress/* ; do
+
+    failedTests=$(($(grep "" -c "$progressFile")-1))
+    numTests=$(head -n 1 "$progressFile")
+    progress=$((100 * (numTests - failedTests)/numTests))
+    name=$( sed 's:.*/::' <<< "$progressFile")
+
+    echo "======================="
+
+    errorMessage=$(pickErrorMessage "$name")
+
+  if [ "$progress" = 100 ]; then
+    echo -e "$GREEN""$errorMessage""$NC"
+  else
+    echo -e "$RED""$errorMessage""$NC"
+    echo -e "$RED""Failing tests for :""$NC"
+    {
+      read  -r    # read past first line as it indicates number of tests altogether
+      while read -r currLine ; do
+        echo "$currLine" # print failing tests for this feature
+      done
+    } <"$progressFile"
+  fi
+    done
+}
+
+pickErrorMessage() {
+  name=$1
+  case $name in
+    advanced | basic | expressions | array | function )
+    echo "Progress for $name features: $progress%"
+      ;;
+    variables)
+    echo "Progress for variable declarations: $progress%"
+      ;;
+    if | while)
+    echo "Progress for $name statements: $progress%"
+      ;;
+    pairs)
+    echo "Progress for pair features: $progress%"
+      ;;
+    sequence)
+    echo "Progress for sequential composition: $progress%"
+      ;;
+    scope)
+    echo "Progress for scoping: $progress%"
+      ;;
+    IO)
+    echo "Progress for advanced $name : $progress%"
+      ;;
+    print | read)
+    echo "Progress for IO:$name feature: $progress%"
+      ;;
+    runtimeErr)
+    echo "Progress for runtime errors: $progress%"
+    ;;
+    arrayOutOfBounds | divideByZero | integerOverflow | nullDereference)
+    echo "Progress for runtime errors feature: $name: $progress%"
+    ;;
+    *)
+    echo "Progress for $name: $progress%"
+    esac
+}
+
 run_test_with_progress() {
   pathname=$1
 
@@ -126,10 +191,11 @@ passedTests=0
 mkdir "temp_progress"
 LINES=$(cat $TESTS_TO_RUN)
 run_tests "$LINES"
+check_progress
 echo "======================="
 echo SUMMARY
 echo passed $passedTests / $runTests "$TESTS_TYPE" tests
-#rm -r "temp_progress"
+rm -r "temp_progress"
 rm output.txt
 rm output1.txt
 
