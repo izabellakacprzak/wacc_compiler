@@ -112,10 +112,11 @@ public class FuncCallNode extends AssignRHSNode {
     for (int i = arguments.size() - 1; i >= 0; i--) {
       // get argument, calculate size and add it to argsTotalSize
       ExpressionNode currArg = arguments.get(i);
-      int argSize = currArg.getType(currSymTable).getSize();
 
       // generate assembly code for the current argument
       currArg.generateAssembly(internalState);
+
+      int argSize = currArg.getType(currSymTable).getSize();
 
       StrType strInstr = (argSize == 1) ? StrType.STRB : StrType.STR;
 

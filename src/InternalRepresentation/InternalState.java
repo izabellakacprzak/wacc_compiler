@@ -189,6 +189,7 @@ public class InternalState {
   }
 
   public void decrementParamStackOffset(int argSize) {
+    funcSymTable.updateOffsetPerVar(argSize);
     paramStackOffset -= argSize;
   }
 

@@ -104,12 +104,20 @@ run_tests () {
 RED='\e[31m'
 GREEN='\e[32m'
 NC='\e[39m' # No Color
+TESTS_TO_RUN=$1
 runTests=0
 passedTests=0
 touch output.txt
-run_tests "src/test/valid"
+LINES=$(cat $TESTS_TO_RUN)
+run_tests "$LINES"
 rm output.txt
 rm output1.txt
 echo "======================="
 echo SUMMARY
 echo passed $passedTests / $runTests "$TESTS_TYPE" tests
+
+if [ $passedTests -eq $runTests ]; then
+  exit 0
+else
+  exit 1
+fi
