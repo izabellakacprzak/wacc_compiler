@@ -31,13 +31,17 @@ public class InternalState {
 
   private final List<Instruction> generatedInstructions;
   private final CodeGenVisitor codeGenVisitor;
-  private int varSize = 0;
+  private int varSize = 0;                /* stores the size of variables on the stack */
   private Stack<Register> availableRegs;
+  /* paramStackOffset is set to follow the end point of the function parameters on the stack */
   private int paramStackOffset = 0;
-  private int argStackOffset = 0;
+  private int argStackOffset = 0;         /* stack pointer for variables offset calculation */
   private int labelCount;
-  private SymbolTable funcSymTable;
+  private SymbolTable funcSymTable;       /* points to the function symbol table in order to deallocate
+                                             the variables off the stack at scope closing */
 
+  /* The internal states stores the generated instructions list, the available registers to use,
+   * a reference to a CodeGenVisitor object to generate instructions and a label count for labels generation */
   public InternalState() {
     resetAvailableRegs();
     generatedInstructions = new ArrayList<>();
@@ -45,17 +49,23 @@ public class InternalState {
     labelCount = 0;
   }
 
+  /* Generate assembly starts from the top (the Program Node) and traverses the previously generated AST
+   * to generate the assembly code for all of the nodes. */
   public void generateAssembly(File output, ProgramNode programNode) {
     try {
       FileWriter writer = new FileWriter(output);
       List<Instruction> instructions = new ArrayList<>();
 
+      /* generate program assembly code by traversing the AST and store the
+       * instructions in the generatedInstructions list of the internal state */
       programNode.generateAssembly(this);
 
+      /*add the used built-in functions code used to the instructions list  */
       for (CustomBuiltIn label : CustomBuiltIn.getUsed()) {
         instructions.addAll(CustomBuiltInGenerator.generateAssembly(label));
       }
 
+      /* add messages and output them to the .s file */
       if (!MsgInstruction.getMessages().isEmpty()) {
         writer.write(new DirectiveInstruction(DATA).writeInstruction());
         writer.write(LINE_BREAK);
@@ -77,7 +87,7 @@ public class InternalState {
       writer.write(new DirectiveInstruction(GLOBAL, "main").writeInstruction());
       writer.write(LINE_BREAK);
 
-      // add all generated instructions
+      /* write the generated assembly instructions to the .s file */
       for (Instruction instruction : generatedInstructions) {
         if (!(instruction instanceof LabelInstruction)) {
           writer.write(TAB);
@@ -87,7 +97,7 @@ public class InternalState {
         writer.write(LINE_BREAK);
       }
 
-      // add all used built in functions
+      /* write the built-in functions assembly instructions to the .s file */
       for (Instruction instruction : instructions) {
         if (!(instruction instanceof LabelInstruction)) {
           writer.write(TAB);
@@ -109,6 +119,8 @@ public class InternalState {
     return codeGenVisitor;
   }
 
+  /* return the first available register to use without removing it from the available
+   * registers stack */
   public Register peekFreeRegister() {
     Register nextReg = availableRegs.peek();
 
@@ -121,10 +133,13 @@ public class InternalState {
     return nextReg;
   }
 
+  /* add a register to be used back on the available registers stack */
   public void pushFreeRegister(Register reg) {
     availableRegs.push(reg);
   }
 
+  /* return the first available register to use and remove it from the available
+   * registers stack */
   public Register popFreeRegister() {
     if (availableRegs.size() <= NUM_STACK_REGS) {
       addInstruction(new PushInstruction(LAST_LOAD_REG));
@@ -141,10 +156,12 @@ public class InternalState {
     return popReg;
   }
 
+  /*adds instruction to the list of generated instructions*/
   public void addInstruction(Instruction instruction) {
     generatedInstructions.add(instruction);
   }
 
+  /*makes all registers to be used available*/
   public void resetAvailableRegs() {
     Stack<Register> registers = new Stack<>();
     List<Register> paramRegs = getParamRegs();
@@ -163,6 +180,8 @@ public class InternalState {
     return newLabel;
   }
 
+  /*calculates the variables sizes in the symbol table and allocates stack space for them,
+   increases the varSize variable */
   public void allocateStackSpace(SymbolTable symbolTable) {
     int size = symbolTable.getVarsSize();
     argStackOffset += symbolTable.getVarsSize();
@@ -174,9 +193,9 @@ public class InternalState {
     }
   }
 
+  /*calculates the variables sizes in the symbol table and de-allocates stack space from them */
   public void deallocateStackSpace(SymbolTable symbolTable) {
     int size = symbolTable.getVarsSize();
-//    varSize -= symbolTable.getVarsSize();
     while (size > 0) {
       addInstruction(new ArithmeticInstruction(ArithmeticOperation.ADD, SP, SP,
           new Operand(Math.min(size, MAX_STACK_ARITHMETIC_SIZE)), false));
@@ -214,6 +233,7 @@ public class InternalState {
     return funcSymTable;
   }
 
+  /* sets the current scope */
   public void setFunctionSymTable(SymbolTable funcSymTable) {
     this.funcSymTable = funcSymTable;
   }
@@ -233,7 +253,8 @@ public class InternalState {
   public int getVarSize() {
     return varSize;
   }
-  public void incrementVarSize(int size){
-  varSize += size;
+
+  public void incrementVarSize(int size) {
+    varSize += size;
   }
 }
