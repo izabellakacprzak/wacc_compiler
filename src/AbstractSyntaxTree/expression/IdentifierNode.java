@@ -45,8 +45,9 @@ public class IdentifierNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    DataTypeId type = getType(currSymTable);
     internalState.getCodeGenVisitor().
-            visitIdentifierNode(internalState, this, currSymTable);
+            visitIdentifierNode(internalState, identifier, type, currSymTable);
   }
 
   @Override

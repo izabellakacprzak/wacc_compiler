@@ -36,7 +36,8 @@ public class CodeGenVisitor {
     private static final int TRUE = 1;
     private static final int BYTE_SIZE = 1;
     private static final int NO_OF_ELEMS = 2;
-
+    private static final int NO_OFFSET = 0;
+    private static final int RETURN_ADDRESS_SIZE = 4;
     private static final int MUL_SHIFT = 31;
     private static final int INT_BYTES_SIZE = 4;
     private static final int ADDRESS_BYTE_SIZE = 4;
@@ -68,7 +69,7 @@ public class CodeGenVisitor {
             internalState.deallocateStackSpace(statementNode.getCurrSymTable());
         }
 
-        internalState.addInstruction(new LdrInstruction(LdrType.LDR, Register.DEST_REG, 0));
+        internalState.addInstruction(new LdrInstruction(LdrType.LDR, Register.DEST_REG, NO_OFFSET));
         internalState.addInstruction(new PopInstruction(Register.PC));
         internalState.addInstruction(new DirectiveInstruction(Directive.LTORG));
     }
@@ -90,7 +91,7 @@ public class CodeGenVisitor {
 
     public void visitParamListNode(InternalState internalState, List<IdentifierNode> identifiers, SymbolTable currSymTable) {
         int varOffset = internalState.getArgStackOffset();
-        internalState.incrementParamStackOffset(4);
+        internalState.incrementParamStackOffset(RETURN_ADDRESS_SIZE);
         for (IdentifierNode identifier : identifiers) {
             int paramSize = identifier.getType(currSymTable).getSize();
             currSymTable.setOffset(identifier.getIdentifier(), internalState.getArgStackOffset()
@@ -118,7 +119,7 @@ public class CodeGenVisitor {
 
             String pairID = pairElem.getIdentifier();
             int offset = currSymTable
-                    .getOffset(pairID); //TODO: + pairElem.getPosition() * ADDRESS_BYTE_SIZE;
+                    .getOffset(pairID); 
 
             internalState
                     .addInstruction(new LdrInstruction(LdrType.LDR, leftNodeResult, Register.SP, offset));
@@ -198,13 +199,30 @@ public class CodeGenVisitor {
         thenStatement.generateAssembly(internalState);
         internalState.deallocateStackSpace(thenStatement.getCurrSymTable());
 
-        internalState.addInstruction(new BranchInstruction(BranchOperation.B, endIfLabel));
+        generateCondInstruction(internalState, elseStatement, endIfLabel, elseLabel);
+    }
 
-        internalState.addInstruction(new LabelInstruction(elseLabel));
-        internalState.allocateStackSpace(elseStatement.getCurrSymTable());
-        elseStatement.generateAssembly(internalState);
-        internalState.deallocateStackSpace(elseStatement.getCurrSymTable());
-        internalState.addInstruction(new LabelInstruction(endIfLabel));
+    public void visitWhileStatementNode(InternalState internalState, ExpressionNode condition, StatementNode statement) {
+        String condLabel = internalState.generateNewLabel();
+        String statementLabel = internalState.generateNewLabel();
+
+        generateCondInstruction(internalState, statement, condLabel, statementLabel);
+        condition.generateAssembly(internalState);
+
+        internalState
+                .addInstruction(new CompareInstruction(internalState.peekFreeRegister(), new Operand(TRUE)));
+        internalState.addInstruction(new BranchInstruction(
+                ConditionCode.EQ, BranchOperation.B, statementLabel));
+    }
+
+    private void generateCondInstruction(InternalState internalState, StatementNode statement, String condLabel, String statementLabel) {
+        internalState.addInstruction(new BranchInstruction(BranchOperation.B, condLabel));
+
+        internalState.addInstruction(new LabelInstruction(statementLabel));
+        internalState.allocateStackSpace(statement.getCurrSymTable());
+        statement.generateAssembly(internalState);
+        internalState.deallocateStackSpace(statement.getCurrSymTable());
+        internalState.addInstruction(new LabelInstruction(condLabel));
     }
 
     public void visitNewScopeStatementNode(InternalState internalState, StatementNode statement) {
@@ -213,14 +231,16 @@ public class CodeGenVisitor {
         internalState.deallocateStackSpace(statement.getCurrSymTable());
     }
 
-    public void visitPrintLineStatementNode(InternalState internalState, ExpressionNode expression, SymbolTable currSymTable) {
+    public void visitPrintLineStatementNode(InternalState internalState, ExpressionNode expression,
+                                            SymbolTable currSymTable) {
         visitPrintStatementNode(internalState, expression, currSymTable);
 
         internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
                 BuiltInFunction.PRINT_LN));
     }
 
-    public void visitPrintStatementNode(InternalState internalState, ExpressionNode expression, SymbolTable currSymTable) {
+    public void visitPrintStatementNode(InternalState internalState, ExpressionNode expression,
+                                        SymbolTable currSymTable) {
         expression.generateAssembly(internalState);
         Register nextAvailable = internalState.peekFreeRegister();
 
@@ -262,7 +282,8 @@ public class CodeGenVisitor {
         }
     }
 
-    public void visitReadStatementNode(InternalState internalState, AssignLHSNode assignment, SymbolTable currSymTable) {
+    public void visitReadStatementNode(InternalState internalState, AssignLHSNode assignment,
+                                       SymbolTable currSymTable) {
         Register nextAvailable = internalState.peekFreeRegister();
 
         if (assignment instanceof IdentifierNode) {
@@ -274,7 +295,7 @@ public class CodeGenVisitor {
         } else {
             assignment.generateAssembly(internalState);
             internalState.addInstruction(new ArithmeticInstruction(ArithmeticOperation.ADD, nextAvailable, Register.SP,
-                    new Operand(0), !SET_BITS));
+                    new Operand(NO_OFFSET), !SET_BITS));
         }
 
         internalState.addInstruction(new MovInstruction(Register.DEST_REG, nextAvailable));
@@ -313,25 +334,6 @@ public class CodeGenVisitor {
         }
     }
 
-    public void visitWhileStatementNode(InternalState internalState, ExpressionNode condition, StatementNode statement) {
-        String condLabel = internalState.generateNewLabel();
-        String statementLabel = internalState.generateNewLabel();
-
-        internalState.addInstruction(new BranchInstruction(BranchOperation.B, condLabel));
-
-        internalState.addInstruction(new LabelInstruction(statementLabel));
-        internalState.allocateStackSpace(statement.getCurrSymTable());
-        statement.generateAssembly(internalState);
-        internalState.deallocateStackSpace(statement.getCurrSymTable());
-        internalState.addInstruction(new LabelInstruction(condLabel));
-        condition.generateAssembly(internalState);
-
-        internalState
-                .addInstruction(new CompareInstruction(internalState.peekFreeRegister(), new Operand(1)));
-        internalState.addInstruction(new BranchInstruction(
-                ConditionCode.EQ, BranchOperation.B, statementLabel));
-    }
-
     public void visitArrayElemNode(InternalState internalState, ArrayElemNode node) {
         Register arrayReg = internalState.popFreeRegister();
 
@@ -343,7 +345,7 @@ public class CodeGenVisitor {
 
 
     public void visitBinaryOpExprNode(InternalState internalState, ExpressionNode left, ExpressionNode right,
-                               Operator.BinOp operator, SymbolTable currSymTable) {
+                                      Operator.BinOp operator) {
         left.generateAssembly(internalState);
         Register leftResult = internalState.popFreeRegister();
         right.generateAssembly(internalState);
@@ -455,19 +457,20 @@ public class CodeGenVisitor {
         internalState.addInstruction(new MovInstruction(currDestination, value));
     }
 
-    public void visitIdentifierNode(InternalState internalState, IdentifierNode identifier, SymbolTable currSymTable) { //TODO: PASS TYPE/NODE???
+    public void visitIdentifierNode(InternalState internalState, String identifier, DataTypeId type,
+                                    SymbolTable currSymTable) { //TODO: PASS TYPE/NODE???
         // get offset from symbolTable of variable and store that in available reg
         if (currSymTable == null) {
             return;
         }
-        Identifier id = currSymTable.lookupAll(identifier.getIdentifier());
+        Identifier id = currSymTable.lookupAll(identifier);
         if (id == null) {
             return;
         }
 
-        int offset = currSymTable.getOffset(identifier.getIdentifier());
+        int offset = currSymTable.getOffset(identifier);
         Register reg = internalState.peekFreeRegister();
-        LdrType ldrInstr = (identifier.getType(currSymTable).getSize() == BYTE_SIZE) ? LDRSB : LDR;
+        LdrType ldrInstr = (type.getSize() == BYTE_SIZE) ? LDRSB : LDR;
         internalState.addInstruction(new LdrInstruction(ldrInstr, reg, Register.SP, offset));
     }
 
@@ -478,7 +481,7 @@ public class CodeGenVisitor {
 
     public void visitPairLiterExprNode(InternalState internalState) {
         Register currDestination = internalState.peekFreeRegister();
-        internalState.addInstruction(new LdrInstruction(LdrType.LDR, currDestination, 0));  //TODO: MAGIC NUMBER!
+        internalState.addInstruction(new LdrInstruction(LdrType.LDR, currDestination, NO_OFFSET));
     }
 
     public void visitParenthesisExprNode(InternalState internalState, ExpressionNode innerExpr) {
@@ -498,11 +501,11 @@ public class CodeGenVisitor {
         switch (operator) {
             case NOT:
                 internalState.addInstruction(new LogicalInstruction(LogicalOperation.EOR,
-                        operandResult, operandResult, new Operand(1)));
+                        operandResult, operandResult, new Operand(TRUE)));
                 break;
             case NEGATION:
                 internalState.addInstruction(new ArithmeticInstruction(ArithmeticOperation.RSB,
-                        operandResult, operandResult, new Operand(0), true));
+                        operandResult, operandResult, new Operand(NO_OFFSET), true));
                 internalState.addInstruction(new BranchInstruction(
                         ConditionCode.VS,
                         BranchOperation.BL, BuiltInFunction.OVERFLOW));

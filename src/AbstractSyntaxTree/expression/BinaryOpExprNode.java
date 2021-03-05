@@ -109,7 +109,7 @@ public class BinaryOpExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().visitBinaryOpExprNode(internalState, left, right, operator, currSymTable);
+    internalState.getCodeGenVisitor().visitBinaryOpExprNode(internalState, left, right, operator);
   }
 
   @Override
