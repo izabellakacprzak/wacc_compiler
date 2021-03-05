@@ -5,10 +5,7 @@ import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
-import InternalRepresentation.Enums.*;
-import InternalRepresentation.Instructions.*;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Operand;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -25,7 +22,6 @@ public class FuncCallNode extends AssignRHSNode {
    *               passed into the function call */
   private final IdentifierNode identifier;
   private final List<ExpressionNode> arguments;
-  private final static int MAX_DEALLOCATION_SIZE = 1024;
   private SymbolTable currSymTable = null;
 
   public FuncCallNode(int line, int charPositionInLine, IdentifierNode identifier,
@@ -105,46 +101,8 @@ public class FuncCallNode extends AssignRHSNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    // calculate total arguments size in argsTotalSize
-    int argsTotalSize = 0;
-
-    // arguments are stored in decreasing order they are given in the code
-    for (int i = arguments.size() - 1; i >= 0; i--) {
-      // get argument, calculate size and add it to argsTotalSize
-      ExpressionNode currArg = arguments.get(i);
-      int argSize = currArg.getType(currSymTable).getSize();
-
-      // generate assembly code for the current argument
-      currArg.generateAssembly(internalState);
-
-      StrType strInstr = (argSize == 1) ? StrType.STRB : StrType.STR;
-
-      //store currArg on the stack and decrease stack pointer (stack grows downwards)
-      internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(),
-          Register.SP, -argSize, true));
-      argsTotalSize += argSize;
-      internalState.decrementParamStackOffset(argSize);
-
-    }
-
-
-    //Branch Instruction to the callee label
-    String functionLabel = "f_" + identifier.toString();
-    internalState.addInstruction(new BranchInstruction(
-        ConditionCode.L, BranchOperation.B, functionLabel));
-
-    //de-allocate stack from the function arguments. Max size for one de-allocation is 1024B
-    while (argsTotalSize > 0) {
-      internalState.addInstruction(
-          new ArithmeticInstruction(ArithmeticOperation.ADD, Register.SP, Register.SP,
-              new Operand(Math.min(argsTotalSize, MAX_DEALLOCATION_SIZE)),
-              false));
-      argsTotalSize -= Math.min(argsTotalSize, MAX_DEALLOCATION_SIZE);
-    }
-
-    //move the result stored in R0 in the first free register
-    internalState
-        .addInstruction(new MovInstruction(internalState.peekFreeRegister(), Register.DEST_REG));
+    internalState.getCodeGenVisitor().
+            visitFuncCallNode(internalState, identifier, arguments, currSymTable);
   }
 
   @Override

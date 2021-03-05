@@ -3,9 +3,6 @@ package AbstractSyntaxTree.statement;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.TypeNode;
-import InternalRepresentation.Enums.Register;
-import InternalRepresentation.Enums.StrType;
-import InternalRepresentation.Instructions.StrInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
@@ -75,17 +72,8 @@ public class DeclarationStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    assignment.generateAssembly(internalState);
-
-    int typeSize = type.getType().getSize();
-    StrType storeType = typeSize == BYTE_SIZE ? StrType.STRB : StrType.STR;
-
-    internalState.decrementArgStackOffset(typeSize);
-    currSymTable.setOffset(identifier.getIdentifier(), internalState.getArgStackOffset());
-
-    Register destReg = internalState.peekFreeRegister();
-
-    internalState.addInstruction(new StrInstruction(storeType, destReg, Register.SP, currSymTable.getOffset(identifier.getIdentifier())));
+    internalState.getCodeGenVisitor().
+            visitDeclarationStatementNode(internalState, assignment, type, identifier, currSymTable);
   }
 
   @Override

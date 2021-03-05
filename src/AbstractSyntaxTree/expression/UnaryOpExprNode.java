@@ -1,18 +1,6 @@
 package AbstractSyntaxTree.expression;
 
-import InternalRepresentation.Enums.ConditionCode;
-import InternalRepresentation.Enums.LdrType;
-import InternalRepresentation.Enums.Register;
-import InternalRepresentation.Instructions.ArithmeticInstruction;
-import InternalRepresentation.Enums.ArithmeticOperation;
-import InternalRepresentation.Instructions.BranchInstruction;
-import InternalRepresentation.Enums.BranchOperation;
-import InternalRepresentation.Enums.BuiltInFunction;
-import InternalRepresentation.Instructions.LdrInstruction;
-import InternalRepresentation.Instructions.LogicalInstruction;
-import InternalRepresentation.Enums.LogicalOperation;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Operand;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.Operator.UnOp;
@@ -86,29 +74,8 @@ public class UnaryOpExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    operand.generateAssembly(internalState);
-    Register operandResult = internalState.popFreeRegister();
-
-    switch(operator) {
-      case NOT:
-        internalState.addInstruction(new LogicalInstruction(LogicalOperation.EOR,
-            operandResult, operandResult, new Operand(1)));
-        break;
-      case NEGATION:
-        internalState.addInstruction(new ArithmeticInstruction(ArithmeticOperation.RSB,
-            operandResult, operandResult, new Operand(0), true));
-        internalState.addInstruction(new BranchInstruction(
-            ConditionCode.VS,
-            BranchOperation.BL, BuiltInFunction.OVERFLOW));
-        break;
-      case LEN:
-        internalState.addInstruction(new LdrInstruction(LdrType.LDR, operandResult, operandResult));
-        break;
-      case ORD:
-      case CHR:
-    }
-
-    internalState.pushFreeRegister(operandResult);
+    internalState.getCodeGenVisitor().
+            visitUnaryOpExprNode(internalState, operand, operator);
   }
 
   @Override

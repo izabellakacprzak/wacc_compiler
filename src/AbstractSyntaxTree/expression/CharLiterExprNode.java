@@ -1,7 +1,5 @@
 package AbstractSyntaxTree.expression;
 
-import InternalRepresentation.Enums.Register;
-import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -27,8 +25,8 @@ public class CharLiterExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    Register currDestination = internalState.peekFreeRegister();
-    internalState.addInstruction(new MovInstruction(currDestination, value));
+    internalState.getCodeGenVisitor().
+            visitCharLiterExprNode(internalState, value);
   }
 
   @Override

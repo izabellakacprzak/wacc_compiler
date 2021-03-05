@@ -28,6 +28,8 @@ public class InternalState {
   private static final String TAB = "\t";
 
   private final List<Instruction> generatedInstructions;
+
+  private final CodeGenVisitor codeGenVisitor;
   private Stack<Register> availableRegs;
   private int paramStackOffset = 0;
   private int argStackOffset = 0;
@@ -40,6 +42,7 @@ public class InternalState {
     //TODO check callee reserved regs => main func starts from R4
     //TODO change this to a stack!!!!
     generatedInstructions = new ArrayList<>();
+    codeGenVisitor = new CodeGenVisitor();
     labelCount = 0;
   }
 
@@ -102,6 +105,11 @@ public class InternalState {
     } catch (IOException e) {
       System.out.println("Could not write to file: " + output.getName());
     }
+  }
+
+
+  public CodeGenVisitor getCodeGenVisitor() {
+    return codeGenVisitor;
   }
 
   public Register peekFreeRegister() {

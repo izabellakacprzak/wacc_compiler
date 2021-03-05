@@ -129,7 +129,7 @@ end
 -- Assembling and Linking...
 -- Executing...
 ===========================================================
-Using fixed-point real: 10 / 3 * 3 = 10
+Using fixed-point real: 10 / 3 * 3 = 0
 ===========================================================
 The exit code is 0.
 -- Finished

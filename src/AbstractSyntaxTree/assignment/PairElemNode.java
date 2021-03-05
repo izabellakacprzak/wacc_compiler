@@ -2,11 +2,6 @@ package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
-import InternalRepresentation.Enums.*;
-import InternalRepresentation.Instructions.BranchInstruction;
-import InternalRepresentation.Instructions.LdrInstruction;
-import InternalRepresentation.Instructions.MovInstruction;
-import InternalRepresentation.Instructions.StrInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.PairType;
@@ -73,22 +68,8 @@ public class PairElemNode extends AssignRHSNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    expression.generateAssembly(internalState);
-    Register reg = internalState.peekFreeRegister();
-
-    internalState.addInstruction(new MovInstruction(Register.DEST_REG, reg));
-
-    internalState
-        .addInstruction(new BranchInstruction(BranchOperation.BL, BuiltInFunction.NULL_POINTER));
-    internalState
-        .addInstruction(new LdrInstruction(LdrType.LDR, reg, reg, position * ADDRESS_BYTES_SIZE));
-
-    PairType pair = (PairType) expression.getType(currSymTable);
-    DataTypeId type = (position == FST) ? pair.getFstType() : pair.getSndType();
-    int elemSize = type.getSize();
-    LdrType ldrInstr = (elemSize == 1) ? LdrType.LDRSB : LdrType.LDR;
-
-    internalState.addInstruction(new LdrInstruction(ldrInstr, reg, reg));
+    internalState.getCodeGenVisitor().
+            visitPairElemNode(internalState, expression, position, currSymTable);
   }
 
   @Override

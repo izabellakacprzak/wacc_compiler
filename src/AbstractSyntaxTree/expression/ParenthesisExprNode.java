@@ -25,7 +25,8 @@ public class ParenthesisExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    innerExpr.generateAssembly(internalState);
+    internalState.getCodeGenVisitor().
+            visitParenthesisExprNode(internalState, innerExpr);
   }
 
   @Override

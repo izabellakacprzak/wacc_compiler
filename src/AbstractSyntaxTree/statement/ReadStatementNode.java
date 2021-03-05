@@ -1,16 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.assignment.AssignLHSNode;
-import AbstractSyntaxTree.expression.IdentifierNode;
-import InternalRepresentation.Enums.ArithmeticOperation;
-import InternalRepresentation.Enums.BranchOperation;
-import InternalRepresentation.Enums.BuiltInFunction;
-import InternalRepresentation.Enums.Register;
-import InternalRepresentation.Instructions.ArithmeticInstruction;
-import InternalRepresentation.Instructions.BranchInstruction;
-import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Operand;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
@@ -54,37 +45,8 @@ public class ReadStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    Register nextAvailable = internalState.peekFreeRegister();
-
-    if (assignment instanceof IdentifierNode) {
-      String identifier = ((IdentifierNode) assignment).getIdentifier();
-
-      int offset = currSymTable.getOffset(identifier);
-      internalState.addInstruction(new ArithmeticInstruction(ArithmeticOperation.ADD, nextAvailable, Register.SP,
-              new Operand(offset), !SET_BITS));
-    } else {
-      assignment.generateAssembly(internalState);
-      internalState.addInstruction(new ArithmeticInstruction(ArithmeticOperation.ADD, nextAvailable, Register.SP,
-              new Operand(0), !SET_BITS));
-    }
-
-    internalState.addInstruction(new MovInstruction(Register.DEST_REG, nextAvailable));
-    DataTypeId type = assignment.getType(currSymTable);
-
-    if (type instanceof BaseType) {
-      BaseType.Type baseType = ((BaseType) type).getBaseType();
-
-      switch (baseType) {
-        case INT:
-          internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
-              BuiltInFunction.READ_INT));
-          break;
-        case CHAR:
-          internalState.addInstruction(new BranchInstruction(BranchOperation.BL,
-              BuiltInFunction.READ_CHAR));
-          break;
-      }
-    }
+    internalState.getCodeGenVisitor().
+            visitReadStatementNode(internalState, assignment, currSymTable);
   }
 
   @Override

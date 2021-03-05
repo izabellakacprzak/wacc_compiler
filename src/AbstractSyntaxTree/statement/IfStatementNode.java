@@ -1,13 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
-import InternalRepresentation.Enums.ConditionCode;
-import InternalRepresentation.Instructions.BranchInstruction;
-import InternalRepresentation.Enums.BranchOperation;
-import InternalRepresentation.Instructions.CompareInstruction;
-import InternalRepresentation.Instructions.LabelInstruction;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Operand;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
@@ -57,27 +51,8 @@ public class IfStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    condition.generateAssembly(internalState);
-
-    String elseLabel = internalState.generateNewLabel();
-    String endIfLabel = internalState.generateNewLabel();
-
-    internalState.addInstruction(
-        new CompareInstruction(internalState.peekFreeRegister(), new Operand(0)));
-    internalState.addInstruction(
-        new BranchInstruction(ConditionCode.EQ, BranchOperation.B, elseLabel));
-
-    internalState.allocateStackSpace(thenStatement.getCurrSymTable());
-    thenStatement.generateAssembly(internalState);
-    internalState.deallocateStackSpace(thenStatement.getCurrSymTable());
-
-    internalState.addInstruction(new BranchInstruction(BranchOperation.B, endIfLabel));
-
-    internalState.addInstruction(new LabelInstruction(elseLabel));
-    internalState.allocateStackSpace(elseStatement.getCurrSymTable());
-    elseStatement.generateAssembly(internalState);
-    internalState.deallocateStackSpace(elseStatement.getCurrSymTable());
-    internalState.addInstruction(new LabelInstruction(endIfLabel));
+    internalState.getCodeGenVisitor().
+            visitIfStatementNode(internalState, condition, thenStatement, elseStatement);
   }
 
   /* Recursively call on statement nodes */

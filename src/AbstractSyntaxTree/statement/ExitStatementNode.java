@@ -1,10 +1,6 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
-import InternalRepresentation.Enums.Register;
-import InternalRepresentation.Instructions.BranchInstruction;
-import InternalRepresentation.Enums.BranchOperation;
-import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -43,11 +39,8 @@ public class ExitStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    Register exitCodeReg = internalState.peekFreeRegister();
-
-    expression.generateAssembly(internalState);
-    internalState.addInstruction(new MovInstruction(Register.DEST_REG, exitCodeReg));
-    internalState.addInstruction(new BranchInstruction(BranchOperation.BL, "exit"));
+    internalState.getCodeGenVisitor().
+            visitExitStatementNode(internalState, expression);
   }
 
   /* Flags that ExitStatementNode represents an exit statement. Used for syntax errors checking

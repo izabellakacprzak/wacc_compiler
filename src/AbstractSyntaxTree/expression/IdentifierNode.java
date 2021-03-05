@@ -1,12 +1,7 @@
 package AbstractSyntaxTree.expression;
 
-import InternalRepresentation.Enums.LdrType;
-import InternalRepresentation.Enums.Register;
-import InternalRepresentation.Instructions.LdrInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.DataTypes.BaseType;
-import SemanticAnalysis.DataTypes.BaseType.Type;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.ParameterId;
@@ -54,19 +49,8 @@ public class IdentifierNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    // get offset from symbolTable of variable and store that in available reg
-    if (currSymTable == null) {
-      return;
-    }
-    Identifier id = currSymTable.lookupAll(identifier);
-    if (id == null) {
-      return;
-    }
-
-    int offset = currSymTable.getOffset(getIdentifier());
-    Register reg = internalState.peekFreeRegister();
-    LdrType ldrInstr = (getType(currSymTable).getSize() == BYTE_SIZE) ? LDRSB : LDR;
-    internalState.addInstruction(new LdrInstruction(ldrInstr, reg, Register.SP, offset));
+    internalState.getCodeGenVisitor().
+            visitIdentifierNode(internalState, this, currSymTable);
   }
 
   @Override

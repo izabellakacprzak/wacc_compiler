@@ -1,8 +1,6 @@
 package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
-import InternalRepresentation.Enums.*;
-import InternalRepresentation.Instructions.*;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.PairType;
@@ -11,10 +9,6 @@ import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 public class NewPairNode extends AssignRHSNode {
-
-  private final static int NO_OF_ELEMS = 2;
-  private static final int FST = 0;
-  private static final int SND = 1;
 
   /* fstExpr: ExpressionNode corresponding to the first element of this node's PAIR
    * sndExpr: ExpressionNode corresponding to the second element of this node's PAIR */
@@ -40,43 +34,7 @@ public class NewPairNode extends AssignRHSNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.addInstruction(
-        new LdrInstruction(LdrType.LDR, Register.DEST_REG, NO_OF_ELEMS * ADDRESS_BYTES_SIZE));
-    //BL malloc
-    internalState.addInstruction(
-        new BranchInstruction(ConditionCode.L, BranchOperation.B, "malloc"));
-
-    Register pairReg = internalState.popFreeRegister();
-
-    internalState.addInstruction(new MovInstruction(pairReg, Register.DEST_REG));
-
-    generateElem(fstExpr, internalState, pairReg, FST);
-    generateElem(sndExpr, internalState, pairReg, SND);
-
-    internalState.pushFreeRegister(pairReg);
-  }
-
-  private void generateElem(ExpressionNode expr, InternalState internalState,
-      Register pairReg, int offset) {
-    /* begin expr code generation */
-    expr.generateAssembly(internalState);
-    Register exprReg = internalState.popFreeRegister();
-
-    // load expr type size into R0
-    int size = expr.getType(currSymTable).getSize();
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, Register.DEST_REG, size));
-
-    // BL malloc
-    internalState.addInstruction(new BranchInstruction(
-        ConditionCode.L, BranchOperation.B, "malloc"));
-
-    StrType strInstr = (size == 1) ? StrType.STRB : StrType.STR;
-    internalState.addInstruction(new StrInstruction(strInstr, exprReg, Register.DEST_REG));
-
-    internalState.addInstruction(
-        new StrInstruction(StrType.STR, Register.DEST_REG, pairReg, offset * ADDRESS_BYTES_SIZE));
-
-    internalState.pushFreeRegister(exprReg);
+    internalState.getCodeGenVisitor().visitNewPairNode(internalState, fstExpr, sndExpr, currSymTable);
   }
 
   @Override

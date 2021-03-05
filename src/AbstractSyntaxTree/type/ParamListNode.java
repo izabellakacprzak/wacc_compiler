@@ -64,12 +64,7 @@ public class ParamListNode implements ASTNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    int varOffset = internalState.getArgStackOffset();
-    internalState.incrementParamStackOffset(4);
-    for (IdentifierNode identifier : identifiers) {
-      int paramSize = identifier.getType(currSymTable).getSize();
-      currSymTable.setOffset(identifier.getIdentifier(), internalState.getArgStackOffset() + internalState.getParamStackOffset());
-      internalState.incrementParamStackOffset(paramSize);
-    }
+    internalState.getCodeGenVisitor().
+    visitParamListNode(internalState, identifiers, currSymTable);
   }
 }

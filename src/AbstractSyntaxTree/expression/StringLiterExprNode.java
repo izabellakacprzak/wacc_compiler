@@ -1,9 +1,5 @@
 package AbstractSyntaxTree.expression;
 
-import InternalRepresentation.Enums.LdrType;
-import InternalRepresentation.Enums.Register;
-import InternalRepresentation.Instructions.LdrInstruction;
-import InternalRepresentation.Instructions.MsgInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -28,9 +24,7 @@ public class StringLiterExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    Register currDestination = internalState.peekFreeRegister();
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, currDestination,
-        new MsgInstruction(value)));
+    internalState.getCodeGenVisitor().visitStringLiterNode(internalState, value);
   }
 
   @Override

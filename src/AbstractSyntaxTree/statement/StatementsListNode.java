@@ -26,9 +26,8 @@ public class StatementsListNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    for (StatementNode stat : statements) {
-      stat.generateAssembly(internalState);
-    }
+    internalState.getCodeGenVisitor().
+            visitStatementsListNode(internalState,statements);
   }
 
   /* Recursively call setReturnType on each statement to set

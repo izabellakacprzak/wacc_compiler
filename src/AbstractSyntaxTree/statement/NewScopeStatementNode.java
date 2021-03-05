@@ -24,9 +24,7 @@ public class NewScopeStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.allocateStackSpace(statement.getCurrSymTable());
-    statement.generateAssembly(internalState);
-    internalState.deallocateStackSpace(statement.getCurrSymTable());
+    internalState.getCodeGenVisitor().visitNewScopeStatementNode(internalState, statement);
   }
 
   /* Recursively traverses the AST and sets the function expected return type in the ReturnNode

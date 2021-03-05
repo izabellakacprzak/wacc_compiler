@@ -1,9 +1,6 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
-import InternalRepresentation.Enums.Register;
-import InternalRepresentation.Instructions.MovInstruction;
-import InternalRepresentation.Instructions.PopInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
@@ -52,14 +49,8 @@ public class ReturnStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    Register returnStatReg = internalState.peekFreeRegister();
-    returnExpr.generateAssembly(internalState);
-
-
-    internalState.addInstruction(new MovInstruction(Register.DEST_REG, returnStatReg));
-
-    internalState.deallocateStackSpace(internalState.getFunctionSymTable());
-    internalState.addInstruction(new PopInstruction(Register.PC));
+    internalState.getCodeGenVisitor().
+            visitReturnStatementNode(internalState, returnExpr);
   }
 
   /* Sets the function expected returnType  */

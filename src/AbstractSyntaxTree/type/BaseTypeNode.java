@@ -25,7 +25,6 @@ public class BaseTypeNode implements TypeNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
   }
 
   @Override

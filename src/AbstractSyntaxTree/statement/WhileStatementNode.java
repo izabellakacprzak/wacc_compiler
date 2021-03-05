@@ -1,13 +1,7 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
-import InternalRepresentation.Enums.ConditionCode;
-import InternalRepresentation.Instructions.BranchInstruction;
-import InternalRepresentation.Enums.BranchOperation;
-import InternalRepresentation.Instructions.CompareInstruction;
-import InternalRepresentation.Instructions.LabelInstruction;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Operand;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
@@ -52,22 +46,8 @@ public class WhileStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    String condLabel = internalState.generateNewLabel();
-    String statementLabel = internalState.generateNewLabel();
-
-    internalState.addInstruction(new BranchInstruction(BranchOperation.B, condLabel));
-
-    internalState.addInstruction(new LabelInstruction(statementLabel));
-    internalState.allocateStackSpace(statement.getCurrSymTable());
-    statement.generateAssembly(internalState);
-    internalState.deallocateStackSpace(statement.getCurrSymTable());
-    internalState.addInstruction(new LabelInstruction(condLabel));
-    condition.generateAssembly(internalState);
-
-    internalState
-        .addInstruction(new CompareInstruction(internalState.peekFreeRegister(), new Operand(1)));
-    internalState.addInstruction(new BranchInstruction(
-        ConditionCode.EQ, BranchOperation.B, statementLabel));
+    internalState.getCodeGenVisitor().
+            visitWhileStatementNode(internalState, condition, statement);
   }
 
   /* Recursively traverses the AST and sets the function expected return type in the ReturnNode

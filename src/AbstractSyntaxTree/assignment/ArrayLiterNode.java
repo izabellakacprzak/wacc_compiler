@@ -1,8 +1,6 @@
 package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
-import InternalRepresentation.Enums.*;
-import InternalRepresentation.Instructions.*;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
@@ -68,40 +66,8 @@ public class ArrayLiterNode extends AssignRHSNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    // get the size of the array elements type
-    DataTypeId type = ((ArrayType) this.getType(currSymTable)).getElemType();
-    int arrElemSize = (type != null ) ? type.getSize() : 0;
-
-    // load array size in R0
-    int arrSize = expressions.size() * arrElemSize + INT_BYTES_SIZE;
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, Register.DEST_REG, arrSize));
-
-    // BL malloc
-    internalState.addInstruction(new BranchInstruction(ConditionCode.L,
-        BranchOperation.B, "malloc"));
-
-    Register reg = internalState.popFreeRegister();
-    internalState.addInstruction(new MovInstruction(reg, Register.DEST_REG));
-
-    // if the array elem size is 1 byte, use STRB, otherwise use STR
-    StrType strInstr = (arrElemSize == 1) ? StrType.STRB : StrType.STR;
-
-    //iterate over the expressions, generate assembly for them and store them
-    Register nextAvailable = internalState.peekFreeRegister();
-    int i = INT_BYTES_SIZE;
-    for (ExpressionNode expression : expressions) {
-      expression.generateAssembly(internalState);
-      internalState.addInstruction(new StrInstruction(strInstr, nextAvailable, reg, i));
-      i += arrElemSize;
-    }
-
-    Register noOfArrElemsReg = internalState.peekFreeRegister();
-    internalState
-        .addInstruction(new LdrInstruction(LdrType.LDR, noOfArrElemsReg, expressions.size()));
-    internalState.addInstruction(new StrInstruction(StrType.STR, noOfArrElemsReg, reg));
-
-    //push back and free nextAvailable allocation register
-    internalState.pushFreeRegister(reg);
+    internalState.getCodeGenVisitor().
+            visitArrayLiterNode(internalState, expressions, this);
   }
 
   @Override

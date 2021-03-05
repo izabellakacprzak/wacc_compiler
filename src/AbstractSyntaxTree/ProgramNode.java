@@ -3,14 +3,6 @@ package AbstractSyntaxTree;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.type.FunctionNode;
-import InternalRepresentation.Enums.Register;
-import InternalRepresentation.Instructions.DirectiveInstruction;
-import InternalRepresentation.Instructions.LabelInstruction;
-import InternalRepresentation.Instructions.LdrInstruction;
-import InternalRepresentation.Instructions.PopInstruction;
-import InternalRepresentation.Instructions.PushInstruction;
-import InternalRepresentation.Enums.Directive;
-import InternalRepresentation.Enums.LdrType;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.SymbolTable;
@@ -80,29 +72,8 @@ public class ProgramNode implements ASTNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    // generate assembly code for all function nodes
-    for (FunctionNode functionNode : functionNodes) {
-      functionNode.generateAssembly(internalState);
-    }
-
-    // add main label and push Link Register
-    internalState.addInstruction(new LabelInstruction("main"));
-    internalState.addInstruction(new PushInstruction(Register.LR));
-
-    //TODO allocate stack space for variables. How to get the var symbol table??
-    // TODO size should include function calls params sizes ???????
-    if (statementNode.getCurrSymTable() != null)
-      internalState.allocateStackSpace(statementNode.getCurrSymTable());
-
-    statementNode.generateAssembly(internalState);
-
-    if (statementNode.getCurrSymTable() != null) {
-      internalState.deallocateStackSpace(statementNode.getCurrSymTable());
-    }
-
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, Register.DEST_REG, 0));
-    internalState.addInstruction(new PopInstruction(Register.PC));
-    internalState.addInstruction(new DirectiveInstruction(Directive.LTORG));
+    internalState.getCodeGenVisitor().
+    visitProgramNode(internalState, statementNode, functionNodes);
   }
 
   @Override
