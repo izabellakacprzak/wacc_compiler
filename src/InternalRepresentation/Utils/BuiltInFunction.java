@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 public class BuiltInFunction {
 
+  /* Builtin system functions */
   public enum SystemBuiltIn {
     MALLOC("malloc"),
     PRINTF("printf"),
@@ -18,6 +19,7 @@ public class BuiltInFunction {
     FREE("free"),
     PUTCHAR("putchar");
 
+    /* label: string label of builtin function */
     private final String label;
 
     SystemBuiltIn(String label) {
@@ -29,6 +31,7 @@ public class BuiltInFunction {
     }
   }
 
+  /* Custom builtin functions */
   public enum CustomBuiltIn {
     OVERFLOW("p_throw_overflow_error"),
     RUNTIME("p_throw_runtime_error"),
@@ -44,6 +47,9 @@ public class BuiltInFunction {
     PRINT_REFERENCE("p_print_reference"),
     PRINT_LN("p_print_ln");
 
+    /* label: string label of builtin function
+     * used:  true if function is accessed in the program false otherwise
+     */
     private final String label;
     private boolean used;
 
@@ -52,6 +58,7 @@ public class BuiltInFunction {
       this.used = false;
     }
 
+    /* Returns all custom builtin functions used in the program */
     public static List<CustomBuiltIn> getUsed() {
       return Arrays.stream(CustomBuiltIn.values()).filter(CustomBuiltIn::isUsed)
           .collect(Collectors.toList());

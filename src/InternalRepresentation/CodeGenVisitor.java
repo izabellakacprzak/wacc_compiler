@@ -88,8 +88,6 @@ public class CodeGenVisitor {
     internalState.addInstruction(new LabelInstruction("main"));
     internalState.addInstruction(new PushInstruction(LR));
 
-    // TODO allocate stack space for variables. How to get the var symbol table??
-    // TODO size should include function calls params sizes ???????
     /* Allocate space for variables in the program StatementNode's currSymbolTable */
     internalState.allocateStackSpace(statementNode.getCurrSymTable());
 
@@ -529,7 +527,7 @@ public class CodeGenVisitor {
   }
 
   public void visitIdentifierNode(InternalState internalState, String identifier, DataTypeId type,
-      SymbolTable currSymTable) { //TODO: PASS TYPE/NODE???
+      SymbolTable currSymTable) {
     // get offset from symbolTable of variable and store that in available reg
     if (currSymTable == null) {
       return;

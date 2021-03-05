@@ -3,6 +3,7 @@ package InternalRepresentation.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
+/* Available ARM11 architecture registers */
 public enum Register {
   R0, R1, R2, R3, R4, R5, R6,
   R7, R8, R9, R10, R11, R12,

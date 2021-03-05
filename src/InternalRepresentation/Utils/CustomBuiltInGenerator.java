@@ -16,11 +16,13 @@ import java.util.List;
 
 public class CustomBuiltInGenerator {
 
+  /* Global value for FALSE */
   private static final int FALSE = 0;
 
   private CustomBuiltInGenerator() {
   }
 
+  /* Generates assembly for builtin functions */
   public static List<Instruction> generateAssembly(CustomBuiltIn type) {
     List<Instruction> instructions = new ArrayList<>();
     instructions.add(new LabelInstruction(type.getLabel()));
@@ -61,6 +63,7 @@ public class CustomBuiltInGenerator {
     return instructions;
   }
 
+  /* Generates assembly for print builtin functions */
   private static void generatePrint(CustomBuiltIn type, List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
 
@@ -89,6 +92,7 @@ public class CustomBuiltInGenerator {
     instructions.add(new PopInstruction(PC));
   }
 
+  /* Generates assembly for overflow error builtin function */
   private static void generateOverflow(List<Instruction> instructions) {
     instructions.add(new LdrInstruction(
         LDR, Register.DEST_REG,
@@ -97,12 +101,14 @@ public class CustomBuiltInGenerator {
     instructions.add(new BranchInstruction(BL, RUNTIME));
   }
 
+  /* Generates assembly for runtime error builtin function */
   private static void generateRuntime(List<Instruction> instructions) {
     instructions.add(new BranchInstruction(BL, PRINT_STRING));
     instructions.add(new MovInstruction(Register.DEST_REG, -1));
     instructions.add(new BranchInstruction(BL, EXIT.getLabel()));
   }
 
+  /* Generates assembly for array-out-of-bounds error builtin function */
   private static void generateArrayBounds(List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
     instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(0)));
@@ -118,6 +124,7 @@ public class CustomBuiltInGenerator {
     instructions.add(new PopInstruction(PC));
   }
 
+  /* Generates assembly for division-by-zero error builtin function */
   private static void generateDivZero(List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
     instructions.add(new CompareInstruction(Register.ARG_REG_1, new Operand(0)));
@@ -127,6 +134,7 @@ public class CustomBuiltInGenerator {
     instructions.add(new PopInstruction(PC));
   }
 
+  /* Generates assembly for null pointer error builtin function */
   private static void generateNullPointer(List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
     instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(0)));
@@ -136,6 +144,7 @@ public class CustomBuiltInGenerator {
     instructions.add(new PopInstruction(PC));
   }
 
+  /* Generates assembly for free pair error builtin function */
   private static void generateFreePair(List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
     instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(0)));
@@ -154,6 +163,7 @@ public class CustomBuiltInGenerator {
     instructions.add(new PopInstruction(PC));
   }
 
+  /* Generates assembly for read builtin functions */
   private static void generateRead(List<Instruction> instructions, CustomBuiltIn type) {
     instructions.add(new PushInstruction(LR));
     instructions.add(new MovInstruction(Register.ARG_REG_1, Register.DEST_REG));
@@ -175,6 +185,7 @@ public class CustomBuiltInGenerator {
     instructions.add(new PopInstruction(PC));
   }
 
+  /* Generates assembly for print string builtin function */
   private static void generatePrintString(List<Instruction> instructions) {
     instructions.add(new LdrInstruction(LDR, Register.ARG_REG_1, Register.DEST_REG));
     instructions.add(
@@ -187,6 +198,7 @@ public class CustomBuiltInGenerator {
     instructions.add(new BranchInstruction(BL, PRINTF.getLabel()));
   }
 
+  /* Generates assembly for print int builtin function */
   private static void generatePrintInt(List<Instruction> instructions) {
     instructions.add(new MovInstruction(Register.ARG_REG_1, Register.DEST_REG));
     instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction("%d\\0")));
@@ -196,6 +208,7 @@ public class CustomBuiltInGenerator {
     instructions.add(new BranchInstruction(BL, PRINTF.getLabel()));
   }
 
+  /* Generates assembly for print bool builtin function */
   private static void generatePrintBool(List<Instruction> instructions) {
     instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(FALSE)));
     instructions.add(new LdrInstruction(LDR, NE, Register.DEST_REG, new MsgInstruction("true\\0")));
@@ -207,6 +220,7 @@ public class CustomBuiltInGenerator {
     instructions.add(new BranchInstruction(BL, PRINTF.getLabel()));
   }
 
+  /* Generates assembly for print reference builtin function */
   private static void generatePrintReference(List<Instruction> instructions) {
     instructions.add(new MovInstruction(Register.ARG_REG_1, Register.DEST_REG));
     instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction("%p\\0")));
@@ -217,6 +231,7 @@ public class CustomBuiltInGenerator {
 
   }
 
+  /* Generates assembly for print line builtin function */
   private static void generatePrintLn(List<Instruction> instructions) {
     instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction("\\0")));
     instructions.add(
