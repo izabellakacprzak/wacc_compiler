@@ -93,7 +93,8 @@ public class AssignVarNode extends StatementNode {
       Register leftNodeResult = internalState.peekFreeRegister();
 
       String pairID = pairElem.getIdentifier();
-      int offset = currSymTable.getOffset(pairID) + pairElem.getPosition() * ADDRESS_BYTE_SIZE;
+      int offset = currSymTable
+          .getOffset(pairID); //TODO: + pairElem.getPosition() * ADDRESS_BYTE_SIZE;
 
       internalState
           .addInstruction(new LdrInstruction(LdrType.LDR, leftNodeResult, Register.SP, offset));

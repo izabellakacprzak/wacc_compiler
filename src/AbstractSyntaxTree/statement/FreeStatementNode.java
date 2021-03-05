@@ -4,6 +4,7 @@ import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.Enums.BranchOperation;
 import InternalRepresentation.Enums.BuiltInFunction;
 import InternalRepresentation.Instructions.BranchInstruction;
+import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
@@ -12,6 +13,7 @@ import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 import static InternalRepresentation.Enums.ConditionCode.VS;
+import static InternalRepresentation.Enums.Register.DEST_REG;
 
 public class FreeStatementNode extends StatementNode {
 
@@ -48,6 +50,7 @@ public class FreeStatementNode extends StatementNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     expression.generateAssembly(internalState);
+    internalState.addInstruction(new MovInstruction(DEST_REG, internalState.peekFreeRegister()));
     internalState
         .addInstruction(new BranchInstruction(BranchOperation.BL, BuiltInFunction.FREE_PAIR));
   }
