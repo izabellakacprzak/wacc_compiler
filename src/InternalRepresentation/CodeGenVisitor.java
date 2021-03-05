@@ -11,7 +11,8 @@ import AbstractSyntaxTree.type.FunctionNode;
 import AbstractSyntaxTree.type.ParamListNode;
 import AbstractSyntaxTree.type.TypeNode;
 import InternalRepresentation.Instructions.*;
-import InternalRepresentation.Utils.BuiltInFunction;
+import InternalRepresentation.Instructions.LdrInstruction.LdrType;
+import InternalRepresentation.Instructions.StrInstruction.StrType;
 import InternalRepresentation.Utils.ConditionCode;
 import InternalRepresentation.Utils.Operand;
 import InternalRepresentation.Utils.Register;
@@ -27,11 +28,17 @@ import SemanticAnalysis.SymbolTable;
 import java.util.List;
 import java.util.Map;
 
+import static InternalRepresentation.Instructions.ArithmeticInstruction.ArithmeticOperation.*;
+import static InternalRepresentation.Instructions.LogicalInstruction.LogicalOperation.*;
+import static InternalRepresentation.Instructions.StrInstruction.StrType.*;
+import static InternalRepresentation.Utils.BuiltInFunction.CustomBuiltIn.*;
 import static InternalRepresentation.Utils.ConditionCode.*;
-import static InternalRepresentation.Utils.BuiltInFunction.SystemBuiltIn.MALLOC;
+import static InternalRepresentation.Utils.BuiltInFunction.SystemBuiltIn.*;
 import static InternalRepresentation.Instructions.DirectiveInstruction.Directive.*;
+import static InternalRepresentation.Instructions.BranchInstruction.BranchOperation.*;
 import static InternalRepresentation.Instructions.LdrInstruction.LdrType.*;
 import static InternalRepresentation.Utils.Register.*;
+import static InternalRepresentation.Utils.Shift.ShiftType.*;
 
 public class CodeGenVisitor {
 
@@ -75,10 +82,9 @@ public class CodeGenVisitor {
       internalState.deallocateStackSpace(statementNode.getCurrSymTable());
     }
 
-    internalState.addInstruction(
-        new LdrInstruction(LdrInstruction.LdrType.LDR, Register.DEST_REG, NO_OFFSET));
+    internalState.addInstruction(new LdrInstruction(LDR, Register.DEST_REG, NO_OFFSET));
     internalState.addInstruction(new PopInstruction(Register.PC));
-    internalState.addInstruction(new DirectiveInstruction(DirectiveInstruction.Directive.LTORG));
+    internalState.addInstruction(new DirectiveInstruction(LTORG));
   }
 
   public void visitFunctionNode(InternalState internalState, IdentifierNode identifier,
@@ -119,8 +125,7 @@ public class CodeGenVisitor {
       int typeSize = left.getType(currSymTable).getSize();
       int offset = currSymTable.getOffset(((IdentifierNode) left).getIdentifier());
 
-      StrInstruction.StrType strType =
-          typeSize == BYTE_SIZE ? StrInstruction.StrType.STRB : StrInstruction.StrType.STR;
+      StrType strType = typeSize == BYTE_SIZE ? STRB : STR;
       internalState
           .addInstruction(new StrInstruction(strType, rightNodeResult, Register.SP, offset));
 
@@ -133,21 +138,17 @@ public class CodeGenVisitor {
           .getOffset(pairID);
 
       internalState
-          .addInstruction(
-              new LdrInstruction(LdrInstruction.LdrType.LDR, leftNodeResult, Register.SP, offset));
+          .addInstruction(new LdrInstruction(LDR, leftNodeResult, Register.SP, offset));
       internalState.addInstruction(new MovInstruction(Register.DEST_REG, leftNodeResult));
 
       internalState
-          .addInstruction(new BranchInstruction(BranchInstruction.BranchOperation.BL,
-              BuiltInFunction.CustomBuiltIn.NULL_POINTER));
+          .addInstruction(new BranchInstruction(BL, NULL_POINTER));
 
-      internalState.addInstruction(
-          new LdrInstruction(LdrInstruction.LdrType.LDR, leftNodeResult, leftNodeResult,
-              pairElem.getPosition() * ADDRESS_BYTE_SIZE));
+      internalState.addInstruction(new LdrInstruction(LDR, leftNodeResult, leftNodeResult,
+          pairElem.getPosition() * ADDRESS_BYTE_SIZE));
 
-      StrInstruction.StrType strType =
-          pairElem.getType(currSymTable).getSize() == BYTE_SIZE ? StrInstruction.StrType.STRB
-              : StrInstruction.StrType.STR;
+      StrType strType =
+          pairElem.getType(currSymTable).getSize() == BYTE_SIZE ? STRB : StrType.STR;
       internalState.addInstruction(new StrInstruction(strType, rightNodeResult, leftNodeResult));
 
     } else if (left instanceof ArrayElemNode) {
@@ -156,9 +157,8 @@ public class CodeGenVisitor {
       ArrayElemNode arrayElem = (ArrayElemNode) left;
       arrayElem.generateElemAddr(internalState, arrayReg);
 
-      StrInstruction.StrType strType =
-          arrayElem.getType(currSymTable).getSize() == BYTE_SIZE ? StrInstruction.StrType.STRB
-              : StrInstruction.StrType.STR;
+      StrType strType =
+          arrayElem.getType(currSymTable).getSize() == BYTE_SIZE ? STRB : StrType.STR;
       internalState.addInstruction(
           new StrInstruction(strType, rightNodeResult, arrayReg));
 
@@ -174,8 +174,7 @@ public class CodeGenVisitor {
     assignment.generateAssembly(internalState);
 
     int typeSize = type.getType().getSize();
-    StrInstruction.StrType storeType =
-        typeSize == BYTE_SIZE ? StrInstruction.StrType.STRB : StrInstruction.StrType.STR;
+    StrType storeType = typeSize == BYTE_SIZE ? STRB : StrType.STR;
 
     internalState.decrementArgStackOffset(typeSize);
     currSymTable.setOffset(identifier.getIdentifier(), internalState.getArgStackOffset());
@@ -191,17 +190,14 @@ public class CodeGenVisitor {
 
     expression.generateAssembly(internalState);
     internalState.addInstruction(new MovInstruction(Register.DEST_REG, exitCodeReg));
-    internalState
-        .addInstruction(new BranchInstruction(BranchInstruction.BranchOperation.BL, "exit"));
+    internalState.addInstruction(new BranchInstruction(BL, "exit"));
   }
 
   public void visitFreeStatementNode(InternalState internalState, ExpressionNode expression) {
     expression.generateAssembly(internalState);
     internalState.addInstruction(new MovInstruction(DEST_REG, internalState.peekFreeRegister()));
     internalState
-        .addInstruction(
-            new BranchInstruction(BranchInstruction.BranchOperation.BL,
-                BuiltInFunction.CustomBuiltIn.FREE_PAIR));
+        .addInstruction(new BranchInstruction(BL, FREE_PAIR));
   }
 
   public void visitIfStatementNode(InternalState internalState, ExpressionNode condition,
@@ -215,7 +211,7 @@ public class CodeGenVisitor {
     internalState.addInstruction(
         new CompareInstruction(internalState.peekFreeRegister(), new Operand(0)));
     internalState.addInstruction(
-        new BranchInstruction(ConditionCode.EQ, BranchInstruction.BranchOperation.B, elseLabel));
+        new BranchInstruction(ConditionCode.EQ, B, elseLabel));
 
     internalState.allocateStackSpace(thenStatement.getCurrSymTable());
     thenStatement.generateAssembly(internalState);
@@ -236,13 +232,12 @@ public class CodeGenVisitor {
         .addInstruction(
             new CompareInstruction(internalState.peekFreeRegister(), new Operand(TRUE)));
     internalState.addInstruction(new BranchInstruction(
-        ConditionCode.EQ, BranchInstruction.BranchOperation.B, statementLabel));
+        ConditionCode.EQ, B, statementLabel));
   }
 
   private void generateCondInstruction(InternalState internalState, StatementNode statement,
       String condLabel, String statementLabel) {
-    internalState
-        .addInstruction(new BranchInstruction(BranchInstruction.BranchOperation.B, condLabel));
+    internalState.addInstruction(new BranchInstruction(B, condLabel));
 
     internalState.addInstruction(new LabelInstruction(statementLabel));
     internalState.allocateStackSpace(statement.getCurrSymTable());
@@ -261,8 +256,7 @@ public class CodeGenVisitor {
       SymbolTable currSymTable) {
     visitPrintStatementNode(internalState, expression, currSymTable);
 
-    internalState.addInstruction(new BranchInstruction(BranchInstruction.BranchOperation.BL,
-        BuiltInFunction.CustomBuiltIn.PRINT_LN));
+    internalState.addInstruction(new BranchInstruction(BL, PRINT_LN));
   }
 
   public void visitPrintStatementNode(InternalState internalState, ExpressionNode expression,
@@ -276,39 +270,26 @@ public class CodeGenVisitor {
 
     if (type instanceof ArrayType) {
       if (((ArrayType) type).getElemType().equals(new BaseType(BaseType.Type.CHAR))) {
-        internalState.addInstruction(new BranchInstruction(
-            BranchInstruction.BranchOperation.BL,
-            BuiltInFunction.CustomBuiltIn.PRINT_STRING));
+        internalState.addInstruction(new BranchInstruction(BL, PRINT_STRING));
       } else {
-        internalState.addInstruction(new BranchInstruction(
-            BranchInstruction.BranchOperation.BL,
-            BuiltInFunction.CustomBuiltIn.PRINT_REFERENCE));
+        internalState.addInstruction(new BranchInstruction(BL, PRINT_REFERENCE));
       }
     } else if (type instanceof PairType) {
-      internalState.addInstruction(new BranchInstruction(BranchInstruction.BranchOperation.BL,
-          BuiltInFunction.CustomBuiltIn.PRINT_REFERENCE));
+      internalState.addInstruction(new BranchInstruction(BL, PRINT_REFERENCE));
     } else if (type instanceof BaseType) {
       BaseType.Type baseType = ((BaseType) type).getBaseType();
       switch (baseType) {
         case CHAR:
-          internalState.addInstruction(new BranchInstruction(
-              BranchInstruction.BranchOperation.BL,
-              BuiltInFunction.SystemBuiltIn.PUTCHAR.getMessage()));
+          internalState.addInstruction(new BranchInstruction(BL, PUTCHAR.getMessage()));
           break;
         case STRING:
-          internalState.addInstruction(new BranchInstruction(
-              BranchInstruction.BranchOperation.BL,
-              BuiltInFunction.CustomBuiltIn.PRINT_STRING));
+          internalState.addInstruction(new BranchInstruction(BL, PRINT_STRING));
           break;
         case BOOL:
-          internalState.addInstruction(new BranchInstruction(
-              BranchInstruction.BranchOperation.BL,
-              BuiltInFunction.CustomBuiltIn.PRINT_BOOL));
+          internalState.addInstruction(new BranchInstruction(BL, PRINT_BOOL));
           break;
         case INT:
-          internalState.addInstruction(new BranchInstruction(
-              BranchInstruction.BranchOperation.BL,
-              BuiltInFunction.CustomBuiltIn.PRINT_INT));
+          internalState.addInstruction(new BranchInstruction(BL, PRINT_INT));
           break;
       }
     }
@@ -322,13 +303,11 @@ public class CodeGenVisitor {
       String identifier = ((IdentifierNode) assignment).getIdentifier();
 
       int offset = currSymTable.getOffset(identifier);
-      internalState.addInstruction(new ArithmeticInstruction(
-          ArithmeticInstruction.ArithmeticOperation.ADD, nextAvailable, Register.SP,
+      internalState.addInstruction(new ArithmeticInstruction(ADD, nextAvailable, Register.SP,
           new Operand(offset), !SET_BITS));
     } else {
       assignment.generateAssembly(internalState);
-      internalState.addInstruction(new ArithmeticInstruction(
-          ArithmeticInstruction.ArithmeticOperation.ADD, nextAvailable, Register.SP,
+      internalState.addInstruction(new ArithmeticInstruction(ADD, nextAvailable, Register.SP,
           new Operand(NO_OFFSET), !SET_BITS));
     }
 
@@ -340,14 +319,10 @@ public class CodeGenVisitor {
 
       switch (baseType) {
         case INT:
-          internalState.addInstruction(new BranchInstruction(
-              BranchInstruction.BranchOperation.BL,
-              BuiltInFunction.CustomBuiltIn.READ_INT));
+          internalState.addInstruction(new BranchInstruction(BL, READ_INT));
           break;
         case CHAR:
-          internalState.addInstruction(new BranchInstruction(
-              BranchInstruction.BranchOperation.BL,
-              BuiltInFunction.CustomBuiltIn.READ_CHAR));
+          internalState.addInstruction(new BranchInstruction(BL, READ_CHAR));
           break;
       }
     }
@@ -373,7 +348,8 @@ public class CodeGenVisitor {
     Register arrayReg = internalState.popFreeRegister();
 
     node.generateElemAddr(internalState, arrayReg);
-    internalState.addInstruction(new LdrInstruction(LDR, arrayReg, arrayReg));
+    LdrType ldrType = (node.getType(node.getCurrSymTable()).getSize() == BYTE_SIZE) ? LDRSB : LDR;
+    internalState.addInstruction(new LdrInstruction(ldrType, arrayReg, arrayReg));
 
     internalState.pushFreeRegister(arrayReg);
   }
@@ -399,46 +375,39 @@ public class CodeGenVisitor {
             new SMullInstruction(destReg, rightResult, leftResult, rightResult, false));
         internalState.addInstruction(
             new CompareInstruction(
-                rightResult, new Operand(destReg, new Shift(Shift.ShiftType.ASR, MUL_SHIFT))));
+                rightResult, new Operand(destReg, new Shift(ASR, MUL_SHIFT))));
         internalState.addInstruction(new BranchInstruction(
-            ConditionCode.NE,
-            BranchInstruction.BranchOperation.BL, BuiltInFunction.CustomBuiltIn.OVERFLOW));
+            ConditionCode.NE, BL, OVERFLOW));
         break;
       case DIV:
         internalState.addInstruction(new MovInstruction(Register.DEST_REG, leftResult));
-        internalState.addInstruction(new MovInstruction(Register.ARG_REG_1, rightResult));
+        internalState.addInstruction(new MovInstruction(R1, rightResult));
         internalState.addInstruction(
-            new BranchInstruction(BranchInstruction.BranchOperation.BL,
-                BuiltInFunction.CustomBuiltIn.DIV_ZERO));
+            new BranchInstruction(BL, DIV_ZERO));
         internalState.addInstruction(
-            new BranchInstruction(BranchInstruction.BranchOperation.BL,
-                BuiltInFunction.SystemBuiltIn.IDIV.getMessage()));
+            new BranchInstruction(BL, IDIV.getMessage()));
         internalState.addInstruction(new MovInstruction(destReg, Register.DEST_REG));
         break;
       case MOD:
         internalState.addInstruction(new MovInstruction(Register.DEST_REG, leftResult));
-        internalState.addInstruction(new MovInstruction(Register.ARG_REG_1, rightResult));
+        internalState.addInstruction(new MovInstruction(R1, rightResult));
         internalState.addInstruction(
-            new BranchInstruction(BranchInstruction.BranchOperation.BL,
-                BuiltInFunction.CustomBuiltIn.DIV_ZERO));
+            new BranchInstruction(BL, DIV_ZERO));
         internalState.addInstruction(
-            new BranchInstruction(BranchInstruction.BranchOperation.BL,
-                BuiltInFunction.SystemBuiltIn.IDIVMOD.getMessage()));
-        internalState.addInstruction(new MovInstruction(destReg, Register.ARG_REG_1));
+            new BranchInstruction(BL, IDIVMOD.getMessage()));
+        internalState.addInstruction(new MovInstruction(destReg, R1));
         break;
       case PLUS:
         internalState.addInstruction(
-            new ArithmeticInstruction(ArithmeticInstruction.ArithmeticOperation.ADD,
-                destReg, leftResult, new Operand(rightResult), true));
-        internalState.addInstruction(new BranchInstruction(VS,
-            BranchInstruction.BranchOperation.BL, BuiltInFunction.CustomBuiltIn.OVERFLOW));
+            new ArithmeticInstruction(ADD, destReg, leftResult,
+                new Operand(rightResult), true));
+        internalState.addInstruction(new BranchInstruction(VS, BL, OVERFLOW));
         break;
       case MINUS:
         internalState.addInstruction(
-            new ArithmeticInstruction(ArithmeticInstruction.ArithmeticOperation.SUB,
+            new ArithmeticInstruction(SUB,
                 destReg, leftResult, new Operand(rightResult), true));
-        internalState.addInstruction(new BranchInstruction(VS,
-            BranchInstruction.BranchOperation.BL, BuiltInFunction.CustomBuiltIn.OVERFLOW));
+        internalState.addInstruction(new BranchInstruction(VS, BL, OVERFLOW));
         break;
       case GREATER:
         conditionAssembly(internalState, destReg, leftResult, rightResult, GT, LE);
@@ -460,15 +429,11 @@ public class CodeGenVisitor {
         break;
       case AND:
         internalState.addInstruction(
-            new LogicalInstruction(
-                LogicalInstruction.LogicalOperation.AND, destReg, leftResult,
-                new Operand(rightResult)));
+            new LogicalInstruction(AND, destReg, leftResult, new Operand(rightResult)));
         break;
       case OR:
         internalState.addInstruction(
-            new LogicalInstruction(
-                LogicalInstruction.LogicalOperation.ORR, destReg, leftResult,
-                new Operand(rightResult)));
+            new LogicalInstruction(ORR, destReg, leftResult, new Operand(rightResult)));
     }
 
     if (destReg == rightResult) {
@@ -512,20 +477,18 @@ public class CodeGenVisitor {
 
     int offset = currSymTable.getOffset(identifier);
     Register reg = internalState.peekFreeRegister();
-    LdrInstruction.LdrType ldrInstr = (type.getSize() == BYTE_SIZE) ? LDRSB : LDR;
+    LdrType ldrInstr = (type.getSize() == BYTE_SIZE) ? LDRSB : LDR;
     internalState.addInstruction(new LdrInstruction(ldrInstr, reg, Register.SP, offset));
   }
 
   public void visitIntLiterExprNode(InternalState internalState, int value) {
     Register currDestination = internalState.peekFreeRegister();
-    internalState
-        .addInstruction(new LdrInstruction(LdrInstruction.LdrType.LDR, currDestination, value));
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR, currDestination, value));
   }
 
   public void visitPairLiterExprNode(InternalState internalState) {
     Register currDestination = internalState.peekFreeRegister();
-    internalState
-        .addInstruction(new LdrInstruction(LdrInstruction.LdrType.LDR, currDestination, NO_OFFSET));
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR, currDestination, NO_OFFSET));
   }
 
   public void visitParenthesisExprNode(InternalState internalState, ExpressionNode innerExpr) {
@@ -534,7 +497,7 @@ public class CodeGenVisitor {
 
   public void visitStringLiterNode(InternalState internalState, String value) {
     Register currDestination = internalState.peekFreeRegister();
-    internalState.addInstruction(new LdrInstruction(LdrInstruction.LdrType.LDR, currDestination,
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR, currDestination,
         new MsgInstruction(value)));
   }
 
@@ -545,24 +508,18 @@ public class CodeGenVisitor {
 
     switch (operator) {
       case NOT:
-        internalState.addInstruction(new LogicalInstruction(
-            LogicalInstruction.LogicalOperation.EOR,
-            operandResult, operandResult, new Operand(TRUE)));
+        internalState.addInstruction(
+            new LogicalInstruction(EOR, operandResult, operandResult, new Operand(TRUE)));
         break;
       case NEGATION:
-        internalState.addInstruction(new ArithmeticInstruction(
-            ArithmeticInstruction.ArithmeticOperation.RSB,
-            operandResult, operandResult, new Operand(NO_OFFSET), true));
-        internalState.addInstruction(new BranchInstruction(
-            ConditionCode.VS,
-            BranchInstruction.BranchOperation.BL, BuiltInFunction.CustomBuiltIn.OVERFLOW));
+        internalState.addInstruction(
+            new ArithmeticInstruction(RSB, operandResult, operandResult, new Operand(NO_OFFSET),
+                true));
+        internalState.addInstruction(new BranchInstruction(ConditionCode.VS, BL, OVERFLOW));
         break;
       case LEN:
-        internalState.addInstruction(
-            new LdrInstruction(LdrInstruction.LdrType.LDR, operandResult, operandResult));
+        internalState.addInstruction(new LdrInstruction(LdrType.LDR, operandResult, operandResult));
         break;
-      case ORD:
-      case CHR:
     }
 
     internalState.pushFreeRegister(operandResult);
@@ -578,19 +535,16 @@ public class CodeGenVisitor {
 
     // load array size in R0
     int arrSize = expressions.size() * arrElemSize + INT_BYTES_SIZE;
-    internalState
-        .addInstruction(new LdrInstruction(LdrInstruction.LdrType.LDR, Register.DEST_REG, arrSize));
+    internalState.addInstruction(new LdrInstruction(LDR, DEST_REG, arrSize));
 
     // BL malloc
-    internalState.addInstruction(new BranchInstruction(ConditionCode.L,
-        BranchInstruction.BranchOperation.B, MALLOC.getMessage()));
+    internalState.addInstruction(new BranchInstruction(L, B, MALLOC.getMessage()));
 
     Register reg = internalState.popFreeRegister();
-    internalState.addInstruction(new MovInstruction(reg, Register.DEST_REG));
+    internalState.addInstruction(new MovInstruction(reg, DEST_REG));
 
     // if the array elem size is 1 byte, use STRB, otherwise use STR
-    StrInstruction.StrType strInstr =
-        (arrElemSize == 1) ? StrInstruction.StrType.STRB : StrInstruction.StrType.STR;
+    StrType strInstr = (arrElemSize == 1) ? STRB : STR;
 
     //iterate over the expressions, generate assembly for them and store them
     Register nextAvailable = internalState.peekFreeRegister();
@@ -603,10 +557,8 @@ public class CodeGenVisitor {
 
     Register noOfArrElemsReg = internalState.peekFreeRegister();
     internalState
-        .addInstruction(
-            new LdrInstruction(LdrInstruction.LdrType.LDR, noOfArrElemsReg, expressions.size()));
-    internalState
-        .addInstruction(new StrInstruction(StrInstruction.StrType.STR, noOfArrElemsReg, reg));
+        .addInstruction(new LdrInstruction(LDR, noOfArrElemsReg, expressions.size()));
+    internalState.addInstruction(new StrInstruction(STR, noOfArrElemsReg, reg));
 
     //push back and free nextAvailable allocation register
     internalState.pushFreeRegister(reg);
@@ -629,8 +581,7 @@ public class CodeGenVisitor {
 
       int argSize = currArg.getType(currSymTable).getSize();
 
-      StrInstruction.StrType strInstr =
-          (argSize == 1) ? StrInstruction.StrType.STRB : StrInstruction.StrType.STR;
+      StrType strInstr = (argSize == 1) ? STRB : StrType.STR;
 
       //store currArg on the stack and decrease stack pointer (stack grows downwards)
       internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(),
@@ -645,16 +596,13 @@ public class CodeGenVisitor {
         .resetParamStackOffset(internalState.getParamStackOffset() + argsTotalSize + newOff);
     //Branch Instruction to the callee label
     String functionLabel = "f_" + identifier.toString();
-    internalState.addInstruction(new BranchInstruction(
-        ConditionCode.L, BranchInstruction.BranchOperation.B, functionLabel));
+    internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, functionLabel));
 
     //de-allocate stack from the function arguments. Max size for one de-allocation is 1024B
     while (argsTotalSize > 0) {
       internalState.addInstruction(
-          new ArithmeticInstruction(ArithmeticInstruction.ArithmeticOperation.ADD, Register.SP,
-              Register.SP,
-              new Operand(Math.min(argsTotalSize, MAX_DEALLOCATION_SIZE)),
-              false));
+          new ArithmeticInstruction(ADD, Register.SP, Register.SP,
+              new Operand(Math.min(argsTotalSize, MAX_DEALLOCATION_SIZE)), false));
       argsTotalSize -= Math.min(argsTotalSize, MAX_DEALLOCATION_SIZE);
     }
 
@@ -667,12 +615,9 @@ public class CodeGenVisitor {
       ExpressionNode sndExpr,
       SymbolTable currSymTable) {
     internalState.addInstruction(
-        new LdrInstruction(LdrInstruction.LdrType.LDR, Register.DEST_REG,
-            NO_OF_ELEMS * ADDRESS_BYTE_SIZE));
+        new LdrInstruction(LdrType.LDR, Register.DEST_REG, NO_OF_ELEMS * ADDRESS_BYTE_SIZE));
     //BL malloc
-    internalState.addInstruction(
-        new BranchInstruction(ConditionCode.L, BranchInstruction.BranchOperation.B,
-            MALLOC.getMessage()));
+    internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, MALLOC.getMessage()));
 
     Register pairReg = internalState.popFreeRegister();
 
@@ -693,20 +638,16 @@ public class CodeGenVisitor {
 
     // load expr type size into R0
     int size = expr.getType(currSymTable).getSize();
-    internalState
-        .addInstruction(new LdrInstruction(LdrInstruction.LdrType.LDR, Register.DEST_REG, size));
+    internalState.addInstruction(new LdrInstruction(LdrType.LDR, Register.DEST_REG, size));
 
     // BL malloc
-    internalState.addInstruction(new BranchInstruction(
-        ConditionCode.L, BranchInstruction.BranchOperation.B, MALLOC.getMessage()));
+    internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, MALLOC.getMessage()));
 
-    StrInstruction.StrType strInstr =
-        (size == 1) ? StrInstruction.StrType.STRB : StrInstruction.StrType.STR;
+    StrType strInstr = (size == 1) ? STRB : StrType.STR;
     internalState.addInstruction(new StrInstruction(strInstr, exprReg, Register.DEST_REG));
 
     internalState.addInstruction(
-        new StrInstruction(StrInstruction.StrType.STR, Register.DEST_REG, pairReg,
-            offset * ADDRESS_BYTE_SIZE));
+        new StrInstruction(StrType.STR, Register.DEST_REG, pairReg, offset * ADDRESS_BYTE_SIZE));
 
     internalState.pushFreeRegister(exprReg);
   }
@@ -719,18 +660,14 @@ public class CodeGenVisitor {
 
     internalState.addInstruction(new MovInstruction(Register.DEST_REG, reg));
 
-    internalState
-        .addInstruction(new BranchInstruction(BranchInstruction.BranchOperation.BL,
-            BuiltInFunction.CustomBuiltIn.NULL_POINTER));
-    internalState
-        .addInstruction(
-            new LdrInstruction(LdrInstruction.LdrType.LDR, reg, reg, position * ADDRESS_BYTE_SIZE));
+    internalState.addInstruction(new BranchInstruction(BL, NULL_POINTER));
+    internalState.addInstruction(
+        new LdrInstruction(LdrType.LDR, reg, reg, position * ADDRESS_BYTE_SIZE));
 
     PairType pair = (PairType) expression.getType(currSymTable);
     DataTypeId type = (position == FST) ? pair.getFstType() : pair.getSndType();
     int elemSize = type.getSize();
-    LdrInstruction.LdrType ldrInstr =
-        (elemSize == 1) ? LdrInstruction.LdrType.LDRSB : LdrInstruction.LdrType.LDR;
+    LdrType ldrInstr = (elemSize == 1) ? LdrType.LDRSB : LdrType.LDR;
 
     internalState.addInstruction(new LdrInstruction(ldrInstr, reg, reg));
   }

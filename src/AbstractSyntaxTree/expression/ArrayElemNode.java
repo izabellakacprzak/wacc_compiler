@@ -42,7 +42,7 @@ public class ArrayElemNode extends ExpressionNode {
     // put address of array into register
     int offset = getCurrSymTable().getOffset(identifier.getIdentifier());
     internalState
-            .addInstruction(new ArithmeticInstruction(ADD, arrayReg, SP, new Operand(offset), false));
+        .addInstruction(new ArithmeticInstruction(ADD, arrayReg, SP, new Operand(offset), false));
     // evaluate each index expression
     for (ExpressionNode expression : expressions) {
       expression.generateAssembly(internalState);
@@ -54,9 +54,19 @@ public class ArrayElemNode extends ExpressionNode {
       internalState.addInstruction(new MovInstruction(Register.ARG_REG_1, arrayReg));
       internalState.addInstruction(new BranchInstruction(BL, ARRAY_BOUNDS));
       internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
-              new Operand(INT_BYTES_SIZE), false));
-      internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
-              new Operand(exprReg, new Shift(LSL, 2)), false));
+          new Operand(INT_BYTES_SIZE), false));
+
+      DataTypeId arrayElemType = ((ArrayType) identifier.getType(getCurrSymTable())).getElemType();
+      if (arrayElemType instanceof BaseType
+          && ((BaseType) arrayElemType).getBaseType() == BaseType.Type.CHAR) {
+
+        internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
+            new Operand(exprReg), false));
+      } else {
+        internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
+            new Operand(exprReg, new Shift(LSL, 2)), false));
+
+      }
     }
   }
 
@@ -113,7 +123,7 @@ public class ArrayElemNode extends ExpressionNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
-            visitArrayElemNode(internalState, this);
+        visitArrayElemNode(internalState, this);
   }
 
   /* Return the type of the elements stored in identifier array */
