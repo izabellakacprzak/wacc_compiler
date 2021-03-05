@@ -6,32 +6,33 @@ execute() {
 
 	refOutput=${pathname/valid/backendTests}
   FILE_PATH=$(basename "$pathname")
-  customInputPath="src/test/backendTests/testInput/${FILE_PATH/.wacc/.txt}"  #text file of custom user input
+  customInputPath="src/test/backendTests/testInput/${FILE_PATH/.wacc/.txt}"  # text file of custom user input
 
   customInput="\n"
-  if [  -e "$customInputPath" ]; then
+  if [  -e "$customInputPath" ]; then # if custom user input exists, run the program with it
     read -r customInput<"$customInputPath";
   fi
 
 
 	if [ ! -e ${refOutput/.wacc/.txt} ]; then  # check for the existence of a cached file
-	  # MAKE CHECK FOR TIME OF CACHING
-	  echo "$customInput" | ./refCompile "-x" "$pathname" > ${refOutput/.wacc/.txt}
+	  echo "$customInput" | ./refCompile "-x" "$pathname" > ${refOutput/.wacc/.txt} # get result from reference compiler
 	fi
 
 
-  ./compile "$pathname" "-a" >/dev/null 2>&1
+  ./compile "$pathname" "-a" >/dev/null 2>&1 # compile and emulate with local compiler
   arm-linux-gnueabi-gcc -o ${FILE_PATH/.wacc/} -mcpu=arm1176jzf-s -mtune=arm1176jzf-s ${FILE_PATH/.wacc/.s}
-  echo "$customInput" | qemu-arm -L /usr/arm-linux-gnueabi/ ${FILE_PATH/.wacc/} > output.txt
+  echo "$customInput" | qemu-arm -L /usr/arm-linux-gnueabi/ ${FILE_PATH/.wacc/} > output1.txt
   ourExitCode=$?
   rm ${FILE_PATH/.wacc/.s}
   rm ${FILE_PATH/.wacc/}
 
   {
+    sed 's/ *$//' output1.txt > output.txt # remove any extra spaces at the end of the line
+
     correctFlag=true
-    stage1=true
-    stage2=false
-    readLines=1
+    stage1=true # everything up to the first line of ='s in the reference compiler's output
+    stage2=false # everything from stage1 up to the second line of ='s - output from running the program
+    readLines=1 # position in local compiler's output file
     while read -r refLine;
       do
         if [ "$stage1" = true ] && [ "$refLine" = "===========================================================" ]; then
@@ -47,11 +48,10 @@ execute() {
             if [ "$stage2" = true ]; then
 
              ourLine=$(sed "${readLines}q;d" output.txt)
-
              readLines=$(("$readLines"+1))
 
-             refLine=${refLine/0x*/addr}
-             ourLine=${ourLine/0x*/addr}
+             refLine=$(sed 's/\b0x[^ ]*/#addr#/' <<< "$refLine") # substitute any addresses with #addr#
+             ourLine=$(sed 's/\b0x[^ ]*/#addr#/' <<< "$ourLine")
 
               if [ "$refLine" != "$ourLine" ]; then
               correctFlag=false
@@ -62,8 +62,7 @@ execute() {
         fi
       done; }  < "${refOutput/.wacc/.txt}"
 
-        #compare exit code
-        if [ "$refLine" != "The exit code is ${ourExitCode}." ] ; then
+        if [ "$refLine" != "The exit code is ${ourExitCode}." ] ; then   #compare exit code
           correctFlag=false
         fi
 
@@ -110,6 +109,7 @@ passedTests=0
 touch output.txt
 run_tests "src/test/valid"
 rm output.txt
-echo =======================
+rm output1.txt
+echo "======================="
 echo SUMMARY
 echo passed $passedTests / $runTests "$TESTS_TYPE" tests
