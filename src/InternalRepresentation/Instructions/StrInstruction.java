@@ -20,6 +20,10 @@ public final class StrInstruction implements Instruction {
 
   private StrInstruction(StrType type, Register destReg, Register offsetReg1, Register offsetReg2,
       int offsetImm, boolean useExclamation) {
+
+    assert destReg != null;
+    assert offsetReg1 != null;
+
     this.type = type;
     this.destReg = destReg;
     this.offsetReg1 = offsetReg1;

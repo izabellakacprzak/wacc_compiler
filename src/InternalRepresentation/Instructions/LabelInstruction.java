@@ -7,6 +7,8 @@ public class LabelInstruction implements Instruction {
     private final String label;
 
     public LabelInstruction(String label) {
+        assert label != null;
+
         this.label = label;
     }
 

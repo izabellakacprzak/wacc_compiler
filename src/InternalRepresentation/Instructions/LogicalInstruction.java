@@ -14,6 +14,12 @@ public final class LogicalInstruction implements Instruction{
 
     public LogicalInstruction(LogicalOperation operation, Register destReg,
         Register operand1, Operand operand2) {
+
+        assert operation != null;
+        assert destReg != null;
+        assert operand1 != null;
+        assert operand2 != null;
+
         this.operation = operation;
         this.destReg = destReg;
         this.operand1 = operand1;

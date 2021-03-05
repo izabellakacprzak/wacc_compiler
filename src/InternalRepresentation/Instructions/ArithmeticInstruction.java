@@ -1,5 +1,6 @@
 package InternalRepresentation.Instructions;
 
+import static InternalRepresentation.Utils.Register.*;
 import InternalRepresentation.Utils.Register;
 import InternalRepresentation.InstructionPrinter;
 import InternalRepresentation.Utils.Operand;
@@ -15,6 +16,11 @@ public final class ArithmeticInstruction implements Instruction {
 
     public ArithmeticInstruction(ArithmeticOperation operation, Register destReg,
         Register operand1, Operand operand2, boolean setBits) {
+
+        assert destReg != null;
+        assert operand1 != null;
+        assert operand2 != null;
+
         this.operation = operation;
         this.destReg = destReg;
         this.operand1 = operand1;

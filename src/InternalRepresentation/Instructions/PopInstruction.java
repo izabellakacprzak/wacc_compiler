@@ -11,6 +11,7 @@ public final class PopInstruction implements Instruction {
     private final Register reg;
 
     public PopInstruction(Register reg) {
+        assert reg != null;
         this.reg = reg;
     }
 

@@ -10,6 +10,7 @@ public final class PushInstruction implements Instruction {
     private final Register reg;
 
     public PushInstruction(Register reg) {
+        assert reg != null;
         this.reg = reg;
     }
 

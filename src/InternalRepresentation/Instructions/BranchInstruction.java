@@ -17,6 +17,11 @@ public final class BranchInstruction implements Instruction {
   //MULTIPLE COND INSTR + LABEL
   public BranchInstruction(List<ConditionCode> conditionCodes, BranchOperation operation,
       String label) {
+
+    assert conditionCodes != null;
+    assert operation != null;
+    assert label != null;
+
     this.label = label;
     this.conditionCodes = conditionCodes;
     this.operation = operation;

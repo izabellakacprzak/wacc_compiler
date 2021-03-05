@@ -14,6 +14,12 @@ public final class SMullInstruction implements Instruction {
 
     public SMullInstruction(Register dest1, Register dest2, Register operand1,
         Register operand2, boolean setBits) {
+
+        assert dest1 != null;
+        assert dest2 != null;
+        assert operand1 != null;
+        assert operand2 != null;
+
         this.destReg1 = dest1;
         this.destReg2 = dest2;
 

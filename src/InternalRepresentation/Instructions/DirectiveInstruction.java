@@ -9,6 +9,10 @@ public final class DirectiveInstruction implements Instruction {
   private final String value;
 
   public DirectiveInstruction(Directive type, String value) {
+
+    assert type != null;
+    assert value != null;
+
     this.type = type;
     this.value = value;
   }

@@ -25,6 +25,10 @@ public final class LdrInstruction implements Instruction {
 
   private LdrInstruction(LdrType type, Register destReg, ConditionCode conditionCode,
       String constant, Register srcReg, int immOffset) {
+
+    assert type!= null;
+    assert destReg != null;
+
     this.type = type;
     this.destReg = destReg;
     this.conditionCode = conditionCode;

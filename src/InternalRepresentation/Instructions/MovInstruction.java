@@ -20,6 +20,9 @@ public final class MovInstruction implements Instruction {
 
   private MovInstruction(Register destReg, ConditionCode conditionCode, Register srcReg,
       Integer intImmediate, char charImmediate) {
+
+    assert destReg != null;
+
     this.destReg = destReg;
     this.conditionCode = conditionCode;
     this.srcReg = srcReg;

@@ -11,6 +11,10 @@ public final class CompareInstruction implements Instruction {
     private final Operand operand2;
 
     public CompareInstruction(Register operand1, Operand operand2) {
+
+        assert operand1 != null;
+        assert operand2 != null;
+
         this.operand1 = operand1;
         this.operand2 = operand2;
     }
