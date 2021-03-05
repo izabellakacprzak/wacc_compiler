@@ -56,6 +56,7 @@ public class ReturnStatementNode extends StatementNode {
     returnExpr.generateAssembly(internalState);
 
     internalState.addInstruction(new MovInstruction(Register.DEST_REG, returnStatReg));
+    internalState.deallocateStackSpace(internalState.getFunctionSymTable());
     internalState.addInstruction(new PopInstruction(Register.PC));
   }
 

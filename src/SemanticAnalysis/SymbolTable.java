@@ -13,6 +13,11 @@ public class SymbolTable {
     this.parentSymTable = parentSymTable;
   }
 
+  public SymbolTable getParentSymTable() {
+    return parentSymTable;
+  }
+
+
   /* Add a name and object to the symbol table */
   public void add(String name, Identifier object) {
     dictionary.put(name, object);
@@ -39,8 +44,8 @@ public class SymbolTable {
   }
 
   public void setOffset(String id, Integer offset) {
-  if(!offsetPerVar.containsKey(id))
-    offsetPerVar.put(id, offset);
+    if (!offsetPerVar.containsKey(id))
+      offsetPerVar.put(id, offset);
   }
 
   public int getOffset(String id) {
