@@ -1,8 +1,8 @@
 package InternalRepresentation.Instructions;
 
-import InternalRepresentation.Enums.Register;
+import InternalRepresentation.Utils.Register;
 import InternalRepresentation.InstructionPrinter;
-import InternalRepresentation.Operand;
+import InternalRepresentation.Utils.Operand;
 
 public final class CompareInstruction implements Instruction {
 

@@ -1,6 +1,5 @@
 package InternalRepresentation.Instructions;
 
-import InternalRepresentation.Enums.Directive;
 import InternalRepresentation.InstructionPrinter;
 
 public final class DirectiveInstruction implements Instruction {
@@ -23,4 +22,5 @@ public final class DirectiveInstruction implements Instruction {
     return printer.printDirective(type, value);
   }
 
+  public enum Directive {LTORG, WORD, ASCII, DATA, TEXT, GLOBAL}
 }

@@ -1,7 +1,6 @@
-package InternalRepresentation;
+package InternalRepresentation.Utils;
 
-import InternalRepresentation.Enums.Register;
-import InternalRepresentation.Enums.ShiftType;
+import InternalRepresentation.Utils.Register;
 
 public class Shift {
 
@@ -28,4 +27,5 @@ public class Shift {
         }
     }
 
+    public enum ShiftType {LSL, LSR, ASR, ROR}
 }

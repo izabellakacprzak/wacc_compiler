@@ -1,9 +1,8 @@
 package InternalRepresentation.Instructions;
 
-import InternalRepresentation.Enums.LogicalOperation;
-import InternalRepresentation.Enums.Register;
+import InternalRepresentation.Utils.Register;
 import InternalRepresentation.InstructionPrinter;
-import InternalRepresentation.Operand;
+import InternalRepresentation.Utils.Operand;
 
 public final class LogicalInstruction implements Instruction{
 
@@ -26,4 +25,5 @@ public final class LogicalInstruction implements Instruction{
         return printer.printLogical(operation, destReg, operand1, operand2);
     }
 
+    public enum LogicalOperation {AND, EOR, ORR, BIC, MVN, TST}
 }

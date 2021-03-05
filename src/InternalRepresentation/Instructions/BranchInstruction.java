@@ -1,8 +1,7 @@
 package InternalRepresentation.Instructions;
 
-import InternalRepresentation.Enums.BranchOperation;
-import InternalRepresentation.Enums.BuiltInFunction;
-import InternalRepresentation.Enums.ConditionCode;
+import InternalRepresentation.Utils.BuiltInFunction.CustomBuiltIn;
+import InternalRepresentation.Utils.ConditionCode;
 import InternalRepresentation.InstructionPrinter;
 
 import java.util.ArrayList;
@@ -34,12 +33,12 @@ public final class BranchInstruction implements Instruction {
   }
 
   public BranchInstruction(ConditionCode conditionCode, BranchOperation operation,
-      BuiltInFunction function) {
+      CustomBuiltIn function) {
     this(conditionCode, operation, function.getLabel());
     function.setUsed();
   }
 
-  public BranchInstruction(BranchOperation operation, BuiltInFunction function) {
+  public BranchInstruction(BranchOperation operation, CustomBuiltIn function) {
     this(operation, function.getLabel());
     function.setUsed();
   }
@@ -49,4 +48,5 @@ public final class BranchInstruction implements Instruction {
     return printer.printBranch(operation, conditionCodes, label);
   }
 
+  public enum BranchOperation {B, BL, BX, SWI}
 }

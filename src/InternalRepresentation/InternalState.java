@@ -1,19 +1,21 @@
 package InternalRepresentation;
 
-import static InternalRepresentation.Enums.Directive.*;
-import static InternalRepresentation.Enums.Register.*;
+import static InternalRepresentation.Instructions.DirectiveInstruction.Directive.*;
+import static InternalRepresentation.Utils.Register.*;
 
 import AbstractSyntaxTree.ProgramNode;
-import InternalRepresentation.Enums.BuiltInFunction;
+import InternalRepresentation.Utils.BuiltInFunction.CustomBuiltIn;
 import InternalRepresentation.Instructions.DirectiveInstruction;
-import InternalRepresentation.Enums.ArithmeticOperation;
+import InternalRepresentation.Instructions.ArithmeticInstruction.ArithmeticOperation;
 import InternalRepresentation.Instructions.ArithmeticInstruction;
 import InternalRepresentation.Instructions.Instruction;
 import InternalRepresentation.Instructions.LabelInstruction;
 import InternalRepresentation.Instructions.MsgInstruction;
-import InternalRepresentation.Enums.Register;
 import InternalRepresentation.Instructions.PopInstruction;
 import InternalRepresentation.Instructions.PushInstruction;
+import InternalRepresentation.Utils.CustomBuiltInGenerator;
+import InternalRepresentation.Utils.Operand;
+import InternalRepresentation.Utils.Register;
 import SemanticAnalysis.SymbolTable;
 
 import java.io.File;
@@ -39,8 +41,6 @@ public class InternalState {
   public InternalState() {
     // setup stack function
     resetAvailableRegs();
-    //TODO check callee reserved regs => main func starts from R4
-    //TODO change this to a stack!!!!
     generatedInstructions = new ArrayList<>();
     codeGenVisitor = new CodeGenVisitor();
     labelCount = 0;
@@ -49,14 +49,12 @@ public class InternalState {
   public void generateAssembly(File output, ProgramNode programNode) {
     try {
       FileWriter writer = new FileWriter(output);
+      List<Instruction> instructions = new ArrayList<>();
 
       programNode.generateAssembly(this);
 
-      CustomBuiltInFunctions customBuiltInFunctions = new CustomBuiltInFunctions();
-      List<Instruction> instructions = new ArrayList<>();
-
-      for (BuiltInFunction label : BuiltInFunction.getUsed()) {
-        instructions.addAll(customBuiltInFunctions.generateAssembly(label));
+      for (CustomBuiltIn label : CustomBuiltIn.getUsed()) {
+        instructions.addAll(CustomBuiltInGenerator.generateAssembly(label));
       }
 
       if (!MsgInstruction.getMessages().isEmpty()) {
@@ -138,7 +136,6 @@ public class InternalState {
   }
 
   public Register popRegFromStack() {
-    //TODO: is this check meaningless?: if (availableRegs.isEmpty())
     Register popReg = availableRegs.pop();
 
     addInstruction(new PopInstruction(popReg));
@@ -151,15 +148,13 @@ public class InternalState {
 
   public void resetAvailableRegs() {
     Stack<Register> registers = new Stack<>();
-    registers.push(R12);
-    registers.push(R11);
-    registers.push(R10);
-    registers.push(R9);
-    registers.push(R8);
-    registers.push(R7);
-    registers.push(R6);
-    registers.push(R5);
-    registers.push(R4);
+    List<Register> paramRegs = getParamRegs();
+    Collections.reverse(paramRegs);
+
+    for (Register reg : paramRegs) {
+      registers.push(reg);
+    }
+
     this.availableRegs = registers;
   }
 

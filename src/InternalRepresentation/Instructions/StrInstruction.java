@@ -1,7 +1,6 @@
 package InternalRepresentation.Instructions;
 
-import InternalRepresentation.Enums.Register;
-import InternalRepresentation.Enums.StrType;
+import InternalRepresentation.Utils.Register;
 
 import InternalRepresentation.InstructionPrinter;
 
@@ -50,4 +49,7 @@ public final class StrInstruction implements Instruction {
   public String writeInstruction() {
     return printer.printStr(type, destReg, offsetReg1, offsetReg2, offsetImm, useExclamation);
   }
+
+  // TODO: ADD WORD AND HALFWORD NUMS TO TYPES
+  public enum StrType {STR, STRH, STRB}
 }

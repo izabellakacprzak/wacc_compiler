@@ -1,8 +1,7 @@
-package InternalRepresentation.Enums;
+package InternalRepresentation.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public enum Register {
   R0, R1, R2, R3, R4, R5, R6,
@@ -23,12 +22,7 @@ public enum Register {
   /* Number of reserved registers to hold values from the stack */
   public static int NUM_STACK_REGS = 2;
 
-  public String getRegName() {
-    return name().toLowerCase(Locale.ROOT);
-  }
-
-  // TODO: Make constants for reserved parameter registers
-
+  /* Returns all non-reserved registers as a list */
   public static List<Register> getParamRegs() {
     List<Register> registers = new ArrayList<>(List.of(Register.values()));
 
@@ -41,5 +35,9 @@ public enum Register {
     registers.remove(Register.PC);
 
     return registers;
+  }
+
+  public String getRegName() {
+    return name().toLowerCase();
   }
 }

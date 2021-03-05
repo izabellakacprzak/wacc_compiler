@@ -1,6 +1,4 @@
-package InternalRepresentation;
-
-import InternalRepresentation.Enums.Register;
+package InternalRepresentation.Utils;
 
 public class Operand {
 

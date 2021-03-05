@@ -4,7 +4,9 @@ import SemanticAnalysis.DataTypeId;
 
 public class PairType extends DataTypeId {
 
+  /* PAIR_ELEM_BYTES_SIZE: size of a one pair elem */
   private static final int PAIR_ELEM_BYTES_SIZE = 4;
+
   /* fstType:  DataTypeId of the first element in the pair's type
    * sndType:  DataTypeId of the second element in the pair's type */
   private final DataTypeId fstType;
@@ -47,7 +49,6 @@ public class PairType extends DataTypeId {
     return "PAIR(" + fstType.toString() + ", " + sndType.toString() + ")";
   }
 
-//TODO: check if to return size * 2. Currently returning size of 1 element of the pair
   @Override
   public int getSize() {
     return PAIR_ELEM_BYTES_SIZE;

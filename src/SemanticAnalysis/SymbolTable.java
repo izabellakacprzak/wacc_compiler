@@ -71,8 +71,6 @@ public class SymbolTable {
     return offsetPerVar.get(id);
   }
 
-  //TODO in case size is not correct, check values() vs keys()
-  // TODO size should include function calls params sizes ???????
   public int getVarsSize() {
     int totalSize = 0;
     for (Identifier identifier : dictionary.values()) {
@@ -85,9 +83,7 @@ public class SymbolTable {
   }
 
   public Map<String, Integer> saveOffsetPerVar() {
-  Map<String, Integer> deepCopy = new HashMap<String, Integer>();
-  deepCopy.putAll(offsetPerVar);
-    return deepCopy;
+    return new HashMap<>(offsetPerVar);
   }
 
 

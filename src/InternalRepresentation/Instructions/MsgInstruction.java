@@ -1,7 +1,7 @@
 package InternalRepresentation.Instructions;
 
 
-import InternalRepresentation.Enums.Directive;
+import InternalRepresentation.Instructions.DirectiveInstruction.Directive;
 import java.util.ArrayList;
 import java.util.List;
 

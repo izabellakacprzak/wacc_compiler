@@ -1,7 +1,7 @@
 package InternalRepresentation.Instructions;
 
-import InternalRepresentation.Enums.ConditionCode;
-import InternalRepresentation.Enums.Register;
+import InternalRepresentation.Utils.ConditionCode;
+import InternalRepresentation.Utils.Register;
 import InternalRepresentation.InstructionPrinter;
 
 public final class MovInstruction implements Instruction {
@@ -17,11 +17,6 @@ public final class MovInstruction implements Instruction {
   private final Register srcReg;
   private final Integer intImmediate;
   private final char charImmediate;
-
-  /*
-  TODO: delete this comment - MOV constructor taken after assembly code
-     in folder IO/print
-   */
 
   private MovInstruction(Register destReg, ConditionCode conditionCode, Register srcReg,
       Integer intImmediate, char charImmediate) {

@@ -42,7 +42,7 @@ public class ProgramNode implements ASTNode {
 
   @Override
   public void semanticAnalysis(SymbolTable topSymbolTable, List<String> errorMessages) {
-    currSymTable = topSymbolTable;
+    setCurrSymTable(topSymbolTable);
 
     for (FunctionNode func : functionNodes) {
       /* Create a new SymbolTable for the function's scope */
@@ -73,7 +73,12 @@ public class ProgramNode implements ASTNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
-    visitProgramNode(internalState, statementNode, functionNodes);
+        visitProgramNode(internalState, statementNode, functionNodes);
+  }
+
+  @Override
+  public void setCurrSymTable(SymbolTable currSymTable) {
+    this.currSymTable = currSymTable;
   }
 
   @Override

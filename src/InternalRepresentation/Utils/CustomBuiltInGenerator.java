@@ -1,25 +1,29 @@
-package InternalRepresentation;
+package InternalRepresentation.Utils;
 
-import static InternalRepresentation.Enums.BranchOperation.*;
-import static InternalRepresentation.Enums.BuiltInFunction.*;
-import static InternalRepresentation.Enums.ConditionCode.*;
-import static InternalRepresentation.Enums.LdrType.LDR;
-import static InternalRepresentation.Enums.Register.*;
-import static InternalRepresentation.Enums.ArithmeticOperation.*;
-import static InternalRepresentation.Enums.SystemBuiltInFunction.*;
+import static InternalRepresentation.Instructions.BranchInstruction.BranchOperation.*;
+import static InternalRepresentation.Utils.BuiltInFunction.CustomBuiltIn.*;
+import static InternalRepresentation.Utils.ConditionCode.*;
+import static InternalRepresentation.Instructions.LdrInstruction.LdrType.LDR;
+import static InternalRepresentation.Utils.Register.*;
+import static InternalRepresentation.Instructions.ArithmeticInstruction.ArithmeticOperation.*;
+import static InternalRepresentation.Utils.BuiltInFunction.SystemBuiltIn.*;
 
-import InternalRepresentation.Enums.BuiltInFunction;
-import InternalRepresentation.Enums.Register;
+import InternalRepresentation.Utils.BuiltInFunction.CustomBuiltIn;
 import InternalRepresentation.Instructions.*;
 
+import InternalRepresentation.Utils.Operand;
+import InternalRepresentation.Utils.Register;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomBuiltInFunctions {
+public class CustomBuiltInGenerator {
 
   private static final int FALSE = 0;
 
-  public List<Instruction> generateAssembly(BuiltInFunction type) {
+  private CustomBuiltInGenerator() {
+  }
+
+  public static List<Instruction> generateAssembly(CustomBuiltIn type) {
     List<Instruction> instructions = new ArrayList<>();
     instructions.add(new LabelInstruction(type.getLabel()));
 
@@ -43,10 +47,10 @@ public class CustomBuiltInFunctions {
         generateFreePair(instructions);
         break;
       case READ_CHAR:
-        generateReadChar(instructions);
+        generateRead(instructions, READ_CHAR);
         break;
       case READ_INT:
-        generateReadInt(instructions);
+        generateRead(instructions, READ_INT);
         break;
       case PRINT_STRING:
       case PRINT_INT:
@@ -59,7 +63,7 @@ public class CustomBuiltInFunctions {
     return instructions;
   }
 
-  private void generatePrint(BuiltInFunction type, List<Instruction> instructions) {
+  private static void generatePrint(CustomBuiltIn type, List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
 
     switch (type) {
@@ -87,7 +91,7 @@ public class CustomBuiltInFunctions {
     instructions.add(new PopInstruction(PC));
   }
 
-  private void generateOverflow(List<Instruction> instructions) {
+  private static void generateOverflow(List<Instruction> instructions) {
     instructions.add(new LdrInstruction(
         LDR, Register.DEST_REG,
         new MsgInstruction("OverflowError: the result is too small/large to store in"
@@ -95,13 +99,13 @@ public class CustomBuiltInFunctions {
     instructions.add(new BranchInstruction(BL, RUNTIME));
   }
 
-  private void generateRuntime(List<Instruction> instructions) {
+  private static void generateRuntime(List<Instruction> instructions) {
     instructions.add(new BranchInstruction(BL, PRINT_STRING));
     instructions.add(new MovInstruction(Register.DEST_REG, -1));
     instructions.add(new BranchInstruction(BL, EXIT.getMessage()));
   }
 
-  private void generateArrayBounds(List<Instruction> instructions) {
+  private static void generateArrayBounds(List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
     instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(0)));
     instructions.add(
@@ -116,7 +120,7 @@ public class CustomBuiltInFunctions {
     instructions.add(new PopInstruction(PC));
   }
 
-  private void generateDivZero(List<Instruction> instructions) {
+  private static void generateDivZero(List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
     instructions.add(new CompareInstruction(Register.ARG_REG_1, new Operand(0)));
     instructions.add(new LdrInstruction(LDR, EQ, Register.DEST_REG,
@@ -125,7 +129,7 @@ public class CustomBuiltInFunctions {
     instructions.add(new PopInstruction(PC));
   }
 
-  private void generateNullPointer(List<Instruction> instructions) {
+  private static void generateNullPointer(List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
     instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(0)));
     instructions.add(new LdrInstruction(LDR, EQ, Register.DEST_REG,
@@ -134,7 +138,7 @@ public class CustomBuiltInFunctions {
     instructions.add(new PopInstruction(PC));
   }
 
-  private void generateFreePair(List<Instruction> instructions) {
+  private static void generateFreePair(List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
     instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(0)));
     instructions.add(
@@ -152,15 +156,7 @@ public class CustomBuiltInFunctions {
     instructions.add(new PopInstruction(PC));
   }
 
-  private void generateReadChar(List<Instruction> instructions) {
-    generateRead(instructions, READ_CHAR);
-  }
-
-  private void generateReadInt(List<Instruction> instructions) {
-    generateRead(instructions, READ_INT);
-  }
-
-  private void generateRead(List<Instruction> instructions, BuiltInFunction type) {
+  private static void generateRead(List<Instruction> instructions, CustomBuiltIn type) {
     instructions.add(new PushInstruction(LR));
     instructions.add(new MovInstruction(Register.ARG_REG_1, Register.DEST_REG));
     switch (type) {
@@ -175,13 +171,13 @@ public class CustomBuiltInFunctions {
     }
 
     instructions.add(
-        new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),
-            false));
+        new ArithmeticInstruction(
+            ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4), false));
     instructions.add(new BranchInstruction(BL, SCANF.getMessage()));
     instructions.add(new PopInstruction(PC));
   }
 
-  private void generatePrintString(List<Instruction> instructions) {
+  private static void generatePrintString(List<Instruction> instructions) {
     instructions.add(new LdrInstruction(LDR, Register.ARG_REG_1, Register.DEST_REG));
     instructions.add(
         new ArithmeticInstruction(ADD, Register.ARG_REG_2, Register.DEST_REG, new Operand(4),
@@ -193,7 +189,7 @@ public class CustomBuiltInFunctions {
     instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
   }
 
-  private void generatePrintInt(List<Instruction> instructions) {
+  private static void generatePrintInt(List<Instruction> instructions) {
     instructions.add(new MovInstruction(Register.ARG_REG_1, Register.DEST_REG));
     instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction("%d\\0")));
     instructions.add(
@@ -202,7 +198,7 @@ public class CustomBuiltInFunctions {
     instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
   }
 
-  private void generatePrintBool(List<Instruction> instructions) {
+  private static void generatePrintBool(List<Instruction> instructions) {
     instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(FALSE)));
     instructions.add(new LdrInstruction(LDR, NE, Register.DEST_REG, new MsgInstruction("true\\0")));
     instructions
@@ -213,16 +209,7 @@ public class CustomBuiltInFunctions {
     instructions.add(new BranchInstruction(BL, PRINTF.getMessage()));
   }
 
-  /* Also has:
-        msg_0:
-          .word 4
-          .ascii	" = ("
-        msg_1:
-          .word 2
-          .ascii	", "
-      but idk when these are for
-  */
-  private void generatePrintReference(List<Instruction> instructions) {
+  private static void generatePrintReference(List<Instruction> instructions) {
     instructions.add(new MovInstruction(Register.ARG_REG_1, Register.DEST_REG));
     instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction("%p\\0")));
     instructions.add(
@@ -232,7 +219,7 @@ public class CustomBuiltInFunctions {
 
   }
 
-  private void generatePrintLn(List<Instruction> instructions) {
+  private static void generatePrintLn(List<Instruction> instructions) {
     instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction("\\0")));
     instructions.add(
         new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),

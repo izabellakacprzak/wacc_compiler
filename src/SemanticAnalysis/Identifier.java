@@ -1,7 +1,7 @@
 package SemanticAnalysis;
 
 import AbstractSyntaxTree.expression.IdentifierNode;
-import InternalRepresentation.Enums.Register;
+import InternalRepresentation.Utils.Register;
 
 public abstract class Identifier {
 

@@ -1,4 +1,4 @@
-package InternalRepresentation.Enums;
+package InternalRepresentation.Utils;
 
 /*
 L Link

@@ -1,12 +1,20 @@
 package InternalRepresentation;
 
-import InternalRepresentation.Enums.*;
-
+import InternalRepresentation.Instructions.ArithmeticInstruction;
+import InternalRepresentation.Instructions.BranchInstruction;
+import InternalRepresentation.Instructions.DirectiveInstruction;
+import InternalRepresentation.Instructions.LdrInstruction;
+import InternalRepresentation.Instructions.LogicalInstruction;
+import InternalRepresentation.Instructions.StrInstruction;
+import InternalRepresentation.Utils.ConditionCode;
+import InternalRepresentation.Utils.Operand;
+import InternalRepresentation.Utils.Register;
 import java.util.List;
 
 public class InstructionPrinter {
 
-  public String printArithmetic(ArithmeticOperation operationType, Register destReg,
+  public String printArithmetic(ArithmeticInstruction.ArithmeticOperation operationType,
+      Register destReg,
       Register operand1, Operand operand2, boolean setBits) {
     StringBuilder instruction = new StringBuilder(operationType.toString());
     if (setBits) {
@@ -27,8 +35,8 @@ public class InstructionPrinter {
     return "CMP " + operand1.getRegName() + ", " + operand2.toString();
   }
 
-  public String printDirective(Directive type, String value) {
-    if (type == Directive.ASCII) {
+  public String printDirective(DirectiveInstruction.Directive type, String value) {
+    if (type == DirectiveInstruction.Directive.ASCII) {
       return "." + type.name().toLowerCase() + " \"" + value + "\"";
     }
     if (value.equals("")) {
@@ -37,7 +45,8 @@ public class InstructionPrinter {
     return "." + type.name().toLowerCase() + " " + value;
   }
 
-  public String printBranch(BranchOperation operation, List<ConditionCode> conditionCodes,
+  public String printBranch(BranchInstruction.BranchOperation operation,
+      List<ConditionCode> conditionCodes,
       String label) {
     StringBuilder instruction = new StringBuilder(operation.toString());
     if (conditionCodes != null) {
@@ -55,7 +64,7 @@ public class InstructionPrinter {
 
   public String printLDR(Register destReg, ConditionCode conditionCode,
       int immOffset, Register srcReg,
-      String constant, LdrType type) {
+      String constant, LdrInstruction.LdrType type) {
     String instruction = type.name();
 
     if (conditionCode != null) {
@@ -74,7 +83,7 @@ public class InstructionPrinter {
     return instruction;
   }
 
-  public String printLogical(LogicalOperation operationType, Register destReg,
+  public String printLogical(LogicalInstruction.LogicalOperation operationType, Register destReg,
       Register operand1, Operand operand2) {
     return operationType.toString() + " " + destReg.getRegName() + ", " +
         operand1.getRegName() + ", " +
@@ -126,7 +135,7 @@ public class InstructionPrinter {
         operand2.getRegName();
   }
 
-  public String printStr(StrType type, Register destReg,
+  public String printStr(StrInstruction.StrType type, Register destReg,
       Register offsetReg1, Register offsetReg2, int offsetImm, boolean useExclamation) {
     StringBuilder instruction = new StringBuilder(type.toString());
 

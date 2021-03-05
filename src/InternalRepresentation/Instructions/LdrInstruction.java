@@ -1,8 +1,7 @@
 package InternalRepresentation.Instructions;
 
-import InternalRepresentation.Enums.ConditionCode;
-import InternalRepresentation.Enums.LdrType;
-import InternalRepresentation.Enums.Register;
+import InternalRepresentation.Utils.ConditionCode;
+import InternalRepresentation.Utils.Register;
 import InternalRepresentation.InstructionPrinter;
 
 public final class LdrInstruction implements Instruction {
@@ -86,4 +85,6 @@ public final class LdrInstruction implements Instruction {
         constant,
         type);
   }
+
+  public enum LdrType {LDR, LDRSB}
 }

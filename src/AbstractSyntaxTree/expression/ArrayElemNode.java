@@ -1,19 +1,20 @@
 package AbstractSyntaxTree.expression;
 
-import static InternalRepresentation.Enums.ArithmeticOperation.*;
-import static InternalRepresentation.Enums.BranchOperation.*;
-import static InternalRepresentation.Enums.Register.*;
-import static InternalRepresentation.Enums.LdrType.*;
-import static InternalRepresentation.Enums.BuiltInFunction.*;
-import static InternalRepresentation.Enums.ShiftType.LSL;
-import InternalRepresentation.Enums.Register;
+import static InternalRepresentation.Instructions.ArithmeticInstruction.ArithmeticOperation.*;
+import static InternalRepresentation.Instructions.BranchInstruction.BranchOperation.*;
+import static InternalRepresentation.Utils.Register.*;
+import static InternalRepresentation.Instructions.LdrInstruction.LdrType.*;
+import static InternalRepresentation.Utils.BuiltInFunction.CustomBuiltIn.*;
+import static InternalRepresentation.Utils.Shift.ShiftType.LSL;
+
+import InternalRepresentation.Utils.Register;
 import InternalRepresentation.Instructions.ArithmeticInstruction;
 import InternalRepresentation.Instructions.BranchInstruction;
 import InternalRepresentation.Instructions.LdrInstruction;
 import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Operand;
-import InternalRepresentation.Shift;
+import InternalRepresentation.Utils.Operand;
+import InternalRepresentation.Utils.Shift;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
