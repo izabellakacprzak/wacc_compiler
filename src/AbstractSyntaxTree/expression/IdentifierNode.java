@@ -12,9 +12,8 @@ import java.util.List;
 
 public class IdentifierNode extends ExpressionNode {
 
-  /* value: String representing the identifier of this node */
+  /* value:        String representing the identifier of this node */
   private final String identifier;
-  private SymbolTable currSymTable = null;
 
   public IdentifierNode(int line, int charPositionInLine, String identifier) {
     super(line, charPositionInLine);
@@ -27,7 +26,8 @@ public class IdentifierNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
 
     /* Check that the identifier has been declared as either a ParameterId or VariableId.
      * FunctionId identifiers do not call this function */
@@ -35,7 +35,7 @@ public class IdentifierNode extends ExpressionNode {
 
     if (id == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " Identifier '" + identifier + "' has not been declared.");
+          + " Identifier '" + identifier + "' has not been declared.");
     } else if (!(id instanceof VariableId) && !(id instanceof ParameterId)) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
                             + " Identifier '" + identifier + "' is referenced incorrectly."
@@ -45,14 +45,9 @@ public class IdentifierNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    DataTypeId type = getType(currSymTable);
+    DataTypeId type = getType(getCurrSymTable());
     internalState.getCodeGenVisitor().
-            visitIdentifierNode(internalState, identifier, type, currSymTable);
-  }
-
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
+        visitIdentifierNode(internalState, identifier, type, getCurrSymTable());
   }
 
   @Override

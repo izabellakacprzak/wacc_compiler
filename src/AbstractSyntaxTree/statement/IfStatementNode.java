@@ -10,13 +10,12 @@ import java.util.List;
 
 public class IfStatementNode extends StatementNode {
 
-  /* condition: ExpressionNode representing the condition of the if statement
+  /* condition:     ExpressionNode representing the condition of the if statement
    * thenStatement: StatementNode representing the 'then' body of the if statement
    * elseStatement: StatementNode representing the 'else' body of the if statement */
   private final ExpressionNode condition;
   private final StatementNode thenStatement;
   private final StatementNode elseStatement;
-  private SymbolTable currSymTable = null;
 
   public IfStatementNode(ExpressionNode condition, StatementNode thenStatement,
       StatementNode elseStatement) {
@@ -27,7 +26,9 @@ public class IfStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on condition node */
     condition.semanticAnalysis(symbolTable, errorMessages);
 
@@ -76,8 +77,4 @@ public class IfStatementNode extends StatementNode {
     return this.hasReturnStatement();
   }
 
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
-  }
 }

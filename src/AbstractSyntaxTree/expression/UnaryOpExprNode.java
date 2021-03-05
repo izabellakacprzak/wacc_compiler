@@ -10,11 +10,10 @@ import java.util.List;
 
 public class UnaryOpExprNode extends ExpressionNode {
 
-  /* operand:  ExpressionNode corresponding to the expression the operator was called with
-   * operator: UnOp enum representing the operator corresponding to this node */
+  /* operand:       ExpressionNode corresponding to the expression the operator was called with
+   * operator:      UnOp enum representing the operator corresponding to this node */
   private final ExpressionNode operand;
   private final UnOp operator;
-  private SymbolTable currSymTable = null;
 
   public UnaryOpExprNode(int line, int charPositionInLine, ExpressionNode operand, UnOp operator) {
     super(line, charPositionInLine);
@@ -33,7 +32,9 @@ public class UnaryOpExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on operand node */
     operand.semanticAnalysis(symbolTable, errorMessages);
 
@@ -77,11 +78,6 @@ public class UnaryOpExprNode extends ExpressionNode {
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
             visitUnaryOpExprNode(internalState, operand, operator);
-  }
-
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
   }
 
   @Override

@@ -8,9 +8,8 @@ import java.util.List;
 
 public class StringLiterExprNode extends ExpressionNode {
 
-  /* value: String representing the value of this node's STRING literal */
+  /* value:        String representing the value of this node's STRING literal */
   private final String value;
-  private SymbolTable currSymTable = null;
 
   public StringLiterExprNode(int line, int charPositionInLine, String value) {
     super(line, charPositionInLine);
@@ -19,18 +18,14 @@ public class StringLiterExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
   }
 
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
             visitStringLiterNode(internalState, value);
-  }
-
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
   }
 
   @Override

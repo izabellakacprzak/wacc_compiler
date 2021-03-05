@@ -9,11 +9,10 @@ import java.util.List;
 
 public class ReturnStatementNode extends StatementNode {
 
-  /* returnExpr:  ExpressionNode corresponding to the expression 'return' was called with
-   * returnType:  DataTypeId of the expected return type according to the function's declaration */
+  /* returnExpr: ExpressionNode corresponding to the expression 'return' was called with
+   * returnType: DataTypeId of the expected return type according to the function's declaration */
   private final ExpressionNode returnExpr;
   private DataTypeId returnType;
-  private SymbolTable currSymTable = null;
 
   public ReturnStatementNode(ExpressionNode returnExpr) {
     this.returnExpr = returnExpr;
@@ -21,7 +20,9 @@ public class ReturnStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on expression node */
     returnExpr.semanticAnalysis(symbolTable, errorMessages);
 
@@ -67,8 +68,4 @@ public class ReturnStatementNode extends StatementNode {
     return true;
   }
 
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
-  }
 }

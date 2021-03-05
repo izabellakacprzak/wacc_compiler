@@ -12,13 +12,12 @@ import java.util.List;
 
 public class DeclarationStatementNode extends StatementNode {
 
-  /* type:       TypeNode corresponding to the type of the new variable
-   * identifier: Name identifier given to the new variable
-   * assignment: AssignRHSNode corresponding to the value assigned to the new variable */
+  /* type:         TypeNode corresponding to the type of the new variable
+   * identifier:   Name identifier given to the new variable
+   * assignment:   AssignRHSNode corresponding to the value assigned to the new variable */
   private final TypeNode type;
   private final IdentifierNode identifier;
   private final AssignRHSNode assignment;
-  private SymbolTable currSymTable = null;
 
   public DeclarationStatementNode(TypeNode type, IdentifierNode identifier,
       AssignRHSNode assignment) {
@@ -29,7 +28,9 @@ public class DeclarationStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Check whether identifier has been previously declared as another variable in the current scope.
      * If not, add a new VariableId to the symbol table under identifier */
     if (symbolTable.lookup(identifier.getIdentifier()) != null) {
@@ -72,11 +73,8 @@ public class DeclarationStatementNode extends StatementNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
-            visitDeclarationStatementNode(internalState, assignment, type, identifier, currSymTable);
+        visitDeclarationStatementNode(internalState, assignment, type, identifier,
+            getCurrSymTable());
   }
 
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
-  }
 }

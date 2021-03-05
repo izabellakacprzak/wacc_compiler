@@ -7,8 +7,12 @@ import AbstractSyntaxTree.ASTNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.SymbolTable;
 
 public abstract class StatementNode implements ASTNode {
+
+  /* currSymTable: the node's symbol table of identifiers it can access */
+  private SymbolTable currSymTable = null;
 
   /* Used to recursively set the function expected return type in ReturnStatementNode */
   public void setReturnType(DataTypeId returnType) {
@@ -39,5 +43,15 @@ public abstract class StatementNode implements ASTNode {
     }
 
     return false;
+  }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
+
+  @Override
+  public void setCurrSymTable(SymbolTable currSymTable) {
+    this.currSymTable = currSymTable;
   }
 }

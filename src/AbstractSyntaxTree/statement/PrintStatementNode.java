@@ -8,9 +8,8 @@ import java.util.List;
 
 public class PrintStatementNode extends StatementNode {
 
-  /* expression:  ExpressionNode corresponding to the expression 'print' was called with */
+  /* expression:   ExpressionNode corresponding to the expression 'print' was called with */
   private final ExpressionNode expression;
-  private SymbolTable currSymTable = null;
 
   public PrintStatementNode(ExpressionNode expression) {
     this.expression = expression;
@@ -18,7 +17,9 @@ public class PrintStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on expression node */
     expression.semanticAnalysis(symbolTable, errorMessages);
   }
@@ -26,11 +27,7 @@ public class PrintStatementNode extends StatementNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
-            visitPrintStatementNode(internalState, expression, currSymTable);
+        visitPrintStatementNode(internalState, expression, getCurrSymTable());
   }
 
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
-  }
 }

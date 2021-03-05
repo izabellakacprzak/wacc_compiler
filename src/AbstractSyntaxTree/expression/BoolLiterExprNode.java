@@ -8,9 +8,8 @@ import java.util.List;
 
 public class BoolLiterExprNode extends ExpressionNode {
 
-  /* value: boolean representing the value of this node's BOOL literal */
+  /* value:        boolean representing the value of this node's BOOL literal */
   private final boolean value;
-  private SymbolTable currSymTable = null;
 
   public BoolLiterExprNode(int line, int charPositionInLine, boolean value) {
     super(line, charPositionInLine);
@@ -19,18 +18,14 @@ public class BoolLiterExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
   }
 
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
             visitBoolLiterExprNode(internalState, value);
-  }
-
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
   }
 
   @Override

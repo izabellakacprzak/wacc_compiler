@@ -10,10 +10,9 @@ import java.util.List;
 
 public class ReadStatementNode extends StatementNode {
 
-  /* assignment:  AssignLHSNode corresponding to the IdentifierNode, ArrayElemNode
-   *                or PairElemNode 'read' was called with */
+  /* assignment:   AssignLHSNode corresponding to the IdentifierNode, ArrayElemNode
+   *                 or PairElemNode 'read' was called with */
   private final AssignLHSNode assignment;
-  private SymbolTable currSymTable = null;
 
   public ReadStatementNode(AssignLHSNode assignment) {
     this.assignment = assignment;
@@ -21,7 +20,9 @@ public class ReadStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on assignment node */
     assignment.semanticAnalysis(symbolTable, errorMessages);
 
@@ -44,11 +45,7 @@ public class ReadStatementNode extends StatementNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
-            visitReadStatementNode(internalState, assignment, currSymTable);
+        visitReadStatementNode(internalState, assignment, getCurrSymTable());
   }
 
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
-  }
 }

@@ -21,11 +21,17 @@ public class BaseTypeNode implements TypeNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
   }
 
   @Override
   public void generateAssembly(InternalState internalState) {
+  }
+
+  @Override
+  public void setCurrSymTable(SymbolTable currSymTable) {
+    this.currSymTable = currSymTable;
   }
 
   @Override

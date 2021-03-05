@@ -14,7 +14,6 @@ public class WhileStatementNode extends StatementNode {
    * statement: StatementNode representing the body of the while loop */
   private final ExpressionNode condition;
   private final StatementNode statement;
-  private SymbolTable currSymTable = null;
 
   public WhileStatementNode(ExpressionNode condition, StatementNode statement) {
     this.condition = condition;
@@ -22,7 +21,9 @@ public class WhileStatementNode extends StatementNode {
   }
 
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on condition node */
     condition.semanticAnalysis(symbolTable, errorMessages);
 
@@ -31,8 +32,8 @@ public class WhileStatementNode extends StatementNode {
 
     if (conditionType == null) {
       errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
-                            + " Could not resolve type of '" + condition + "'."
-                            + " Expected: BOOL");
+          + " Could not resolve type of '" + condition + "'."
+          + " Expected: BOOL");
 
     } else if (!conditionType.equals(new BaseType(BaseType.Type.BOOL))) {
       errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
@@ -72,8 +73,4 @@ public class WhileStatementNode extends StatementNode {
     return statement.hasExitStatement();
   }
 
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
-  }
 }

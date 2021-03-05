@@ -13,5 +13,7 @@ public interface ASTNode {
 
   void generateAssembly(InternalState internalState);
 
+  void setCurrSymTable(SymbolTable currSymTable);
+
   SymbolTable getCurrSymTable();
 }

@@ -10,9 +10,8 @@ import java.util.List;
 
 public class ArrayLiterNode extends AssignRHSNode {
 
-  /* expressions: List of ExpressionNodes corresponding to each element of the ARRAY literal */
+  /* expressions:  List of ExpressionNodes corresponding to each element of the ARRAY literal */
   private final List<ExpressionNode> expressions;
-  private SymbolTable currSymTable = null;
 
 
   public ArrayLiterNode(int line, int charPositionInLine, List<ExpressionNode> expressions) {
@@ -22,7 +21,9 @@ public class ArrayLiterNode extends AssignRHSNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* If there are no expressions, then ARRAY literal is empty */
     if (expressions.isEmpty()) {
       return;
@@ -69,11 +70,6 @@ public class ArrayLiterNode extends AssignRHSNode {
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
             visitArrayLiterNode(internalState, expressions, this);
-  }
-
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
   }
 
   @Override

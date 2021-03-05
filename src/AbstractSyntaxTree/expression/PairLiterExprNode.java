@@ -9,25 +9,19 @@ import java.util.List;
 
 public class PairLiterExprNode extends ExpressionNode {
 
-  private SymbolTable currSymTable = null;
-
   public PairLiterExprNode(int line, int charPositionInLine) {
     super(line, charPositionInLine);
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
   }
 
   @Override
   public void generateAssembly(InternalState internalState) {
    internalState.getCodeGenVisitor().visitPairLiterExprNode(internalState);
-  }
-
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
   }
 
   @Override

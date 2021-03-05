@@ -14,11 +14,10 @@ public class PairElemNode extends AssignRHSNode {
   /* Used to check if position is for 'fst' or 'snd' */
   private static final int FST = 0;
 
-  /* position:   0 if 'fst' was called, otherwise 'snd' was called.
-   * expression: ExpressionNode called with 'fst' or 'snd'. Should be an IdentifierNode */
+  /* position:     0 if 'fst' was called, otherwise 'snd' was called.
+   * expression:   ExpressionNode called with 'fst' or 'snd'. Should be an IdentifierNode */
   private final int position;
   private final ExpressionNode expression;
-  private SymbolTable currSymTable = null;
 
   public PairElemNode(int line, int charPositionInLine, int position, ExpressionNode expression) {
     super(line, charPositionInLine);
@@ -40,14 +39,16 @@ public class PairElemNode extends AssignRHSNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on expression node */
     expression.semanticAnalysis(symbolTable, errorMessages);
 
     /* Check that expression is an IdentifierNode */
     if (!(expression instanceof IdentifierNode)) {
       errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-                            + " Invalid identifier. Expected: PAIR IDENTIFIER Actual: '" + expression + "'");
+          + " Invalid identifier. Expected: PAIR IDENTIFIER Actual: '" + expression + "'");
       return;
     }
 
@@ -69,12 +70,7 @@ public class PairElemNode extends AssignRHSNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
-            visitPairElemNode(internalState, expression, position, currSymTable);
-  }
-
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
+        visitPairElemNode(internalState, expression, position, getCurrSymTable());
   }
 
   @Override

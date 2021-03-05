@@ -8,9 +8,8 @@ import java.util.List;
 
 public class ParenthesisExprNode extends ExpressionNode {
 
-  /* innerExpr: ExpressionNode corresponding to the expression within parenthesis */
+  /* innerExpr:    ExpressionNode corresponding to the expression within parenthesis */
   private final ExpressionNode innerExpr;
-  private SymbolTable currSymTable = null;
 
   public ParenthesisExprNode(int line, int charPositionInLine, ExpressionNode innerExpr) {
     super(line, charPositionInLine);
@@ -19,7 +18,9 @@ public class ParenthesisExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on expression node */
     innerExpr.semanticAnalysis(symbolTable, errorMessages);
   }
@@ -28,11 +29,6 @@ public class ParenthesisExprNode extends ExpressionNode {
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
             visitParenthesisExprNode(internalState, innerExpr);
-  }
-
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
   }
 
   @Override

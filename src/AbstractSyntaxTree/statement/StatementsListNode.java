@@ -10,7 +10,6 @@ public class StatementsListNode extends StatementNode {
 
   /* statements: List of StatementNodes corresponding to program statements */
   private final List<StatementNode> statements;
-  private SymbolTable currSymTable = null;
 
   public StatementsListNode(List<StatementNode> statements) {
     this.statements = statements;
@@ -18,7 +17,9 @@ public class StatementsListNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on each stored statement node */
     for (StatementNode stat : statements) {
       stat.semanticAnalysis(symbolTable, errorMessages);
@@ -64,8 +65,4 @@ public class StatementsListNode extends StatementNode {
     return true;
   }
 
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
-  }
 }

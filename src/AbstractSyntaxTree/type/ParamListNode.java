@@ -23,10 +23,6 @@ public class ParamListNode implements ASTNode {
     this.types = types;
   }
 
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
-  }
-
   /* Create a new ParameterId for each parameter and add to the symbolTable.
    * Returns the ParameterIds as a list  */
   public List<ParameterId> getIdentifiers(SymbolTable symbolTable) {
@@ -43,7 +39,8 @@ public class ParamListNode implements ASTNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
 
     /* Recursively call semanticAnalysis on each identifier */
     for (IdentifierNode identifier : identifiers) {
@@ -62,6 +59,16 @@ public class ParamListNode implements ASTNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
-    visitParamListNode(internalState, identifiers, currSymTable);
+        visitParamListNode(internalState, identifiers, currSymTable);
+  }
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
+
+  @Override
+  public void setCurrSymTable(SymbolTable currSymTable) {
+    this.currSymTable = currSymTable;
   }
 }

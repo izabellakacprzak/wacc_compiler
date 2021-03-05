@@ -34,10 +34,6 @@ public class FunctionNode implements TypeNode {
     this.bodyStatement = bodyStatement;
   }
 
-  public void setCurrSymTable(SymbolTable currSymTable) {
-    this.currSymTable = currSymTable;
-  }
-
   /* Returns the function identifier string as is stored in the symbol table.
    * Character '*' added to differentiate from variable and parameter names */
   public String getName() {
@@ -66,7 +62,8 @@ public class FunctionNode implements TypeNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
 
     /* Set the expected return type in the corresponding ReturnStatementNode of the
      * function body */
@@ -81,13 +78,18 @@ public class FunctionNode implements TypeNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
-    visitFunctionNode(internalState, identifier, params, bodyStatement, currSymTable);
+        visitFunctionNode(internalState, identifier, params, bodyStatement, currSymTable);
   }
 
   @Override
   public Identifier getIdentifier(SymbolTable symbolTable) {
     return new FunctionId(identifier, returnType.getType(),
         params.getIdentifiers(symbolTable));
+  }
+
+  @Override
+  public void setCurrSymTable(SymbolTable currSymTable) {
+    this.currSymTable = currSymTable;
   }
 
   @Override

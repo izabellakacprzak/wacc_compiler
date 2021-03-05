@@ -6,11 +6,15 @@ import SemanticAnalysis.SymbolTable;
 
 public abstract class AssignLHSNode implements ASTNode {
 
+  /* INT_BYTES_SIZE: size of an int in bytes */
+  protected final static int INT_BYTES_SIZE = 4;
+
   /* line:               Line number of node. Used for error messages
-   * charPositionInLine: Character position of node in the line. Used for error messages */
+   * charPositionInLine: Character position of node in the line. Used for error messages
+   * currSymTable: the node's symbol table of identifiers it can access */
   private final int line;
   private final int charPositionInLine;
-  protected final int INT_BYTES_SIZE = 4;
+  protected SymbolTable currSymTable = null;
 
   protected AssignLHSNode(int line, int charPositionInLine) {
     this.line = line;
@@ -31,4 +35,14 @@ public abstract class AssignLHSNode implements ASTNode {
   /* All AssignLHSNodes must Override toString for use in error messages */
   @Override
   public abstract String toString();
+
+  @Override
+  public SymbolTable getCurrSymTable() {
+    return currSymTable;
+  }
+
+  @Override
+  public void setCurrSymTable(SymbolTable currSymTable) {
+    this.currSymTable = currSymTable;
+  }
 }

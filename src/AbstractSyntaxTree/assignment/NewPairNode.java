@@ -10,11 +10,10 @@ import java.util.List;
 
 public class NewPairNode extends AssignRHSNode {
 
-  /* fstExpr: ExpressionNode corresponding to the first element of this node's PAIR
-   * sndExpr: ExpressionNode corresponding to the second element of this node's PAIR */
+  /* fstExpr:      ExpressionNode corresponding to the first element of this node's PAIR
+   * sndExpr:      ExpressionNode corresponding to the second element of this node's PAIR */
   private final ExpressionNode fstExpr;
   private final ExpressionNode sndExpr;
-  private SymbolTable currSymTable = null;
 
 
   public NewPairNode(int line, int charPositionInLine, ExpressionNode fstExpr,
@@ -26,7 +25,9 @@ public class NewPairNode extends AssignRHSNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on expression nodes */
     fstExpr.semanticAnalysis(symbolTable, errorMessages);
     sndExpr.semanticAnalysis(symbolTable, errorMessages);
@@ -34,12 +35,8 @@ public class NewPairNode extends AssignRHSNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().visitNewPairNode(internalState, fstExpr, sndExpr, currSymTable);
-  }
-
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
+    internalState.getCodeGenVisitor().visitNewPairNode(internalState, fstExpr, sndExpr,
+        getCurrSymTable());
   }
 
   @Override

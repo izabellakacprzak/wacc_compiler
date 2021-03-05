@@ -8,13 +8,12 @@ import java.util.List;
 
 public class BinaryOpExprNode extends ExpressionNode {
 
-  /* left:     ExpressionNode corresponding to the left expression the operator was called with
-   * right:    ExpressionNode corresponding to the right expression the operator was called with
-   * operator: BinOp enum representing the operator corresponding to this node */
+  /* left:         ExpressionNode corresponding to the left expression the operator was called with
+   * right:        ExpressionNode corresponding to the right expression the operator was called with
+   * operator:     BinOp enum representing the operator corresponding to this node */
   private final ExpressionNode left;
   private final ExpressionNode right;
   private final BinOp operator;
-  private SymbolTable currSymTable = null;
 
   public BinaryOpExprNode(int line, int charPositionInLine, ExpressionNode left,
       ExpressionNode right,
@@ -36,7 +35,9 @@ public class BinaryOpExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on assignment nodes */
     left.semanticAnalysis(symbolTable, errorMessages);
     right.semanticAnalysis(symbolTable, errorMessages);
@@ -110,11 +111,6 @@ public class BinaryOpExprNode extends ExpressionNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().visitBinaryOpExprNode(internalState, left, right, operator);
-  }
-
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
   }
 
   @Override

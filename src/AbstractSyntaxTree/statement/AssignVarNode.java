@@ -10,11 +10,10 @@ import java.util.List;
 
 public class AssignVarNode extends StatementNode {
 
-  /* left:  AssignLHSNode corresponding to what being assigned to
-   * right: AssignRHSNode corresponding to the assignment for the AssignLHSNode */
+  /* left:         AssignLHSNode corresponding to what being assigned to
+   * right:        AssignRHSNode corresponding to the assignment for the AssignLHSNode */
   private final AssignLHSNode left;
   private final AssignRHSNode right;
-  private SymbolTable currSymTable = null;
 
   public AssignVarNode(AssignLHSNode left, AssignRHSNode right) {
     this.left = left;
@@ -37,7 +36,9 @@ public class AssignVarNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on LHS node */
     left.semanticAnalysis(symbolTable, errorMessages);
     right.semanticAnalysis(symbolTable, errorMessages);
@@ -67,12 +68,8 @@ public class AssignVarNode extends StatementNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
-            visitAssignVarNode(internalState, left, right, currSymTable);
+        visitAssignVarNode(internalState, left, right, getCurrSymTable());
   }
 
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
-  }
 }
 

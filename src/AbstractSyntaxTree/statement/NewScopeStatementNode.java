@@ -8,9 +8,8 @@ import java.util.List;
 
 public class NewScopeStatementNode extends StatementNode {
 
-  /* statement:  StatementNode corresponding to the root statement contained within the new scope */
+  /* statement: StatementNode corresponding to the root statement contained within the new scope */
   private final StatementNode statement;
-  private SymbolTable currSymTable = null;
 
   public NewScopeStatementNode(StatementNode statement) {
     this.statement = statement;
@@ -18,9 +17,11 @@ public class NewScopeStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = new SymbolTable(symbolTable);
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on statement node */
-    statement.semanticAnalysis(currSymTable, errorMessages);
+    statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
   }
 
   @Override
@@ -49,8 +50,4 @@ public class NewScopeStatementNode extends StatementNode {
     return statement.hasExitStatement();
   }
 
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
-  }
 }

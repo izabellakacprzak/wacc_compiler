@@ -10,9 +10,8 @@ import java.util.List;
 
 public class ExitStatementNode extends StatementNode {
 
-  /* expression:  ExpressionNode corresponding to the expression 'exit' was called with */
+  /* expression:   ExpressionNode corresponding to the expression 'exit' was called with */
   private final ExpressionNode expression;
-  private SymbolTable currSymTable = null;
 
   public ExitStatementNode(ExpressionNode expression) {
     this.expression = expression;
@@ -20,7 +19,9 @@ public class ExitStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on expression node */
     expression.semanticAnalysis(symbolTable, errorMessages);
 
@@ -51,8 +52,4 @@ public class ExitStatementNode extends StatementNode {
     return true;
   }
 
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
-  }
 }

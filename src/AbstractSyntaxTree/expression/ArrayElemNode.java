@@ -24,14 +24,14 @@ import java.util.List;
 
 public class ArrayElemNode extends ExpressionNode {
 
-  /* identifier:  IdentifierNode representing the identifier of this node
-   * expressions: List of ExpressionNodes corresponding to the INT references to an array element */
+  /* identifier:   IdentifierNode representing the identifier of this node
+   * expressions:  List of ExpressionNodes corresponding to the INT references to
+   *                 an array element */
   private final IdentifierNode identifier;
   private final List<ExpressionNode> expressions;
-  private SymbolTable currSymTable = null;
 
   public ArrayElemNode(int line, int charPositionInLine, IdentifierNode identifier,
-                       List<ExpressionNode> expressions) {
+      List<ExpressionNode> expressions) {
     super(line, charPositionInLine);
     this.identifier = identifier;
     this.expressions = expressions;
@@ -39,7 +39,7 @@ public class ArrayElemNode extends ExpressionNode {
 
   public void generateElemAddr(InternalState internalState, Register arrayReg) {
     // put address of array into register
-    int offset = currSymTable.getOffset(identifier.getIdentifier());
+    int offset = getCurrSymTable().getOffset(identifier.getIdentifier());
     internalState
             .addInstruction(new ArithmeticInstruction(ADD, arrayReg, SP, new Operand(offset), false));
     // evaluate each index expression
@@ -61,7 +61,9 @@ public class ArrayElemNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on stored nodes */
     identifier.semanticAnalysis(symbolTable, errorMessages);
 
@@ -111,11 +113,6 @@ public class ArrayElemNode extends ExpressionNode {
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
             visitArrayElemNode(internalState, this);
-  }
-
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
   }
 
   /* Return the type of the elements stored in identifier array */

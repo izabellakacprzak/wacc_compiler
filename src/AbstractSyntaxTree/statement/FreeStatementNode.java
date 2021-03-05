@@ -11,9 +11,8 @@ import java.util.List;
 
 public class FreeStatementNode extends StatementNode {
 
-  /* expression:  ExpressionNode corresponding to the expression 'free' was called with */
+  /* expression:   ExpressionNode corresponding to the expression 'free' was called with */
   private final ExpressionNode expression;
-  private SymbolTable currSymTable = null;
 
   public FreeStatementNode(ExpressionNode expression) {
     this.expression = expression;
@@ -21,7 +20,9 @@ public class FreeStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Recursively call semanticAnalysis on expression node */
     expression.semanticAnalysis(symbolTable, errorMessages);
 
@@ -46,8 +47,4 @@ public class FreeStatementNode extends StatementNode {
     internalState.getCodeGenVisitor().visitFreeStatementNode(internalState, expression);
   }
 
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
-  }
 }

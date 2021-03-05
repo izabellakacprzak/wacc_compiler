@@ -19,15 +19,14 @@ import java.util.Map;
 public class FuncCallNode extends AssignRHSNode {
 
   private final static int MAX_DEALLOCATION_SIZE = 1024;
-  /* identifier: IdentifierNode corresponding to the function's name identifier
-   * arguments:  List of ExpressionNodes corresponding to the arguments
-   *               passed into the function call */
+  /* identifier:   IdentifierNode corresponding to the function's name identifier
+   * arguments:    List of ExpressionNodes corresponding to the arguments
+   *                 passed into the function call */
   private final IdentifierNode identifier;
   private final List<ExpressionNode> arguments;
-  private SymbolTable currSymTable = null;
 
   public FuncCallNode(int line, int charPositionInLine, IdentifierNode identifier,
-                      List<ExpressionNode> arguments) {
+      List<ExpressionNode> arguments) {
     super(line, charPositionInLine);
     this.identifier = identifier;
     this.arguments = arguments;
@@ -44,14 +43,16 @@ public class FuncCallNode extends AssignRHSNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
+
     /* Check that the function has been previously declared as a FunctionId with its identifier */
     Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
 
     if (functionId == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " No declaration of '" + identifier.getIdentifier() + "' identifier."
-                            + " Expected: FUNCTION IDENTIFIER");
+          + " No declaration of '" + identifier.getIdentifier() + "' identifier."
+          + " Expected: FUNCTION IDENTIFIER");
       return;
     }
 
@@ -104,12 +105,7 @@ public class FuncCallNode extends AssignRHSNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
-            visitFuncCallNode(internalState, identifier, arguments, currSymTable);
-  }
-
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return currSymTable;
+        visitFuncCallNode(internalState, identifier, arguments, getCurrSymTable());
   }
 
   /* Return the return type of the function */

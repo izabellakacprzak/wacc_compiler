@@ -20,7 +20,8 @@ public class ArrayTypeNode implements TypeNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-    currSymTable = symbolTable;
+    /* Set the symbol table for this node's scope */
+    setCurrSymTable(symbolTable);
 
     /* Recursively call semanticAnalysis on type */
     type.semanticAnalysis(symbolTable, errorMessages);
@@ -29,6 +30,11 @@ public class ArrayTypeNode implements TypeNode {
   @Override
   public void generateAssembly(InternalState internalState) {
 
+  }
+
+  @Override
+  public void setCurrSymTable(SymbolTable currSymTable) {
+    this.currSymTable = currSymTable;
   }
 
   @Override
