@@ -14,9 +14,11 @@ import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
+import java.util.Map;
 
 public class FuncCallNode extends AssignRHSNode {
 
+  private final static int MAX_DEALLOCATION_SIZE = 1024;
   /* identifier: IdentifierNode corresponding to the function's name identifier
    * arguments:  List of ExpressionNodes corresponding to the arguments
    *               passed into the function call */

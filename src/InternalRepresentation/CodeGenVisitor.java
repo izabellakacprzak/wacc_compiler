@@ -21,6 +21,7 @@ import SemanticAnalysis.Operator;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
+import java.util.Map;
 
 import static InternalRepresentation.Enums.ConditionCode.*;
 import static InternalRepresentation.Enums.Directive.*;
@@ -559,15 +560,17 @@ public class CodeGenVisitor {
                            SymbolTable currSymTable) {
         // calculate total arguments size in argsTotalSize
         int argsTotalSize = 0;
-
+        int newOff = 0;
+        Map<String, Integer> offsetPerVarMap = currSymTable.saveOffsetPerVar();
         // arguments are stored in decreasing order they are given in the code
         for (int i = arguments.size() - 1; i >= 0; i--) {
             // get argument, calculate size and add it to argsTotalSize
             ExpressionNode currArg = arguments.get(i);
-            int argSize = currArg.getType(currSymTable).getSize();
 
             // generate assembly code for the current argument
             currArg.generateAssembly(internalState);
+
+            int argSize = currArg.getType(currSymTable).getSize();
 
             StrType strInstr = (argSize == 1) ? StrType.STRB : StrType.STR;
 
@@ -575,11 +578,12 @@ public class CodeGenVisitor {
             internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(),
                     Register.SP, -argSize, true));
             argsTotalSize += argSize;
-            internalState.decrementParamStackOffset(argSize);
+            newOff += internalState.decrementParamStackOffset(argSize, internalState.getVarSize()
+                    + internalState.getParamStackOffset() - argSize);
 
         }
-
-
+        currSymTable.setOffsetPerVar(offsetPerVarMap);
+        internalState.resetParamStackOffset(internalState.getParamStackOffset() + argsTotalSize + newOff);
         //Branch Instruction to the callee label
         String functionLabel = "f_" + identifier.toString();
         internalState.addInstruction(new BranchInstruction(

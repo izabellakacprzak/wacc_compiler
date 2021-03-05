@@ -7,7 +7,7 @@ public class SymbolTable {
 
   private final SymbolTable parentSymTable;
   private final Map<String, Identifier> dictionary = new HashMap<>();
-  private final Map<String, Integer> offsetPerVar = new HashMap<>();
+  private Map<String, Integer> offsetPerVar = new HashMap<>();
 
   public SymbolTable(SymbolTable parentSymTable) {
     this.parentSymTable = parentSymTable;
@@ -36,6 +36,18 @@ public class SymbolTable {
       return parentSymTable.lookupAll(name);
     }
     return currentObject;
+  }
+
+  public int updateOffsetPerVar(int newOffset, int paramOffset) {
+  int newOff = 0;
+    for (String key : offsetPerVar.keySet()) {
+      Integer value = offsetPerVar.get(key);
+      if (paramOffset > value) {
+        offsetPerVar.put(key, value + newOffset);
+        newOff += newOffset;
+      }
+    }
+    return newOff;
   }
 
   public boolean isTopSymTable() {
@@ -70,5 +82,16 @@ public class SymbolTable {
     }
 
     return totalSize;
+  }
+
+  public Map<String, Integer> saveOffsetPerVar() {
+  Map<String, Integer> deepCopy = new HashMap<String, Integer>();
+  deepCopy.putAll(offsetPerVar);
+    return deepCopy;
+  }
+
+
+  public void setOffsetPerVar(Map<String, Integer> offsetPerVar) {
+    this.offsetPerVar = offsetPerVar;
   }
 }
