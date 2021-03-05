@@ -3,6 +3,8 @@ package SemanticAnalysis.DataTypes;
 import SemanticAnalysis.DataTypeId;
 
 public class ArrayType extends DataTypeId {
+
+  /* ARRAY_BYTES_SIZE: size of a reference of an array */
   private static final int ARRAY_BYTES_SIZE = 4;
 
   /* elemType:  DataTypeId of the corresponding type of elements the array contains */
@@ -38,6 +40,7 @@ public class ArrayType extends DataTypeId {
     return elemType + "[]";
   }
 
+  /* Returns corresponding size of an array reference in bytes */
   @Override
   public int getSize() {
     return ARRAY_BYTES_SIZE;

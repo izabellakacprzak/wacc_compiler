@@ -431,6 +431,7 @@ public class CodeGenVisitor {
       destReg = rightResult;
     }
 
+    /* Generate assembly for expected binary operation */
     switch (operator) {
       case MUL:
         internalState.addInstruction(
@@ -528,7 +529,7 @@ public class CodeGenVisitor {
 
   public void visitIdentifierNode(InternalState internalState, String identifier, DataTypeId type,
       SymbolTable currSymTable) {
-    // get offset from symbolTable of variable and store that in available reg
+    /* Get offset from symbolTable of variable and store that in available reg */
     if (currSymTable == null) {
       return;
     }
@@ -565,9 +566,11 @@ public class CodeGenVisitor {
 
   public void visitUnaryOpExprNode(InternalState internalState, ExpressionNode operand,
       Operator.UnOp operator) {
+    /* Load needed variable from stack */
     operand.generateAssembly(internalState);
     Register operandResult = internalState.popFreeRegister();
 
+    /* Generate assembly for expected unary operation */
     switch (operator) {
       case NOT:
         internalState.addInstruction(
@@ -591,24 +594,24 @@ public class CodeGenVisitor {
       AssignRHSNode node) {
     SymbolTable currSymTable = node.getCurrSymTable();
 
-    // get the size of the array elements type
+    /* Get the size of the array elements type */
     DataTypeId type = ((ArrayType) node.getType(currSymTable)).getElemType();
     int arrElemSize = (type != null) ? type.getSize() : 0;
 
-    // load array size in DES_REG
+    /* Load array size in DEST_REG */
     int arrSize = expressions.size() * arrElemSize + INT_BYTES_SIZE;
     internalState.addInstruction(new LdrInstruction(LDR, DEST_REG, arrSize));
 
-    // BL malloc
+    /* Allocate space on the heap */
     internalState.addInstruction(new BranchInstruction(L, B, MALLOC.getLabel()));
 
     Register reg = internalState.popFreeRegister();
     internalState.addInstruction(new MovInstruction(reg, DEST_REG));
 
-    // if the array elem size is 1 byte, use STRB, otherwise use STR
+    /* If the array elem size is 1 byte, use STRB, otherwise use STR */
     StrType strInstr = (arrElemSize == 1) ? STRB : STR;
 
-    //iterate over the expressions, generate assembly for them and store them
+    /* Generate assembly for each of the expressions and store them */
     Register nextAvailable = internalState.peekFreeRegister();
     int i = INT_BYTES_SIZE;
     for (ExpressionNode expression : expressions) {
@@ -622,30 +625,30 @@ public class CodeGenVisitor {
         .addInstruction(new LdrInstruction(LDR, noOfArrElemsReg, expressions.size()));
     internalState.addInstruction(new StrInstruction(STR, noOfArrElemsReg, reg));
 
-    //push back and free nextAvailable allocation register
+    /* Push back and free nextAvailable allocation register */
     internalState.pushFreeRegister(reg);
   }
 
   public void visitFuncCallNode(InternalState internalState, IdentifierNode identifier,
       List<ExpressionNode> arguments,
       SymbolTable currSymTable) {
-    // calculate total arguments size in argsTotalSize
+    /* Calculate total arguments size in argsTotalSize */
     int argsTotalSize = 0;
     int newOff = 0;
     Map<String, Integer> offsetPerVarMap = currSymTable.saveOffsetPerVar();
-    // arguments are stored in decreasing order they are given in the code
+    /* Arguments are stored in decreasing order they are given in the code */
     for (int i = arguments.size() - 1; i >= 0; i--) {
-      // get argument, calculate size and add it to argsTotalSize
+      /* Get argument, calculate size and add it to argsTotalSize */
       ExpressionNode currArg = arguments.get(i);
 
-      // generate assembly code for the current argument
+      /* Generate assembly code for the current argument */
       currArg.generateAssembly(internalState);
 
       int argSize = currArg.getType(currSymTable).getSize();
 
       StrType strInstr = (argSize == 1) ? STRB : StrType.STR;
 
-      //store currArg on the stack and decrease stack pointer (stack grows downwards)
+      /* Store currArg on the stack and decrease stack pointer (stack grows downwards) */
       internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(),
           SP, -argSize, true));
       argsTotalSize += argSize;
@@ -656,11 +659,11 @@ public class CodeGenVisitor {
     currSymTable.setOffsetPerVar(offsetPerVarMap);
     internalState
         .resetParamStackOffset(internalState.getParamStackOffset() + argsTotalSize + newOff);
-    //Branch Instruction to the callee label
+    /* Branch Instruction to the callee label */
     String functionLabel = "f_" + identifier.toString();
     internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, functionLabel));
 
-    //de-allocate stack from the function arguments. Max size for one de-allocation is 1024B
+    /* De-allocate stack from the function arguments. Max size for one de-allocation is 1024B */
     while (argsTotalSize > 0) {
       internalState.addInstruction(
           new ArithmeticInstruction(ADD, SP, SP,
@@ -668,7 +671,7 @@ public class CodeGenVisitor {
       argsTotalSize -= Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE);
     }
 
-    //move the result stored in DEST_REG in the first free register
+    /* Move the result stored in DEST_REG in the first free register */
     internalState
         .addInstruction(new MovInstruction(internalState.peekFreeRegister(), DEST_REG));
   }
@@ -678,34 +681,38 @@ public class CodeGenVisitor {
       SymbolTable currSymTable) {
     internalState.addInstruction(
         new LdrInstruction(LdrType.LDR, DEST_REG, NUM_PAIR_ELEMS * ADDRESS_BYTE_SIZE));
-    //BL malloc
+
+    /* Allocate space on the heap */
     internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, MALLOC.getLabel()));
 
     Register pairReg = internalState.popFreeRegister();
-
     internalState.addInstruction(new MovInstruction(pairReg, DEST_REG));
 
+    /* Generates the assembly code for each pair element*/
     generateElem(fstExpr, internalState, currSymTable, pairReg, FST);
     generateElem(sndExpr, internalState, currSymTable, pairReg, SND);
 
     internalState.pushFreeRegister(pairReg);
   }
 
+  /* Helper function for visit newPairNode.
+     Generates the assembly code for a pair element*/
   private void generateElem(ExpressionNode expr, InternalState internalState,
       SymbolTable currSymTable,
       Register pairReg, int offset) {
-    /* begin expr code generation */
+    /* Visit and generate assembly code for the expression */
     expr.generateAssembly(internalState);
     Register exprReg = internalState.popFreeRegister();
 
-    // load expr type size into DEST_REG
+    /* Load expr type size into DEST_REG */
     int size = expr.getType(currSymTable).getSize();
     internalState.addInstruction(new LdrInstruction(LDR, DEST_REG, size));
 
-    // BL malloc
+    /* Allocate space on the heap */
     internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, MALLOC.getLabel()));
 
-    StrType strInstr = (size == 1) ? STRB : StrType.STR;
+    /* If the expr type size is 1 byte, use STRB, otherwise use STR */
+    StrType strInstr = (size == BYTE_SIZE) ? STRB : StrType.STR;
     internalState.addInstruction(new StrInstruction(strInstr, exprReg, DEST_REG));
 
     internalState.addInstruction(
@@ -717,15 +724,18 @@ public class CodeGenVisitor {
   public void visitPairElemNode(InternalState internalState, ExpressionNode expression,
       int position,
       SymbolTable currSymTable) {
+    /* Visit and generate assembly code for the expression */
     expression.generateAssembly(internalState);
     Register reg = internalState.peekFreeRegister();
 
     internalState.addInstruction(new MovInstruction(DEST_REG, reg));
 
+    /* Check for null pointer exception */
     internalState.addInstruction(new BranchInstruction(BL, NULL_POINTER));
     internalState.addInstruction(
         new LdrInstruction(LdrType.LDR, reg, reg, position * ADDRESS_BYTE_SIZE));
 
+    /* Calculate type of Ldr instruction based on the size of the pair elem */
     PairType pair = (PairType) expression.getType(currSymTable);
     DataTypeId type = (position == FST) ? pair.getFstType() : pair.getSndType();
     int elemSize = type.getSize();

@@ -49,6 +49,7 @@ public class PairType extends DataTypeId {
     return "PAIR(" + fstType.toString() + ", " + sndType.toString() + ")";
   }
 
+  /* Returns corresponding size of a pair reference in bytes */
   @Override
   public int getSize() {
     return PAIR_ELEM_BYTES_SIZE;
