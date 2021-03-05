@@ -12,6 +12,11 @@ public enum Register {
   /* Reserved destination register */
   public static Register DEST_REG = R0;
 
+  /* Registers reserved for system built in arguments */
+  public static Register ARG_REG_1 = R1;
+  public static Register ARG_REG_2 = R2;
+  public static Register ARG_REG_3 = R3;
+
   /* Last register before registers store values from the stack */
   public static Register LAST_LOAD_REG = R10;
 
@@ -28,9 +33,9 @@ public enum Register {
     List<Register> registers = new ArrayList<>(List.of(Register.values()));
 
     registers.remove(DEST_REG);
-    registers.remove(R1);
-    registers.remove(R2);
-    registers.remove(R3);
+    registers.remove(ARG_REG_1);
+    registers.remove(ARG_REG_2);
+    registers.remove(ARG_REG_3);
     registers.remove(Register.SP);
     registers.remove(Register.LR);
     registers.remove(Register.PC);

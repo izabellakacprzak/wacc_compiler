@@ -108,8 +108,8 @@ public class CustomBuiltInFunctions {
         new LdrInstruction(LDR, LT, Register.DEST_REG,
             new MsgInstruction("ArrayIndexOutOfBoundsError: negative index\\n\\0")));
     instructions.add(new BranchInstruction(LT, BL, RUNTIME));
-    instructions.add(new LdrInstruction(LDR, R1, R1));
-    instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(R1)));
+    instructions.add(new LdrInstruction(LDR, Register.ARG_REG_1, Register.ARG_REG_1));
+    instructions.add(new CompareInstruction(Register.DEST_REG, new Operand(Register.ARG_REG_1)));
     instructions.add(new LdrInstruction(LDR, CS, Register.DEST_REG,
         new MsgInstruction("ArrayIndexOutOfBoundsError: index too large\\n\\0")));
     instructions.add(new BranchInstruction(CS, BL, RUNTIME));
@@ -118,7 +118,7 @@ public class CustomBuiltInFunctions {
 
   private void generateDivZero(List<Instruction> instructions) {
     instructions.add(new PushInstruction(LR));
-    instructions.add(new CompareInstruction(R1, new Operand(0)));
+    instructions.add(new CompareInstruction(Register.ARG_REG_1, new Operand(0)));
     instructions.add(new LdrInstruction(LDR, EQ, Register.DEST_REG,
         new MsgInstruction("DivideByZeroError: divide or modulo by zero\\n\\0")));
     instructions.add(new BranchInstruction(EQ, BL, RUNTIME));
@@ -162,7 +162,7 @@ public class CustomBuiltInFunctions {
 
   private void generateRead(List<Instruction> instructions, BuiltInFunction type) {
     instructions.add(new PushInstruction(LR));
-    instructions.add(new MovInstruction(R1, Register.DEST_REG));
+    instructions.add(new MovInstruction(Register.ARG_REG_1, Register.DEST_REG));
     switch (type) {
       case READ_CHAR:
         instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction(" %c\\0")));
@@ -182,8 +182,10 @@ public class CustomBuiltInFunctions {
   }
 
   private void generatePrintString(List<Instruction> instructions) {
-    instructions.add(new LdrInstruction(LDR, R1, Register.DEST_REG));
-    instructions.add(new ArithmeticInstruction(ADD, R2, Register.DEST_REG, new Operand(4), false));
+    instructions.add(new LdrInstruction(LDR, Register.ARG_REG_1, Register.DEST_REG));
+    instructions.add(
+        new ArithmeticInstruction(ADD, Register.ARG_REG_2, Register.DEST_REG, new Operand(4),
+            false));
     instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction("%.*s\\0")));
     instructions.add(
         new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),
@@ -192,7 +194,7 @@ public class CustomBuiltInFunctions {
   }
 
   private void generatePrintInt(List<Instruction> instructions) {
-    instructions.add(new MovInstruction(R1, Register.DEST_REG));
+    instructions.add(new MovInstruction(Register.ARG_REG_1, Register.DEST_REG));
     instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction("%d\\0")));
     instructions.add(
         new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),
@@ -221,7 +223,7 @@ public class CustomBuiltInFunctions {
       but idk when these are for
   */
   private void generatePrintReference(List<Instruction> instructions) {
-    instructions.add(new MovInstruction(R1, Register.DEST_REG));
+    instructions.add(new MovInstruction(Register.ARG_REG_1, Register.DEST_REG));
     instructions.add(new LdrInstruction(LDR, Register.DEST_REG, new MsgInstruction("%p\\0")));
     instructions.add(
         new ArithmeticInstruction(ADD, Register.DEST_REG, Register.DEST_REG, new Operand(4),

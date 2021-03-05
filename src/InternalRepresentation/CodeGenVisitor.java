@@ -370,21 +370,22 @@ public class CodeGenVisitor {
                 break;
             case DIV:
                 internalState.addInstruction(new MovInstruction(Register.DEST_REG, leftResult));
-                internalState.addInstruction(new MovInstruction(R1, rightResult));
+                internalState.addInstruction(new MovInstruction(Register.ARG_REG_1, rightResult));
                 internalState.addInstruction(
-                        new BranchInstruction(BranchOperation.BL, BuiltInFunction.DIV_ZERO));
+                    new BranchInstruction(BranchOperation.BL, BuiltInFunction.DIV_ZERO));
                 internalState.addInstruction(
                         new BranchInstruction(BranchOperation.BL, SystemBuiltInFunction.IDIV.getMessage()));
                 internalState.addInstruction(new MovInstruction(destReg, Register.DEST_REG));
                 break;
             case MOD:
                 internalState.addInstruction(new MovInstruction(Register.DEST_REG, leftResult));
-                internalState.addInstruction(new MovInstruction(R1, rightResult));
+                internalState.addInstruction(new MovInstruction(Register.ARG_REG_1, rightResult));
                 internalState.addInstruction(
-                        new BranchInstruction(BranchOperation.BL, BuiltInFunction.DIV_ZERO));
+                    new BranchInstruction(BranchOperation.BL, BuiltInFunction.DIV_ZERO));
                 internalState.addInstruction(
-                        new BranchInstruction(BranchOperation.BL, SystemBuiltInFunction.IDIVMOD.getMessage()));
-                internalState.addInstruction(new MovInstruction(destReg, R1));
+                    new BranchInstruction(BranchOperation.BL,
+                        SystemBuiltInFunction.IDIVMOD.getMessage()));
+                internalState.addInstruction(new MovInstruction(destReg, Register.ARG_REG_1));
                 break;
             case PLUS:
                 internalState.addInstruction(

@@ -50,7 +50,7 @@ public class ArrayElemNode extends ExpressionNode {
       // move result of expression to R0
       internalState.addInstruction(new MovInstruction(Register.DEST_REG, exprReg));
       // move result of array to R1
-      internalState.addInstruction(new MovInstruction(R1, arrayReg));
+      internalState.addInstruction(new MovInstruction(Register.ARG_REG_1, arrayReg));
       internalState.addInstruction(new BranchInstruction(BL, ARRAY_BOUNDS));
       internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
               new Operand(INT_BYTES_SIZE), false));
