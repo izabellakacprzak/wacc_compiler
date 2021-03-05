@@ -92,7 +92,9 @@ public class FunctionNode implements TypeNode {
     internalState.addInstruction(new PushInstruction(LR));
     internalState.allocateStackSpace(currSymTable);
     params.generateAssembly(internalState);
+    internalState.setFunctionSymTable(currSymTable);
     bodyStatement.generateAssembly(internalState);
+    internalState.resetParamStackOffset();
     internalState.addInstruction(new PopInstruction(PC));
     internalState.addInstruction(new DirectiveInstruction(LTORG));
   }

@@ -107,7 +107,7 @@ public class FuncCallNode extends AssignRHSNode {
   public void generateAssembly(InternalState internalState) {
     // calculate total arguments size in argsTotalSize
     int argsTotalSize = 0;
-    int argStackOffset = internalState.getArgStackOffset();
+
     // arguments are stored in decreasing order they are given in the code
     for (int i = arguments.size() - 1; i >= 0; i--) {
       // get argument, calculate size and add it to argsTotalSize
@@ -123,10 +123,9 @@ public class FuncCallNode extends AssignRHSNode {
       internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(),
           Register.SP, -argSize, true));
       argsTotalSize += argSize;
-      internalState.decrementArgStackOffset(argSize);
+      internalState.decrementParamStackOffset(argSize);
 
     }
-    internalState.resetArgStackOffset(argStackOffset);
 
 
     //Branch Instruction to the callee label

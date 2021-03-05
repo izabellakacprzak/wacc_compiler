@@ -29,8 +29,10 @@ public class InternalState {
 
   private final List<Instruction> generatedInstructions;
   private Stack<Register> availableRegs;
+  private int paramStackOffset = 0;
   private int argStackOffset = 0;
   private int labelCount;
+  private SymbolTable funcSymTable;
 
   public InternalState() {
     // setup stack function
@@ -186,11 +188,35 @@ public class InternalState {
     argStackOffset += argSize;
   }
 
+  public void decrementParamStackOffset(int argSize) {
+    paramStackOffset -= argSize;
+  }
+
+  public void incrementParamStackOffset(int argSize) {
+    paramStackOffset += argSize;
+  }
+
   public int getArgStackOffset() {
     return argStackOffset;
   }
 
   public void resetArgStackOffset(int argStackOffset) {
     this.argStackOffset = argStackOffset;
+  }
+
+  public SymbolTable getFunctionSymTable() {
+    return funcSymTable;
+  }
+
+  public void setFunctionSymTable(SymbolTable funcSymTable) {
+    this.funcSymTable = funcSymTable;
+  }
+
+  public int getParamStackOffset() {
+    return paramStackOffset;
+  }
+
+  public void resetParamStackOffset() {
+    paramStackOffset = 0;
   }
 }

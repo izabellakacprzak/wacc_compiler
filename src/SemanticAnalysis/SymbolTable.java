@@ -43,8 +43,8 @@ public class SymbolTable {
   }
 
   public void setOffset(String id, Integer offset) {
-  if(!offsetPerVar.containsKey(id))
-    offsetPerVar.put(id, offset);
+    if (!offsetPerVar.containsKey(id))
+      offsetPerVar.put(id, offset);
   }
 
   public int getOffset(String id) {
