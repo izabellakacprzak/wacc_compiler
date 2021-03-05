@@ -2,6 +2,7 @@ package AbstractSyntaxTree;
 
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.List;
 
 public interface ASTNode {

@@ -1,7 +1,6 @@
 package InternalRepresentation.Instructions;
 
 import InternalRepresentation.InstructionPrinter;
-import InternalRepresentation.Instructions.Instruction;
 
 public class LabelInstruction implements Instruction {
     private final InstructionPrinter printer = new InstructionPrinter();

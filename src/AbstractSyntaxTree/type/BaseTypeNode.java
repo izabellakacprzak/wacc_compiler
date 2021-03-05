@@ -6,6 +6,7 @@ import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.DataTypes.BaseType.Type;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.List;
 
 public class BaseTypeNode implements TypeNode {

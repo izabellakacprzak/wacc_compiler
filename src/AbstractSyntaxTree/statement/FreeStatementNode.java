@@ -6,8 +6,8 @@ import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.SymbolTable;
-import java.util.List;
 
+import java.util.List;
 
 public class FreeStatementNode extends StatementNode {
 

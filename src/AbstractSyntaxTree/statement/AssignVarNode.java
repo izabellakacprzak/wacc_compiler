@@ -10,9 +10,6 @@ import java.util.List;
 
 public class AssignVarNode extends StatementNode {
 
-  private static final int BYTE_SIZE = 1;
-  private static final int ADDRESS_BYTE_SIZE = 4;
-
   /* left:  AssignLHSNode corresponding to what being assigned to
    * right: AssignRHSNode corresponding to the assignment for the AssignLHSNode */
   private final AssignLHSNode left;

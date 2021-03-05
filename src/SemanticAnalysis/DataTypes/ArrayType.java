@@ -4,6 +4,7 @@ import SemanticAnalysis.DataTypeId;
 
 public class ArrayType extends DataTypeId {
   private static final int ARRAY_BYTES_SIZE = 4;
+
   /* elemType:  DataTypeId of the corresponding type of elements the array contains */
   private final DataTypeId elemType;
 

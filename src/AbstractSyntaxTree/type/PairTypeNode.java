@@ -5,6 +5,7 @@ import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.List;
 
 public class PairTypeNode implements TypeNode {

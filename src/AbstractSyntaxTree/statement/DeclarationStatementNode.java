@@ -7,11 +7,10 @@ import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
 import SemanticAnalysis.VariableId;
+
 import java.util.List;
 
 public class DeclarationStatementNode extends StatementNode {
-
-  private static final int BYTE_SIZE = 1;
 
   /* type:       TypeNode corresponding to the type of the new variable
    * identifier: Name identifier given to the new variable

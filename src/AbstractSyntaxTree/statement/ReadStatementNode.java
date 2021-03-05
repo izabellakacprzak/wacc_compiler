@@ -5,12 +5,10 @@ import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.List;
 
 public class ReadStatementNode extends StatementNode {
-
-  private static final boolean SET_BITS = true;
-  private static final int NO_OFFSET = 0;
 
   /* assignment:  AssignLHSNode corresponding to the IdentifierNode, ArrayElemNode
    *                or PairElemNode 'read' was called with */

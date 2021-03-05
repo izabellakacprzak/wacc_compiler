@@ -2,15 +2,12 @@ package AbstractSyntaxTree.type;
 
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
-import InternalRepresentation.Enums.Register;
 import InternalRepresentation.InternalState;
-import SemanticAnalysis.Identifier;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 public class ParamListNode implements ASTNode {
 

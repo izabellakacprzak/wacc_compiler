@@ -10,7 +10,7 @@ public final class SMullInstruction implements Instruction {
     private final Register destReg2;
     private final Register operand1;
     private final Register operand2;
-    private final boolean setBits;  // TODO: USE SET BITS IN PRINTER
+    private final boolean setBits;
 
     public SMullInstruction(Register dest1, Register dest2, Register operand1,
         Register operand2, boolean setBits) {

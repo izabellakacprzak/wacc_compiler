@@ -18,7 +18,6 @@ public final class DirectiveInstruction implements Instruction {
     this(type, "");
   }
 
-  //TODO: MOVE TO PRINTER
   @Override
   public String writeInstruction() {
     return printer.printDirective(type, value);

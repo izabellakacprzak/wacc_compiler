@@ -24,7 +24,8 @@ public class StringLiterExprNode extends ExpressionNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().visitStringLiterNode(internalState, value);
+    internalState.getCodeGenVisitor().
+            visitStringLiterNode(internalState, value);
   }
 
   @Override

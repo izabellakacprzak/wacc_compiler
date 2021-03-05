@@ -10,12 +10,8 @@ import SemanticAnalysis.VariableId;
 
 import java.util.List;
 
-import static InternalRepresentation.Enums.LdrType.LDR;
-import static InternalRepresentation.Enums.LdrType.LDRSB;
-
 public class IdentifierNode extends ExpressionNode {
 
-  private final static int BYTE_SIZE = 1;
   /* value: String representing the identifier of this node */
   private final String identifier;
   private SymbolTable currSymTable = null;

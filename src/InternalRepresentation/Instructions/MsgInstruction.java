@@ -14,7 +14,10 @@ public final class MsgInstruction implements Instruction {
   private final int index;
 
   public MsgInstruction(String value) {
-    int length = value.replace("\\0", "\0").replace("\\n", "\n").replace("\\\"", "\"").replace("\\'", "'").length();
+    int length = value.replace("\\0", "\0").
+            replace("\\n", "\n").
+            replace("\\\"", "\"").
+            replace("\\'", "'").length();
     this.length = new DirectiveInstruction(Directive.WORD, String.valueOf(length));
     this.value = new DirectiveInstruction(Directive.ASCII, value);
     this.index = messages.size();

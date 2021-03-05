@@ -11,7 +11,6 @@ public abstract class AssignLHSNode implements ASTNode {
   private final int line;
   private final int charPositionInLine;
   protected final int INT_BYTES_SIZE = 4;
-  protected final int ADDRESS_BYTES_SIZE = 4;
 
   protected AssignLHSNode(int line, int charPositionInLine) {
     this.line = line;

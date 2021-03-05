@@ -5,6 +5,7 @@ import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.List;
 
 public class ArrayTypeNode implements TypeNode {

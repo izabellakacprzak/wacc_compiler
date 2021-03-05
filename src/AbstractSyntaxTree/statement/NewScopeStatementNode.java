@@ -3,6 +3,7 @@ package AbstractSyntaxTree.statement;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.List;
 
 public class NewScopeStatementNode extends StatementNode {

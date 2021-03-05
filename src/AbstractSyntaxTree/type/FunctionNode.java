@@ -1,19 +1,13 @@
 package AbstractSyntaxTree.type;
 
-import static InternalRepresentation.Enums.Directive.LTORG;
-import static InternalRepresentation.Enums.Register.*;
-
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
-import InternalRepresentation.Instructions.DirectiveInstruction;
-import InternalRepresentation.Instructions.LabelInstruction;
-import InternalRepresentation.Instructions.PopInstruction;
-import InternalRepresentation.Instructions.PushInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
+
 import java.util.List;
 
 public class FunctionNode implements TypeNode {

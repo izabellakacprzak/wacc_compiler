@@ -7,7 +7,6 @@ import AbstractSyntaxTree.ASTNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
-import SemanticAnalysis.SymbolTable;
 
 public abstract class StatementNode implements ASTNode {
 
