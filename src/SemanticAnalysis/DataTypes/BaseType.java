@@ -3,6 +3,7 @@ package SemanticAnalysis.DataTypes;
 import SemanticAnalysis.DataTypeId;
 
 public class BaseType extends DataTypeId {
+
   private static final int INT_BYTES_SIZE = 4;
   private static final int BOOL_BYTES_SIZE = 1;
   private static final int CHAR_BYTES_SIZE = 1;
@@ -35,6 +36,7 @@ public class BaseType extends DataTypeId {
     return type.toString();
   }
 
+  /* Returns corresponding size of type in bytes */
   @Override
   public int getSize() {
     switch (type) {

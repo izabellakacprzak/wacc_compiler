@@ -38,6 +38,8 @@ public class SymbolTable {
     return currentObject;
   }
 
+  /* Update the offset for every entry in the symbol table that has
+     an offset less than paramOffset */
   public int updateOffsetPerVar(int newOffset, int paramOffset) {
   int newOff = 0;
     for (String key : offsetPerVar.keySet()) {
@@ -54,11 +56,14 @@ public class SymbolTable {
     return parentSymTable == null;
   }
 
+  /* Set offset for a specific identifier */
   public void setOffset(String id, Integer offset) {
     if (!offsetPerVar.containsKey(id))
       offsetPerVar.put(id, offset);
   }
 
+  /* Get offset of a specific identifier from the symbol table or
+     or it's enclosing symbol tables */
   public int getOffset(String id) {
     if (parentSymTable == null && !offsetPerVar.containsKey(id)) {
       return 0;
@@ -71,6 +76,7 @@ public class SymbolTable {
     return offsetPerVar.get(id);
   }
 
+  /* Get size of all variables stored in the symbol table */
   public int getVarsSize() {
     int totalSize = 0;
     for (Identifier identifier : dictionary.values()) {
@@ -82,11 +88,12 @@ public class SymbolTable {
     return totalSize;
   }
 
+  /* Get offset of each variable stored in the symbol table */
   public Map<String, Integer> saveOffsetPerVar() {
     return new HashMap<>(offsetPerVar);
   }
 
-
+  /* Set offset of each variable stored in the symbol table */
   public void setOffsetPerVar(Map<String, Integer> offsetPerVar) {
     this.offsetPerVar = offsetPerVar;
   }
