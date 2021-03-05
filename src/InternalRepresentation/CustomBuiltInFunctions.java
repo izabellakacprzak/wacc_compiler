@@ -21,7 +21,7 @@ public class CustomBuiltInFunctions {
 
   public List<Instruction> generateAssembly(BuiltInFunction type) {
     List<Instruction> instructions = new ArrayList<>();
-    instructions.add(new CustomBuiltInInstruction(type));
+    instructions.add(new LabelInstruction(type.getLabel()));
 
     switch (type) {
       case OVERFLOW:

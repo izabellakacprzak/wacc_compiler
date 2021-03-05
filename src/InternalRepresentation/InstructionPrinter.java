@@ -27,7 +27,18 @@ public class InstructionPrinter {
     return "CMP " + operand1.getRegName() + ", " + operand2.toString();
   }
 
-  public String printBranch(BranchOperation operation, List<ConditionCode> conditionCodes, String label) {
+  public String printDirective(Directive type, String value) {
+    if (type == Directive.ASCII) {
+      return "." + type.name().toLowerCase() + " \"" + value + "\"";
+    }
+    if (value.equals("")) {
+      return "." + type.name().toLowerCase();
+    }
+    return "." + type.name().toLowerCase() + " " + value;
+  }
+
+  public String printBranch(BranchOperation operation, List<ConditionCode> conditionCodes,
+      String label) {
     StringBuilder instruction = new StringBuilder(operation.toString());
     if (conditionCodes != null) {
       for (ConditionCode conditionCode : conditionCodes) {
@@ -106,9 +117,10 @@ public class InstructionPrinter {
     return "PUSH {" + reg.getRegName() + "}";
   }
 
-  public String printSMull(Register destReg1, Register destReg2, Register operand1,
+  public String printSMull(boolean setBits, Register destReg1, Register destReg2, Register operand1,
       Register operand2) {
-    return "SMULL " + destReg1.getRegName() + ", " +
+    String setBitsS = setBits ? "S" : "";
+    return "SMULL" + setBitsS + " " + destReg1.getRegName() + ", " +
         destReg2.getRegName() + ", " +
         operand1.getRegName() + ", " +
         operand2.getRegName();

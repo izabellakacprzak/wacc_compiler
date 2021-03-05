@@ -120,10 +120,8 @@ public class FuncCallNode extends AssignRHSNode {
       StrType strInstr = (argSize == 1) ? StrType.STRB : StrType.STR;
 
       //store currArg on the stack and decrease stack pointer (stack grows downwards)
-      StrInstruction strInstruction = new StrInstruction(strInstr, internalState.peekFreeRegister(),
-          Register.SP, -argSize);
-      strInstruction.useExclamation();
-      internalState.addInstruction(strInstruction);
+      internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(),
+          Register.SP, -argSize, true));
       argsTotalSize += argSize;
       internalState.decrementArgStackOffset(argSize);
 

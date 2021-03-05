@@ -24,6 +24,6 @@ public final class SMullInstruction implements Instruction {
 
     @Override
     public String writeInstruction() {
-        return printer.printSMull(destReg1, destReg2, operand1, operand2);
+        return printer.printSMull(setBits, destReg1, destReg2, operand1, operand2);
     }
 }

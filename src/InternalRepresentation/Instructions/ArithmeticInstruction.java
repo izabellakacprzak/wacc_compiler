@@ -17,11 +17,9 @@ public final class ArithmeticInstruction implements Instruction {
     public ArithmeticInstruction(ArithmeticOperation operation, Register destReg,
         Register operand1, Operand operand2, boolean setBits) {
         this.operation = operation;
-
         this.destReg = destReg;
         this.operand1 = operand1;
         this.operand2 = operand2;
-
         this.setBits = setBits;
     }
 

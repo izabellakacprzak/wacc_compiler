@@ -1,9 +1,11 @@
 package InternalRepresentation.Instructions;
 
 import InternalRepresentation.Enums.Directive;
+import InternalRepresentation.InstructionPrinter;
 
 public final class DirectiveInstruction implements Instruction {
 
+  private final InstructionPrinter printer = new InstructionPrinter();
   private final Directive type;
   private final String value;
 
@@ -13,20 +15,13 @@ public final class DirectiveInstruction implements Instruction {
   }
 
   public DirectiveInstruction(Directive type) {
-    this.type = type;
-    this.value = "";
+    this(type, "");
   }
 
   //TODO: MOVE TO PRINTER
   @Override
   public String writeInstruction() {
-    if (type == Directive.ASCII) {
-      return "." + type.name().toLowerCase() + " \"" + value + "\"";
-    }
-    if (value.equals("")) {
-      return "." + type.name().toLowerCase();
-    }
-    return "." + type.name().toLowerCase() + " " + value;
+    return printer.printDirective(type, value);
   }
 
 }
