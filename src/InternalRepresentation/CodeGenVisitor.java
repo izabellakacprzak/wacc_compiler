@@ -137,210 +137,281 @@ public class CodeGenVisitor {
 
   public void visitParamListNode(InternalState internalState,
       List<IdentifierNode> identifiers, SymbolTable currSymTable) {
+
+    /* Initially increment the parameters' stack offset by the size of an address */
     internalState.incrementParamStackOffset(ADDRESS_BYTE_SIZE);
+
+    /* Set the offset of each identifier in the currSymbolTable (for the function scope) */
     for (IdentifierNode identifier : identifiers) {
-      int paramSize = identifier.getType(currSymTable).getSize();
       currSymTable.setOffset(identifier.getIdentifier(), internalState.getArgStackOffset()
           + internalState.getParamStackOffset());
+
+      /* Increment the parameters' stack pointer by the size of each parameter */
+      int paramSize = identifier.getType(currSymTable).getSize();
       internalState.incrementParamStackOffset(paramSize);
     }
   }
 
   public void visitAssignVarNode(InternalState internalState, AssignLHSNode left,
       AssignRHSNode right, SymbolTable currSymTable) {
+
+    /* Visit and generate assembly for the right assignment and get result from register stack */
     right.generateAssembly(internalState);
     Register rightNodeResult = internalState.popFreeRegister();
 
+    /* Switch based on the instance of AssignLHSNode */
     if (left instanceof IdentifierNode) {
+      /* Get the size and offset of the IdentifierNode being reassigned */
       int typeSize = left.getType(currSymTable).getSize();
       int offset = currSymTable.getOffset(((IdentifierNode) left).getIdentifier());
 
+      /* Find the type of store instruction based on the size and store
+       *   rightNodeResult on the stack in the correct position */
       StrType strType = typeSize == BYTE_SIZE ? STRB : STR;
-      internalState
-          .addInstruction(new StrInstruction(strType, rightNodeResult, SP, offset));
+      internalState.addInstruction(new StrInstruction(strType, rightNodeResult, SP, offset));
 
     } else if (left instanceof PairElemNode) {
+      /* Cast left to PairElemNode, take a free register (to store the pair pointer)
+       * from the register stack and take the offset of the pairElem from the current SymbolTable */
       PairElemNode pairElem = (PairElemNode) left;
-      Register leftNodeResult = internalState.peekFreeRegister();
+      Register pairPointer = internalState.peekFreeRegister();
+      int offset = currSymTable.getOffset(pairElem.getIdentifier());
 
-      String pairID = pairElem.getIdentifier();
-      int offset = currSymTable
-          .getOffset(pairID);
+      /* Load the pair pointer from the stack and move it to the DEST_REG before branching
+       * to the p_check_null_pointer CustomBuiltIn function */
+      internalState.addInstruction(new LdrInstruction(LDR, pairPointer, SP, offset));
+      internalState.addInstruction(new MovInstruction(DEST_REG, pairPointer));
+      internalState.addInstruction(new BranchInstruction(BL, NULL_POINTER));
 
-      internalState
-          .addInstruction(new LdrInstruction(LDR, leftNodeResult, SP, offset));
-      internalState.addInstruction(new MovInstruction(DEST_REG, leftNodeResult));
+      /* Load the pair element to the pairPointer register */
+      internalState.addInstruction(
+          new LdrInstruction(LDR, pairPointer, pairPointer,
+              pairElem.getPosition() * ADDRESS_BYTE_SIZE));
 
-      internalState
-          .addInstruction(new BranchInstruction(BL, NULL_POINTER));
-
-      internalState.addInstruction(new LdrInstruction(LDR, leftNodeResult, leftNodeResult,
-          pairElem.getPosition() * ADDRESS_BYTE_SIZE));
-
-      StrType strType =
-          pairElem.getType(currSymTable).getSize() == BYTE_SIZE ? STRB : StrType.STR;
-      internalState.addInstruction(new StrInstruction(strType, rightNodeResult, leftNodeResult));
+      /* Find the type of store instruction based on the size and store
+       *   rightNodeResult on the stack in the correct position */
+      StrType strType = pairElem.getType(currSymTable).getSize() == BYTE_SIZE ? STRB : StrType.STR;
+      internalState.addInstruction(new StrInstruction(strType, rightNodeResult, pairPointer));
 
     } else if (left instanceof ArrayElemNode) {
+      /* Cast left to ArrayElemNode, take a free register (to store the array elem pointer)
+       * from the register stack */
+      ArrayElemNode arrayElem = (ArrayElemNode) left;
       Register arrayReg = internalState.popFreeRegister();
 
-      ArrayElemNode arrayElem = (ArrayElemNode) left;
+      /* Generate instructions for loading the array element */
       generateElemAddr(internalState, arrayReg, arrayElem);
 
-      StrType strType =
-          arrayElem.getType(currSymTable).getSize() == BYTE_SIZE ? STRB : StrType.STR;
-      internalState.addInstruction(
-          new StrInstruction(strType, rightNodeResult, arrayReg));
+      /* Find the type of store instruction based on the size and store
+       *   rightNodeResult on the stack in the correct position */
+      StrType strType = arrayElem.getType(currSymTable).getSize() == BYTE_SIZE ? STRB : StrType.STR;
+      internalState.addInstruction(new StrInstruction(strType, rightNodeResult, arrayReg));
 
+      /* Push arrayReg back to the register stack */
       internalState.pushFreeRegister(arrayReg);
     }
 
+    /* Push rightNodeResult back to the register stack */
     internalState.pushFreeRegister(rightNodeResult);
   }
 
-  private void generateElemAddr(InternalState internalState,
-      Register arrayReg, ArrayElemNode arrayElem) {
+  private void generateElemAddr(InternalState internalState, Register arrayReg,
+      ArrayElemNode arrayElem) {
+    /* Take the identifier and currSymbolTable from the ArrayElemNode */
     IdentifierNode identifier = arrayElem.getIdentifier();
     SymbolTable currSymTable = arrayElem.getCurrSymTable();
 
-    // put address of array into register
+    /* Take stack offset of the array from the SymbolTable and put address of array into arrayReg */
     int offset = currSymTable.getOffset(identifier.getIdentifier());
-    internalState
-        .addInstruction(new ArithmeticInstruction(ADD, arrayReg, SP, new Operand(offset), false));
-    // evaluate each index expression
+    internalState.addInstruction(
+        new ArithmeticInstruction(ADD, arrayReg, SP, new Operand(offset), !SET_BITS));
+
+    /* Evaluate each index expression */
     for (ExpressionNode expression : arrayElem.getExpressions()) {
+      /* Visit and generate assembly for the index ExpressionNode */
       expression.generateAssembly(internalState);
+
+      /* Take a free register from the register stack (to store the evaluated index)
+       * and load array pointer into it */
       Register exprReg = internalState.peekFreeRegister();
       internalState.addInstruction(new LdrInstruction(LDR, arrayReg, arrayReg));
-      // move result of expression to DEST_REG
+
+      /* Move the index into the DEST_REG and array pointer to ARG_REG_1 in preparation to
+       * branch to the p_check_array_bounds function */
       internalState.addInstruction(new MovInstruction(DEST_REG, exprReg));
-      // move result of array to ARG_REG_1
       internalState.addInstruction(new MovInstruction(ARG_REG_1, arrayReg));
       internalState.addInstruction(new BranchInstruction(BL, ARRAY_BOUNDS));
-      internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
-          new Operand(INT_BYTES_SIZE), false));
 
+      /* Find position of element before adding size in array according to index */
+      internalState.addInstruction(new ArithmeticInstruction(
+          ADD, arrayReg, arrayReg, new Operand(INT_BYTES_SIZE), !SET_BITS));
+
+      /* Add size to find position of element on the stack */
       DataTypeId arrayElemType = ((ArrayType) identifier.getType(currSymTable)).getElemType();
       if (arrayElemType instanceof BaseType
           && ((BaseType) arrayElemType).getBaseType() == BaseType.Type.CHAR) {
-
         internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
-            new Operand(exprReg), false));
+            new Operand(exprReg), !SET_BITS));
+
       } else {
         internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
-            new Operand(exprReg, new Shift(LSL, 2)), false));
+            new Operand(exprReg, new Shift(LSL, INT_BYTES_SIZE / 2)), !SET_BITS));
       }
     }
   }
 
   public void visitDeclarationStatementNode(InternalState internalState, AssignRHSNode assignment,
       TypeNode type, IdentifierNode identifier, SymbolTable currSymTable) {
+    /* Visit and generate assembly for the function's AssignRHSNode and store the result
+     *   in destReg */
     assignment.generateAssembly(internalState);
+    Register destReg = internalState.peekFreeRegister();
 
+    /* Set the offset of the declaration identifier based on the size of the AssignRHSNode */
     int typeSize = type.getType().getSize();
-    StrType storeType = typeSize == BYTE_SIZE ? STRB : StrType.STR;
-
     internalState.decrementArgStackOffset(typeSize);
     currSymTable.setOffset(identifier.getIdentifier(), internalState.getArgStackOffset());
 
-    Register destReg = internalState.peekFreeRegister();
-
-    internalState.addInstruction(new StrInstruction(storeType, destReg, SP,
-        currSymTable.getOffset(identifier.getIdentifier())));
+    /* Find the correct store instruction type based on the size and store destReg in the
+     * correct position on the stack */
+    StrType storeType = typeSize == BYTE_SIZE ? STRB : StrType.STR;
+    internalState.addInstruction(new StrInstruction(
+        storeType, destReg, SP, currSymTable.getOffset(identifier.getIdentifier())));
   }
 
   public void visitExitStatementNode(InternalState internalState, ExpressionNode expression) {
+    /* Visit and generate assembly for the exit code, then take the result register
+     *   from the register stack */
+    expression.generateAssembly(internalState);
     Register exitCodeReg = internalState.peekFreeRegister();
 
-    expression.generateAssembly(internalState);
+    /* Move the exit code to the DEST_REG before branching to exit */
     internalState.addInstruction(new MovInstruction(DEST_REG, exitCodeReg));
     internalState.addInstruction(new BranchInstruction(BL, "exit"));
   }
 
   public void visitFreeStatementNode(InternalState internalState, ExpressionNode expression) {
+    /* Visit and generate assembly for the ExpressionNode */
     expression.generateAssembly(internalState);
+
+    /* Move the result of the expression to DEST_REG before branching to the p_free_pair
+     *   SystemBuiltIn function */
     internalState.addInstruction(new MovInstruction(DEST_REG, internalState.peekFreeRegister()));
-    internalState
-        .addInstruction(new BranchInstruction(BL, FREE_PAIR));
+    internalState.addInstruction(new BranchInstruction(BL, FREE_PAIR));
   }
 
   public void visitIfStatementNode(InternalState internalState, ExpressionNode condition,
-      StatementNode thenStatement,
-      StatementNode elseStatement) {
+      StatementNode thenStatement, StatementNode elseStatement) {
+    /* Visit and generate assembly for the condition expression */
     condition.generateAssembly(internalState);
 
+    /* Generate labels for else and endIf */
     String elseLabel = internalState.generateNewLabel();
     String endIfLabel = internalState.generateNewLabel();
 
+    /* Branch to the elseLabel if the condition is FALSE */
     internalState.addInstruction(
-        new CompareInstruction(internalState.peekFreeRegister(), new Operand(0)));
-    internalState.addInstruction(
-        new BranchInstruction(ConditionCode.EQ, B, elseLabel));
+        new CompareInstruction(internalState.peekFreeRegister(), new Operand(FALSE)));
+    internalState.addInstruction(new BranchInstruction(EQ, B, elseLabel));
 
+    /* Allocate stack space for the new thenStatement scope */
     internalState.allocateStackSpace(thenStatement.getCurrSymTable());
+
+    /* Visit and generate assembly for the function's ParamListNode */
     thenStatement.generateAssembly(internalState);
+
+    /* Dellocate stack space for the thenStatement scope */
     internalState.deallocateStackSpace(thenStatement.getCurrSymTable());
 
+    /* Generate elseStatement with condition instructions */
     generateCondInstruction(internalState, elseStatement, endIfLabel, elseLabel);
   }
 
   public void visitWhileStatementNode(InternalState internalState, ExpressionNode condition,
       StatementNode statement) {
+    /* Generate labels for cond and statement */
     String condLabel = internalState.generateNewLabel();
     String statementLabel = internalState.generateNewLabel();
 
+    /* Generate statement with condition instructions */
     generateCondInstruction(internalState, statement, condLabel, statementLabel);
+
+    /* Visit and generate assembly for the condition expression */
     condition.generateAssembly(internalState);
 
-    internalState
-        .addInstruction(
-            new CompareInstruction(internalState.peekFreeRegister(), new Operand(TRUE)));
-    internalState.addInstruction(new BranchInstruction(
-        ConditionCode.EQ, B, statementLabel));
+    /* Branch to the statement if the condition is true */
+    internalState.addInstruction(
+        new CompareInstruction(internalState.peekFreeRegister(), new Operand(TRUE)));
+    internalState.addInstruction(new BranchInstruction(EQ, B, statementLabel));
   }
 
   private void generateCondInstruction(InternalState internalState, StatementNode statement,
       String condLabel, String statementLabel) {
+    /* Add branch to condition label */
     internalState.addInstruction(new BranchInstruction(B, condLabel));
 
+    /* Add label for the beginning of statement */
     internalState.addInstruction(new LabelInstruction(statementLabel));
+
+    /* Allocate stack space for the new statement scope */
     internalState.allocateStackSpace(statement.getCurrSymTable());
+
+    /* Visit and generate assembly for the function's ParamListNode */
     statement.generateAssembly(internalState);
+
+    /* Deallocate stack space for the statement scope */
     internalState.deallocateStackSpace(statement.getCurrSymTable());
+
+    /* Add label for the beginning of the condition */
     internalState.addInstruction(new LabelInstruction(condLabel));
   }
 
   public void visitNewScopeStatementNode(InternalState internalState, StatementNode statement) {
+    /* Allocate stack space for the new statement scope */
     internalState.allocateStackSpace(statement.getCurrSymTable());
+
+    /* Visit and generate assembly for the internal statement */
     statement.generateAssembly(internalState);
+
+    /* Deallocate stack space for the statement scope */
     internalState.deallocateStackSpace(statement.getCurrSymTable());
   }
 
   public void visitPrintLineStatementNode(InternalState internalState, ExpressionNode expression,
       SymbolTable currSymTable) {
+    /* Visit and generate assembly for a print node */
     visitPrintStatementNode(internalState, expression, currSymTable);
 
+    /* Branch to the CustomBuiltIn p_print_ln function */
     internalState.addInstruction(new BranchInstruction(BL, PRINT_LN));
   }
 
   public void visitPrintStatementNode(InternalState internalState, ExpressionNode expression,
       SymbolTable currSymTable) {
+    /* Visit and generate assembly for the expression to be printed and store in a new register */
     expression.generateAssembly(internalState);
-    Register nextAvailable = internalState.peekFreeRegister();
+    Register exprReg = internalState.peekFreeRegister();
 
-    internalState.addInstruction(new MovInstruction(DEST_REG, nextAvailable));
+    /* Move the expression to the DEST_REG for printing with a BuiltInFunction */
+    internalState.addInstruction(new MovInstruction(DEST_REG, exprReg));
 
+    /* Switch based on the type of the ExpressionNode */
     DataTypeId type = expression.getType(currSymTable);
-
     if (type instanceof ArrayType) {
+      /* Print as a string if the array element type is CHAR, print as reference otherwise */
       if (((ArrayType) type).getElemType().equals(new BaseType(BaseType.Type.CHAR))) {
         internalState.addInstruction(new BranchInstruction(BL, PRINT_STRING));
+
       } else {
         internalState.addInstruction(new BranchInstruction(BL, PRINT_REFERENCE));
       }
+
     } else if (type instanceof PairType) {
+      /* Print as a reference */
       internalState.addInstruction(new BranchInstruction(BL, PRINT_REFERENCE));
+
     } else if (type instanceof BaseType) {
+      /* Print as base type */
       BaseType.Type baseType = ((BaseType) type).getBaseType();
       switch (baseType) {
         case CHAR:
@@ -424,6 +495,7 @@ public class CodeGenVisitor {
       Operator.BinOp operator) {
     left.generateAssembly(internalState);
     Register leftResult = internalState.popFreeRegister();
+
     right.generateAssembly(internalState);
     Register rightResult = internalState.popFreeRegister();
 
@@ -640,7 +712,6 @@ public class CodeGenVisitor {
       // get argument, calculate size and add it to argsTotalSize
       ExpressionNode currArg = arguments.get(i);
 
-      // generate assembly code for the current argument
       currArg.generateAssembly(internalState);
 
       int argSize = currArg.getType(currSymTable).getSize();
@@ -696,7 +767,6 @@ public class CodeGenVisitor {
   private void generateElem(ExpressionNode expr, InternalState internalState,
       SymbolTable currSymTable,
       Register pairReg, int offset) {
-    /* begin expr code generation */
     expr.generateAssembly(internalState);
     Register exprReg = internalState.popFreeRegister();
 
