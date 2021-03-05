@@ -9,8 +9,10 @@ public class BackEndCompilerTest {
       String[] cmds = {"./compile_emulate_tests.sh", "src/test/backend_tests.txt"};
       Process process = new ProcessBuilder(cmds).inheritIO().start();
       process.waitFor();
+      int exit = process.exitValue();
+      assert (exit == 0);
     } catch (IOException | InterruptedException e) {
-      e.printStackTrace();
+      System.out.println("Exception");
     }
   }
 }
