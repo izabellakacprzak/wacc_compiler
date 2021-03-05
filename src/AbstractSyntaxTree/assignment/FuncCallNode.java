@@ -17,15 +17,16 @@ import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
+import java.util.Map;
 
 public class FuncCallNode extends AssignRHSNode {
 
+  private final static int MAX_DEALLOCATION_SIZE = 1024;
   /* identifier: IdentifierNode corresponding to the function's name identifier
    * arguments:  List of ExpressionNodes corresponding to the arguments
    *               passed into the function call */
   private final IdentifierNode identifier;
   private final List<ExpressionNode> arguments;
-  private final static int MAX_DEALLOCATION_SIZE = 1024;
   private SymbolTable currSymTable = null;
 
   public FuncCallNode(int line, int charPositionInLine, IdentifierNode identifier,
@@ -107,7 +108,8 @@ public class FuncCallNode extends AssignRHSNode {
   public void generateAssembly(InternalState internalState) {
     // calculate total arguments size in argsTotalSize
     int argsTotalSize = 0;
-
+    int newOff = 0;
+    Map<String, Integer> offsetPerVarMap = currSymTable.saveOffsetPerVar();
     // arguments are stored in decreasing order they are given in the code
     for (int i = arguments.size() - 1; i >= 0; i--) {
       // get argument, calculate size and add it to argsTotalSize
@@ -124,11 +126,11 @@ public class FuncCallNode extends AssignRHSNode {
       internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(),
           Register.SP, -argSize, true));
       argsTotalSize += argSize;
-      internalState.decrementParamStackOffset(argSize);
+       newOff += internalState.decrementParamStackOffset(argSize, internalState.getVarSize() + internalState.getParamStackOffset() - argSize);
 
     }
-
-
+    currSymTable.setOffsetPerVar(offsetPerVarMap);
+    internalState.resetParamStackOffset(internalState.getParamStackOffset() + argsTotalSize + newOff);
     //Branch Instruction to the callee label
     String functionLabel = "f_" + identifier.toString();
     internalState.addInstruction(new BranchInstruction(

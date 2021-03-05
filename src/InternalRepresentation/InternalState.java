@@ -28,6 +28,7 @@ public class InternalState {
   private static final String TAB = "\t";
 
   private final List<Instruction> generatedInstructions;
+  int varSize = 0;
   private Stack<Register> availableRegs;
   private int paramStackOffset = 0;
   private int argStackOffset = 0;
@@ -164,6 +165,7 @@ public class InternalState {
   public void allocateStackSpace(SymbolTable symbolTable) {
     int size = symbolTable.getVarsSize();
     argStackOffset += symbolTable.getVarsSize();
+    varSize += symbolTable.getVarsSize();
     while (size > 0) {
       addInstruction(new ArithmeticInstruction(ArithmeticOperation.SUB, SP, SP,
           new Operand(Math.min(size, MAX_STACK_ARITHMETIC_SIZE)), false));
@@ -173,6 +175,7 @@ public class InternalState {
 
   public void deallocateStackSpace(SymbolTable symbolTable) {
     int size = symbolTable.getVarsSize();
+//    varSize -= symbolTable.getVarsSize();
     while (size > 0) {
       addInstruction(new ArithmeticInstruction(ArithmeticOperation.ADD, SP, SP,
           new Operand(Math.min(size, MAX_STACK_ARITHMETIC_SIZE)), false));
@@ -188,9 +191,10 @@ public class InternalState {
     argStackOffset += argSize;
   }
 
-  public void decrementParamStackOffset(int argSize) {
-    funcSymTable.updateOffsetPerVar(argSize);
+  public int decrementParamStackOffset(int argSize, int offset) {
+    int newOff = funcSymTable.updateOffsetPerVar(argSize, offset);
     paramStackOffset -= argSize;
+    return newOff;
   }
 
   public void incrementParamStackOffset(int argSize) {
@@ -219,5 +223,16 @@ public class InternalState {
 
   public void resetParamStackOffset() {
     paramStackOffset = 0;
+  }
+
+  public void resetParamStackOffset(int size) {
+    paramStackOffset = size;
+  }
+
+  public int getVarSize() {
+    return varSize;
+  }
+  public void incrementVarSize(int size){
+  varSize += size;
   }
 }
