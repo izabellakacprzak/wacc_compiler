@@ -20,7 +20,6 @@ public class ProgramNode implements ASTNode {
   private final List<String> syntaxErrors;
   private SymbolTable currSymTable;
 
-
   public ProgramNode(StatementNode statementNode, List<FunctionNode> functionNodes) {
     this.statementNode = statementNode;
     this.functionNodes = functionNodes;

@@ -46,68 +46,98 @@ public class CodeGenVisitor {
   private static final int TRUE = 1;
   private static final int FALSE = 0;
 
-  /* */
+  /* Representation of null as an int */
+  private static final int NULL = 0;
+
+  /* Constants for pair use */
   private static final int FST = 0;
   private static final int SND = 1;
   private static final int NUM_PAIR_ELEMS = 2;
 
+  /* Constant sizes */
   private static final int BYTE_SIZE = 1;
-  private static final int RETURN_ADDRESS_SIZE = 4;
   private static final int INT_BYTES_SIZE = 4;
   private static final int ADDRESS_BYTE_SIZE = 4;
-  private static final int MAX_DEALLOCATION_SIZE = 1024;
+  private static final int MAX_DEALLOCATE_SIZE = 1024;
 
-  private static final int NO_OFFSET = 0;
+  /* Exit code for a successful execution */
+  private static final int EXIT_SUCCESS = 0;
+
+  /* For use as an immediate offset */
+  private static final int ZERO_OFFSET = 0;
+
+  /* Shift right value for MUL operation */
   private static final int MUL_SHIFT = 31;
+
+  /* For use when setting condition flag bits in arithmetic instructions */
   private static final boolean SET_BITS = true;
 
-  public void visitProgramNode(InternalState internalState, StatementNode statementNode,
-      List<FunctionNode> functionNodes) {
+  /* Each visitor function visits a type of ASTNode from the AbstractSyntaxTree.
+   * Visitor functions must all take an InternalState to add generated instructions to.
+   * Other parameters refer to values stored in the visited ASTNode */
+
+  public void visitProgramNode(InternalState internalState,
+      StatementNode statementNode, List<FunctionNode> functionNodes) {
+
+    /* Visit and generate assembly for each FunctionNode */
     for (FunctionNode functionNode : functionNodes) {
       functionNode.generateAssembly(internalState);
     }
 
-    // add main label and push Link Register
+    /* Add main label and push Link Register */
     internalState.addInstruction(new LabelInstruction("main"));
     internalState.addInstruction(new PushInstruction(LR));
 
-    //TODO allocate stack space for variables. How to get the var symbol table??
+    // TODO allocate stack space for variables. How to get the var symbol table??
     // TODO size should include function calls params sizes ???????
-    if (statementNode.getCurrSymTable() != null) {
-      internalState.allocateStackSpace(statementNode.getCurrSymTable());
-    }
+    /* Allocate space for variables in the program StatementNode's currSymbolTable */
+    internalState.allocateStackSpace(statementNode.getCurrSymTable());
 
+    /* Visit and generate assembly for the program StatementNode */
     statementNode.generateAssembly(internalState);
 
-    if (statementNode.getCurrSymTable() != null) {
-      internalState.deallocateStackSpace(statementNode.getCurrSymTable());
-    }
+    /* Allocate space for variables in the program StatementNode's currSymbolTable */
+    internalState.deallocateStackSpace(statementNode.getCurrSymTable());
 
-    internalState.addInstruction(new LdrInstruction(LDR, DEST_REG, NO_OFFSET));
+    /* Load success code to the DEST_REG, pop the PC program counter and add the
+     *   .ltorg instruction to finish the program */
+    internalState.addInstruction(new LdrInstruction(LDR, DEST_REG, EXIT_SUCCESS));
     internalState.addInstruction(new PopInstruction(PC));
     internalState.addInstruction(new DirectiveInstruction(LTORG));
   }
 
   public void visitFunctionNode(InternalState internalState, IdentifierNode identifier,
-      ParamListNode params,
-      StatementNode bodyStatement, SymbolTable currSymTable) {
+      ParamListNode params, StatementNode bodyStatement, SymbolTable currSymTable) {
+
+    /* Reset registers to start generating a function */
     internalState.resetAvailableRegs();
 
+    /* Add function label and push Link Register */
     internalState.addInstruction(new LabelInstruction("f_" + identifier.getIdentifier()));
     internalState.addInstruction(new PushInstruction(LR));
+
+    /* Allocate space for variables in the function's currSymbolTable */
     internalState.allocateStackSpace(currSymTable);
+
+    /* Visit and generate assembly for the function's ParamListNode */
     params.generateAssembly(internalState);
+
+    /* Allocate space for variables in the function's currSymbolTable */
     internalState.setFunctionSymTable(currSymTable);
+
+    /* Visit and generate assembly for the function's StatementNode */
     bodyStatement.generateAssembly(internalState);
+
+    /* Reset the parameters' offset, pop the PC program counter add the
+     *   .ltorg instruction to finish the function */
     internalState.resetParamStackOffset();
     internalState.addInstruction(new PopInstruction(PC));
     internalState.addInstruction(new DirectiveInstruction(LTORG));
   }
 
-  public void visitParamListNode(InternalState internalState, List<IdentifierNode> identifiers,
-      SymbolTable currSymTable) {
-    int varOffset = internalState.getArgStackOffset();
-    internalState.incrementParamStackOffset(RETURN_ADDRESS_SIZE);
+  public void visitParamListNode(InternalState internalState,
+      List<IdentifierNode> identifiers, SymbolTable currSymTable) {
+    internalState.incrementParamStackOffset(ADDRESS_BYTE_SIZE);
     for (IdentifierNode identifier : identifiers) {
       int paramSize = identifier.getType(currSymTable).getSize();
       currSymTable.setOffset(identifier.getIdentifier(), internalState.getArgStackOffset()
@@ -342,7 +372,7 @@ public class CodeGenVisitor {
     } else {
       assignment.generateAssembly(internalState);
       internalState.addInstruction(new ArithmeticInstruction(ADD, nextAvailable, SP,
-          new Operand(NO_OFFSET), !SET_BITS));
+          new Operand(ZERO_OFFSET), !SET_BITS));
     }
 
     internalState.addInstruction(new MovInstruction(DEST_REG, nextAvailable));
@@ -517,12 +547,12 @@ public class CodeGenVisitor {
 
   public void visitIntLiterExprNode(InternalState internalState, int value) {
     Register currDestination = internalState.peekFreeRegister();
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, currDestination, value));
+    internalState.addInstruction(new LdrInstruction(LDR, currDestination, value));
   }
 
   public void visitPairLiterExprNode(InternalState internalState) {
     Register currDestination = internalState.peekFreeRegister();
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, currDestination, NO_OFFSET));
+    internalState.addInstruction(new LdrInstruction(LDR, currDestination, NULL));
   }
 
   public void visitParenthesisExprNode(InternalState internalState, ExpressionNode innerExpr) {
@@ -531,7 +561,7 @@ public class CodeGenVisitor {
 
   public void visitStringLiterNode(InternalState internalState, String value) {
     Register currDestination = internalState.peekFreeRegister();
-    internalState.addInstruction(new LdrInstruction(LdrType.LDR, currDestination,
+    internalState.addInstruction(new LdrInstruction(LDR, currDestination,
         new MsgInstruction(value)));
   }
 
@@ -547,8 +577,8 @@ public class CodeGenVisitor {
         break;
       case NEGATION:
         internalState.addInstruction(
-            new ArithmeticInstruction(RSB, operandResult, operandResult, new Operand(NO_OFFSET),
-                true));
+            new ArithmeticInstruction(RSB, operandResult, operandResult, new Operand(ZERO_OFFSET),
+                SET_BITS));
         internalState.addInstruction(new BranchInstruction(ConditionCode.VS, BL, OVERFLOW));
         break;
       case LEN:
@@ -636,8 +666,8 @@ public class CodeGenVisitor {
     while (argsTotalSize > 0) {
       internalState.addInstruction(
           new ArithmeticInstruction(ADD, SP, SP,
-              new Operand(Math.min(argsTotalSize, MAX_DEALLOCATION_SIZE)), false));
-      argsTotalSize -= Math.min(argsTotalSize, MAX_DEALLOCATION_SIZE);
+              new Operand(Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE)), false));
+      argsTotalSize -= Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE);
     }
 
     //move the result stored in DEST_REG in the first free register
