@@ -1,17 +1,17 @@
 package SemanticAnalysis;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SymbolTable {
 
   private final SymbolTable parentSymTable;
   private final Map<String, Identifier> dictionary = new HashMap<>();
-  private Map<String, Integer> offsetPerVar = new HashMap<>();
+  private SortedMap<String, Integer> offsetPerVar = new TreeMap<>();
+  private int declaredParamsOffset = 0;
+  private int declaredVarsOffset = 0;
+  private int argsOffset = 0;
   /* Reserved variables size of the current scope */
-  private int paramOffset = 0;
   /* Declared variables size of the current scope */
-  private int declaredVariableSize = 0;
 
   public SymbolTable(SymbolTable parentSymTable) {
     this.parentSymTable = parentSymTable;
@@ -42,10 +42,6 @@ public class SymbolTable {
     return currentObject;
   }
 
-  public void resetVariableOffset() {
-    this.paramOffset = 0;
-  }
-
   /* Update the offset for every entry in the symbol table that has
      an offset less than paramOffset */
   public void updateOffsetPerVar(int newOffset, int paramOffset) {
@@ -62,24 +58,32 @@ public class SymbolTable {
   }
 
   /* Set offset for a specific identifier */
-  public void setOffset(String id, int offset) {
-    offsetPerVar.put(id, offset);
+  public void setVarsOffset(String id, int size) {
+    declaredVarsOffset -= size;
+    offsetPerVar.put(id, declaredVarsOffset);
   }
 
+
+
+  public void setParamsOffset(String id, int size) {
+    offsetPerVar.put(id, declaredParamsOffset);
+    declaredParamsOffset += size;
+  }
   /* Get offset of a specific identifier from the symbol table or
      or it's enclosing symbol tables */
   public int getOffset(String id) {
-    if(!dictionary.containsKey(id)) {
+    if (!offsetPerVar.containsKey(id)) {
+    //TODO check getVarsSize() in this case
       return parentSymTable.getOffset(id) + getVarsSize();
     }
 
-    return offsetPerVar.get(id);
+    return offsetPerVar.get(id) + argsOffset;
   }
 
   /* Get size of all variables stored in the symbol table */
   public int getVarsSize() {
     int size = 0;
-    for(Identifier id : dictionary.values()) {
+    for (Identifier id : dictionary.values()) {
       if (id instanceof VariableId) {
         size += id.getSize();
       }
@@ -87,12 +91,20 @@ public class SymbolTable {
     return size;
   }
 
-  public void incrementParamOffset(int size) {
-    this.paramOffset += size;
+  public void incrementDeclaredVarsOffset(int size) {
+    this.declaredVarsOffset += size;
+  }
+  public void incrementDeclaredParamsOffset(int size) {
+    this.declaredParamsOffset += size;
   }
 
-  public int getParamOffset() {
-    return paramOffset;
+
+  public void incrementArgsOffset(int size) {
+    this.argsOffset += size;
+  }
+
+  public void resetArgsOffset() {
+    this.argsOffset = 0;
   }
 
 //  /* Get offset of each variable stored in the symbol table */

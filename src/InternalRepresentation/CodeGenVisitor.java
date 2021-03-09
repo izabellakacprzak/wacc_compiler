@@ -76,7 +76,7 @@ public class CodeGenVisitor {
    * Other parameters refer to values stored in the visited ASTNode */
 
   public void visitProgramNode(InternalState internalState,
-      StatementNode statementNode, List<FunctionNode> functionNodes) {
+                               StatementNode statementNode, List<FunctionNode> functionNodes) {
 
     /* Visit and generate assembly for each FunctionNode */
     for (FunctionNode functionNode : functionNodes) {
@@ -104,7 +104,7 @@ public class CodeGenVisitor {
   }
 
   public void visitFunctionNode(InternalState internalState, IdentifierNode identifier,
-      ParamListNode params, StatementNode bodyStatement, SymbolTable currSymTable) {
+                                ParamListNode params, StatementNode bodyStatement, SymbolTable currSymTable) {
 
     /* Reset registers to start generating a function */
     internalState.resetAvailableRegs();
@@ -133,26 +133,27 @@ public class CodeGenVisitor {
   }
 
   public void visitParamListNode(InternalState internalState,
-      List<IdentifierNode> identifiers, SymbolTable currSymTable) {
+                                 List<IdentifierNode> identifiers, SymbolTable currSymTable) {
 
     /* Initially increment the parameters' stack offset by the size of an address */
     //internalState.incrementParamStackOffset(ADDRESS_BYTE_SIZE);
 
     /* Set the offset of each identifier in the currSymbolTable (for the function scope) */
-    int size = 0;
+    currSymTable.incrementDeclaredParamsOffset(ADDRESS_BYTE_SIZE);
+    int typeSize;
     for (IdentifierNode identifier : identifiers) {
-      size = identifier.getType(currSymTable).getSize();
-      currSymTable.setOffset(identifier.getIdentifier(),
-          size);
-      currSymTable.incrementParamOffset(size);
+      typeSize = identifier.getType(currSymTable).getSize();
+      currSymTable.setParamsOffset(identifier.getIdentifier(), typeSize);
+
       /* Increment the parameters' stack pointer by the size of each parameter */
       //int paramSize = identifier.getType(currSymTable).getSize();
       //internalState.incrementParamStackOffset(paramSize);
     }
+
   }
 
   public void visitAssignVarNode(InternalState internalState, AssignLHSNode left,
-      AssignRHSNode right, SymbolTable currSymTable) {
+                                 AssignRHSNode right, SymbolTable currSymTable) {
 
     /* Visit and generate assembly for the right assignment and get result from register stack */
     right.generateAssembly(internalState);
@@ -215,7 +216,7 @@ public class CodeGenVisitor {
   }
 
   private void generateElemAddr(InternalState internalState, Register arrayReg,
-      ArrayElemNode arrayElem) {
+                                ArrayElemNode arrayElem) {
     /* Take the identifier and currSymbolTable from the ArrayElemNode */
     IdentifierNode identifier = arrayElem.getIdentifier();
     SymbolTable currSymTable = arrayElem.getCurrSymTable();
@@ -248,7 +249,7 @@ public class CodeGenVisitor {
       /* Add size to find position of element on the stack */
       DataTypeId arrayElemType = ((ArrayType) identifier.getType(currSymTable)).getElemType();
       if (arrayElemType instanceof BaseType
-          && ((BaseType) arrayElemType).getBaseType() == BaseType.Type.CHAR) {
+              && ((BaseType) arrayElemType).getBaseType() == BaseType.Type.CHAR) {
         internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
             new Operand(exprReg), !SET_BITS));
 
@@ -260,7 +261,7 @@ public class CodeGenVisitor {
   }
 
   public void visitDeclarationStatementNode(InternalState internalState, AssignRHSNode assignment,
-      TypeNode type, IdentifierNode identifier, SymbolTable currSymTable) {
+                                            TypeNode type, IdentifierNode identifier, SymbolTable currSymTable) {
     /* Visit and generate assembly for the function's AssignRHSNode and store the result
      *   in destReg */
     assignment.generateAssembly(internalState);
@@ -269,8 +270,7 @@ public class CodeGenVisitor {
     /* Set the offset of the declaration identifier based on the size of the AssignRHSNode */
     int typeSize = type.getType().getSize();
     //internalState.decrementArgStackOffset(typeSize);
-    currSymTable.setOffset(identifier.getIdentifier(),
-        currSymTable.lookup(identifier.getIdentifier()).getSize());
+    currSymTable.setVarsOffset(identifier.getIdentifier(), typeSize);
 
     /* Find the correct store instruction type based on the size and store destReg in the
      * correct position on the stack */
@@ -301,7 +301,7 @@ public class CodeGenVisitor {
   }
 
   public void visitIfStatementNode(InternalState internalState, ExpressionNode condition,
-      StatementNode thenStatement, StatementNode elseStatement) {
+                                   StatementNode thenStatement, StatementNode elseStatement) {
     /* Visit and generate assembly for the condition expression */
     condition.generateAssembly(internalState);
 
@@ -328,7 +328,7 @@ public class CodeGenVisitor {
   }
 
   public void visitWhileStatementNode(InternalState internalState, ExpressionNode condition,
-      StatementNode statement) {
+                                      StatementNode statement) {
     /* Generate labels for cond and statement */
     String condLabel = internalState.generateNewLabel();
     String statementLabel = internalState.generateNewLabel();
@@ -346,7 +346,7 @@ public class CodeGenVisitor {
   }
 
   private void generateCondInstruction(InternalState internalState, StatementNode statement,
-      String condLabel, String statementLabel) {
+                                       String condLabel, String statementLabel) {
     /* Add branch to condition label */
     internalState.addInstruction(new BranchInstruction(B, condLabel));
 
@@ -378,7 +378,7 @@ public class CodeGenVisitor {
   }
 
   public void visitPrintLineStatementNode(InternalState internalState, ExpressionNode expression,
-      SymbolTable currSymTable) {
+                                          SymbolTable currSymTable) {
     /* Visit and generate assembly for a print node */
     visitPrintStatementNode(internalState, expression, currSymTable);
 
@@ -387,7 +387,7 @@ public class CodeGenVisitor {
   }
 
   public void visitPrintStatementNode(InternalState internalState, ExpressionNode expression,
-      SymbolTable currSymTable) {
+                                      SymbolTable currSymTable) {
     /* Visit and generate assembly for the expression to be printed and store in a new register */
     expression.generateAssembly(internalState);
     Register exprReg = internalState.peekFreeRegister();
@@ -431,7 +431,7 @@ public class CodeGenVisitor {
   }
 
   public void visitReadStatementNode(InternalState internalState, AssignLHSNode assignment,
-      SymbolTable currSymTable) {
+                                     SymbolTable currSymTable) {
     Register nextAvailable = internalState.peekFreeRegister();
 
     if (assignment instanceof IdentifierNode) {
@@ -491,8 +491,8 @@ public class CodeGenVisitor {
 
 
   public void visitBinaryOpExprNode(InternalState internalState, ExpressionNode left,
-      ExpressionNode right,
-      Operator.BinOp operator) {
+                                    ExpressionNode right,
+                                    Operator.BinOp operator) {
     left.generateAssembly(internalState);
     Register leftResult = internalState.popFreeRegister();
 
@@ -583,7 +583,7 @@ public class CodeGenVisitor {
   }
 
   private void conditionAssembly(InternalState internalState, Register destReg, Register leftResult,
-      Register rightResult, ConditionCode trueCond, ConditionCode falseCond) {
+                                 Register rightResult, ConditionCode trueCond, ConditionCode falseCond) {
     internalState.addInstruction(new CompareInstruction(leftResult, new Operand(rightResult)));
     internalState.addInstruction(new MovInstruction(trueCond, destReg, TRUE));
     internalState.addInstruction(
@@ -602,7 +602,7 @@ public class CodeGenVisitor {
   }
 
   public void visitIdentifierNode(InternalState internalState, String identifier, DataTypeId type,
-      SymbolTable currSymTable) {
+                                  SymbolTable currSymTable) {
     /* Get offset from symbolTable of variable and store that in available reg */
     if (currSymTable == null) {
       return;
@@ -639,7 +639,7 @@ public class CodeGenVisitor {
   }
 
   public void visitUnaryOpExprNode(InternalState internalState, ExpressionNode operand,
-      Operator.UnOp operator) {
+                                   Operator.UnOp operator) {
     /* Load needed variable from stack */
     operand.generateAssembly(internalState);
     Register operandResult = internalState.popFreeRegister();
@@ -665,7 +665,7 @@ public class CodeGenVisitor {
   }
 
   public void visitArrayLiterNode(InternalState internalState, List<ExpressionNode> expressions,
-      AssignRHSNode node) {
+                                  AssignRHSNode node) {
     SymbolTable currSymTable = node.getCurrSymTable();
 
     /* Get the size of the array elements type */
@@ -704,14 +704,13 @@ public class CodeGenVisitor {
   }
 
   public void visitFuncCallNode(InternalState internalState, IdentifierNode identifier,
-      List<ExpressionNode> arguments,
-      SymbolTable currSymTable) {
+                                List<ExpressionNode> arguments,
+                                SymbolTable currSymTable) {
     /* Calculate total arguments size in argsTotalSize */
     int argsTotalSize = 0;
     int newOff = 0;
     //Map<String, Integer> offsetPerVarMap = currSymTable.saveOffsetPerVar();
     /* Arguments are stored in decreasing order they are given in the code */
-    currSymTable.incrementParamOffset(4);
     for (int i = arguments.size() - 1; i >= 0; i--) {
       /* Get argument, calculate size and add it to argsTotalSize */
       ExpressionNode currArg = arguments.get(i);
@@ -728,13 +727,12 @@ public class CodeGenVisitor {
           SP, -argSize, true));
       argsTotalSize += argSize;
 
-      currSymTable.incrementParamOffset(argSize);
-
+      currSymTable.incrementArgsOffset(argSize);
       //internalState.decrementStackOffset(argSize, internalState.getVarSize()
       //    + internalState.getStackOffset() - argSize);
 
     }
-    currSymTable.resetVariableOffset();
+    currSymTable.resetArgsOffset();
     //currSymTable.setOffsetPerVar(offsetPerVarMap);
     //internalState
     //    .resetParamStackOffset(internalState.getStackOffset() + argsTotalSize + newOff);
@@ -756,8 +754,8 @@ public class CodeGenVisitor {
   }
 
   public void visitNewPairNode(InternalState internalState, ExpressionNode fstExpr,
-      ExpressionNode sndExpr,
-      SymbolTable currSymTable) {
+                               ExpressionNode sndExpr,
+                               SymbolTable currSymTable) {
     internalState.addInstruction(
         new LdrInstruction(LdrType.LDR, DEST_REG, NUM_PAIR_ELEMS * ADDRESS_BYTE_SIZE));
 
@@ -777,8 +775,8 @@ public class CodeGenVisitor {
   /* Helper function for visit newPairNode.
      Generates the assembly code for a pair element*/
   private void generateElem(ExpressionNode expr, InternalState internalState,
-      SymbolTable currSymTable,
-      Register pairReg, int offset) {
+                            SymbolTable currSymTable,
+                            Register pairReg, int offset) {
     /* Visit and generate assembly code for the expression */
     expr.generateAssembly(internalState);
     Register exprReg = internalState.popFreeRegister();
@@ -801,8 +799,8 @@ public class CodeGenVisitor {
   }
 
   public void visitPairElemNode(InternalState internalState, ExpressionNode expression,
-      int position,
-      SymbolTable currSymTable) {
+                                int position,
+                                SymbolTable currSymTable) {
     /* Visit and generate assembly code for the expression */
     expression.generateAssembly(internalState);
     Register reg = internalState.peekFreeRegister();

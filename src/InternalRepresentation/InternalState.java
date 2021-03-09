@@ -185,7 +185,8 @@ public class InternalState {
    increases the varSize variable */
   public void allocateStackSpace(SymbolTable symbolTable) {
     int size = symbolTable.getVarsSize();
-    symbolTable.incrementParamOffset(size);
+    symbolTable.incrementDeclaredParamsOffset(size);
+    symbolTable.incrementDeclaredVarsOffset(size);
     stackOffset += size;
 
     while (size > 0) {
