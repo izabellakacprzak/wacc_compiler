@@ -26,7 +26,6 @@ import SemanticAnalysis.Operator;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
-import java.util.Map;
 
 import static InternalRepresentation.Instructions.ArithmeticInstruction.ArithmeticOperation.*;
 import static InternalRepresentation.Instructions.LogicalInstruction.LogicalOperation.*;
@@ -137,16 +136,18 @@ public class CodeGenVisitor {
       List<IdentifierNode> identifiers, SymbolTable currSymTable) {
 
     /* Initially increment the parameters' stack offset by the size of an address */
-    internalState.incrementParamStackOffset(ADDRESS_BYTE_SIZE);
+    //internalState.incrementParamStackOffset(ADDRESS_BYTE_SIZE);
 
     /* Set the offset of each identifier in the currSymbolTable (for the function scope) */
+    int size = 0;
     for (IdentifierNode identifier : identifiers) {
-      currSymTable.setOffset(identifier.getIdentifier(), internalState.getArgStackOffset()
-          + internalState.getParamStackOffset());
-
+      size = identifier.getType(currSymTable).getSize();
+      currSymTable.setOffset(identifier.getIdentifier(),
+          size);
+      currSymTable.incrementParamOffset(size);
       /* Increment the parameters' stack pointer by the size of each parameter */
-      int paramSize = identifier.getType(currSymTable).getSize();
-      internalState.incrementParamStackOffset(paramSize);
+      //int paramSize = identifier.getType(currSymTable).getSize();
+      //internalState.incrementParamStackOffset(paramSize);
     }
   }
 
@@ -267,8 +268,9 @@ public class CodeGenVisitor {
 
     /* Set the offset of the declaration identifier based on the size of the AssignRHSNode */
     int typeSize = type.getType().getSize();
-    internalState.decrementArgStackOffset(typeSize);
-    currSymTable.setOffset(identifier.getIdentifier(), internalState.getArgStackOffset());
+    //internalState.decrementArgStackOffset(typeSize);
+    currSymTable.setOffset(identifier.getIdentifier(),
+        currSymTable.lookup(identifier.getIdentifier()).getSize());
 
     /* Find the correct store instruction type based on the size and store destReg in the
      * correct position on the stack */
@@ -707,8 +709,9 @@ public class CodeGenVisitor {
     /* Calculate total arguments size in argsTotalSize */
     int argsTotalSize = 0;
     int newOff = 0;
-    Map<String, Integer> offsetPerVarMap = currSymTable.saveOffsetPerVar();
+    //Map<String, Integer> offsetPerVarMap = currSymTable.saveOffsetPerVar();
     /* Arguments are stored in decreasing order they are given in the code */
+    currSymTable.incrementParamOffset(4);
     for (int i = arguments.size() - 1; i >= 0; i--) {
       /* Get argument, calculate size and add it to argsTotalSize */
       ExpressionNode currArg = arguments.get(i);
@@ -724,13 +727,17 @@ public class CodeGenVisitor {
       internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(),
           SP, -argSize, true));
       argsTotalSize += argSize;
-      newOff += internalState.decrementParamStackOffset(argSize, internalState.getVarSize()
-          + internalState.getParamStackOffset() - argSize);
+
+      currSymTable.incrementParamOffset(argSize);
+
+      //internalState.decrementStackOffset(argSize, internalState.getVarSize()
+      //    + internalState.getStackOffset() - argSize);
 
     }
-    currSymTable.setOffsetPerVar(offsetPerVarMap);
-    internalState
-        .resetParamStackOffset(internalState.getParamStackOffset() + argsTotalSize + newOff);
+    currSymTable.resetVariableOffset();
+    //currSymTable.setOffsetPerVar(offsetPerVarMap);
+    //internalState
+    //    .resetParamStackOffset(internalState.getStackOffset() + argsTotalSize + newOff);
     /* Branch Instruction to the callee label */
     String functionLabel = "f_" + identifier.toString();
     internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, functionLabel));

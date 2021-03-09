@@ -33,9 +33,10 @@ public class InternalState {
   private final CodeGenVisitor codeGenVisitor;
   private int varSize = 0;                /* stores the size of variables on the stack */
   private Stack<Register> availableRegs;
-  /* paramStackOffset is set to follow the end point of the function parameters on the stack */
-  private int paramStackOffset = 0;
-  private int argStackOffset = 0;         /* stack pointer for variables offset calculation */
+  /* Global stack offset of declared variables */
+  private int stackOffset = 0;
+  private int declaredArgStackOffset = 0;
+  //private int argStackOffset = 0;         /* stack pointer for variables offset calculation */
   private int labelCount;
   private SymbolTable funcSymTable;       /* points to the function symbol table in order to deallocate
                                              the variables off the stack at scope closing */
@@ -184,8 +185,9 @@ public class InternalState {
    increases the varSize variable */
   public void allocateStackSpace(SymbolTable symbolTable) {
     int size = symbolTable.getVarsSize();
-    argStackOffset += symbolTable.getVarsSize();
-    varSize += symbolTable.getVarsSize();
+    symbolTable.incrementParamOffset(size);
+    stackOffset += size;
+
     while (size > 0) {
       addInstruction(new ArithmeticInstruction(ArithmeticOperation.SUB, SP, SP,
           new Operand(Math.min(size, MAX_STACK_ARITHMETIC_SIZE)), false));
@@ -196,6 +198,8 @@ public class InternalState {
   /*calculates the variables sizes in the symbol table and de-allocates stack space from them */
   public void deallocateStackSpace(SymbolTable symbolTable) {
     int size = symbolTable.getVarsSize();
+    stackOffset -= size;
+
     while (size > 0) {
       addInstruction(new ArithmeticInstruction(ArithmeticOperation.ADD, SP, SP,
           new Operand(Math.min(size, MAX_STACK_ARITHMETIC_SIZE)), false));
@@ -203,31 +207,22 @@ public class InternalState {
     }
   }
 
-  public void decrementArgStackOffset(int argSize) {
-    argStackOffset -= argSize;
+  public void decrementStackOffset(int argSize, int offset) {
+    //funcSymTable.updateOffsetPerVar(argSize, offset);
+    stackOffset -= argSize;
   }
 
-  public void incrementArgStackOffset(int argSize) {
-    argStackOffset += argSize;
+  public void incrementStackOffset(int argSize) {
+    stackOffset += argSize;
   }
 
-  public int decrementParamStackOffset(int argSize, int offset) {
-    int newOff = funcSymTable.updateOffsetPerVar(argSize, offset);
-    paramStackOffset -= argSize;
-    return newOff;
-  }
-
-  public void incrementParamStackOffset(int argSize) {
-    paramStackOffset += argSize;
-  }
-
-  public int getArgStackOffset() {
-    return argStackOffset;
-  }
-
-  public void resetArgStackOffset(int argStackOffset) {
-    this.argStackOffset = argStackOffset;
-  }
+//  public int getArgStackOffset() {
+//    return argStackOffset;
+//  }
+//
+//  public void resetArgStackOffset(int argStackOffset) {
+//    this.argStackOffset = argStackOffset;
+//  }
 
   public SymbolTable getFunctionSymTable() {
     return funcSymTable;
@@ -238,16 +233,16 @@ public class InternalState {
     this.funcSymTable = funcSymTable;
   }
 
-  public int getParamStackOffset() {
-    return paramStackOffset;
+  public int getStackOffset() {
+    return stackOffset;
   }
 
   public void resetParamStackOffset() {
-    paramStackOffset = 0;
+    stackOffset = 0;
   }
 
   public void resetParamStackOffset(int size) {
-    paramStackOffset = size;
+    stackOffset = size;
   }
 
   public int getVarSize() {
