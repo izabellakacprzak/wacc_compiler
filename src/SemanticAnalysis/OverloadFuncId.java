@@ -15,7 +15,7 @@ public class OverloadFuncId extends Identifier {
     }
 
     public boolean addNewFunc(FunctionId function) {
-        if (this.containsFunc(function)) {
+        if (!this.canOverload(function)) {
             return false;
         }
 
@@ -34,7 +34,7 @@ public class OverloadFuncId extends Identifier {
     }
 
 
-    private boolean containsFunc(FunctionId function) {
+    private boolean canOverload(FunctionId function) {
         DataTypeId returnType = function.getType();
         Set<DataTypeId> params = new HashSet<>(function.getParamTypes());
 
