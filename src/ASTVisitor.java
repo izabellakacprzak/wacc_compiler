@@ -10,6 +10,7 @@ import SemanticAnalysis.Operator.*;
 import antlr.WACCParser;
 import antlr.WACCParser.*;
 import antlr.WACCParserBaseVisitor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +68,9 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
       for (int i = 0; i < ctx.IDENT().size(); i++) {
 
         names.add(new IdentifierNode(line, charPositionInLine, ctx.IDENT(i).getText()));
-        types.add((TypeNode) visit(ctx.type(i)));
+        if (ctx.type() != null) {
+          types.add((TypeNode) visit(ctx.type(i)));
+        }
       }
     }
 

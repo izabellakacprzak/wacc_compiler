@@ -7,7 +7,9 @@ import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ParamListNode implements ASTNode {
 
@@ -16,11 +18,19 @@ public class ParamListNode implements ASTNode {
    * currSymTable: set to the node's SymbolTable for the current scope during semanticAnalysis */
   private final List<IdentifierNode> identifiers;
   private final List<TypeNode> types;
+  private Map<IdentifierNode, TypeNode> identifiersToTypes = new HashMap<>();
   private SymbolTable currSymTable = null;
 
   public ParamListNode(List<IdentifierNode> identifiers, List<TypeNode> types) {
     this.identifiers = identifiers;
     this.types = types;
+    for (int i = 0; i < identifiers.size(); i++) {
+      if (i < types.size()) {
+        identifiersToTypes.put(identifiers.get(i), types.get(i));
+      } else {
+        identifiersToTypes.put(identifiers.get(i), null);
+      }
+    }
   }
 
   /* Create a new ParameterId for each parameter and add to the symbolTable.
@@ -29,7 +39,12 @@ public class ParamListNode implements ASTNode {
     List<ParameterId> paramIds = new ArrayList<>();
 
     for (int i = 0; i < identifiers.size(); i++) {
-      ParameterId parameter = new ParameterId(identifiers.get(i), types.get(i).getType());
+      ParameterId parameter;
+      if (i < types.size()) {
+        parameter = new ParameterId(identifiers.get(i), types.get(i).getType());
+      } else {
+        parameter = new ParameterId(identifiers.get(i));
+      }
       paramIds.add(parameter);
       symbolTable.add(identifiers.get(i).getIdentifier(), parameter);
     }
