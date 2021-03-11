@@ -13,6 +13,10 @@ public abstract class Identifier {
     this.node = node;
   }
 
+  public Identifier() {
+    this.node = null;
+  }
+
   public IdentifierNode getNode() {
     return node;
   }
