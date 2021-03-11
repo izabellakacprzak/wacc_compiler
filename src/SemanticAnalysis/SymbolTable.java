@@ -10,8 +10,6 @@ public class SymbolTable {
   private int declaredParamsOffset = 0;
   private int declaredVarsOffset = 0;
   private int argsOffset = 0;
-  /* Reserved variables size of the current scope */
-  /* Declared variables size of the current scope */
 
   public SymbolTable(SymbolTable parentSymTable) {
     this.parentSymTable = parentSymTable;
@@ -24,6 +22,10 @@ public class SymbolTable {
   /* Add a name and object to the symbol table */
   public void add(String name, Identifier object) {
     dictionary.put(name, object);
+  }
+
+  public void remove(String name) {
+    dictionary.remove(name);
   }
 
   /* Get an identifier object from the symbol table */
@@ -62,8 +64,6 @@ public class SymbolTable {
     declaredVarsOffset -= size;
     offsetPerVar.put(id, declaredVarsOffset);
   }
-
-
 
   public void setParamsOffset(String id, int size) {
     offsetPerVar.put(id, declaredParamsOffset);

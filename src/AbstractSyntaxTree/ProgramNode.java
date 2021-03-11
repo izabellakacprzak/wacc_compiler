@@ -5,6 +5,8 @@ import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.type.FunctionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.FunctionId;
+import SemanticAnalysis.Identifier;
+import SemanticAnalysis.OverloadFuncId;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.ArrayList;
@@ -43,20 +45,43 @@ public class ProgramNode implements ASTNode {
   public void semanticAnalysis(SymbolTable topSymbolTable, List<String> errorMessages) {
     setCurrSymTable(topSymbolTable);
 
-    for (FunctionNode func : functionNodes) {
+    for (FunctionNode newFunction : functionNodes) {
       /* Create a new SymbolTable for the function's scope */
-      func.setCurrSymTable(new SymbolTable(topSymbolTable));
+      newFunction.setCurrSymTable(new SymbolTable(topSymbolTable));
 
-      if (topSymbolTable.lookupAll(func.getName()) != null) {
-        /* A function with the same name has already been declared */
-        IdentifierNode id = func.getIdentifierNode();
-        errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
-            + " Function '" + func + "' has already been declared.");
+      Identifier declaredFunc = topSymbolTable.lookupAll(newFunction.getName());
+      FunctionId newIdentifier = (FunctionId) newFunction.getIdentifier(newFunction.getCurrSymTable());
 
+      if ( declaredFunc != null) {
+        /* A function with the same name has already been declared
+         * Extension: check if function can be overloaded */
+        if (declaredFunc instanceof FunctionId) {
+          OverloadFuncId overloadFunc = new OverloadFuncId((FunctionId) declaredFunc);
+          if (overloadFunc.addNewFunc(newIdentifier)) {
+            /* Replace function ID with new Overload function ID*/
+            topSymbolTable.remove(newFunction.getName());
+            topSymbolTable.add(newFunction.getName(), overloadFunc);
+          } else {
+            IdentifierNode id = newFunction.getIdentifierNode();
+            errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
+                    + " Cannot overload " + declaredFunc.toString() + "' as a function with the same " +
+                    "signature already exists.");
+          }
+        } else if (declaredFunc instanceof OverloadFuncId) {
+          OverloadFuncId overloadFunc = (OverloadFuncId) declaredFunc;
+          if (!overloadFunc.addNewFunc(newIdentifier)) {
+            IdentifierNode id = newFunction.getIdentifierNode();
+            errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
+                    + " Cannot overload " + declaredFunc.toString() + "' as a function with the same " +
+                    "signature already exists.");
+          }
+        } else {
+          IdentifierNode id = newFunction.getIdentifierNode();
+          errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
+                  + " Type of '" + declaredFunc.toString() + "' could not be resolved.");
+        }
       } else {
-        /* Create function identifier and add it to the topSymbolTable */
-        FunctionId identifier = (FunctionId) func.getIdentifier(func.getCurrSymTable());
-        topSymbolTable.add(func.getName(), identifier);
+        topSymbolTable.add(newFunction.getName(), newIdentifier);
       }
     }
 

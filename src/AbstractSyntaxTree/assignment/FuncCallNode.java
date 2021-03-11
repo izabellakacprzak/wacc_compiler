@@ -6,13 +6,12 @@ import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.InternalState;
-import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
-import SemanticAnalysis.FunctionId;
-import SemanticAnalysis.Identifier;
-import SemanticAnalysis.SymbolTable;
 
+import javax.xml.crypto.Data;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +54,7 @@ public class FuncCallNode extends AssignRHSNode {
       return;
     }
 
-    if (!(functionId instanceof FunctionId)) {
+    if (!(functionId instanceof FunctionId) && !(functionId instanceof OverloadFuncId)) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
           + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
           + " Expected: FUNCTION IDENTIFIER"
@@ -63,8 +62,26 @@ public class FuncCallNode extends AssignRHSNode {
       return;
     }
 
+    List<DataTypeId> argTypes = new ArrayList<>();
+    for (ExpressionNode arg : arguments) {
+      argTypes.add(arg.getType(symbolTable));
+    }
+
     /* Check that function has been called with the correct number of arguments */
-    FunctionId function = (FunctionId) functionId;
+    FunctionId function;
+    if (functionId instanceof OverloadFuncId) {
+      function = ((OverloadFuncId) functionId).findFunc(argTypes);
+      if (function == null) {
+        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
+                + " Function call'" + functionId.toString()
+                + "' does not match any of the Overload signatures for function '" +
+                identifier.getIdentifier() + "'");
+        return;
+      }
+    } else {
+      function = (FunctionId) functionId;
+    }
+
     List<DataTypeId> paramTypes = function.getParamTypes();
 
     if (paramTypes.size() > arguments.size() || paramTypes.size() < arguments.size()) {
@@ -107,10 +124,21 @@ public class FuncCallNode extends AssignRHSNode {
         visitFuncCallNode(internalState, identifier, arguments, getCurrSymTable());
   }
 
-  /* Return the return type of the function */
+  /* Return the return type of the function
+  * TODO: CHANGE FOR OVERLOAD*/
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
-    FunctionId function = (FunctionId) symbolTable.lookupAll("*" + identifier.getIdentifier());
+   Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
+   FunctionId function;
+   if (functionId instanceof OverloadFuncId) {
+     List<DataTypeId> argTypes = new ArrayList<>();
+     for (ExpressionNode arg : arguments) {
+       argTypes.add(arg.getType(symbolTable));
+     }
+      function = ((OverloadFuncId) functionId).findFunc(argTypes);
+   } else {
+     function = (FunctionId) functionId;
+   }
 
     if (function == null) {
       return null;
