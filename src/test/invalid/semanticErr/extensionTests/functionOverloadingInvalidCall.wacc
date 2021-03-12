@@ -1,0 +1,11 @@
+begin
+int f(int a, bool b) is
+return 0
+end
+int f(int b) is
+return 1
+end
+int x = call f(1, true);
+int b = call f();
+println x
+end

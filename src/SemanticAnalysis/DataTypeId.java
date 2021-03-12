@@ -1,6 +1,6 @@
 package SemanticAnalysis;
 
-public abstract class DataTypeId extends Identifier {
+public abstract class DataTypeId extends Identifier{
 
   /* Base types have no node associated with them */
   public DataTypeId() {
@@ -21,4 +21,7 @@ public abstract class DataTypeId extends Identifier {
   /* All DataTypeIds must Override the equals method */
   @Override
   public abstract boolean equals(Object object);
+
+  @Override
+  public abstract int hashCode();
 }

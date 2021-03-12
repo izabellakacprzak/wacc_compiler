@@ -1,0 +1,22 @@
+# attempted redefinition of function
+
+# Output:
+# #semantic_error#
+
+# Exit:
+# 200
+
+# Program:
+
+begin
+bool f() is
+return false
+end
+int f() is
+return 1
+end
+int x = call f();
+bool b = call f();
+println x;
+println b
+end

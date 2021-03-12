@@ -6,6 +6,7 @@ public class PairType extends DataTypeId {
 
   /* PAIR_ELEM_BYTES_SIZE: size of a one pair elem */
   private static final int PAIR_ELEM_BYTES_SIZE = 4;
+  private static final int HASH_PRIME = 83;
 
   /* fstType:  DataTypeId of the first element in the pair's type
    * sndType:  DataTypeId of the second element in the pair's type */
@@ -42,6 +43,11 @@ public class PairType extends DataTypeId {
     PairType pairObject = (PairType) object;
     return equalsPairElem(pairObject.getFstType(), this.fstType) &&
                equalsPairElem(pairObject.getSndType(), this.sndType);
+  }
+
+  @Override
+  public int hashCode() {
+    return (fstType.hashCode() + sndType.hashCode()) * HASH_PRIME;
   }
 
   @Override

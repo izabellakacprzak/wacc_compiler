@@ -32,6 +32,11 @@ public class BaseType extends DataTypeId {
   }
 
   @Override
+  public int hashCode() {
+    return type.ordinal();
+  }
+
+  @Override
   public String toString() {
     return type.toString();
   }
