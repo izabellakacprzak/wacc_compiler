@@ -3,11 +3,13 @@ package AbstractSyntaxTree.type;
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.InternalState;
+import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ParamListNode implements ASTNode {
 
@@ -35,6 +37,11 @@ public class ParamListNode implements ASTNode {
     }
 
     return paramIds;
+  }
+
+  public List<DataTypeId> getParamTypes() {
+    return types.stream().map(TypeNode::getType)
+        .collect(Collectors.toList());
   }
 
   @Override

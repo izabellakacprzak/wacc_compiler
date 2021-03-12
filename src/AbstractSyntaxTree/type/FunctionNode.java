@@ -79,7 +79,7 @@ public class FunctionNode implements TypeNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
-        visitFunctionNode(internalState, identifier, params, bodyStatement, currSymTable);
+        visitFunctionNode(internalState, identifier, params, getType(), bodyStatement, currSymTable);
   }
 
   @Override

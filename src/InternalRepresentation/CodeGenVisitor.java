@@ -21,11 +21,14 @@ import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.DataTypes.PairType;
+import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.Operator;
+import SemanticAnalysis.OverloadFuncId;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static InternalRepresentation.Instructions.ArithmeticInstruction.ArithmeticOperation.*;
 import static InternalRepresentation.Instructions.LogicalInstruction.LogicalOperation.*;
@@ -104,13 +107,21 @@ public class CodeGenVisitor {
   }
 
   public void visitFunctionNode(InternalState internalState, IdentifierNode identifier,
-                                ParamListNode params, StatementNode bodyStatement, SymbolTable currSymTable) {
+                                ParamListNode params, DataTypeId returnType,
+                                StatementNode bodyStatement, SymbolTable currSymTable) {
 
     /* Reset registers to start generating a function */
     internalState.resetAvailableRegs();
 
     /* Add function label and push Link Register */
-    internalState.addInstruction(new LabelInstruction("f_" + identifier.getIdentifier()));
+    String index = "";
+    Identifier functionIdentifier = currSymTable.lookupAll("*" + identifier.getIdentifier());
+    if(functionIdentifier instanceof OverloadFuncId) {
+      OverloadFuncId overloadFuncId = (OverloadFuncId) functionIdentifier;
+      FunctionId functionId = overloadFuncId.fundFuncReturnType(params.getParamTypes(), returnType);
+      index = String.valueOf(overloadFuncId.getIndex(functionId));
+    }
+    internalState.addInstruction(new LabelInstruction("f_" + identifier.getIdentifier() + index));
     internalState.addInstruction(new PushInstruction(LR));
 
     /* Allocate space for variables in the function's currSymbolTable */
@@ -708,8 +719,7 @@ public class CodeGenVisitor {
                                 SymbolTable currSymTable) {
     /* Calculate total arguments size in argsTotalSize */
     int argsTotalSize = 0;
-    int newOff = 0;
-    //Map<String, Integer> offsetPerVarMap = currSymTable.saveOffsetPerVar();
+
     /* Arguments are stored in decreasing order they are given in the code */
     for (int i = arguments.size() - 1; i >= 0; i--) {
       /* Get argument, calculate size and add it to argsTotalSize */
@@ -728,16 +738,22 @@ public class CodeGenVisitor {
       argsTotalSize += argSize;
 
       currSymTable.incrementArgsOffset(argSize);
-      //internalState.decrementStackOffset(argSize, internalState.getVarSize()
-      //    + internalState.getStackOffset() - argSize);
 
     }
     currSymTable.resetArgsOffset();
-    //currSymTable.setOffsetPerVar(offsetPerVarMap);
-    //internalState
-    //    .resetParamStackOffset(internalState.getStackOffset() + argsTotalSize + newOff);
+
     /* Branch Instruction to the callee label */
-    String functionLabel = "f_" + identifier.toString();
+    String index = "";
+    List<DataTypeId> argTypes = arguments.stream().map(e -> e.getType(currSymTable))
+        .collect(Collectors.toList());
+    Identifier functionIdentifier = currSymTable.lookupAll("*" + identifier.getIdentifier());
+    if(functionIdentifier instanceof OverloadFuncId) {
+      OverloadFuncId overloadFuncId = (OverloadFuncId) functionIdentifier;
+      FunctionId functionId = overloadFuncId.fundFuncReturnType(argTypes, identifier.getType(currSymTable));
+      index = String.valueOf(overloadFuncId.getIndex(functionId));
+    }
+
+    String functionLabel = "f_" + identifier.toString() + index;
     internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, functionLabel));
 
     /* De-allocate stack from the function arguments. Max size for one de-allocation is 1024B */
