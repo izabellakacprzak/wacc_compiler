@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.statement;
 
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
@@ -26,12 +27,13 @@ public class IfStatementNode extends StatementNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
     /* Recursively call semanticAnalysis on condition node */
-    condition.semanticAnalysis(symbolTable, errorMessages);
+    condition.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check that the type of the condition expression is of type BOOL */
     DataTypeId conditionType = condition.getType(symbolTable);
@@ -48,8 +50,10 @@ public class IfStatementNode extends StatementNode {
     }
 
     /* Recursively call semanticAnalysis on statement nodes */
-    thenStatement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
-    elseStatement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
+    thenStatement
+        .semanticAnalysis(new SymbolTable(symbolTable), errorMessages, uncheckedNodes, firstCheck);
+    elseStatement
+        .semanticAnalysis(new SymbolTable(symbolTable), errorMessages, uncheckedNodes, firstCheck);
   }
 
   /* Recursively call on statement nodes */

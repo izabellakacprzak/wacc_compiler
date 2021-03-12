@@ -41,7 +41,8 @@ public class ProgramNode implements ASTNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable topSymbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable topSymbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     setCurrSymTable(topSymbolTable);
 
     for (FunctionNode func : functionNodes) {
@@ -63,11 +64,11 @@ public class ProgramNode implements ASTNode {
 
     /* Call semanticAnalysis on each function, even if it has been declared twice */
     for (FunctionNode func : functionNodes) {
-      func.semanticAnalysis(func.getCurrSymTable(), errorMessages);
+      func.semanticAnalysis(func.getCurrSymTable(), errorMessages, uncheckedNodes, firstCheck);
     }
 
     /* Call semanticAnalysis on the root statement node to analysis the rest of the program */
-    statementNode.semanticAnalysis(topSymbolTable, errorMessages);
+    statementNode.semanticAnalysis(topSymbolTable, errorMessages, uncheckedNodes, firstCheck);
   }
 
   @Override

@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.type;
 
+import AbstractSyntaxTree.ASTNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.PairType;
@@ -34,17 +35,18 @@ public class PairTypeNode implements TypeNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
     /* Recursively call semanticAnalysis on each type */
     if (fstType != null) {
-      fstType.semanticAnalysis(symbolTable, errorMessages);
+      fstType.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
 
     if (sndType != null) {
-      sndType.semanticAnalysis(symbolTable, errorMessages);
+      sndType.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
   }
 

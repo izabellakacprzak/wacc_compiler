@@ -6,6 +6,7 @@ public class SemanticErrorListener {
 
   private final List<SemanticError> semanticErrors;
 
+
   public SemanticErrorListener() {
     this.semanticErrors = new ArrayList<>();
   }

@@ -54,18 +54,19 @@ public class ParamListNode implements ASTNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
     /* Recursively call semanticAnalysis on each identifier */
     for (IdentifierNode identifier : identifiers) {
-      identifier.semanticAnalysis(symbolTable, errorMessages);
+      identifier.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
 
     /* Recursively call semanticAnalysis on each type */
     for (TypeNode type : types) {
-      type.semanticAnalysis(symbolTable, errorMessages);
+      type.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
 
     /* Set the current symbol table */

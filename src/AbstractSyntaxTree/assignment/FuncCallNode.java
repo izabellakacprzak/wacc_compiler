@@ -3,6 +3,7 @@ package AbstractSyntaxTree.assignment;
 import static SemanticAnalysis.DataTypes.BaseType.Type.CHAR;
 import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
 
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.InternalState;
@@ -41,7 +42,8 @@ public class FuncCallNode extends AssignRHSNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -95,7 +97,7 @@ public class FuncCallNode extends AssignRHSNode {
             "Invalid type for parameter " + (i + 1) + " in '" + identifier + "' function."
                 + " Expected: " + currParamType + " Actual: " + currArg));
       }
-      arguments.get(i).semanticAnalysis(symbolTable, errorMessages);
+      arguments.get(i).semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
   }
 

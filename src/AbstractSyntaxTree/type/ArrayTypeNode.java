@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.type;
 
+import AbstractSyntaxTree.ASTNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
@@ -21,12 +22,13 @@ public class ArrayTypeNode implements TypeNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
     /* Recursively call semanticAnalysis on type */
-    type.semanticAnalysis(symbolTable, errorMessages);
+    type.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
   }
 
   @Override

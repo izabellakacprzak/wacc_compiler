@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.statement;
 
+import AbstractSyntaxTree.ASTNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SemanticError;
@@ -17,13 +18,14 @@ public class StatementsListNode extends StatementNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
     /* Recursively call semanticAnalysis on each stored statement node */
     for (StatementNode stat : statements) {
-      stat.semanticAnalysis(symbolTable, errorMessages);
+      stat.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
   }
 

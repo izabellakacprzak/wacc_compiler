@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.expression;
 
+import AbstractSyntaxTree.ASTNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.SemanticError;
@@ -18,12 +19,13 @@ public class ParenthesisExprNode extends ExpressionNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
     /* Recursively call semanticAnalysis on expression node */
-    innerExpr.semanticAnalysis(symbolTable, errorMessages);
+    innerExpr.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
   }
 
   @Override

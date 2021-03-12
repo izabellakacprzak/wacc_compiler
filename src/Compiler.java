@@ -1,3 +1,4 @@
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.ProgramNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.SymbolTable;
@@ -5,6 +6,7 @@ import antlr.WACCLexer;
 import antlr.WACCParser;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -13,6 +15,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class Compiler {
 
+  private static final boolean FIRST_CHECK = true;
   private static final int SYNTAX_ERROR_CODE = 100;
   private static final int INPUT_FILE_ERROR = 1;
   private static final int SEMANTIC_ERROR_CODE = 200;
@@ -100,8 +103,18 @@ public class Compiler {
        * semanticErrorListener object. */
       SemanticErrorListener semanticErrorListener = new SemanticErrorListener();
       SymbolTable topSymbolTable = new SymbolTable(null);
+      List<ASTNode> uncheckedNodes = new ArrayList<>();
 
-      prog.semanticAnalysis(topSymbolTable, semanticErrorListener.getList());
+      prog.semanticAnalysis(topSymbolTable, semanticErrorListener.getList(), uncheckedNodes,
+          FIRST_CHECK);
+
+      int i = 0;
+      while (!(i == uncheckedNodes.size())) {
+        ASTNode node = uncheckedNodes.get(i);
+        node.semanticAnalysis(node.getCurrSymTable(), semanticErrorListener.getList(),
+            uncheckedNodes, !FIRST_CHECK);
+        i++;
+      }
 
       /* If the  semantic error listener has been notified of error during semantic checking ,
        * then the accumulated errors are printed after and the program exits with the semantic

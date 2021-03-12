@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.expression;
 
+import AbstractSyntaxTree.ASTNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
@@ -34,15 +35,16 @@ public class ArrayElemNode extends ExpressionNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
     /* Recursively call semanticAnalysis on stored nodes */
-    identifier.semanticAnalysis(symbolTable, errorMessages);
+    identifier.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     for (ExpressionNode expression : expressions) {
-      expression.semanticAnalysis(symbolTable, errorMessages);
+      expression.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
 
     /* Check identifier has been declared and is of an ARRAY type */

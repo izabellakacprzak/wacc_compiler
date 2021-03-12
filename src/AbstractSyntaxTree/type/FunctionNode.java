@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.type;
 
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
 import InternalRepresentation.InternalState;
@@ -63,7 +64,8 @@ public class FunctionNode implements TypeNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -72,9 +74,9 @@ public class FunctionNode implements TypeNode {
     bodyStatement.setReturnType(returnType.getType());
 
     /* Recursively call semanticAnalysis on each stored node */
-    params.semanticAnalysis(symbolTable, errorMessages);
-    bodyStatement.semanticAnalysis(symbolTable, errorMessages);
-    returnType.semanticAnalysis(symbolTable, errorMessages);
+    params.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
+    bodyStatement.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
+    returnType.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
   }
 
   @Override

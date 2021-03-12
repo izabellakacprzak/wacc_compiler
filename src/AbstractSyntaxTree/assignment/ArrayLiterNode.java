@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.assignment;
 
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
@@ -20,7 +21,8 @@ public class ArrayLiterNode extends AssignRHSNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -39,7 +41,7 @@ public class ArrayLiterNode extends AssignRHSNode {
       return;
     }
 
-    fstExpr.semanticAnalysis(symbolTable, errorMessages);
+    fstExpr.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check if the other elements' types can be resolved and match the first element's type */
     for (int i = 1; i < expressions.size(); i++) {
@@ -61,7 +63,7 @@ public class ArrayLiterNode extends AssignRHSNode {
       }
 
       /* Recursively call semanticAnalysis on each expression node */
-      currExpr.semanticAnalysis(symbolTable, errorMessages);
+      currExpr.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
   }
 

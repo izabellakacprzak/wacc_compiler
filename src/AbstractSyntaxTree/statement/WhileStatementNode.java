@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.statement;
 
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
@@ -21,12 +22,13 @@ public class WhileStatementNode extends StatementNode {
     this.statement = statement;
   }
 
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
     /* Recursively call semanticAnalysis on condition node */
-    condition.semanticAnalysis(symbolTable, errorMessages);
+    condition.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check that the type of the condition expression is of type BOOL */
     DataTypeId conditionType = condition.getType(symbolTable);
@@ -43,7 +45,8 @@ public class WhileStatementNode extends StatementNode {
     }
 
     /* Recursively call semanticAnalysis on statement node */
-    statement.semanticAnalysis(new SymbolTable(symbolTable), errorMessages);
+    statement
+        .semanticAnalysis(new SymbolTable(symbolTable), errorMessages, uncheckedNodes, firstCheck);
   }
 
   /* Recursively traverses the AST and sets the function expected return type in the ReturnNode

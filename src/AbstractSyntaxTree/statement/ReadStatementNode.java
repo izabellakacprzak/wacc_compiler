@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.statement;
 
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.assignment.AssignLHSNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
@@ -20,12 +21,13 @@ public class ReadStatementNode extends StatementNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
     /* Recursively call semanticAnalysis on assignment node */
-    assignment.semanticAnalysis(symbolTable, errorMessages);
+    assignment.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check that the type of assignment is an INT or a CHAR */
     DataTypeId assignmentType = assignment.getType(symbolTable);

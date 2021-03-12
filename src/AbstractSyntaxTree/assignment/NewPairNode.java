@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.assignment;
 
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
@@ -25,13 +26,14 @@ public class NewPairNode extends AssignRHSNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
     /* Recursively call semanticAnalysis on expression nodes */
-    fstExpr.semanticAnalysis(symbolTable, errorMessages);
-    sndExpr.semanticAnalysis(symbolTable, errorMessages);
+    fstExpr.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
+    sndExpr.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
   }
 
   @Override

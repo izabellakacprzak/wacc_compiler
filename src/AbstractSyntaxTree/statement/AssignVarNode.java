@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.statement;
 
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import InternalRepresentation.InternalState;
@@ -36,13 +37,14 @@ public class AssignVarNode extends StatementNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
     /* Recursively call semanticAnalysis on LHS node */
-    left.semanticAnalysis(symbolTable, errorMessages);
-    right.semanticAnalysis(symbolTable, errorMessages);
+    left.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
+    right.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check that the left assignment type and the right assignment type
      * can be resolved and match */

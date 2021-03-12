@@ -10,7 +10,8 @@ public interface ASTNode {
 
   /* Method to check for semantic errors, and to add any found errors to the errorMessages List.
    * The symbolTable is the current scope of declared Identifiers */
-  void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages);
+  void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck);
 
   /* Method to generate assembly Instructions and store them in the internalState.
    * Calls the appropriate function in the internalState's CodeGenVisitor */

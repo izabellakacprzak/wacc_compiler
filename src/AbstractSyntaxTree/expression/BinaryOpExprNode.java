@@ -1,7 +1,11 @@
 package AbstractSyntaxTree.expression;
 
+import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
+
+import AbstractSyntaxTree.ASTNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.Operator.BinOp;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
@@ -10,6 +14,8 @@ import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 public class BinaryOpExprNode extends ExpressionNode {
+
+  private static final DataTypeId DEFAULT_TYPE = new BaseType(INT);
 
   /* left:     ExpressionNode corresponding to the left expression the operator was called with
    * right:    ExpressionNode corresponding to the right expression the operator was called with
@@ -64,13 +70,10 @@ public class BinaryOpExprNode extends ExpressionNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
-
-    /* Recursively call semanticAnalysis on assignment nodes */
-    left.semanticAnalysis(symbolTable, errorMessages);
-    right.semanticAnalysis(symbolTable, errorMessages);
 
     /* Check that the left assignment type and the right assignment type
      * can be resolved and match one of the operator's expected argument types */
@@ -80,25 +83,61 @@ public class BinaryOpExprNode extends ExpressionNode {
 
     boolean isUnsetParamLeft = left.isUnsetParamId(symbolTable);
     boolean isUnsetParamRight = right.isUnsetParamId(symbolTable);
-    ParameterId paramLeft = left.getParamId(symbolTable);
-    ParameterId paramRight = right.getParamId(symbolTable);
+    ParameterId leftParam = left.getParamId(symbolTable);
+    ParameterId rightParam = right.getParamId(symbolTable);
 
-    if (argTypes.size() == 1) {
-      setParamType(isUnsetParamLeft, lhsType, paramLeft);
-      setParamType(isUnsetParamRight, rhsType, paramRight);
-    } else {
-      matchTypes(symbolTable, left, right);
-      matchTypes(symbolTable, right, left);
+    if (isUnsetParamLeft && isUnsetParamRight) {
+      if (argTypes.size() == 1) {
+        leftParam.setType(argTypes.get(0));
+        rightParam.setType(argTypes.get(0));
+
+      } else if (firstCheck) {
+        uncheckedNodes.add(this);
+        leftParam.addToMatchingParams(rightParam);
+        rightParam.addToMatchingParams(leftParam);
+
+        for (DataTypeId type : operator.getArgTypes()) {
+          leftParam.addToExpectedTypes(type);
+          rightParam.addToExpectedTypes(type);
+        }
+
+        return;
+
+      } else if (argTypes.isEmpty()) {
+        leftParam.setType(DEFAULT_TYPE);
+        rightParam.setType(DEFAULT_TYPE);
+        firstCheck = true;
+
+      } else {
+        leftParam.setType(argTypes.get(0));
+        rightParam.setType(argTypes.get(0));
+        firstCheck = true;
+      }
     }
 
-    if (!isUnsetParamLeft && lhsType == null) {
+    if (isUnsetParamLeft) {
+      leftParam.setType(rhsType);
+    }
+
+    if (isUnsetParamRight) {
+      rightParam.setType(lhsType);
+    }
+
+    lhsType = left.getType(symbolTable);
+    rhsType = right.getType(symbolTable);
+
+    /* Recursively call semanticAnalysis on assignment nodes */
+    left.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
+    right.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
+
+    if (lhsType == null) {
       errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
           "Could not resolve type of LHS expression for '" + operator.getLabel() + "' operator."
               + " Expected: " + listTypeToString(argTypes)));
       return;
     }
 
-    if (!isUnsetParamRight && rhsType == null) {
+    if (rhsType == null) {
       errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
           "Could not resolve type of RHS expression for '" + operator.getLabel() + "' operator."
               + " Expected: " + listTypeToString(argTypes)));
@@ -109,21 +148,15 @@ public class BinaryOpExprNode extends ExpressionNode {
      * argument types matches the LHS assignment's type */
     boolean argMatched = false;
 
-    if (isUnsetParamLeft) {
-      for (DataTypeId argType : argTypes) {
-        paramLeft.addToExpectedTypes(argType);
-      }
-    } else {
-      for (DataTypeId argType : argTypes) {
-        if (lhsType.equals(argType)) {
-          argMatched = true;
-          break;
-        }
+    for (DataTypeId argType : argTypes) {
+      if (lhsType.equals(argType)) {
+        argMatched = true;
+        break;
       }
     }
 
     /* No expected argument types in argTypes implies any type is expected */
-    if (!isUnsetParamLeft && !argTypes.isEmpty() && !argMatched) {
+    if (!argTypes.isEmpty() && !argMatched) {
       errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
           "Incompatible LHS type for '" + operator.getLabel() + "' operator."
               + " Expected: " + listTypeToString(argTypes) + " Actual: " + lhsType));
@@ -134,21 +167,15 @@ public class BinaryOpExprNode extends ExpressionNode {
      * argument types matches the RHS assignment's type */
     argMatched = false;
 
-    if (isUnsetParamRight) {
-      for (DataTypeId argType : argTypes) {
-        paramRight.addToExpectedTypes(argType);
-      }
-    } else {
-      for (DataTypeId argType : argTypes) {
-        if (rhsType.equals(argType)) {
-          argMatched = true;
-          break;
-        }
+    for (DataTypeId argType : argTypes) {
+      if (rhsType.equals(argType)) {
+        argMatched = true;
+        break;
       }
     }
 
     /* No expected argument types in argTypes implies any type is expected */
-    if (!isUnsetParamRight && !argTypes.isEmpty() && !argMatched) {
+    if (!argTypes.isEmpty() && !argMatched) {
       errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
           "Incompatible RHS type for '" + operator.getLabel() + "' operator."
               + " Expected: " + listTypeToString(argTypes) + " Actual: " + rhsType));
@@ -156,12 +183,13 @@ public class BinaryOpExprNode extends ExpressionNode {
     }
 
     /* Check that the LHS and RHS assignment types match */
-    if (!isUnsetParamLeft && !isUnsetParamRight && !lhsType.equals(rhsType)) {
+    if (!lhsType.equals(rhsType)) {
       errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
           "RHS type does not match LHS type for '" + operator.getLabel() + "' operator. "
               + "Expected: " + lhsType + " Actual: " + rhsType));
     }
   }
+
 
   private void setParamType(boolean unsetParameter, DataTypeId type, ParameterId param) {
     if (type != null || param == null) {

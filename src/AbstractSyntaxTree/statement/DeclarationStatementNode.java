@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.statement;
 
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.TypeNode;
@@ -28,7 +29,8 @@ public class DeclarationStatementNode extends StatementNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -67,8 +69,8 @@ public class DeclarationStatementNode extends StatementNode {
     }
 
     /* Recursively call semanticAnalysis on stored nodes */
-    identifier.semanticAnalysis(symbolTable, errorMessages);
-    assignment.semanticAnalysis(symbolTable, errorMessages);
+    identifier.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
+    assignment.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
   }
 
   @Override
