@@ -72,6 +72,8 @@ public class DeclarationStatementNode extends StatementNode {
             + " Expected: " + declaredType + ". Could not find matching return type"
             + " in overloaded functions.");
         return;
+      } else {
+        ((FuncCallNode) assignment).setReturnType(assignedType);
       }
     } else {
       assignedType = assignment.getType(symbolTable);

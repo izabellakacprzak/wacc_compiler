@@ -33,7 +33,7 @@ public class OverloadFuncId extends Identifier {
     return null;
   }
 
-  public FunctionId fundFuncReturnType(List<DataTypeId> paramTypes, DataTypeId returnType) {
+  public FunctionId findFuncReturnType(List<DataTypeId> paramTypes, DataTypeId returnType) {
     for (FunctionId function : functions) {
       List<DataTypeId> funcParams = function.getParamTypes();
       if (paramTypes.equals(funcParams) && returnType.equals(function.getType())) {

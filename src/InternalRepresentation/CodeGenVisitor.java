@@ -118,7 +118,7 @@ public class CodeGenVisitor {
     Identifier functionIdentifier = currSymTable.lookupAll("*" + identifier.getIdentifier());
     if(functionIdentifier instanceof OverloadFuncId) {
       OverloadFuncId overloadFuncId = (OverloadFuncId) functionIdentifier;
-      FunctionId functionId = overloadFuncId.fundFuncReturnType(params.getParamTypes(), returnType);
+      FunctionId functionId = overloadFuncId.findFuncReturnType(params.getParamTypes(), returnType);
       index = String.valueOf(overloadFuncId.getIndex(functionId));
     }
     internalState.addInstruction(new LabelInstruction("f_" + identifier.getIdentifier() + index));
@@ -715,7 +715,7 @@ public class CodeGenVisitor {
   }
 
   public void visitFuncCallNode(InternalState internalState, IdentifierNode identifier,
-                                List<ExpressionNode> arguments,
+                                List<ExpressionNode> arguments, DataTypeId returnType,
                                 SymbolTable currSymTable) {
     /* Calculate total arguments size in argsTotalSize */
     int argsTotalSize = 0;
@@ -749,7 +749,7 @@ public class CodeGenVisitor {
     Identifier functionIdentifier = currSymTable.lookupAll("*" + identifier.getIdentifier());
     if(functionIdentifier instanceof OverloadFuncId) {
       OverloadFuncId overloadFuncId = (OverloadFuncId) functionIdentifier;
-      FunctionId functionId = overloadFuncId.fundFuncReturnType(argTypes, identifier.getType(currSymTable));
+      FunctionId functionId = overloadFuncId.findFuncReturnType(argTypes, returnType);
       index = String.valueOf(overloadFuncId.getIndex(functionId));
     }
 

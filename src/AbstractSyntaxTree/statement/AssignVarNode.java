@@ -80,6 +80,8 @@ public class AssignVarNode extends StatementNode {
             + " Expected: " + leftType + ". Could not find matching return type"
             + " in overloaded functions.");
         return;
+      } else {
+        ((FuncCallNode) right).setReturnType(rightType);
       }
     } else {
       rightType = right.getType(symbolTable);

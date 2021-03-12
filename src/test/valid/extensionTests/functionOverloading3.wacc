@@ -13,12 +13,12 @@ int f() is
 return 1
 end
 int f(int a) is
-return 1
+return a
 end
 int f(int a, int b) is
-return 1
+return b
 end
-int x = call f();
+int x = call f(4);
 println x
 end
 

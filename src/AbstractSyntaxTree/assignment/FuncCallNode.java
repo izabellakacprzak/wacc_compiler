@@ -20,6 +20,7 @@ public class FuncCallNode extends AssignRHSNode {
    *                 passed into the function call */
   private final IdentifierNode identifier;
   private final List<ExpressionNode> arguments;
+  private DataTypeId returnType = null;
 
   public FuncCallNode(
       int line, int charPositionInLine, IdentifierNode identifier, List<ExpressionNode> arguments) {
@@ -30,6 +31,14 @@ public class FuncCallNode extends AssignRHSNode {
 
   public Identifier getIdentifier(SymbolTable symbolTable) {
     return symbolTable.lookup("*" + identifier.getIdentifier());
+  }
+
+  public DataTypeId getReturnType() {
+    return returnType;
+  }
+
+  public void setReturnType(DataTypeId type) {
+    returnType = type;
   }
 
   /* Returns true when the declared type is a STRING and assigned type is a CHAR[] */
@@ -162,7 +171,7 @@ public class FuncCallNode extends AssignRHSNode {
   public void generateAssembly(InternalState internalState) {
     internalState
         .getCodeGenVisitor()
-        .visitFuncCallNode(internalState, identifier, arguments, getCurrSymTable());
+        .visitFuncCallNode(internalState, identifier, arguments, returnType, getCurrSymTable());
   }
 
   /* Return the return type of the function
