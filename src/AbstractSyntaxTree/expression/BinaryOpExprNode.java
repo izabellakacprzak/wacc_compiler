@@ -2,12 +2,10 @@ package AbstractSyntaxTree.expression;
 
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.Identifier;
 import SemanticAnalysis.Operator.BinOp;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
 
-import java.lang.reflect.Parameter;
 import java.util.List;
 
 public class BinaryOpExprNode extends ExpressionNode {
@@ -20,37 +18,38 @@ public class BinaryOpExprNode extends ExpressionNode {
   private final BinOp operator;
 
   public BinaryOpExprNode(int line, int charPositionInLine, ExpressionNode left,
-                          ExpressionNode right,
-                          BinOp operator) {
+      ExpressionNode right,
+      BinOp operator) {
     super(line, charPositionInLine);
     this.left = left;
     this.right = right;
     this.operator = operator;
   }
 
-  private static void matchTypes(SymbolTable symbolTable, ExpressionNode left, ExpressionNode right) {
+  private void matchTypes(SymbolTable symbolTable, ExpressionNode left,
+      ExpressionNode right) {
+
     DataTypeId lhsType = left.getType(symbolTable);
     DataTypeId rhsType = right.getType(symbolTable);
-    if (lhsType == null) {
-      if (left instanceof IdentifierNode) {
-        IdentifierNode leftIdentifierNode = (IdentifierNode) left;
-        Identifier leftIdentifierId = symbolTable.lookupAll(leftIdentifierNode.getIdentifier());
-        if (leftIdentifierId instanceof ParameterId) {
-          ParameterId leftParam = (ParameterId) leftIdentifierId;
-          if (rhsType != null) {
-            leftParam.setType(rhsType);
-          } else {
-            if (right instanceof IdentifierNode) {
-              IdentifierNode rightIdentifierNode = (IdentifierNode) right;
-              Identifier rightIdentifierId = symbolTable.lookupAll(rightIdentifierNode.getIdentifier());
-              if (rightIdentifierId instanceof ParameterId) {
-                ParameterId rightParam = (ParameterId) rightIdentifierId;
-                leftParam.addToMatchingTypeParams(rightIdentifierNode);
-                rightParam.addToMatchingTypeParams(leftIdentifierNode);
-              }
-            }
-          }
-        }
+
+    if (lhsType != null && !(left.isUnsetParamId(symbolTable))) {
+      return;
+    }
+
+    ParameterId paramLeft = left.getParamId(symbolTable);
+
+    if (rhsType != null) {
+      paramLeft.setType(rhsType);
+      return;
+    }
+
+    ParameterId paramRight = right.getParamId(symbolTable);
+
+    if (!(right.isUnsetParamId(symbolTable))) {
+      paramLeft.addToMatchingParams(paramRight);
+
+      for (DataTypeId type : operator.getArgTypes()) {
+        paramLeft.addToExpectedTypes(type);
       }
     }
   }
@@ -69,11 +68,9 @@ public class BinaryOpExprNode extends ExpressionNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
-
     /* Recursively call semanticAnalysis on assignment nodes */
     left.semanticAnalysis(symbolTable, errorMessages);
     right.semanticAnalysis(symbolTable, errorMessages);
-
 
     /* Check that the left assignment type and the right assignment type
      * can be resolved and match one of the operator's expected argument types */
@@ -81,26 +78,30 @@ public class BinaryOpExprNode extends ExpressionNode {
     DataTypeId lhsType = left.getType(symbolTable);
     DataTypeId rhsType = right.getType(symbolTable);
 
+    boolean isUnsetParamLeft = left.isUnsetParamId(symbolTable);
+    boolean isUnsetParamRight = right.isUnsetParamId(symbolTable);
+    ParameterId paramLeft = left.getParamId(symbolTable);
+    ParameterId paramRight = right.getParamId(symbolTable);
+
     if (argTypes.size() == 1) {
-      passOperatorType(symbolTable, argTypes, lhsType, left);
-      passOperatorType(symbolTable, argTypes, rhsType, right);
+      setParamType(isUnsetParamLeft, lhsType, paramLeft);
+      setParamType(isUnsetParamRight, rhsType, paramRight);
     } else {
       matchTypes(symbolTable, left, right);
       matchTypes(symbolTable, right, left);
     }
 
-
-    if (!isParameter(left, symbolTable) && lhsType == null) {
+    if (!isUnsetParamLeft && lhsType == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " Could not resolve type of LHS expression for '" + operator.getLabel() + "' operator."
-                            + " Expected: " + listTypeToString(argTypes));
+          + " Could not resolve type of LHS expression for '" + operator.getLabel() + "' operator."
+          + " Expected: " + listTypeToString(argTypes));
       return;
     }
 
-    if (!isParameter(right, symbolTable) && rhsType == null) {
+    if (!isUnsetParamRight && rhsType == null) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " Could not resolve type of RHS expression for '" + operator.getLabel() + "' operator."
-                            + " Expected: " + listTypeToString(argTypes));
+          + " Could not resolve type of RHS expression for '" + operator.getLabel() + "' operator."
+          + " Expected: " + listTypeToString(argTypes));
       return;
     }
 
@@ -108,10 +109,9 @@ public class BinaryOpExprNode extends ExpressionNode {
      * argument types matches the LHS assignment's type */
     boolean argMatched = false;
 
-    if (isParameter(left, symbolTable)) {
+    if (isUnsetParamLeft) {
       for (DataTypeId argType : argTypes) {
-        ParameterId leftParam = getParameter(left, symbolTable);
-        leftParam.addToExpectedTypes(argType);
+        paramLeft.addToExpectedTypes(argType);
       }
     } else {
       for (DataTypeId argType : argTypes) {
@@ -123,10 +123,10 @@ public class BinaryOpExprNode extends ExpressionNode {
     }
 
     /* No expected argument types in argTypes implies any type is expected */
-    if (!isParameter(left, symbolTable) && !argTypes.isEmpty() && !argMatched) {
+    if (!isUnsetParamLeft && !argTypes.isEmpty() && !argMatched) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " Incompatible LHS type for '" + operator.getLabel() + "' operator."
-                            + " Expected: " + listTypeToString(argTypes) + " Actual: " + lhsType);
+          + " Incompatible LHS type for '" + operator.getLabel() + "' operator."
+          + " Expected: " + listTypeToString(argTypes) + " Actual: " + lhsType);
       return;
     }
 
@@ -134,67 +134,41 @@ public class BinaryOpExprNode extends ExpressionNode {
      * argument types matches the RHS assignment's type */
     argMatched = false;
 
-    if (isParameter(right, symbolTable)) {
+    if (isUnsetParamRight) {
       for (DataTypeId argType : argTypes) {
-        ParameterId rightParam = getParameter(right, symbolTable);
-        rightParam.addToExpectedTypes(argType);
+        paramRight.addToExpectedTypes(argType);
       }
-    }
+    } else {
       for (DataTypeId argType : argTypes) {
         if (rhsType.equals(argType)) {
           argMatched = true;
           break;
         }
       }
-
+    }
 
     /* No expected argument types in argTypes implies any type is expected */
-    if (!isParameter(right, symbolTable) && !argTypes.isEmpty() && !argMatched) {
+    if (!isUnsetParamRight && !argTypes.isEmpty() && !argMatched) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " Incompatible RHS type for '" + operator.getLabel() + "' operator."
-                            + " Expected: " + listTypeToString(argTypes) + " Actual: " + rhsType);
+          + " Incompatible RHS type for '" + operator.getLabel() + "' operator."
+          + " Expected: " + listTypeToString(argTypes) + " Actual: " + rhsType);
       return;
     }
 
     /* Check that the LHS and RHS assignment types match */
-    if (!isParameter(left, symbolTable) && !isParameter(right, symbolTable) && !lhsType.equals(rhsType)) {
+    if (!isUnsetParamLeft && !isUnsetParamRight && !lhsType.equals(rhsType)) {
       errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " RHS type does not match LHS type for '" + operator.getLabel() + "' operator. "
-                            + "Expected: " + lhsType + " Actual: " + rhsType);
+          + " RHS type does not match LHS type for '" + operator.getLabel() + "' operator. "
+          + "Expected: " + lhsType + " Actual: " + rhsType);
     }
   }
 
-  private void passOperatorType(SymbolTable symbolTable, List<DataTypeId> argTypes, DataTypeId type, ExpressionNode node) {
-    if (type == null) {
-      if (node instanceof IdentifierNode) {
-        IdentifierNode identifierNode = (IdentifierNode) node;
-        Identifier identifierId = symbolTable.lookupAll(identifierNode.getIdentifier());
-        if (identifierId instanceof ParameterId) {
-          ParameterId param = (ParameterId) identifierId;
-          param.setType(argTypes.get(1));
-        }
-      }
+  private void setParamType(boolean unsetParameter, DataTypeId type, ParameterId param) {
+    if (type != null || param == null) {
+      return;
     }
-  }
 
-  private boolean isParameter(ExpressionNode node, SymbolTable symbolTable) {
-    if (node instanceof IdentifierNode) {
-      IdentifierNode identifierNode = (IdentifierNode) node;
-      Identifier identifierId = symbolTable.lookupAll(identifierNode.getIdentifier());
-      return (identifierId instanceof ParameterId);
-    }
-    return false;
-  }
-
-  private ParameterId getParameter(ExpressionNode node, SymbolTable symbolTable) {
-    if (node instanceof IdentifierNode) {
-      IdentifierNode identifierNode = (IdentifierNode) node;
-      Identifier identifierId = symbolTable.lookupAll(identifierNode.getIdentifier());
-      if (identifierId instanceof ParameterId) {
-        return (ParameterId) identifierId;
-      }
-    }
-    return null;
+    param.setType(operator.getArgTypes().get(0));
   }
 
   @Override

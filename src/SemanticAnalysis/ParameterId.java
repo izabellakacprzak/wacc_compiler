@@ -10,8 +10,8 @@ public class ParameterId extends Identifier {
   /* type: DataTypeId corresponding to the type of
    *       the represented parameter */
   private DataTypeId type;
-  private List<IdentifierNode> matchingTypeParams = new ArrayList<>();
-  private List<DataTypeId> expectedTypes = new ArrayList<>();
+  private final List<ParameterId> matchingParams = new ArrayList<>();
+  private final List<DataTypeId> expectedTypes = new ArrayList<>();
 
   public ParameterId(IdentifierNode node, DataTypeId type) {
     super(node);
@@ -36,9 +36,9 @@ public class ParameterId extends Identifier {
     return type.getSize();
   }
 
-  public void addToMatchingTypeParams(IdentifierNode identifierNode) {
-    if (!matchingTypeParams.contains(identifierNode)) {
-      matchingTypeParams.add(identifierNode);
+  public void addToMatchingParams(ParameterId paramId) {
+    if (!matchingParams.contains(paramId)) {
+      matchingParams.add(paramId);
     }
   }
 

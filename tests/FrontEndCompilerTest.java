@@ -16,7 +16,6 @@ public class FrontEndCompilerTest {
     }
   }
 
-
   @Test
   public void runSyntaxErrorTests() {
     try {
