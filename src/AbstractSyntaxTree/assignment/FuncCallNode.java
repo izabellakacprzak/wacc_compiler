@@ -10,10 +10,8 @@ import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class FuncCallNode extends AssignRHSNode {
 
@@ -23,11 +21,15 @@ public class FuncCallNode extends AssignRHSNode {
   private final IdentifierNode identifier;
   private final List<ExpressionNode> arguments;
 
-  public FuncCallNode(int line, int charPositionInLine, IdentifierNode identifier,
-      List<ExpressionNode> arguments) {
+  public FuncCallNode(
+      int line, int charPositionInLine, IdentifierNode identifier, List<ExpressionNode> arguments) {
     super(line, charPositionInLine);
     this.identifier = identifier;
     this.arguments = arguments;
+  }
+
+  public Identifier getIdentifier(SymbolTable symbolTable) {
+    return symbolTable.lookup("*" + identifier.getIdentifier());
   }
 
   /* Returns true when the declared type is a STRING and assigned type is a CHAR[] */
@@ -48,17 +50,28 @@ public class FuncCallNode extends AssignRHSNode {
     Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
 
     if (functionId == null) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " No declaration of '" + identifier.getIdentifier() + "' identifier."
-          + " Expected: FUNCTION IDENTIFIER");
+      errorMessages.add(
+          super.getLine()
+              + ":"
+              + super.getCharPositionInLine()
+              + " No declaration of '"
+              + identifier.getIdentifier()
+              + "' identifier."
+              + " Expected: FUNCTION IDENTIFIER");
       return;
     }
 
     if (!(functionId instanceof FunctionId) && !(functionId instanceof OverloadFuncId)) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
-          + " Expected: FUNCTION IDENTIFIER"
-          + " Actual: " + identifier.getType(symbolTable));
+      errorMessages.add(
+          super.getLine()
+              + ":"
+              + super.getCharPositionInLine()
+              + " Incompatible type of '"
+              + identifier.getIdentifier()
+              + "' identifier."
+              + " Expected: FUNCTION IDENTIFIER"
+              + " Actual: "
+              + identifier.getType(symbolTable));
       return;
     }
 
@@ -72,10 +85,15 @@ public class FuncCallNode extends AssignRHSNode {
     if (functionId instanceof OverloadFuncId) {
       function = ((OverloadFuncId) functionId).findFunc(argTypes);
       if (function == null) {
-        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                + " Function call'" + functionId.toString()
-                + "' does not match any of the Overload signatures for function '" +
-                identifier.getIdentifier() + "'");
+        errorMessages.add(
+            super.getLine()
+                + ":"
+                + super.getCharPositionInLine()
+                + " Function call'"
+                + functionId.toString()
+                + "' does not match any of the Overload signatures for function '"
+                + identifier.getIdentifier()
+                + "'");
         return;
       }
     } else {
@@ -85,10 +103,17 @@ public class FuncCallNode extends AssignRHSNode {
     List<DataTypeId> paramTypes = function.getParamTypes();
 
     if (paramTypes.size() > arguments.size() || paramTypes.size() < arguments.size()) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Function '" + identifier.getIdentifier()
-          + "' has been called with the incorrect number of parameters."
-          + " Expected: " + paramTypes.size() + " Actual: " + arguments.size());
+      errorMessages.add(
+          super.getLine()
+              + ":"
+              + super.getCharPositionInLine()
+              + " Function '"
+              + identifier.getIdentifier()
+              + "' has been called with the incorrect number of parameters."
+              + " Expected: "
+              + paramTypes.size()
+              + " Actual: "
+              + arguments.size());
       return;
     }
 
@@ -103,48 +128,68 @@ public class FuncCallNode extends AssignRHSNode {
       }
 
       if (currArg == null) {
-        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-            + " Could not resolve type of parameter " + (i + 1) + " in '" + identifier
-            + "' function."
-            + " Expected: " + currParamType);
+        errorMessages.add(
+            super.getLine()
+                + ":"
+                + super.getCharPositionInLine()
+                + " Could not resolve type of parameter "
+                + (i + 1)
+                + " in '"
+                + identifier
+                + "' function."
+                + " Expected: "
+                + currParamType);
       } else if (!(currArg.equals(currParamType)) && !stringToCharArray(currParamType, currArg)) {
-        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-            + " Invalid type for parameter " + (i + 1) + " in '" + identifier + "' function."
-            + " Expected: " + currParamType + " Actual: " + currArg);
+        errorMessages.add(
+            super.getLine()
+                + ":"
+                + super.getCharPositionInLine()
+                + " Invalid type for parameter "
+                + (i + 1)
+                + " in '"
+                + identifier
+                + "' function."
+                + " Expected: "
+                + currParamType
+                + " Actual: "
+                + currArg);
       }
       arguments.get(i).semanticAnalysis(symbolTable, errorMessages);
     }
-
-
   }
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-        visitFuncCallNode(internalState, identifier, arguments, getCurrSymTable());
+    internalState
+        .getCodeGenVisitor()
+        .visitFuncCallNode(internalState, identifier, arguments, getCurrSymTable());
   }
 
   /* Return the return type of the function
    * TODO: CHANGE FOR OVERLOAD */
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
-   Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
-   FunctionId function;
-   if (functionId instanceof OverloadFuncId) {
-     List<DataTypeId> argTypes = new ArrayList<>();
-     for (ExpressionNode arg : arguments) {
-       argTypes.add(arg.getType(symbolTable));
-     }
-      function = ((OverloadFuncId) functionId).findFunc(argTypes);
-   } else {
-     function = (FunctionId) functionId;
-   }
+    Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
+    FunctionId function = (FunctionId) functionId;
 
     if (function == null) {
       return null;
     }
 
     return function.getType();
+  }
+
+  public List<DataTypeId> getOverloadType(SymbolTable symbolTable) {
+    Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
+    List<DataTypeId> returnTypes;
+
+    List<DataTypeId> argTypes = new ArrayList<>();
+    for (ExpressionNode arg : arguments) {
+      argTypes.add(arg.getType(symbolTable));
+    }
+    returnTypes = ((OverloadFuncId) functionId).findReturnTypes(argTypes);
+
+    return returnTypes;
   }
 
   /* Returns a FuncCall in the form: call func_id(arg1, arg2, ..., argN) */

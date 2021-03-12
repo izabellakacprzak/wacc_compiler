@@ -34,7 +34,7 @@ public class SymbolTable {
   }
 
   /* Get an identifier object from the symbol table or
-      its enclosing symbol tables */
+  its enclosing symbol tables */
   public Identifier lookupAll(String name) {
     Identifier currentObject = this.lookup(name);
 
@@ -45,7 +45,7 @@ public class SymbolTable {
   }
 
   /* Update the offset for every entry in the symbol table that has
-     an offset less than paramOffset */
+  an offset less than paramOffset */
   public void updateOffsetPerVar(int newOffset, int paramOffset) {
     for (String key : offsetPerVar.keySet()) {
       Integer value = offsetPerVar.get(key);
@@ -70,10 +70,10 @@ public class SymbolTable {
     declaredParamsOffset += size;
   }
   /* Get offset of a specific identifier from the symbol table or
-     or it's enclosing symbol tables */
+  or it's enclosing symbol tables */
   public int getOffset(String id) {
     if (!offsetPerVar.containsKey(id)) {
-    //TODO check getVarsSize() in this case
+      // TODO check getVarsSize() in this case
       return parentSymTable.getOffset(id) + getVarsSize();
     }
 
@@ -94,10 +94,10 @@ public class SymbolTable {
   public void incrementDeclaredVarsOffset(int size) {
     this.declaredVarsOffset += size;
   }
+
   public void incrementDeclaredParamsOffset(int size) {
     this.declaredParamsOffset += size;
   }
-
 
   public void incrementArgsOffset(int size) {
     this.argsOffset += size;
@@ -107,13 +107,13 @@ public class SymbolTable {
     this.argsOffset = 0;
   }
 
-//  /* Get offset of each variable stored in the symbol table */
-//  public Map<String, Integer> saveOffsetPerVar() {
-//    return new HashMap<>(offsetPerVar);
-//  }
-//
-//  /* Set offset of each variable stored in the symbol table */
-//  public void setOffsetPerVar(Map<String, Integer> offsetPerVar) {
-//    this.offsetPerVar = offsetPerVar;
-//  }
+  //  /* Get offset of each variable stored in the symbol table */
+  //  public Map<String, Integer> saveOffsetPerVar() {
+  //    return new HashMap<>(offsetPerVar);
+  //  }
+  //
+  //  /* Set offset of each variable stored in the symbol table */
+  //  public void setOffsetPerVar(Map<String, Integer> offsetPerVar) {
+  //    this.offsetPerVar = offsetPerVar;
+  //  }
 }

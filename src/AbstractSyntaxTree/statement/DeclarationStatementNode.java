@@ -1,10 +1,12 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.assignment.AssignRHSNode;
+import AbstractSyntaxTree.assignment.FuncCallNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.TypeNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.OverloadFuncId;
 import SemanticAnalysis.SymbolTable;
 import SemanticAnalysis.VariableId;
 
@@ -46,7 +48,34 @@ public class DeclarationStatementNode extends StatementNode {
     /* Check that the expected (declared) type and the type of assignment
      * can be resolved and match */
     DataTypeId declaredType = type.getType();
-    DataTypeId assignedType = assignment.getType(symbolTable);
+    DataTypeId assignedType = null;
+
+    List<DataTypeId> returnTypes;
+
+    if(assignment instanceof FuncCallNode
+        && ((FuncCallNode) assignment).getIdentifier(symbolTable) instanceof OverloadFuncId) {
+      returnTypes = ((FuncCallNode) assignment).getOverloadType(symbolTable);
+      for(DataTypeId returnType : returnTypes) {
+        if(returnType == null) {
+          continue;
+        }
+
+        if(returnType.equals(declaredType)) {
+          assignedType = returnType;
+          break;
+        }
+      }
+
+      if(assignedType == null) {
+        errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
+            + " RHS type does not match LHS type for assignment.'"
+            + " Expected: " + declaredType + ". Could not find matching return type"
+            + " in overloaded functions.");
+        return;
+      }
+    } else {
+      assignedType = assignment.getType(symbolTable);
+    }
 
     if (declaredType == null) {
       errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()

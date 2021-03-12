@@ -2,8 +2,10 @@ package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
+import AbstractSyntaxTree.assignment.FuncCallNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.OverloadFuncId;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
@@ -46,14 +48,44 @@ public class AssignVarNode extends StatementNode {
     /* Check that the left assignment type and the right assignment type
      * can be resolved and match */
     DataTypeId leftType = left.getType(symbolTable);
-    DataTypeId rightType = right.getType(symbolTable);
+    DataTypeId rightType = null;
 
     if (leftType == null) {
       if (varHasBeenDeclared(errorMessages, left)) {
         errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
             + " Could not resolve type of LHS assignment '" + left + "'.");
       }
-    } else if (rightType == null) {
+      return;
+    }
+
+    List<DataTypeId> returnTypes;
+
+    if(right instanceof FuncCallNode
+        && ((FuncCallNode) right).getIdentifier(symbolTable) instanceof OverloadFuncId) {
+      returnTypes = ((FuncCallNode) right).getOverloadType(symbolTable);
+      for(DataTypeId returnType : returnTypes) {
+        if(returnType == null) {
+          continue;
+        }
+
+        if(returnType.equals(leftType)) {
+          rightType = returnType;
+          break;
+        }
+      }
+
+      if(rightType == null) {
+        errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
+            + " RHS type does not match LHS type for assignment.'"
+            + " Expected: " + leftType + ". Could not find matching return type"
+            + " in overloaded functions.");
+        return;
+      }
+    } else {
+      rightType = right.getType(symbolTable);
+    }
+
+    if (rightType == null) {
       if (varHasBeenDeclared(errorMessages, right)) {
         errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
             + " Could not resolve type of RHS assignment'" + right + "'.");
