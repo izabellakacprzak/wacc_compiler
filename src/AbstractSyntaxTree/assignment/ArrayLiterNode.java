@@ -4,6 +4,7 @@ import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class ArrayLiterNode extends AssignRHSNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -33,8 +34,8 @@ public class ArrayLiterNode extends AssignRHSNode {
     DataTypeId fstType = fstExpr.getType(symbolTable);
 
     if (fstType == null) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Could not resolve type of array assignment.");
+      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+          "Could not resolve type of array assignment."));
       return;
     }
 
@@ -46,23 +47,22 @@ public class ArrayLiterNode extends AssignRHSNode {
       DataTypeId currType = currExpr.getType(symbolTable);
 
       if (currType == null) {
-        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-            + " Could not resolve element type(s) in array literal."
-            + " Expected: " + fstType);
+        errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+            "Could not resolve element type(s) in array literal."
+                + " Expected: " + fstType));
         break;
       }
 
       if (!(fstType.equals(currType))) {
-        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-            + " Incompatible element type(s) in array literal."
-            + " Expected: " + fstType + " Actual: " + currType);
+        errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+            "Incompatible element type(s) in array literal."
+                + " Expected: " + fstType + " Actual: " + currType));
         break;
       }
 
       /* Recursively call semanticAnalysis on each expression node */
       currExpr.semanticAnalysis(symbolTable, errorMessages);
     }
-
   }
 
   @Override

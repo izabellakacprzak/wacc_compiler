@@ -4,6 +4,7 @@ import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class WhileStatementNode extends StatementNode {
     this.statement = statement;
   }
 
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -31,14 +32,14 @@ public class WhileStatementNode extends StatementNode {
     DataTypeId conditionType = condition.getType(symbolTable);
 
     if (conditionType == null) {
-      errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
-          + " Could not resolve type of '" + condition + "'."
-          + " Expected: BOOL");
+      errorMessages.add(new SemanticError(condition.getLine(), condition.getCharPositionInLine(),
+          "Could not resolve type of '" + condition + "'."
+              + " Expected: BOOL"));
 
     } else if (!conditionType.equals(new BaseType(BaseType.Type.BOOL))) {
-      errorMessages.add(condition.getLine() + ":" + condition.getCharPositionInLine()
-          + " Incompatible type for 'If' condition."
-          + " Expected: BOOL Actual: " + conditionType);
+      errorMessages.add(new SemanticError(condition.getLine(), condition.getCharPositionInLine(),
+          "Incompatible type for 'If' condition."
+              + " Expected: BOOL Actual: " + conditionType));
     }
 
     /* Recursively call semanticAnalysis on statement node */

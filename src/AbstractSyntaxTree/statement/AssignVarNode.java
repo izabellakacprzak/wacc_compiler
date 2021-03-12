@@ -4,6 +4,7 @@ import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
@@ -22,12 +23,12 @@ public class AssignVarNode extends StatementNode {
 
   /* Check whether the inability to resolve the assignment does not stem from an undeclared variable.
    * true if variable has been declared in the current scope. */
-  public boolean varHasBeenDeclared(List<String> errorMessages, AssignLHSNode node) {
+  public boolean varHasBeenDeclared(List<SemanticError> errorMessages, AssignLHSNode node) {
     if (errorMessages.isEmpty()) {
       return true;
     }
 
-    String lastErrorMsg = errorMessages.get(errorMessages.size() - 1);
+    String lastErrorMsg = errorMessages.get(errorMessages.size() - 1).getMessage();
     String line = Integer.toString(node.getLine());
     String charPos = Integer.toString(node.getCharPositionInLine());
 
@@ -35,7 +36,7 @@ public class AssignVarNode extends StatementNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -50,18 +51,18 @@ public class AssignVarNode extends StatementNode {
 
     if (leftType == null) {
       if (varHasBeenDeclared(errorMessages, left)) {
-        errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
-            + " Could not resolve type of LHS assignment '" + left + "'.");
+        errorMessages.add(new SemanticError(left.getLine(), left.getCharPositionInLine(),
+            "Could not resolve type of LHS assignment '" + left + "'."));
       }
     } else if (rightType == null) {
       if (varHasBeenDeclared(errorMessages, right)) {
-        errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
-            + " Could not resolve type of RHS assignment'" + right + "'.");
+        errorMessages.add(new SemanticError(right.getLine(), right.getCharPositionInLine(),
+            "Could not resolve type of RHS assignment'" + right + "'."));
       }
     } else if (!leftType.equals(rightType) && !stringToCharArray(leftType, rightType)) {
-      errorMessages.add(left.getLine() + ":" + left.getCharPositionInLine()
-          + " RHS type does not match LHS type for assignment. "
-          + " Expected: " + leftType + " Actual: " + rightType);
+      errorMessages.add(new SemanticError(left.getLine(), left.getCharPositionInLine(),
+          "RHS type does not match LHS type for assignment. "
+              + " Expected: " + leftType + " Actual: " + rightType));
     }
   }
 

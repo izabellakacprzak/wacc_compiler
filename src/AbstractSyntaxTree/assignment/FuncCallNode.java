@@ -11,10 +11,10 @@ import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
-import java.util.Map;
 
 public class FuncCallNode extends AssignRHSNode {
 
@@ -41,7 +41,7 @@ public class FuncCallNode extends AssignRHSNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -49,17 +49,17 @@ public class FuncCallNode extends AssignRHSNode {
     Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
 
     if (functionId == null) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " No declaration of '" + identifier.getIdentifier() + "' identifier."
-          + " Expected: FUNCTION IDENTIFIER");
+      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+          "No declaration of '" + identifier.getIdentifier() + "' identifier."
+              + " Expected: FUNCTION IDENTIFIER"));
       return;
     }
 
     if (!(functionId instanceof FunctionId)) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
-          + " Expected: FUNCTION IDENTIFIER"
-          + " Actual: " + identifier.getType(symbolTable));
+      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+          "Incompatible type of '" + identifier.getIdentifier() + "' identifier."
+              + " Expected: FUNCTION IDENTIFIER"
+              + " Actual: " + identifier.getType(symbolTable)));
       return;
     }
 
@@ -68,10 +68,10 @@ public class FuncCallNode extends AssignRHSNode {
     List<DataTypeId> paramTypes = function.getParamTypes();
 
     if (paramTypes.size() > arguments.size() || paramTypes.size() < arguments.size()) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Function '" + identifier.getIdentifier()
-          + "' has been called with the incorrect number of parameters."
-          + " Expected: " + paramTypes.size() + " Actual: " + arguments.size());
+      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+          "Function '" + identifier.getIdentifier()
+              + "' has been called with the incorrect number of parameters."
+              + " Expected: " + paramTypes.size() + " Actual: " + arguments.size()));
       return;
     }
 
@@ -86,19 +86,17 @@ public class FuncCallNode extends AssignRHSNode {
       }
 
       if (currArg == null) {
-        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-            + " Could not resolve type of parameter " + (i + 1) + " in '" + identifier
-            + "' function."
-            + " Expected: " + currParamType);
+        errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+            "Could not resolve type of parameter " + (i + 1) + " in '" + identifier
+                + "' function."
+                + " Expected: " + currParamType));
       } else if (!(currArg.equals(currParamType)) && !stringToCharArray(currParamType, currArg)) {
-        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-            + " Invalid type for parameter " + (i + 1) + " in '" + identifier + "' function."
-            + " Expected: " + currParamType + " Actual: " + currArg);
+        errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+            "Invalid type for parameter " + (i + 1) + " in '" + identifier + "' function."
+                + " Expected: " + currParamType + " Actual: " + currArg));
       }
       arguments.get(i).semanticAnalysis(symbolTable, errorMessages);
     }
-
-
   }
 
   @Override

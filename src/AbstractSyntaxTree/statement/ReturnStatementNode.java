@@ -3,6 +3,7 @@ package AbstractSyntaxTree.statement;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class ReturnStatementNode extends StatementNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -29,8 +30,8 @@ public class ReturnStatementNode extends StatementNode {
     /* Check to see if the current symbolTable is the top table.
      * Return statements cannot be present in the body of the main function */
     if (symbolTable.isTopSymTable()) {
-      errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
-          + " 'return' statement cannot be present in the body of the main function.");
+      errorMessages.add(new SemanticError(returnExpr.getLine(), returnExpr.getCharPositionInLine(),
+          "'return' statement cannot be present in the body of the main function."));
       return;
     }
 
@@ -38,14 +39,14 @@ public class ReturnStatementNode extends StatementNode {
     DataTypeId returnExprType = returnExpr.getType(symbolTable);
 
     if (returnExprType == null) {
-      errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
-          + " Could not resolve type for '" + returnExpr + "'.");
+      errorMessages.add(new SemanticError(returnExpr.getLine(), returnExpr.getCharPositionInLine(),
+          "Could not resolve type for '" + returnExpr + "'."));
     } else if (!(returnExprType.equals(returnType)) && !stringToCharArray(returnType,
         returnExprType)) {
 
-      errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
-          + " Declared return type does not match 'return' statement type."
-          + " Expected: " + returnType + " Actual: " + returnExprType);
+      errorMessages.add(new SemanticError(returnExpr.getLine(), returnExpr.getCharPositionInLine(),
+          "Declared return type does not match 'return' statement type."
+              + " Expected: " + returnType + " Actual: " + returnExprType));
     }
   }
 

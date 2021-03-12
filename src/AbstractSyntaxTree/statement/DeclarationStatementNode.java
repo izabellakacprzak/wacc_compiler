@@ -5,6 +5,7 @@ import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.TypeNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 import SemanticAnalysis.VariableId;
 
@@ -27,16 +28,16 @@ public class DeclarationStatementNode extends StatementNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
     /* Check whether identifier has been previously declared as another variable in the current scope.
      * If not, add a new VariableId to the symbol table under identifier */
     if (symbolTable.lookup(identifier.getIdentifier()) != null) {
-      errorMessages.add(identifier.getLine() + ":" + identifier.getCharPositionInLine()
-          + " Identifier '" + identifier.getIdentifier()
-          + "' has already been declared in the same scope.");
+      errorMessages.add(new SemanticError(identifier.getLine(), identifier.getCharPositionInLine(),
+          "Identifier '" + identifier.getIdentifier()
+              + "' has already been declared in the same scope."));
 
     } else {
       symbolTable.add(identifier.getIdentifier(),
@@ -49,20 +50,20 @@ public class DeclarationStatementNode extends StatementNode {
     DataTypeId assignedType = assignment.getType(symbolTable);
 
     if (declaredType == null) {
-      errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
-          + " Could not resolve type of '" + identifier.getIdentifier() + "'.");
+      errorMessages.add(new SemanticError(assignment.getLine(), assignment.getCharPositionInLine(),
+          "Could not resolve type of '" + identifier + "'."));
 
     } else if (assignedType == null) {
-      errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
-          + " Could not resolve type of '" + assignment.toString() + "'."
-          + " Expected: " + declaredType);
+      errorMessages.add(new SemanticError(assignment.getLine(), assignment.getCharPositionInLine(),
+          "Could not resolve type of '" + assignment + "'."
+              + " Expected: " + declaredType));
 
     } else if (!declaredType.equals(assignedType) && !stringToCharArray(declaredType,
         assignedType)) {
-      errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
-          + " Assignment type does not match declared type for '"
-          + identifier.getIdentifier() + "'."
-          + " Expected: " + declaredType + " Actual: " + assignedType);
+      errorMessages.add(new SemanticError(assignment.getLine(), assignment.getCharPositionInLine(),
+          "Assignment type does not match declared type for '"
+              + identifier.getIdentifier() + "'."
+              + " Expected: " + declaredType + " Actual: " + assignedType));
     }
 
     /* Recursively call semanticAnalysis on stored nodes */

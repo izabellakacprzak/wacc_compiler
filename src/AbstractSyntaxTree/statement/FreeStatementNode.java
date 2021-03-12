@@ -5,6 +5,7 @@ import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.PairType;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class FreeStatementNode extends StatementNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -30,15 +31,15 @@ public class FreeStatementNode extends StatementNode {
     DataTypeId exprType = expression.getType(symbolTable);
 
     if (exprType == null) {
-      errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-          + " Could not resolve type for '" + expression + "'."
-          + " Expected: ARRAY, PAIR");
+      errorMessages.add(new SemanticError(expression.getLine(), expression.getCharPositionInLine(),
+          "Could not resolve type for '" + expression + "'."
+              + " Expected: ARRAY, PAIR"));
 
     } else if (!exprType.equals(new PairType(null, null)) &&
         !exprType.equals(new ArrayType(null))) {
-      errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-          + " Incompatible type for 'free' statement." +
-          " Expected: ARRAY, PAIR Actual: " + exprType);
+      errorMessages.add(new SemanticError(expression.getLine(), expression.getCharPositionInLine(),
+          " Incompatible type for 'free' statement." +
+              " Expected: ARRAY, PAIR Actual: " + exprType));
     }
   }
 

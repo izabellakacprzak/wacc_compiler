@@ -4,6 +4,7 @@ import AbstractSyntaxTree.assignment.AssignLHSNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class ReadStatementNode extends StatementNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -30,15 +31,15 @@ public class ReadStatementNode extends StatementNode {
     DataTypeId assignmentType = assignment.getType(symbolTable);
 
     if (assignmentType == null) {
-      errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
-          + " Could not resolve type for '" + assignment + "."
-          + " Expected: INT, CHAR");
+      errorMessages.add(new SemanticError(assignment.getLine(), assignment.getCharPositionInLine(),
+          "Could not resolve type for '" + assignment + "."
+              + " Expected: INT, CHAR"));
 
     } else if (!assignmentType.equals(new BaseType(BaseType.Type.INT)) &&
         !assignmentType.equals(new BaseType(BaseType.Type.CHAR))) {
-      errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
-          + " Incompatible type for 'read' statement."
-          + " Expected: INT, CHAR Actual: " + assignmentType);
+      errorMessages.add(new SemanticError(assignment.getLine(), assignment.getCharPositionInLine(),
+          "Incompatible type for 'read' statement."
+              + " Expected: INT, CHAR Actual: " + assignmentType));
     }
   }
 

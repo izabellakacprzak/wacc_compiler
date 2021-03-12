@@ -4,6 +4,7 @@ import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.ParameterId;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class ParamListNode implements ASTNode {
    * currSymTable: set to the node's SymbolTable for the current scope during semanticAnalysis */
   private final List<IdentifierNode> identifiers;
   private final List<TypeNode> types;
-  private Map<IdentifierNode, TypeNode> identifiersToTypes = new HashMap<>();
+  private final Map<IdentifierNode, TypeNode> identifiersToTypes = new HashMap<>();
   private SymbolTable currSymTable = null;
 
   public ParamListNode(List<IdentifierNode> identifiers, List<TypeNode> types) {
@@ -53,7 +54,7 @@ public class ParamListNode implements ASTNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 

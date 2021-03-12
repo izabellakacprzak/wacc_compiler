@@ -20,7 +20,6 @@ src/test/invalid/syntaxErr/function/functionJunkAfterReturn.wacc
 src/test/invalid/syntaxErr/function/functionLateDefine.wacc
 src/test/invalid/syntaxErr/function/functionMissingCall.wacc
 src/test/invalid/syntaxErr/function/functionMissingParam.wacc
-src/test/invalid/syntaxErr/function/functionMissingPType.wacc
 src/test/invalid/syntaxErr/function/functionMissingType.wacc
 src/test/invalid/syntaxErr/function/functionNoReturn.wacc
 src/test/invalid/syntaxErr/function/functionReturnInLoop.wacc

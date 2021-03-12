@@ -5,6 +5,7 @@ import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.PairType;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class PairElemNode extends AssignRHSNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -47,8 +48,8 @@ public class PairElemNode extends AssignRHSNode {
 
     /* Check that expression is an IdentifierNode */
     if (!(expression instanceof IdentifierNode)) {
-      errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-          + " Invalid identifier. Expected: PAIR IDENTIFIER Actual: '" + expression + "'");
+      errorMessages.add(new SemanticError(expression.getLine(), expression.getCharPositionInLine(),
+          "Invalid identifier. Expected: PAIR IDENTIFIER Actual: '" + expression + "'"));
       return;
     }
 
@@ -57,13 +58,13 @@ public class PairElemNode extends AssignRHSNode {
     DataTypeId expectedType = pairId.getType(symbolTable);
 
     if (expectedType == null) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Could not resolve type of '" + pairId + "'. Expected: PAIR");
+      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+          "Could not resolve type of '" + pairId + "'. Expected: PAIR"));
 
     } else if (!(expectedType instanceof PairType)) {
-      errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-          + " Incompatible type of '" + expression + "'. "
-          + " Expected: PAIR Actual: " + expectedType);
+      errorMessages.add(new SemanticError(expression.getLine(), expression.getCharPositionInLine(),
+          "Incompatible type of '" + expression + "'. "
+              + " Expected: PAIR Actual: " + expectedType));
     }
   }
 

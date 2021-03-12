@@ -68,7 +68,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
       for (int i = 0; i < ctx.IDENT().size(); i++) {
 
         names.add(new IdentifierNode(line, charPositionInLine, ctx.IDENT(i).getText()));
-        if (ctx.type() != null) {
+        if (ctx.type(i) != null) {
           types.add((TypeNode) visit(ctx.type(i)));
         }
       }

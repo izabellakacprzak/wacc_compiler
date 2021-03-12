@@ -5,7 +5,7 @@ import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.Identifier;
-import SemanticAnalysis.ParameterId;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class ArrayElemNode extends ExpressionNode {
   private final List<ExpressionNode> expressions;
 
   public ArrayElemNode(int line, int charPositionInLine, IdentifierNode identifier,
-                       List<ExpressionNode> expressions) {
+      List<ExpressionNode> expressions) {
     super(line, charPositionInLine);
     this.identifier = identifier;
     this.expressions = expressions;
@@ -34,7 +34,7 @@ public class ArrayElemNode extends ExpressionNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -49,17 +49,17 @@ public class ArrayElemNode extends ExpressionNode {
     Identifier idType = symbolTable.lookupAll(identifier.getIdentifier());
 
     if (idType == null) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " No declaration of '" + identifier.getIdentifier() + "' identifier."
-                            + " Expected: ARRAY IDENTIFIER.");
+      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+          "No declaration of '" + identifier.getIdentifier() + "' identifier."
+              + " Expected: ARRAY IDENTIFIER."));
       return;
     }
 
     if (!(identifier.getType(symbolTable) instanceof ArrayType)) {
       System.out.println(identifier);
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-                            + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
-                            + " Expected: ARRAY IDENTIFIER Actual: " + idType);
+      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+          "Incompatible type of '" + identifier.getIdentifier() + "' identifier."
+              + " Expected: ARRAY IDENTIFIER Actual: " + idType));
       return;
     }
 
@@ -68,18 +68,17 @@ public class ArrayElemNode extends ExpressionNode {
     for (ExpressionNode expression : expressions) {
       thisType = expression.getType(symbolTable);
 
-
       if (thisType == null) {
-        errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-                              + " Could not resolve type of '" + expression + "' in ARRAY ELEM."
-                              + " Expected: INT");
+        errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+            "Could not resolve type of '" + expression + "' in ARRAY ELEM."
+                + " Expected: INT"));
         break;
       }
 
       if (!thisType.equals(new BaseType(BaseType.Type.INT))) {
-        errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-                              + " Incompatible type of '" + expression + "' in ARRAY ELEM."
-                              + " Expected: INT Actual: " + thisType);
+        errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+            "Incompatible type of '" + expression + "' in ARRAY ELEM."
+                + " Expected: INT Actual: " + thisType));
       }
     }
   }

@@ -4,6 +4,7 @@ import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.Operator.UnOp;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class UnaryOpExprNode extends ExpressionNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -44,9 +45,9 @@ public class UnaryOpExprNode extends ExpressionNode {
     DataTypeId opType = operand.getType(symbolTable);
 
     if (opType == null) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Could not resolve type for '" + operator.getLabel() + "' operand."
-          + " Expected: " + listTypeToString(argTypes));
+      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+          "Could not resolve type for '" + operator.getLabel() + "' operand."
+              + " Expected: " + listTypeToString(argTypes)));
       return;
     }
 
@@ -62,15 +63,15 @@ public class UnaryOpExprNode extends ExpressionNode {
     }
 
     if (!argTypes.isEmpty() && !argMatched) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Invalid type for '" + operator.getLabel() + "' operator."
-          + " Expected: " + listTypeToString(argTypes) + " Actual: " + opType);
+      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+          "Invalid type for '" + operator.getLabel() + "' operator."
+              + " Expected: " + listTypeToString(argTypes) + " Actual: " + opType));
 
     } else if (argTypes.isEmpty() && !(opType instanceof ArrayType)) {
       /* No expected argument types in argTypes implies an ARRAY is expected */
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Incompatible type for '" + operator.getLabel() + "' operator."
-          + " Expected: ARRAY Actual: " + opType);
+      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+          "Incompatible type for '" + operator.getLabel() + "' operator."
+              + " Expected: ARRAY Actual: " + opType));
     }
   }
 

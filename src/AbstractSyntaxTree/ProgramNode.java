@@ -5,6 +5,7 @@ import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.type.FunctionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.FunctionId;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class ProgramNode implements ASTNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable topSymbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable topSymbolTable, List<SemanticError> errorMessages) {
     setCurrSymTable(topSymbolTable);
 
     for (FunctionNode func : functionNodes) {
@@ -50,8 +51,8 @@ public class ProgramNode implements ASTNode {
       if (topSymbolTable.lookupAll(func.getName()) != null) {
         /* A function with the same name has already been declared */
         IdentifierNode id = func.getIdentifierNode();
-        errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
-            + " Function '" + func + "' has already been declared.");
+        errorMessages.add(new SemanticError(id.getLine(), id.getCharPositionInLine(),
+            "Function '" + func + "' has already been declared."));
 
       } else {
         /* Create function identifier and add it to the topSymbolTable */

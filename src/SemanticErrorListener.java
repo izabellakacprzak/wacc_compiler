@@ -1,21 +1,24 @@
+import SemanticAnalysis.SemanticError;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SemanticErrorListener {
 
-  private final List<String> semanticErrors;
+  private final List<SemanticError> semanticErrors;
 
   public SemanticErrorListener() {
     this.semanticErrors = new ArrayList<>();
   }
 
-  public List<String> getList() {
+  public List<SemanticError> getList() {
     return semanticErrors;
   }
 
   public void printAllErrors() {
-    for (String error : semanticErrors) {
-      System.out.println("Semantic error at line " + error);
+    semanticErrors.sort(SemanticError::compareTo);
+
+    for (SemanticError error : semanticErrors) {
+      System.out.println(error);
     }
   }
 
