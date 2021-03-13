@@ -1,0 +1,16 @@
+# a simple function definition and call
+
+# Output:
+# 70
+
+# Program:
+
+begin
+  int f(x) is
+    int y = x + 2 ;
+    print y ;
+    return 0 
+  end
+  int x = call f(5) ;
+  println x 
+end

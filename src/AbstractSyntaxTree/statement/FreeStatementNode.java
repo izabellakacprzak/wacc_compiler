@@ -1,17 +1,24 @@
 package AbstractSyntaxTree.statement;
 
+import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
+
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
+import AbstractSyntaxTree.expression.PairLiterExprNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
+import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.DataTypes.PairType;
+import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
 
 public class FreeStatementNode extends StatementNode {
+
+  private static final DataTypeId DEFAULT_TYPE = new ArrayType(new BaseType(INT));
 
   /* expression:   ExpressionNode corresponding to the expression 'free' was called with */
   private final ExpressionNode expression;
@@ -25,6 +32,22 @@ public class FreeStatementNode extends StatementNode {
       List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
+
+    if (expression.isUnsetParamId(symbolTable)) {
+      ParameterId exprParam = expression.getParamId(symbolTable);
+
+      if (firstCheck) {
+        uncheckedNodes.add(this);
+        exprParam.addToExpectedTypes(new ArrayType(null));
+        exprParam.addToExpectedTypes(new PairType(null, null));
+
+        return;
+
+      } else {
+        exprParam.setType(DEFAULT_TYPE);
+        firstCheck = true;
+      }
+    }
 
     /* Recursively call semanticAnalysis on expression node */
     expression.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);

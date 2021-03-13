@@ -96,7 +96,7 @@ public class BinaryOpExprNode extends ExpressionNode {
         leftParam.addToMatchingParams(rightParam);
         rightParam.addToMatchingParams(leftParam);
 
-        for (DataTypeId type : operator.getArgTypes()) {
+        for (DataTypeId type : argTypes) {
           leftParam.addToExpectedTypes(type);
           rightParam.addToExpectedTypes(type);
         }
