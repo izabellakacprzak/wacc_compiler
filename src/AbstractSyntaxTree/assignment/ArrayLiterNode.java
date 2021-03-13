@@ -31,6 +31,8 @@ public class ArrayLiterNode extends AssignRHSNode {
       return;
     }
 
+
+
     /* Check if the first expression's type can be resolved */
     ExpressionNode fstExpr = expressions.get(0);
     DataTypeId fstType = fstExpr.getType(symbolTable);

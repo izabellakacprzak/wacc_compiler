@@ -1,7 +1,10 @@
 package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.expression.IdentifierNode;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.Identifier;
+import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
 
 public abstract class AssignLHSNode implements ASTNode {
@@ -30,6 +33,30 @@ public abstract class AssignLHSNode implements ASTNode {
 
   public int getCharPositionInLine() {
     return charPositionInLine;
+  }
+
+  /* Returns a ParameterId if one exists for this IdentifierNode, otherwise null */
+  public ParameterId getParamId(SymbolTable symbolTable) {
+    if (!(this instanceof IdentifierNode)) {
+      return null;
+    }
+
+    IdentifierNode idNode = (IdentifierNode) this;
+    ParameterId param = null;
+
+    Identifier identifierId = symbolTable.lookupAll(idNode.getIdentifier());
+
+    if (identifierId instanceof ParameterId) {
+      param = (ParameterId) identifierId;
+    }
+
+    return param;
+  }
+
+  public boolean isUnsetParamId(SymbolTable symbolTable) {
+    ParameterId param = getParamId(symbolTable);
+
+    return !(param == null) && param.getType() == null;
   }
 
   @Override

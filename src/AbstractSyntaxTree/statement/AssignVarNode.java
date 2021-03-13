@@ -1,16 +1,22 @@
 package AbstractSyntaxTree.statement;
 
+import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
+
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
 
 public class AssignVarNode extends StatementNode {
+
+  private static final DataTypeId DEFAULT_TYPE = new BaseType(INT);
 
   /* left:         AssignLHSNode corresponding to what being assigned to
    * right:        AssignRHSNode corresponding to the assignment for the AssignLHSNode */
@@ -42,14 +48,41 @@ public class AssignVarNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+    DataTypeId leftType = left.getType(symbolTable);
+    DataTypeId rightType = right.getType(symbolTable);
+    boolean isUnsetParamLeft = left.isUnsetParamId(symbolTable);
+    boolean isUnsetParamRight = right.isUnsetParamId(symbolTable);
+    ParameterId leftParam = left.getParamId(symbolTable);
+    ParameterId rightParam = right.getParamId(symbolTable);
+
+    if (isUnsetParamLeft && isUnsetParamRight) {
+      if (firstCheck) {
+        uncheckedNodes.add(this);
+        leftParam.addToMatchingParams(rightParam);
+        rightParam.addToMatchingParams(leftParam);
+        return;
+
+      } else {
+        leftParam.setType(DEFAULT_TYPE);
+        rightParam.setType(DEFAULT_TYPE);
+        firstCheck = true;
+      }
+    }
+
+    if (isUnsetParamLeft) {
+      leftParam.setType(rightType);
+    }
+
+    if (isUnsetParamRight) {
+      rightParam.setType(leftType);
+    }
+
     /* Recursively call semanticAnalysis on LHS node */
     left.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     right.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check that the left assignment type and the right assignment type
      * can be resolved and match */
-    DataTypeId leftType = left.getType(symbolTable);
-    DataTypeId rightType = right.getType(symbolTable);
 
     if (leftType == null) {
       if (varHasBeenDeclared(errorMessages, left)) {

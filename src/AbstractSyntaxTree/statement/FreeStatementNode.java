@@ -45,6 +45,7 @@ public class FreeStatementNode extends StatementNode {
 
       } else {
         exprParam.setType(DEFAULT_TYPE);
+        firstCheck = true;
       }
     }
 

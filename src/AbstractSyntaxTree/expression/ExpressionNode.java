@@ -19,28 +19,4 @@ public abstract class ExpressionNode extends AssignRHSNode {
   /* All ExpressionNodes must Override toString for use in error messages */
   @Override
   public abstract String toString();
-
-  /* Returns a ParameterId if one exists for this IdentifierNode, otherwise null */
-  public ParameterId getParamId(SymbolTable symbolTable) {
-    if (!(this instanceof IdentifierNode)) {
-      return null;
-    }
-
-    IdentifierNode idNode = (IdentifierNode) this;
-    ParameterId param = null;
-
-    Identifier identifierId = symbolTable.lookupAll(idNode.getIdentifier());
-
-    if (identifierId instanceof ParameterId) {
-      param = (ParameterId) identifierId;
-    }
-
-    return param;
-  }
-
-  public boolean isUnsetParamId(SymbolTable symbolTable) {
-    ParameterId param = getParamId(symbolTable);
-
-    return !(param == null) && param.getType() == null;
-  }
 }
