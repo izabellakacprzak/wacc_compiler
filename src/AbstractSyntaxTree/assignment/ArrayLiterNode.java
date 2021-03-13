@@ -5,6 +5,7 @@ import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
+import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
@@ -22,7 +23,7 @@ public class ArrayLiterNode extends AssignRHSNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
-      List<ASTNode> uncheckedNodes, boolean firstCheck) {
+                               List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -78,6 +79,16 @@ public class ArrayLiterNode extends AssignRHSNode {
       return new ArrayType(null);
     } else {
       return new ArrayType(expressions.get(0).getType(symbolTable));
+    }
+  }
+
+
+  public void setParamTypes(DataTypeId type, SymbolTable symbolTable) {
+    for (ExpressionNode expr : expressions) {
+      if (expr.isUnsetParamId(symbolTable)) {
+        ParameterId param = expr.getParamId(symbolTable);
+        param.setType(type);
+      }
     }
   }
 

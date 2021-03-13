@@ -4,6 +4,7 @@ import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
@@ -22,9 +23,18 @@ public class ReturnStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
-      List<ASTNode> uncheckedNodes, boolean firstCheck) {
+                               List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
+
+
+    /* Check that the type of returnExpr is the same as the expected returnType */
+    DataTypeId returnExprType = returnExpr.getType(symbolTable);
+
+    if (returnExprType == null && returnExpr.isUnsetParamId(symbolTable)) {
+      ParameterId param = returnExpr.getParamId(symbolTable);
+      param.setType(returnType);
+    }
 
     /* Recursively call semanticAnalysis on expression node */
     returnExpr.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
@@ -37,8 +47,6 @@ public class ReturnStatementNode extends StatementNode {
       return;
     }
 
-    /* Check that the type of returnExpr is the same as the expected returnType */
-    DataTypeId returnExprType = returnExpr.getType(symbolTable);
 
     if (returnExprType == null) {
       errorMessages.add(new SemanticError(returnExpr.getLine(), returnExpr.getCharPositionInLine(),

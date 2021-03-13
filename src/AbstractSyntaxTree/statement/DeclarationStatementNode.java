@@ -1,14 +1,13 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.assignment.ArrayLiterNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
+import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.TypeNode;
 import InternalRepresentation.InternalState;
-import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.SemanticError;
-import SemanticAnalysis.SymbolTable;
-import SemanticAnalysis.VariableId;
+import SemanticAnalysis.*;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class DeclarationStatementNode extends StatementNode {
   private final AssignRHSNode assignment;
 
   public DeclarationStatementNode(TypeNode type, IdentifierNode identifier,
-      AssignRHSNode assignment) {
+                                  AssignRHSNode assignment) {
     this.type = type;
     this.identifier = identifier;
     this.assignment = assignment;
@@ -30,7 +29,7 @@ public class DeclarationStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
-      List<ASTNode> uncheckedNodes, boolean firstCheck) {
+                               List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -50,6 +49,20 @@ public class DeclarationStatementNode extends StatementNode {
      * can be resolved and match */
     DataTypeId declaredType = type.getType();
     DataTypeId assignedType = assignment.getType(symbolTable);
+
+//TODO: Pairs
+    if (assignedType == null) {
+      if (assignment instanceof ExpressionNode) {
+        ExpressionNode expr = (ExpressionNode) assignment;
+        if (expr.isUnsetParamId(symbolTable)) {
+          ParameterId param = expr.getParamId(symbolTable);
+          param.setType(declaredType);
+        }
+      } else if (assignment instanceof ArrayLiterNode) {
+        ArrayLiterNode arrayLiter = (ArrayLiterNode) assignment;
+        arrayLiter.setParamTypes(declaredType, symbolTable);
+      }
+    }
 
     if (declaredType == null) {
       errorMessages.add(new SemanticError(assignment.getLine(), assignment.getCharPositionInLine(),

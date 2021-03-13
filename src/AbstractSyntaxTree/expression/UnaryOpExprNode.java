@@ -5,6 +5,7 @@ import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.Operator.UnOp;
+import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
@@ -34,17 +35,28 @@ public class UnaryOpExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
-      List<ASTNode> uncheckedNodes, boolean firstCheck) {
+                               List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
-    /* Recursively call semanticAnalysis on operand node */
-    operand.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check that the operand type can be resolved and matches with one of the
      * operator's expected argument types */
     List<DataTypeId> argTypes = operator.getArgTypes();
     DataTypeId opType = operand.getType(symbolTable);
+
+    if (opType == null && operand.isUnsetParamId(symbolTable)) {
+      ParameterId param = operand.getParamId(symbolTable);
+      /* UnaryOps for [getArgsType.size() == 1]: -, !, ord, chr. */
+      if (operator.getArgTypes().size() == 1) {
+        param.setType(operator.getArgTypes().get(0));
+      } else /*case len on arrays. */ {
+        param.setType(new ArrayType());
+      }
+    }
+    /* Recursively call semanticAnalysis on operand node */
+    operand.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
+
 
     if (opType == null) {
       errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
