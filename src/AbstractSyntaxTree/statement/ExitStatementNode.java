@@ -1,10 +1,13 @@
 package AbstractSyntaxTree.statement;
 
+import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
+
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
@@ -25,6 +28,11 @@ public class ExitStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+    if (expression.isUnsetParamId(symbolTable)) {
+      ParameterId exprParam = expression.getParamId(symbolTable);
+      exprParam.setType(new BaseType(INT));
+    }
+
     /* Recursively call semanticAnalysis on expression node */
     expression.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
@@ -35,7 +43,7 @@ public class ExitStatementNode extends StatementNode {
       errorMessages.add(new SemanticError(expression.getLine(), expression.getCharPositionInLine(),
           "Could not resolve type for '" + expression + "'."
               + " Expected: INT"));
-    } else if (!exprType.equals(new BaseType(BaseType.Type.INT))) {
+    } else if (!exprType.equals(new BaseType(INT))) {
       errorMessages.add(new SemanticError(expression.getLine(), expression.getCharPositionInLine(),
           "Incompatible type for 'exit' statement."
               + " Expected: INT Actual: " + exprType));
