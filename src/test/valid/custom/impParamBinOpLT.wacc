@@ -6,9 +6,8 @@
 # Program:
 
 begin
-  int f(x) is
-    int y = x + 2 ;
-    print y ;
+  int f(x, y) is
+    bool a = x < y ;
     return 0 
   end
   println 0

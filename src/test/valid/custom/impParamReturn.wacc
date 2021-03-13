@@ -7,9 +7,7 @@
 
 begin
   int f(x) is
-    int y = x + 2 ;
-    print y ;
-    return 0 
+    return x 
   end
   println 0
 end

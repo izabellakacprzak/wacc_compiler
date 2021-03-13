@@ -7,9 +7,12 @@
 
 begin
   int f(x) is
-    int y = x + 2 ;
-    print y ;
-    return 0 
+    if x
+    then
+      println 0
+    else
+      println 1
+    fi ;
   end
   println 0
 end

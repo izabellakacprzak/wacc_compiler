@@ -6,10 +6,8 @@
 # Program:
 
 begin
-  int f(x) is
-    int y = x + 2 ;
-    print y ;
-    return 0 
+  int f(x, y) is
+    pair(int, bool) c = newpair(x, y)
   end
   println 0
 end
