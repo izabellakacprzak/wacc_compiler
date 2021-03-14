@@ -3,6 +3,7 @@ package AbstractSyntaxTree.statement;
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.assignment.ArrayLiterNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
+import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.TypeNode;
@@ -39,6 +40,18 @@ public class DeclarationStatementNode extends StatementNode {
     if (assignment.isUnsetParamId(symbolTable)) {
       ParameterId assignParam = assignment.getParamId(symbolTable);
       assignParam.setType(declaredType);
+    }
+
+    if (assignment instanceof ArrayElemNode) {
+      ArrayElemNode arrElemNode = (ArrayElemNode) assignment;
+      IdentifierNode identifier = arrElemNode.getIdentifier();
+
+      if (identifier.isUnsetParamId(symbolTable) || identifier.isUnsetParamArray(symbolTable)) {
+        ParameterId paramId = identifier.getParamId(symbolTable);
+        int size = arrElemNode.getExpressions().size();
+
+        paramId.setNestedType(declaredType, size);
+      }
     }
 
     /* Check whether identifier has been previously declared as another variable in the current scope.
