@@ -2,12 +2,10 @@ package AbstractSyntaxTree;
 
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
+import AbstractSyntaxTree.type.ClassNode;
 import AbstractSyntaxTree.type.FunctionNode;
 import InternalRepresentation.InternalState;
-import SemanticAnalysis.FunctionId;
-import SemanticAnalysis.Identifier;
-import SemanticAnalysis.OverloadFuncId;
-import SemanticAnalysis.SymbolTable;
+import SemanticAnalysis.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +17,14 @@ public class ProgramNode implements ASTNode {
    * syntaxErrors:  List to add any syntax error messages for syntax errors */
   private final StatementNode statementNode;
   private final List<FunctionNode> functionNodes;
+  private final List<ClassNode> classNodes;
   private final List<String> syntaxErrors;
   private SymbolTable currSymTable;
 
-  public ProgramNode(StatementNode statementNode, List<FunctionNode> functionNodes) {
+  public ProgramNode(StatementNode statementNode, List<FunctionNode> functionNodes, List<ClassNode> classNodes) {
     this.statementNode = statementNode;
     this.functionNodes = functionNodes;
+    this.classNodes = classNodes;
     syntaxErrors = new ArrayList<>();
   }
 
@@ -41,16 +41,13 @@ public class ProgramNode implements ASTNode {
     return syntaxErrors;
   }
 
-  @Override
-  public void semanticAnalysis(SymbolTable topSymbolTable, List<String> errorMessages) {
-    setCurrSymTable(topSymbolTable);
-
-    for (FunctionNode newFunction : functionNodes) {
+  public static void overloadFunc(SymbolTable symbolTable, List<String> errorMessages, List<FunctionNode> methods) {
+    for (FunctionNode method : methods) {
       /* Create a new SymbolTable for the function's scope */
-      newFunction.setCurrSymTable(new SymbolTable(topSymbolTable));
+      method.setCurrSymTable(new SymbolTable(symbolTable));
 
-      Identifier declaredFunc = topSymbolTable.lookupAll(newFunction.getName());
-      FunctionId newIdentifier = (FunctionId) newFunction.getIdentifier(newFunction.getCurrSymTable());
+      Identifier declaredFunc = symbolTable.lookupAll(method.getName());
+      FunctionId newIdentifier = (FunctionId) method.getIdentifier(method.getCurrSymTable());
 
       if ( declaredFunc != null) {
         /* A function with the same name has already been declared
@@ -59,10 +56,10 @@ public class ProgramNode implements ASTNode {
           OverloadFuncId overloadFunc = new OverloadFuncId((FunctionId) declaredFunc);
           if (overloadFunc.addNewFunc(newIdentifier)) {
             /* Replace function ID with new Overload function ID*/
-            topSymbolTable.remove(newFunction.getName());
-            topSymbolTable.add(newFunction.getName(), overloadFunc);
+            symbolTable.remove(method.getName());
+            symbolTable.add(method.getName(), overloadFunc);
           } else {
-            IdentifierNode id = newFunction.getIdentifierNode();
+            IdentifierNode id = method.getIdentifierNode();
             errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
                     + " Cannot overload " + declaredFunc.toString() + "' as a function with the same " +
                     "signature already exists.");
@@ -70,24 +67,51 @@ public class ProgramNode implements ASTNode {
         } else if (declaredFunc instanceof OverloadFuncId) {
           OverloadFuncId overloadFunc = (OverloadFuncId) declaredFunc;
           if (!overloadFunc.addNewFunc(newIdentifier)) {
-            IdentifierNode id = newFunction.getIdentifierNode();
+            IdentifierNode id = method.getIdentifierNode();
             errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
                     + " Cannot overload " + declaredFunc.toString() + "' as a function with the same " +
                     "signature already exists.");
           }
         } else {
-          IdentifierNode id = newFunction.getIdentifierNode();
+          IdentifierNode id = method.getIdentifierNode();
           errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
                   + " Type of '" + declaredFunc.toString() + "' could not be resolved.");
         }
       } else {
-        topSymbolTable.add(newFunction.getName(), newIdentifier);
+        symbolTable.add(method.getName(), newIdentifier);
       }
     }
 
-    /* Call semanticAnalysis on each function, even if it has been declared twice */
-    for (FunctionNode func : functionNodes) {
-      func.semanticAnalysis(func.getCurrSymTable(), errorMessages);
+    for (FunctionNode method : methods) {
+      method.semanticAnalysis(method.getCurrSymTable(), errorMessages);
+    }
+  }
+
+  @Override
+  public void semanticAnalysis(SymbolTable topSymbolTable, List<String> errorMessages) {
+    setCurrSymTable(topSymbolTable);
+
+    /* Call overloadFunc to do semantic analysis on all declared functions and
+     * check if overload is possible */
+    overloadFunc(topSymbolTable, errorMessages, functionNodes);
+
+    /* Semantically analyse all classes */
+    for (ClassNode classDecl : classNodes) {
+      classDecl.setCurrSymTable(new SymbolTable(topSymbolTable));
+
+      if (topSymbolTable.lookupAll(classDecl.getName()) != null) {
+        /* Class with the same name has been declared */
+        IdentifierNode id = classDecl.getIdentifierNode();
+        errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine() +
+                "Class '" + id.getIdentifier() + "' has already been defined.");
+      } else {
+        ClassId classId = (ClassId) classDecl.getIdentifier(classDecl.getCurrSymTable());
+        topSymbolTable.add(classDecl.getName(), classId);
+      }
+    }
+
+    for (ClassNode classNode : classNodes) {
+      classNode.semanticAnalysis(classNode.getCurrSymTable(), errorMessages);
     }
 
     /* Call semanticAnalysis on the root statement node to analysis the rest of the program */

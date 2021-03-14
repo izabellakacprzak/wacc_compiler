@@ -15,7 +15,7 @@ options {
 }
 
 // program
-program: BEGIN (func)* stat END EOF ;
+program: BEGIN (func)* (classdecl)* stat END EOF ;
 
 
 // function and parameters

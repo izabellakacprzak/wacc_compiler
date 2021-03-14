@@ -27,7 +27,13 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     for (FuncContext f : ctx.func()) {
       functionNodes.add((FunctionNode) visit(f));
     }
-    return new ProgramNode(statementNode, functionNodes);
+
+    List<ClassNode> classNodes = new ArrayList<>();
+    for (ClassdeclContext classDecl : ctx.classdecl()) {
+      classNodes.add((ClassNode) visit(classDecl));
+    }
+
+    return new ProgramNode(statementNode, functionNodes, classNodes);
   }
 
   /* FUNCTION AND FUNCTION PARAMETERS NODES */

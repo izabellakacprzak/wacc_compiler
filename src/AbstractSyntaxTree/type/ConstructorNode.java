@@ -10,9 +10,9 @@ import java.util.List;
 
 public class ConstructorNode implements TypeNode{
 
-  private IdentifierNode name;
-  private ParamListNode parameters;
-  private StatementNode bodyStatement;
+  private final IdentifierNode name;
+  private final ParamListNode parameters;
+  private final StatementNode bodyStatement;
 
   public ConstructorNode(IdentifierNode name, ParamListNode parameters,
       StatementNode bodyStatement) {
@@ -33,7 +33,12 @@ public class ConstructorNode implements TypeNode{
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
-
+    /* Check if name matches class name */
+    // TODO: WRITE TEST CASE WHICH CHECKS FOR CONSTRUCTOR A IN CLASS B FOR TWO CLASSES DECLARED
+    /* Get class name and search it up in symbol table */
+    /* Check if such constructor already exists, if not add to list of constructors in symbol table */
+    parameters.semanticAnalysis(symbolTable, errorMessages);
+    bodyStatement.semanticAnalysis(symbolTable, errorMessages);
   }
 
   @Override
