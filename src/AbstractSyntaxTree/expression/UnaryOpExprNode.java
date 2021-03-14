@@ -9,6 +9,7 @@ import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UnaryOpExprNode extends ExpressionNode {
@@ -46,14 +47,36 @@ public class UnaryOpExprNode extends ExpressionNode {
     DataTypeId opType = operand.getType(symbolTable);
 
     if (opType == null && operand.isUnsetParamId(symbolTable)) {
+
       ParameterId param = operand.getParamId(symbolTable);
       /* UnaryOps for [getArgsType.size() == 1]: -, !, ord, chr. */
       if (operator.getArgTypes().size() == 1) {
-        param.setType(operator.getArgTypes().get(0));
+        DataTypeId type = operator.getArgTypes().get(0);
+        param.setType(type);
       } else /*case len on arrays. */ {
-        param.setType(new ArrayType());
+        List<DataTypeId> expectedTypes = new ArrayList<>();
+        expectedTypes.add(new ArrayType());
+        param.addToExpectedTypes(expectedTypes);
+        uncheckedNodes.add(this);
       }
+    } else if (operand instanceof ArrayElemNode) {
+      ArrayElemNode arrayElem = (ArrayElemNode) operand;
+      /* UnaryOps for [getArgsType.size() == 1]: -, !, ord, chr. */
+      if (operator.getArgTypes().size() == 1) {
+        DataTypeId type = operator.getArgTypes().get(0);
+        arrayElem.setArrayElemBaseType(symbolTable, type);
+      } else /*case len on arrays. */ {
+        List<DataTypeId> expectedTypes = new ArrayList<>();
+        expectedTypes.add(new ArrayType());
+        //param.addToExpectedTypes(expectedTypes);
+        uncheckedNodes.add(this);
+      }
+
+
     }
+
+    opType = operand.getType(symbolTable);
+
     /* Recursively call semanticAnalysis on operand node */
     operand.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 

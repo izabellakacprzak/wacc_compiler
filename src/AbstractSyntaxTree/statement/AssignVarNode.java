@@ -5,6 +5,7 @@ import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
+import AbstractSyntaxTree.expression.ArrayElemNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -44,7 +45,7 @@ public class AssignVarNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
-      List<ASTNode> uncheckedNodes, boolean firstCheck) {
+                               List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -67,15 +68,47 @@ public class AssignVarNode extends StatementNode {
         rightParam.setType(DEFAULT_TYPE);
         firstCheck = true;
       }
+    } else if (left instanceof ArrayElemNode && right instanceof ArrayElemNode) {
+      ArrayElemNode leftArrayElem = (ArrayElemNode) left;
+      ArrayElemNode rightArrayElem = (ArrayElemNode) right;
+      if (leftArrayElem.isUnsetParameterIdArrayElem(symbolTable)
+              && rightArrayElem.isUnsetParameterIdArrayElem(symbolTable)) {
+        if (firstCheck) {
+          uncheckedNodes.add(this);
+          leftArrayElem.addToMatchingParamsArrayElem(symbolTable,
+              rightArrayElem.getUnsetParameterIdArrayElem(symbolTable));
+          rightArrayElem.addToMatchingParamsArrayElem(symbolTable,
+              leftArrayElem.getUnsetParameterIdArrayElem(symbolTable));
+          return;
+
+        } else {
+          leftArrayElem.setArrayElemBaseType(symbolTable, DEFAULT_TYPE);
+          rightArrayElem.setArrayElemBaseType(symbolTable, DEFAULT_TYPE);
+          firstCheck = true;
+        }
+
+
+      }
     }
 
     if (isUnsetParamLeft) {
       leftParam.setType(rightType);
+    }else if (left instanceof ArrayElemNode) {
+      ArrayElemNode leftArrayElem = (ArrayElemNode) left;
+      leftArrayElem.setArrayElemBaseType(symbolTable, rightType);
     }
 
     if (isUnsetParamRight) {
       rightParam.setType(leftType);
+    }else if (right instanceof ArrayElemNode) {
+      ArrayElemNode rightArrayElem = (ArrayElemNode) right;
+      rightArrayElem.setArrayElemBaseType(symbolTable, leftType);
     }
+
+
+
+     leftType = left.getType(symbolTable);
+     rightType = right.getType(symbolTable);
 
     /* Recursively call semanticAnalysis on LHS node */
     left.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
@@ -104,7 +137,7 @@ public class AssignVarNode extends StatementNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
-        visitAssignVarNode(internalState, left, right, getCurrSymTable());
+                                         visitAssignVarNode(internalState, left, right, getCurrSymTable());
   }
 
 }

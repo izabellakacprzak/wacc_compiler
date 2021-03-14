@@ -25,8 +25,8 @@ public class BinaryOpExprNode extends ExpressionNode {
   private final BinOp operator;
 
   public BinaryOpExprNode(int line, int charPositionInLine, ExpressionNode left,
-      ExpressionNode right,
-      BinOp operator) {
+                          ExpressionNode right,
+                          BinOp operator) {
     super(line, charPositionInLine);
     this.left = left;
     this.right = right;
@@ -44,7 +44,7 @@ public class BinaryOpExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
-      List<ASTNode> uncheckedNodes, boolean firstCheck) {
+                               List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -59,41 +59,114 @@ public class BinaryOpExprNode extends ExpressionNode {
     ParameterId leftParam = left.getParamId(symbolTable);
     ParameterId rightParam = right.getParamId(symbolTable);
 
-    if (isUnsetParamLeft && isUnsetParamRight) {
+    boolean isUnsetArrayParamLeft = false;
+    boolean isUnsetArrayParamRight = false;
+    ParameterId leftArrayParam = null;
+    ParameterId rightArrayParam = null;
+    ArrayElemNode leftArrayElem = null;
+    ArrayElemNode rightArrayElem = null;
+
+    if (left instanceof ArrayElemNode) {
+      leftArrayElem = (ArrayElemNode) left;
+      isUnsetArrayParamLeft = leftArrayElem.isUnsetParameterIdArrayElem(symbolTable);
+      leftArrayParam = leftArrayElem.getUnsetParameterIdArrayElem(symbolTable);
+    }
+
+    if (right instanceof ArrayElemNode) {
+      rightArrayElem = (ArrayElemNode) right;
+      isUnsetArrayParamRight = rightArrayElem.isUnsetParameterIdArrayElem(symbolTable);
+      rightArrayParam = rightArrayElem.getUnsetParameterIdArrayElem(symbolTable);
+    }
+
+    if ((isUnsetParamLeft || isUnsetArrayParamLeft)
+            && (isUnsetParamRight || isUnsetArrayParamRight)) {
       if (argTypes.size() == 1) {
-        leftParam.setType(argTypes.get(0));
-        rightParam.setType(argTypes.get(0));
+        if (isUnsetParamLeft) { //it is an identifier parameter
+          leftParam.setType(argTypes.get(0));
+        } else { //it is unset array parameter
+          leftArrayElem.setArrayElemBaseType(symbolTable, argTypes.get(0));
+        }
+        if (isUnsetParamRight) { //it is an identifier parameter
+          rightParam.setType(argTypes.get(0));
+        } else { //it is unset array parameter
+          rightArrayElem.setArrayElemBaseType(symbolTable, argTypes.get(0));
+        }
 
       } else if (firstCheck) {
-        leftParam.addToMatchingParams(rightParam);
-        rightParam.addToMatchingParams(leftParam);
+        ParameterId leftParamToAdd = isUnsetParamLeft ? leftParam : leftArrayParam;
+        ParameterId rightParamToAdd = isUnsetParamRight ? rightParam : rightArrayParam;
+        if (isUnsetParamLeft) { //it is an identifier parameter
+          leftParam.addToMatchingParams(rightParamToAdd);
+          leftParam.addToExpectedTypes(argTypes);
+        } else { //it is unset array parameter
+          leftArrayElem.addToMatchingParamsArrayElem(symbolTable,
+              rightParamToAdd);
+          leftArrayElem.addToExpectedTypesArrayElem(symbolTable, argTypes);
+        }
 
-        leftParam.addToExpectedTypes(argTypes);
-        rightParam.addToExpectedTypes(argTypes);
+        if (isUnsetParamRight) { //it is an identifier parameter
+          rightParam.addToMatchingParams(leftParamToAdd);
+          rightParam.addToExpectedTypes(argTypes);
+        } else { //it is unset array parameter
+          rightArrayElem.addToMatchingParamsArrayElem(symbolTable,
+              leftParamToAdd);
+          rightArrayElem.addToExpectedTypesArrayElem(symbolTable, argTypes);
+        }
 
-        if (leftParam.getType() == null && rightParam.getType() == null) {
+        boolean leftTypeIsNull = isUnsetParamLeft ? leftParam.getType() == null
+                                     : rightArrayElem.getType(symbolTable) == null;
+        boolean rightTypeIsNull = isUnsetParamRight ? rightParam.getType() == null
+                                      : rightArrayElem.getType(symbolTable) == null;
+
+        if (leftTypeIsNull && rightTypeIsNull) {
           uncheckedNodes.add(this);
           return;
         }
 
       } else if (argTypes.isEmpty()) {
-        leftParam.setType(DEFAULT_TYPE);
-        rightParam.setType(DEFAULT_TYPE);
+        if (isUnsetParamLeft) { //it is an identifier parameter
+          leftParam.setType(DEFAULT_TYPE);
+        } else { //it is unset array parameter
+          leftArrayElem.setArrayElemBaseType(symbolTable, DEFAULT_TYPE);
+        }
+
+        if (isUnsetParamRight) { //it is an identifier parameter
+          rightParam.setType(DEFAULT_TYPE);
+        } else { //it is unset array parameter
+          rightArrayElem.setArrayElemBaseType(symbolTable, DEFAULT_TYPE);
+        }
         firstCheck = true;
 
       } else {
-        leftParam.setType(argTypes.get(0));
-        rightParam.setType(argTypes.get(0));
+        if (isUnsetParamLeft) { //it is an identifier parameter
+          leftParam.setType(argTypes.get(0));
+        } else { //it is unset array parameter
+          leftArrayElem.setArrayElemBaseType(symbolTable, argTypes.get(0));
+        }
+
+        if (isUnsetParamRight) { //it is an identifier parameter
+          rightParam.setType(argTypes.get(0));
+        } else { //it is unset array parameter
+          rightArrayElem.setArrayElemBaseType(symbolTable, argTypes.get(0));
+        }
         firstCheck = true;
       }
+
     }
+
+
+     //TODO: should recompute isUnset(Array)ParamLeft/Right here???
 
     if (isUnsetParamLeft) {
       leftParam.setType(rhsType);
+    } else if (isUnsetArrayParamLeft) {
+      leftArrayElem.setArrayElemBaseType(symbolTable, rhsType);
     }
 
     if (isUnsetParamRight) {
       rightParam.setType(lhsType);
+    } else if (isUnsetArrayParamRight) {
+      rightArrayElem.setArrayElemBaseType(symbolTable, lhsType);
     }
 
     lhsType = left.getType(symbolTable);

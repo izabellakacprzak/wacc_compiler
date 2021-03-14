@@ -31,6 +31,40 @@ public class ArrayElemNode extends ExpressionNode {
     return expressions;
   }
 
+  public void setArrayElemBaseType(SymbolTable symbolTable, DataTypeId type) {
+    if (identifier.isUnsetParamId(symbolTable) || identifier.isUnsetParamArray(symbolTable)) {
+      ParameterId paramId = identifier.getParamId(symbolTable);
+      int size = expressions.size();
+
+      paramId.setNestedType(type, size);
+    }
+  }
+
+  public void addToExpectedTypesArrayElem(SymbolTable symbolTable, List<DataTypeId> type) {
+    if (identifier.isUnsetParamId(symbolTable) || identifier.isUnsetParamArray(symbolTable)) {
+      ParameterId paramId = identifier.getParamId(symbolTable);
+      paramId.addToExpectedTypes(type);
+    }
+  }
+
+  public void addToMatchingParamsArrayElem(SymbolTable symbolTable, ParameterId param) {
+    if (identifier.isUnsetParamId(symbolTable) || identifier.isUnsetParamArray(symbolTable)) {
+      ParameterId paramId = identifier.getParamId(symbolTable);
+      paramId.addToMatchingParams(param);
+    }
+  }
+
+  public ParameterId getUnsetParameterIdArrayElem(SymbolTable symbolTable) {
+    if (identifier.isUnsetParamId(symbolTable) || identifier.isUnsetParamArray(symbolTable)) {
+      return identifier.getParamId(symbolTable);
+    }
+    return null;
+  }
+
+  public boolean isUnsetParameterIdArrayElem(SymbolTable symbolTable) {
+    return (identifier.isUnsetParamId(symbolTable) || identifier.isUnsetParamArray(symbolTable));
+  }
+
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
                                List<ASTNode> uncheckedNodes, boolean firstCheck) {

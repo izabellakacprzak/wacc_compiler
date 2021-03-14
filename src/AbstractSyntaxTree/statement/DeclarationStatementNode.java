@@ -44,15 +44,12 @@ public class DeclarationStatementNode extends StatementNode {
 
     if (assignment instanceof ArrayElemNode) {
       ArrayElemNode arrElemNode = (ArrayElemNode) assignment;
-      IdentifierNode identifier = arrElemNode.getIdentifier();
-
-      if (identifier.isUnsetParamId(symbolTable) || identifier.isUnsetParamArray(symbolTable)) {
-        ParameterId paramId = identifier.getParamId(symbolTable);
-        int size = arrElemNode.getExpressions().size();
-
-        paramId.setNestedType(declaredType, size);
-      }
+      arrElemNode.setArrayElemBaseType(symbolTable, declaredType);
     }
+
+     declaredType = type.getType();
+     assignedType = assignment.getType(symbolTable);
+
 
     /* Check whether identifier has been previously declared as another variable in the current scope.
      * If not, add a new VariableId to the symbol table under identifier */
