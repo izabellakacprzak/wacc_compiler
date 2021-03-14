@@ -33,33 +33,6 @@ public class BinaryOpExprNode extends ExpressionNode {
     this.operator = operator;
   }
 
-  private void matchTypes(SymbolTable symbolTable, ExpressionNode left,
-      ExpressionNode right) {
-
-    DataTypeId rhsType = right.getType(symbolTable);
-
-    if (!(left.isUnsetParamId(symbolTable))) {
-      return;
-    }
-
-    ParameterId paramLeft = left.getParamId(symbolTable);
-
-    if (rhsType != null) {
-      paramLeft.setType(rhsType);
-      return;
-    }
-
-    ParameterId paramRight = right.getParamId(symbolTable);
-
-    if (!(right.isUnsetParamId(symbolTable))) {
-      paramLeft.addToMatchingParams(paramRight);
-
-      for (DataTypeId type : operator.getArgTypes()) {
-        paramLeft.addToExpectedTypes(type);
-      }
-    }
-  }
-
   /* Returns the toString of a list without the square brackets "[]"
    * surrounding the elements */
   private String listTypeToString(List<DataTypeId> list) {
@@ -92,16 +65,16 @@ public class BinaryOpExprNode extends ExpressionNode {
         rightParam.setType(argTypes.get(0));
 
       } else if (firstCheck) {
-        uncheckedNodes.add(this);
         leftParam.addToMatchingParams(rightParam);
         rightParam.addToMatchingParams(leftParam);
 
-        for (DataTypeId type : argTypes) {
-          leftParam.addToExpectedTypes(type);
-          rightParam.addToExpectedTypes(type);
-        }
+        leftParam.addToExpectedTypes(argTypes);
+        rightParam.addToExpectedTypes(argTypes);
 
-        return;
+        if (leftParam.getType() == null && rightParam.getType() == null) {
+          uncheckedNodes.add(this);
+          return;
+        }
 
       } else if (argTypes.isEmpty()) {
         leftParam.setType(DEFAULT_TYPE);

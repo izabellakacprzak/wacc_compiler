@@ -4,7 +4,6 @@ import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
 
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
-import AbstractSyntaxTree.expression.PairLiterExprNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
@@ -14,6 +13,7 @@ import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FreeStatementNode extends StatementNode {
@@ -37,11 +37,15 @@ public class FreeStatementNode extends StatementNode {
       ParameterId exprParam = expression.getParamId(symbolTable);
 
       if (firstCheck) {
-        uncheckedNodes.add(this);
-        exprParam.addToExpectedTypes(new ArrayType(null));
-        exprParam.addToExpectedTypes(new PairType(null, null));
+        List<DataTypeId> expecteds = new ArrayList<>();
+        expecteds.add(new ArrayType(null));
+        expecteds.add(new PairType(null, null));
+        exprParam.addToExpectedTypes(expecteds);
 
-        return;
+        if (exprParam.getType() == null) {
+          uncheckedNodes.add(this);
+          return;
+        }
 
       } else {
         exprParam.setType(DEFAULT_TYPE);

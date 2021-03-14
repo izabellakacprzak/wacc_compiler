@@ -33,6 +33,14 @@ public class DeclarationStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+    DataTypeId declaredType = type.getType();
+    DataTypeId assignedType = assignment.getType(symbolTable);
+
+    if (assignment.isUnsetParamId(symbolTable)) {
+      ParameterId assignParam = assignment.getParamId(symbolTable);
+      assignParam.setType(declaredType);
+    }
+
     /* Check whether identifier has been previously declared as another variable in the current scope.
      * If not, add a new VariableId to the symbol table under identifier */
     if (symbolTable.lookup(identifier.getIdentifier()) != null) {
@@ -47,23 +55,6 @@ public class DeclarationStatementNode extends StatementNode {
 
     /* Check that the expected (declared) type and the type of assignment
      * can be resolved and match */
-    DataTypeId declaredType = type.getType();
-    DataTypeId assignedType = assignment.getType(symbolTable);
-
-//TODO: Pairs
-    if (assignedType == null) {
-      if (assignment instanceof ExpressionNode) {
-        ExpressionNode expr = (ExpressionNode) assignment;
-        if (expr.isUnsetParamId(symbolTable)) {
-          ParameterId param = expr.getParamId(symbolTable);
-          param.setType(declaredType);
-        }
-      } else if (assignment instanceof ArrayLiterNode) {
-        ArrayLiterNode arrayLiter = (ArrayLiterNode) assignment;
-        arrayLiter.setParamTypes(declaredType, symbolTable);
-      }
-    }
-
     if (declaredType == null) {
       errorMessages.add(new SemanticError(assignment.getLine(), assignment.getCharPositionInLine(),
           "Could not resolve type of '" + identifier + "'."));

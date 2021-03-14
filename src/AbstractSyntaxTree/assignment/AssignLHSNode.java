@@ -39,29 +39,19 @@ public abstract class AssignLHSNode implements ASTNode {
 
   /* Returns a ParameterId if one exists for this IdentifierNode, otherwise null */
   public ParameterId getParamId(SymbolTable symbolTable) {
-    if ((this instanceof IdentifierNode)) {
-      IdentifierNode idNode = (IdentifierNode) this;
-      ParameterId param = null;
-
-      Identifier identifierId = symbolTable.lookupAll(idNode.getIdentifier());
-
-      if (identifierId instanceof ParameterId) {
-        param = (ParameterId) identifierId;
-      }
-
-      return param;
-    } else if (this instanceof ArrayElemNode) {
-      ArrayElemNode arrNode = (ArrayElemNode) this;
-      ParameterId param = null;
-
-      Identifier identifierId = symbolTable.lookupAll(arrNode.getIdentifier().getIdentifier());
-
-      if (identifierId instanceof ParameterId) {
-        param = (ParameterId) identifierId;
-      }
-      return param;
+    if (!(this instanceof IdentifierNode)) {
+      return null;
     }
-    return null;
+
+    IdentifierNode idNode = (IdentifierNode) this;
+    Identifier identifierId = symbolTable.lookupAll(idNode.getIdentifier());
+
+    ParameterId param = null;
+    if (identifierId instanceof ParameterId) {
+      param = (ParameterId) identifierId;
+    }
+
+    return param;
   }
 
   public boolean isUnsetParamId(SymbolTable symbolTable) {
@@ -72,6 +62,23 @@ public abstract class AssignLHSNode implements ASTNode {
       return !(param == null) && ((ArrayType) param.getType()).getElemType() == null;
     }
     return false;
+  }
+
+  public boolean isUnsetParamArray(SymbolTable symbolTable) {
+    ParameterId param = this.getParamId(symbolTable);
+
+    if (param == null) {
+      return false;
+    }
+
+    ArrayType arrType;
+    DataTypeId type = param.getType();
+    while (type instanceof ArrayType) {
+      arrType = (ArrayType) type;
+      type = arrType.getElemType();
+    }
+
+    return type == null;
   }
 
   @Override

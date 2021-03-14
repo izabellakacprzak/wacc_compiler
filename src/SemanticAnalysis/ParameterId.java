@@ -8,11 +8,11 @@ import java.util.List;
 
 public class ParameterId extends Identifier {
 
-  private final List<ParameterId> matchingParams = new ArrayList<>();
-  private final List<DataTypeId> expectedTypes = new ArrayList<>();
   /* type: DataTypeId corresponding to the type of
    *       the represented parameter */
+  private final List<ParameterId> matchingParams = new ArrayList<>();
   private DataTypeId type;
+  private List<DataTypeId> expectedTypes = new ArrayList<>();
 
   public ParameterId(IdentifierNode node, DataTypeId type) {
     super(node);
@@ -38,6 +38,29 @@ public class ParameterId extends Identifier {
     }
   }
 
+  public void setBaseElemType(DataTypeId baseType) {
+    ArrayType arrType;
+    DataTypeId type = this.type;
+    int count = 0;
+    while (type instanceof ArrayType) {
+      arrType = (ArrayType) type;
+      type = arrType.getElemType();
+      count++;
+    }
+
+    setNestedType(baseType, count);
+  }
+
+  public void setNestedType(DataTypeId baseType, int depth) {
+    DataTypeId type = baseType;
+    while (depth > 0) {
+      type = new ArrayType(type);
+      depth--;
+    }
+
+    this.type = type;
+  }
+
   @Override
   public int getSize() {
     return type.getSize();
@@ -49,17 +72,22 @@ public class ParameterId extends Identifier {
     }
   }
 
-  public void addToExpectedTypes(DataTypeId type) {
-    boolean contained = false;
-    for (DataTypeId containedType : expectedTypes) {
-      if (type.equals(containedType)) {
-        contained = true;
-        break;
+  public void addToExpectedTypes(List<DataTypeId> types) {
+    List<DataTypeId> expectedTypes = new ArrayList<>();
+
+    for (DataTypeId type : types) {
+      for (DataTypeId expected : this.expectedTypes) {
+        if (expected.equals(type)) {
+          expectedTypes.add(expected);
+        }
       }
     }
-    if (!contained) {
-      expectedTypes.add(type);
+
+    if (expectedTypes.size() == 1) {
+      this.type = expectedTypes.get(0);
     }
+
+    this.expectedTypes = expectedTypes;
   }
 
   @Override

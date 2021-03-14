@@ -6,15 +6,19 @@ import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReadStatementNode extends StatementNode {
 
+  private static final DataTypeId DEFAULT_TYPE = new BaseType(BaseType.Type.INT);
   /* assignment:   AssignLHSNode corresponding to the IdentifierNode, ArrayElemNode
    *                 or PairElemNode 'read' was called with */
   private final AssignLHSNode assignment;
@@ -29,26 +33,26 @@ public class ReadStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
-    //TODO: pairs
-    if (assignment.getType(symbolTable) == null) {
-      if (assignment instanceof ExpressionNode) {
-        ExpressionNode expr = (ExpressionNode) assignment;
-        if (expr.isUnsetParamId(symbolTable)) {
-          ParameterId param = expr.getParamId(symbolTable);
-          param.addToExpectedTypes(new BaseType(BaseType.Type.INT));
-          param.addToExpectedTypes(new BaseType(BaseType.Type.CHAR));
-          uncheckedNodes.add(assignment);
+    if (assignment.isUnsetParamId(symbolTable)) {
+      ParameterId exprParam = assignment.getParamId(symbolTable);
+
+      if (firstCheck) {
+        List<DataTypeId> expecteds = new ArrayList<>();
+        expecteds.add(new BaseType(BaseType.Type.INT));
+        expecteds.add(new BaseType(BaseType.Type.CHAR));
+        exprParam.addToExpectedTypes(expecteds);
+
+        if (exprParam.getType() == null) {
+          uncheckedNodes.add(this);
           return;
         }
-      } else if (assignment instanceof ArrayLiterNode) {
-        ArrayLiterNode arrayLiter = (ArrayLiterNode) assignment;
-        //TODO: we dont have expected types for arrayLiter
-        // arrayLiter.addToParamsExpectedTypes(new BaseType(BaseType.Type.INT));
-        // arrayLiter.addToParamsExpectedTypes(new BaseType(BaseType.Type.CHAR));
-        uncheckedNodes.add(assignment);
-        return;
+
+      } else {
+        exprParam.setType(DEFAULT_TYPE);
+        firstCheck = true;
       }
     }
+
     /* Recursively call semanticAnalysis on assignment node */
     assignment.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
