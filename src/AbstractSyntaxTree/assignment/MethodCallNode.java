@@ -13,10 +13,13 @@ public class MethodCallNode extends AssignRHSNode{
   private IdentifierNode objectName;
   private IdentifierNode methodName;
   private List<ExpressionNode> arguments;
-  private ClassNode classNode;
 
-  public MethodCallNode(int line, int charPositionInLine) {
+  public MethodCallNode(int line, int charPositionInLine, IdentifierNode objectName,
+      IdentifierNode methodName, List<ExpressionNode> arguments) {
     super(line, charPositionInLine);
+    this.objectName = objectName;
+    this.methodName = methodName;
+    this.arguments = arguments;
   }
 
   @Override

@@ -10,10 +10,16 @@ import java.util.List;
 
 public class ConstructorNode implements TypeNode{
 
-  private ClassNode classNode;
   private IdentifierNode name;
   private ParamListNode parameters;
   private StatementNode bodyStatement;
+
+  public ConstructorNode(IdentifierNode name, ParamListNode parameters,
+      StatementNode bodyStatement) {
+    this.name = name;
+    this.parameters = parameters;
+    this.bodyStatement = bodyStatement;
+  }
 
   @Override
   public Identifier getIdentifier(SymbolTable symbolTable) {

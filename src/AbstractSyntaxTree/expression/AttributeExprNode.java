@@ -9,10 +9,13 @@ import java.util.List;
 public class AttributeExprNode extends ExpressionNode {
 
   private IdentifierNode objectName;
-  private AttributeNode attributeNode;
+  private IdentifierNode attributeName;
 
-  public AttributeExprNode(int line, int charPositionInLine) {
+  public AttributeExprNode(int line, int charPositionInLine, IdentifierNode objectName,
+      IdentifierNode attributeName) {
     super(line, charPositionInLine);
+    this.objectName = objectName;
+    this.attributeName = attributeName;
   }
 
   @Override

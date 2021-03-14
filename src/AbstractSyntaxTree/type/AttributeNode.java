@@ -12,7 +12,19 @@ public class AttributeNode implements TypeNode {
 
   private IdentifierNode name;
   private TypeNode type;
-  private AssignRHSNode assignRHS = null;
+  private AssignRHSNode assignRHS;
+
+  public AttributeNode(IdentifierNode name, TypeNode type, AssignRHSNode assignRHS) {
+    this.name = name;
+    this.type = type;
+    this.assignRHS = assignRHS;
+  }
+
+  public AttributeNode(IdentifierNode name, TypeNode type) {
+    this.name = name;
+    this.type = type;
+    this.assignRHS = null;
+  }
 
   @Override
   public Identifier getIdentifier(SymbolTable symbolTable) {

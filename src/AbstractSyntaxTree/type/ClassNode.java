@@ -9,10 +9,18 @@ import java.util.List;
 
 public class ClassNode implements TypeNode {
 
-  private IdentifierNode className;
-  private List<AttributeNode> attributes;
-  private List<ConstructorNode> constructors;
-  private List<FunctionNode> methods;
+  private final IdentifierNode className;
+  private final List<AttributeNode> attributes;
+  private final List<ConstructorNode> constructors;
+  private final List<FunctionNode> methods;
+
+  public ClassNode(IdentifierNode className, List<AttributeNode> attributes,
+      List<ConstructorNode> constructors, List<FunctionNode> methods) {
+    this.className = className;
+    this.attributes = attributes;
+    this.constructors = constructors;
+    this.methods = methods;
+  }
 
   @Override
   public Identifier getIdentifier(SymbolTable symbolTable) {

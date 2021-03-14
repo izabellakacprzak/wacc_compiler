@@ -24,8 +24,6 @@ param_list: type IDENT (COMMA type IDENT)* ;
 
 // class
 classdecl: CLASS IDENT OPEN_PARENTHESES CLOSE_PARENTHESES BEGIN (attribute)* (constructor)+ (func)* END ;
-getattr: IDENT DOT IDENT ;
-getmethod: IDENT DOT IDENT OPEN_PARENTHESES (expr (COMMA expr)*)? CLOSE_PARENTHESES ;
 
 attribute: type IDENT             #AttrNoAssign
 | type IDENT ASSIGN assign_rhs    #AttrAssign
@@ -63,7 +61,7 @@ assign_rhs: expr                                                           #Expr
 | NEWPAIR OPEN_PARENTHESES expr COMMA expr CLOSE_PARENTHESES               #NewPairRHS
 | pair_elem                                                                #PairElemRHS
 | CALL IDENT OPEN_PARENTHESES (expr (COMMA expr)*)? CLOSE_PARENTHESES      #FuncCallRHS
-| getmethod                                                                #MethodCallRHS
+| IDENT DOT IDENT OPEN_PARENTHESES (expr (COMMA expr)*)? CLOSE_PARENTHESES #MethodCallRHS
 ;
 
 
@@ -108,7 +106,7 @@ expr: int_liter {inbounds(_localctx);}            #IntLiterExpr
 | expr op=AND expr                                #BinaryExpr
 | expr op=OR expr                                 #BinaryExpr
 | OPEN_PARENTHESES expr CLOSE_PARENTHESES         #BracketExpr
-| getattr                                         #AttributeExpr
+| IDENT DOT IDENT                                 #AttributeExpr
 ;
 
 int_liter: (PLUS | MINUS)? INT_LITER;

@@ -5,6 +5,7 @@ import AbstractSyntaxTree.expression.*;
 import AbstractSyntaxTree.statement.*;
 import AbstractSyntaxTree.type.*;
 import SemanticAnalysis.DataTypes.BaseType.Type;
+import SemanticAnalysis.Identifier;
 import SemanticAnalysis.Operator;
 import SemanticAnalysis.Operator.*;
 import antlr.WACCParser;
@@ -72,6 +73,104 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     }
 
     return new ParamListNode(names, types);
+  }
+
+  /* CLASS AND CLASS ELEMENTS NODES */
+
+  @Override
+  public ASTNode visitClassdecl(ClassdeclContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+    IdentifierNode className = new IdentifierNode(line, charPositionInLine, ctx.IDENT().getText());
+
+    List<AttributeNode> attributes = new ArrayList<>();
+    List<ConstructorNode> constructors = new ArrayList<>();
+    List<FunctionNode> methods = new ArrayList<>();
+
+    for(int i = 0; i < ctx.attribute().size(); i++) {
+      attributes.add((AttributeNode) (visit(ctx.attribute(i))));
+    }
+    for(int i = 0; i < ctx.constructor().size(); i++) {
+      constructors.add((ConstructorNode) (visit(ctx.constructor(i))));
+    }
+    for(int i = 0; i < ctx.func().size(); i++) {
+      methods.add((FunctionNode) (visit(ctx.func(i))));
+    }
+    return new ClassNode(className, attributes, constructors, methods);
+  }
+
+  @Override
+  public ASTNode visitAttrNoAssign(AttrNoAssignContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+    IdentifierNode name = new IdentifierNode(line, charPositionInLine, ctx.IDENT().getText());
+    TypeNode type = (TypeNode) visit(ctx.type());
+
+    return new AttributeNode(name, type);
+  }
+
+  @Override
+  public ASTNode visitAttrAssign(AttrAssignContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+    IdentifierNode name = new IdentifierNode(line, charPositionInLine, ctx.IDENT().getText());
+    TypeNode type = (TypeNode) visit(ctx.type());
+    AssignRHSNode assignment = (AssignRHSNode) visit(ctx.assign_rhs());
+
+    return new AttributeNode(name, type, assignment);
+  }
+
+  @Override
+  public ASTNode visitConstructor(ConstructorContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+    IdentifierNode name = new IdentifierNode(line, charPositionInLine, ctx.IDENT().getText());
+    ParamListNode parameters = (ParamListNode) visit(ctx.param_list());
+    StatementNode body = (StatementNode) visit(ctx.stat());
+
+    return new ConstructorNode(name, parameters, body);
+  }
+
+  @Override
+  public ASTNode visitAttributeExpr(AttributeExprContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+    IdentifierNode objectName = new IdentifierNode(line, charPositionInLine,
+        ctx.IDENT(0).getText());
+    IdentifierNode attributeName = new IdentifierNode(line, charPositionInLine,
+        ctx.IDENT(1).getText());
+
+    return new AttributeExprNode(line, charPositionInLine, objectName, attributeName);
+  }
+
+  @Override
+  public ASTNode visitMethodCallRHS(MethodCallRHSContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+    IdentifierNode objectName = new IdentifierNode(line, charPositionInLine, ctx.IDENT(0).getText());
+    IdentifierNode methodName = new IdentifierNode(line, charPositionInLine, ctx.IDENT(1).getText());
+    List<ExpressionNode> expressions = new ArrayList<>();
+
+    for(int i = 0; i < ctx.expr().size(); i++) {
+      expressions.add((ExpressionNode) visit(ctx.expr(i)));
+    }
+
+    return new MethodCallNode(line, charPositionInLine, objectName, methodName, expressions);
+  }
+
+  @Override
+  public ASTNode visitObjectDeclStat(ObjectDeclStatContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+    IdentifierNode className = new IdentifierNode(line, charPositionInLine, ctx.IDENT(0).getText());
+    IdentifierNode objectName = new IdentifierNode(line, charPositionInLine, ctx.IDENT(1).getText());
+    List<ExpressionNode> expressions = new ArrayList<>();
+
+    for(int i = 0; i < ctx.expr().size(); i++) {
+      expressions.add((ExpressionNode) visit(ctx.expr(i)));
+    }
+
+    return new ObjectDeclStatementNode(className, objectName, expressions);
   }
 
   /* RHS ASSIGNMENT NODES */
