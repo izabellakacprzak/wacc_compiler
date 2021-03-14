@@ -1,9 +1,7 @@
 package SemanticAnalysis;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class OverloadFuncId extends Identifier {
 
@@ -60,14 +58,16 @@ public class OverloadFuncId extends Identifier {
 
   private boolean canOverload(FunctionId function) {
     DataTypeId returnType = function.getType();
-    Set<DataTypeId> params = new HashSet<>(function.getParamTypes());
+    List<DataTypeId> params = function.getParamTypes().stream().
+            sorted(Comparator.comparing(DataTypeId::hashCode)).collect(Collectors.toList());
 
     boolean canOverload = true;
 
     for (FunctionId declaredFunc : functions) {
 
       if (declaredFunc.getType().equals(returnType)) {
-        Set<DataTypeId> declaredParams = new HashSet<>(declaredFunc.getParamTypes());
+        List<DataTypeId> declaredParams = declaredFunc.getParamTypes().stream().
+                sorted(Comparator.comparing(DataTypeId::hashCode)).collect(Collectors.toList());;
         if (declaredParams.equals(params)) {
           canOverload = false;
           break;
