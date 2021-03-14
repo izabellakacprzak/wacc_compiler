@@ -22,21 +22,32 @@ program: BEGIN (func)* stat END EOF ;
 func: type IDENT OPEN_PARENTHESES (param_list)? CLOSE_PARENTHESES IS stat END ;
 param_list: type IDENT (COMMA type IDENT)* ;
 
+// class
+class: CLASS IDENT OPEN_PARENTHESES CLOSE_PARENTHESES BEGIN (attribute)* (constructor)+ (function)* END ;
+getattr: IDENT DOT IDENT
+getmethod: IDENT DOT IDENT OPEN_PARENTHESES (expr (COMMA expr)*)? CLOSE_PARENTHESES
+
+attribute: type IDENT
+| type IDENT ASSIGN assign_rhs ;
+
+constructor: IDENT OPEN_PARENTHESES (param_list)? CLOSE_PARENTHESES IS stat END ;
 
 // statement
-stat: SKP                         #SkipStat
-| type IDENT ASSIGN assign_rhs    #DeclStat
-| assign_lhs ASSIGN assign_rhs    #AssignStat
-| READ assign_lhs                 #ReadStat
-| FREE expr                       #FreeStat
-| RETURN expr                     #ReturnStat
-| EXIT expr                       #ExitStat
-| PRINT expr                      #PrintStat
-| PRINTLN expr                    #PrintlnStat
-| IF expr THEN stat ELSE stat FI  #IfStat
-| WHILE expr DO stat DONE         #WhileStat
-| BEGIN stat END                  #ScopeStat
-| stat SEMICOLON stat             #StatsListStat
+stat: SKP                                       #SkipStat
+| type IDENT ASSIGN assign_rhs                  #DeclStat
+| assign_lhs ASSIGN assign_rhs                  #AssignStat
+| READ assign_lhs                               #ReadStat
+| FREE expr                                     #FreeStat
+| RETURN expr                                   #ReturnStat
+| EXIT expr                                     #ExitStat
+| PRINT expr                                    #PrintStat
+| PRINTLN expr                                  #PrintlnStat
+| IF expr THEN stat ELSE stat FI                #IfStat
+| WHILE expr DO stat DONE                       #WhileStat
+| BEGIN stat END                                #ScopeStat
+| stat SEMICOLON stat                           #StatsListStat
+| IDENT IDENT ASSIGN NEW IDENT OPEN_PARENTHESES
+(expr (COMMA expr)*)? CLOSE_PARENTHESES         #ObjectDeclStat
 ;
 
 
@@ -51,6 +62,7 @@ assign_rhs: expr                                                           #Expr
 | NEWPAIR OPEN_PARENTHESES expr COMMA expr CLOSE_PARENTHESES               #NewPairRHS
 | pair_elem                                                                #PairElemRHS
 | CALL IDENT OPEN_PARENTHESES (expr (COMMA expr)*)? CLOSE_PARENTHESES      #FuncCallRHS
+| getmethod                                                                #MethodCallRHS
 ;
 
 
@@ -95,6 +107,7 @@ expr: int_liter {inbounds(_localctx);}            #IntLiterExpr
 | expr op=AND expr                                #BinaryExpr
 | expr op=OR expr                                 #BinaryExpr
 | OPEN_PARENTHESES expr CLOSE_PARENTHESES         #BracketExpr
+| getattr                                         #AttributeExpr
 ;
 
 int_liter: (PLUS | MINUS)? INT_LITER;

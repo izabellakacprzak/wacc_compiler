@@ -9,6 +9,11 @@ SEMICOLON: ';' ;
 // assignment
 ASSIGN: '=' ;
 
+// classes
+CLASS: 'class' ;
+NEW: 'new' ;
+DOT: '.' ;
+
 // statement
 COMMA: ',' ;
 SKP: 'skip' ;
