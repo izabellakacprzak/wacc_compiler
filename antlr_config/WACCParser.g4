@@ -23,12 +23,13 @@ func: type IDENT OPEN_PARENTHESES (param_list)? CLOSE_PARENTHESES IS stat END ;
 param_list: type IDENT (COMMA type IDENT)* ;
 
 // class
-class: CLASS IDENT OPEN_PARENTHESES CLOSE_PARENTHESES BEGIN (attribute)* (constructor)+ (function)* END ;
-getattr: IDENT DOT IDENT
-getmethod: IDENT DOT IDENT OPEN_PARENTHESES (expr (COMMA expr)*)? CLOSE_PARENTHESES
+classdecl: CLASS IDENT OPEN_PARENTHESES CLOSE_PARENTHESES BEGIN (attribute)* (constructor)+ (func)* END ;
+getattr: IDENT DOT IDENT ;
+getmethod: IDENT DOT IDENT OPEN_PARENTHESES (expr (COMMA expr)*)? CLOSE_PARENTHESES ;
 
-attribute: type IDENT
-| type IDENT ASSIGN assign_rhs ;
+attribute: type IDENT             #AttrNoAssign
+| type IDENT ASSIGN assign_rhs    #AttrAssign
+;
 
 constructor: IDENT OPEN_PARENTHESES (param_list)? CLOSE_PARENTHESES IS stat END ;
 
