@@ -4,6 +4,7 @@ import AbstractSyntaxTree.ProgramNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.*;
+import SemanticAnalysis.DataTypes.ClassType;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class ClassNode implements TypeNode {
 
   @Override
   public Identifier getIdentifier(SymbolTable symbolTable) {
-    return new ClassId(className, attributes);
+    return new ClassType(className, attributes);
   }
 
   @Override

@@ -6,6 +6,7 @@ import AbstractSyntaxTree.type.ClassNode;
 import AbstractSyntaxTree.type.FunctionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.*;
+import SemanticAnalysis.DataTypes.ClassType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,8 +106,8 @@ public class ProgramNode implements ASTNode {
         errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine() +
                 "Class '" + id.getIdentifier() + "' has already been defined.");
       } else {
-        ClassId classId = (ClassId) classDecl.getIdentifier(classDecl.getCurrSymTable());
-        topSymbolTable.add(classDecl.getName(), classId);
+        ClassType classType = (ClassType) classDecl.getIdentifier(classDecl.getCurrSymTable());
+        topSymbolTable.add(classDecl.getName(), classType);
       }
     }
 

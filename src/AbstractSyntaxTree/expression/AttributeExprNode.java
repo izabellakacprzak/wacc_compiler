@@ -3,13 +3,19 @@ package AbstractSyntaxTree.expression;
 import AbstractSyntaxTree.type.AttributeNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.ClassType;
+import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SymbolTable;
+
+import javax.xml.crypto.Data;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class AttributeExprNode extends ExpressionNode {
 
-  private IdentifierNode objectName;
-  private IdentifierNode attributeName;
+  private final IdentifierNode objectName;
+  private final IdentifierNode attributeName;
 
   public AttributeExprNode(int line, int charPositionInLine, IdentifierNode objectName,
       IdentifierNode attributeName) {
@@ -20,8 +26,23 @@ public class AttributeExprNode extends ExpressionNode {
 
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
-    return null;
+    DataTypeId objectType = objectName.getType(symbolTable);
+    if (!(objectType instanceof ClassType)) {
+      return null;
+    } else {
+      ClassType classType = (ClassType) objectType;
+      SymbolTable classSymbolTable = classType.getFields().get(0).getCurrSymTable();
+
+      /* Check if such an attribute exists for this class */
+      Identifier attribute = classSymbolTable.lookup(attributeName.getIdentifier());
+      if(attribute == null) {
+        return null;
+      } else {
+        return attribute.getType();
+      }
+    }
   }
+
 
   @Override
   public String toString() {
@@ -30,7 +51,25 @@ public class AttributeExprNode extends ExpressionNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    /* Check class of object */
+    DataTypeId objectType = objectName.getType(symbolTable);
+    if (!(objectType instanceof ClassType)) {
+      errorMessages.add(objectName.getLine() + ":" + objectName.getCharPositionInLine() +
+              "Cannot get attribute of a non-object."   + " Expected: CLASS TYPE "
+              + " Actual: " + objectType);
+    } else {
+      ClassType classType = (ClassType) objectType;
+      SymbolTable classSymbolTable = classType.getFields().get(0).getCurrSymTable();
 
+      /* Check if such an attribute exists for this class */
+      if(classSymbolTable.lookup(attributeName.getIdentifier()) == null) {
+        errorMessages.add(objectName.getLine() + ":" + objectName.getCharPositionInLine() +
+                "Attribute with name '" + attributeName.getIdentifier() + "' has not been declared for class '"
+                + classType.getClassName()
+                + " Expected: [" + classType.getFields().stream().map(Objects::toString).collect(Collectors.toList())
+                + "] Actual: " + attributeName.getIdentifier());
+      }
+    }
   }
 
   @Override

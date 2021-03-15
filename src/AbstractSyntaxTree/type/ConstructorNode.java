@@ -4,6 +4,7 @@ import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.*;
+import SemanticAnalysis.DataTypes.ClassType;
 
 import java.util.List;
 
@@ -45,11 +46,11 @@ public class ConstructorNode implements TypeNode{
     if (classId == null) {
       errorMessages.add(name.getLine() + ":" + name.getCharPositionInLine() +
               "Constructor name '" + name.getIdentifier() + "' does not match declared class.");
-    } else if (!(classId instanceof ClassId)) {
+    } else if (!(classId instanceof ClassType)) {
       errorMessages.add(name.getLine() + ":" + name.getCharPositionInLine() +
               "Constructor '" + name.getIdentifier() + "' can only be declared for a class.");
     } else {
-      ClassId classIdentifier = (ClassId) classId;
+      ClassType classIdentifier = (ClassType) classId;
       ConstructorId constructor = new ConstructorId(name, parameters.getIdentifiers(symbolTable));
 
       /* Check if such constructor already exists, if not add to list of constructors in symbol table */

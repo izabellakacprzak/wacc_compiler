@@ -67,7 +67,7 @@ public class OverloadFuncId extends Identifier {
 
       if (declaredFunc.getType().equals(returnType)) {
         List<DataTypeId> declaredParams = declaredFunc.getParamTypes().stream().
-                sorted(Comparator.comparing(DataTypeId::hashCode)).collect(Collectors.toList());;
+                sorted(Comparator.comparing(DataTypeId::hashCode)).collect(Collectors.toList());
         if (declaredParams.equals(params)) {
           canOverload = false;
           break;

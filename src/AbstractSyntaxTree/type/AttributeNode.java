@@ -80,6 +80,11 @@ public class AttributeNode implements TypeNode {
   }
 
   @Override
+  public String toString() {
+    return name.getIdentifier();
+  }
+
+  @Override
   public void setCurrSymTable(SymbolTable currSymTable) {
     this.currSymTable = currSymTable;
   }
