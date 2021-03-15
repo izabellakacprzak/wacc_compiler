@@ -7,9 +7,8 @@
 
 begin
   int f(x) is
-    while x do
-      x = false ;
-    done ;
+    read x[4][3] ;
+    return 0 
   end
   println 0
 end

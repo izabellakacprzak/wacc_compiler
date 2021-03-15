@@ -3,6 +3,7 @@ package AbstractSyntaxTree.statement;
 import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
 
 import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
@@ -33,31 +34,60 @@ public class FreeStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
-    if (expression.isUnsetParamId(symbolTable)) {
-      ParameterId exprParam = expression.getParamId(symbolTable);
+    DataTypeId exprType = expression.getType(symbolTable);
+
+    boolean isUnsetParam = expression.isUnsetParamId(symbolTable);
+    ParameterId param = expression.getParamId(symbolTable);
+
+    boolean isUnsetArrayParam = false;
+    ParameterId arrayParam = null;
+    ArrayElemNode arrayElem = null;
+
+
+    if (expression instanceof ArrayElemNode) {
+      arrayElem = (ArrayElemNode) expression;
+      isUnsetArrayParam = arrayElem.isUnsetParameterIdArrayElem(symbolTable);
+      arrayParam = arrayElem.getUnsetParameterIdArrayElem(symbolTable);
+    }
+
+
+    if (isUnsetParam || isUnsetArrayParam) {
 
       if (firstCheck) {
         List<DataTypeId> expecteds = new ArrayList<>();
         expecteds.add(new ArrayType(null));
         expecteds.add(new PairType(null, null));
-        exprParam.addToExpectedTypes(expecteds);
 
-        if (exprParam.getType() == null) {
+        if (isUnsetParam) {
+          param.addToExpectedTypes(expecteds);
+        } else if (isUnsetArrayParam) {
+          arrayParam.addToExpectedTypes(expecteds);
+        }
+
+        boolean paramTypeIsStillNull = (isUnsetParam) ? param.getType() == null
+                                           : arrayElem.getType(symbolTable)  == null;
+        if (paramTypeIsStillNull) {
           uncheckedNodes.add(this);
           return;
         }
 
       } else {
-        exprParam.setType(DEFAULT_TYPE);
+        if (isUnsetParam) {
+          param.setType(DEFAULT_TYPE);
+        } else if (isUnsetArrayParam) {
+          arrayElem.setArrayElemBaseType(symbolTable, DEFAULT_TYPE);
+        }
+
         firstCheck = true;
       }
     }
+
 
     /* Recursively call semanticAnalysis on expression node */
     expression.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check that the type of assignment is an ARRAY or a PAIR */
-    DataTypeId exprType = expression.getType(symbolTable);
+     exprType = expression.getType(symbolTable);
 
     if (exprType == null) {
       errorMessages.add(new SemanticError(expression.getLine(), expression.getCharPositionInLine(),

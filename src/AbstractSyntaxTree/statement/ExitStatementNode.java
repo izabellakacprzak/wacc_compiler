@@ -1,8 +1,10 @@
 package AbstractSyntaxTree.statement;
 
+import static SemanticAnalysis.DataTypes.BaseType.Type.BOOL;
 import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
 
 import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
@@ -28,9 +30,25 @@ public class ExitStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
-    if (expression.isUnsetParamId(symbolTable)) {
-      ParameterId exprParam = expression.getParamId(symbolTable);
-      exprParam.setType(new BaseType(INT));
+    boolean isUnsetParam = expression.isUnsetParamId(symbolTable);
+    ParameterId param = expression.getParamId(symbolTable);
+
+    boolean isUnsetArrayParam = false;
+    ParameterId arrayParam = null;
+    ArrayElemNode arrayElem = null;
+
+
+    if (expression instanceof ArrayElemNode) {
+      arrayElem = (ArrayElemNode) expression;
+      isUnsetArrayParam = arrayElem.isUnsetParameterIdArrayElem(symbolTable);
+      arrayParam = arrayElem.getUnsetParameterIdArrayElem(symbolTable);
+    }
+
+
+    if (isUnsetParam) {
+      param.setType(new BaseType(INT));
+    } else if (isUnsetArrayParam) {
+      arrayParam.setBaseElemType(new BaseType(INT));
     }
 
     /* Recursively call semanticAnalysis on expression node */

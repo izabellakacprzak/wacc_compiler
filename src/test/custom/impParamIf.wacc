@@ -7,9 +7,13 @@
 
 begin
   int f(x) is
-    int i = 5 ;
-    i = x ;
-    return 0 
+    if x
+    then
+      println 0
+    else
+      println 1
+    fi ;
+    return 0
   end
   println 0
 end

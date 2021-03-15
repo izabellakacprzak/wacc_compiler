@@ -147,7 +147,7 @@ public class ArrayElemNode extends ExpressionNode {
     DataTypeId idType = identifier.getType(symbolTable);
     if (idType == null && identifier.isUnsetParamId(symbolTable)) {
       ParameterId param = identifier.getParamId(symbolTable);
-      param.setType(new ArrayType());
+      param.setNestedType(null, expressions.size());
       return identifier.getType(symbolTable);
     }
     if (!(idType instanceof ArrayType)) {

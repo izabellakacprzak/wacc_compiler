@@ -6,8 +6,9 @@
 # Program:
 
 begin
-  int f(x) is
-    return x 
+  int f(a) is
+    int x = len a;
+    return 0 
   end
   println 0
 end

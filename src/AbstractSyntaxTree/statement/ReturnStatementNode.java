@@ -1,14 +1,18 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
+
+import static SemanticAnalysis.DataTypes.BaseType.Type.BOOL;
 
 public class ReturnStatementNode extends StatementNode {
 
@@ -27,13 +31,31 @@ public class ReturnStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
-    if (returnExpr.isUnsetParamId(symbolTable)) {
-      ParameterId param = returnExpr.getParamId(symbolTable);
-      param.setType(returnType);
+    DataTypeId returnExprType = returnExpr.getType(symbolTable);
+    boolean isUnsetParam = returnExpr.isUnsetParamId(symbolTable);
+    ParameterId param = returnExpr.getParamId(symbolTable);
+
+    boolean isUnsetArrayParam = false;
+    ParameterId arrayParam = null;
+    ArrayElemNode arrayElem = null;
+
+
+    if (returnExpr instanceof ArrayElemNode) {
+      arrayElem = (ArrayElemNode) returnExpr;
+      isUnsetArrayParam = arrayElem.isUnsetParameterIdArrayElem(symbolTable);
+      arrayParam = arrayElem.getUnsetParameterIdArrayElem(symbolTable);
     }
 
+
+    if (isUnsetParam) {
+      param.setType(returnType);
+    } else if (isUnsetArrayParam) {
+      arrayParam.setBaseElemType(returnType);
+    }
+
+
     /* Check that the type of returnExpr is the same as the expected returnType */
-    DataTypeId returnExprType = returnExpr.getType(symbolTable);
+     returnExprType = returnExpr.getType(symbolTable);
 
     /* Recursively call semanticAnalysis on expression node */
     returnExpr.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);

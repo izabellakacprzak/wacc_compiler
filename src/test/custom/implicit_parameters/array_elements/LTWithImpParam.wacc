@@ -6,8 +6,8 @@
 # Program:
 
 begin
-  int f(x, a) is
-    x = a[1];
+  int f(x, y) is
+    bool a = x[2] < y[3] ;
     return 0 
   end
   println 0

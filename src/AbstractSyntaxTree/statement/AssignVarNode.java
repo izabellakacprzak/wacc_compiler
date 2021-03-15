@@ -49,6 +49,8 @@ public class AssignVarNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+
+    /*Get possible parameters for identifier nodes. */
     DataTypeId leftType = left.getType(symbolTable);
     DataTypeId rightType = right.getType(symbolTable);
     boolean isUnsetParamLeft = left.isUnsetParamId(symbolTable);
@@ -56,56 +58,84 @@ public class AssignVarNode extends StatementNode {
     ParameterId leftParam = left.getParamId(symbolTable);
     ParameterId rightParam = right.getParamId(symbolTable);
 
-    if (isUnsetParamLeft && isUnsetParamRight) {
+
+    /*Get possible parameters for array nodes. */
+    boolean isUnsetArrayParamLeft = false;
+    boolean isUnsetArrayParamRight = false;
+    ParameterId leftArrayParam = null;
+    ParameterId rightArrayParam = null;
+    ArrayElemNode leftArrayElem = null;
+    ArrayElemNode rightArrayElem = null;
+
+    if (left instanceof ArrayElemNode) {
+      leftArrayElem = (ArrayElemNode) left;
+      isUnsetArrayParamLeft = leftArrayElem.isUnsetParameterIdArrayElem(symbolTable);
+      leftArrayParam = leftArrayElem.getUnsetParameterIdArrayElem(symbolTable);
+    }
+
+    if (right instanceof ArrayElemNode) {
+      rightArrayElem = (ArrayElemNode) right;
+      isUnsetArrayParamRight = rightArrayElem.isUnsetParameterIdArrayElem(symbolTable);
+      rightArrayParam = rightArrayElem.getUnsetParameterIdArrayElem(symbolTable);
+    }
+
+
+    /* IF both operands are unset type parameters. */
+    if ((isUnsetParamLeft || isUnsetArrayParamLeft)
+            && (isUnsetParamRight || isUnsetArrayParamRight)) {
+
+    /*CASE 1: implicit param = implicit param & 1st AST traversal. */
       if (firstCheck) {
         uncheckedNodes.add(this);
-        leftParam.addToMatchingParams(rightParam);
-        rightParam.addToMatchingParams(leftParam);
-        return;
 
-      } else {
-        leftParam.setType(DEFAULT_TYPE);
-        rightParam.setType(DEFAULT_TYPE);
-        firstCheck = true;
-      }
-    } else if (left instanceof ArrayElemNode && right instanceof ArrayElemNode) {
-      ArrayElemNode leftArrayElem = (ArrayElemNode) left;
-      ArrayElemNode rightArrayElem = (ArrayElemNode) right;
-      if (leftArrayElem.isUnsetParameterIdArrayElem(symbolTable)
-              && rightArrayElem.isUnsetParameterIdArrayElem(symbolTable)) {
-        if (firstCheck) {
-          uncheckedNodes.add(this);
+        ParameterId leftParamToAdd = isUnsetParamLeft ? leftParam : leftArrayParam;
+        ParameterId rightParamToAdd = isUnsetParamRight ? rightParam : rightArrayParam;
+
+        if (isUnsetParamLeft) { //it is an unset identifier parameter
+          leftParam.addToMatchingParams(rightParamToAdd);
+        } else if (isUnsetArrayParamLeft) { //it is unset array parameter
           leftArrayElem.addToMatchingParamsArrayElem(symbolTable,
-              rightArrayElem.getUnsetParameterIdArrayElem(symbolTable));
-          rightArrayElem.addToMatchingParamsArrayElem(symbolTable,
-              leftArrayElem.getUnsetParameterIdArrayElem(symbolTable));
-          return;
-
-        } else {
-          leftArrayElem.setArrayElemBaseType(symbolTable, DEFAULT_TYPE);
-          rightArrayElem.setArrayElemBaseType(symbolTable, DEFAULT_TYPE);
-          firstCheck = true;
+              rightParamToAdd);
         }
 
+        if (isUnsetParamRight) { //it is an  unset identifier parameter
+          rightParam.addToMatchingParams(leftParamToAdd);
+        } else if (isUnsetArrayParamRight) { //it is unset array parameter
+          rightArrayElem.addToMatchingParamsArrayElem(symbolTable,
+              leftParamToAdd);
+        }
+        return;
 
+      } else {     /*CASE 2: implicit param = implicit param & 2nd AST traversal. */
+        if (isUnsetParamLeft) { //it is an unset identifier parameter
+          leftParam.setType(DEFAULT_TYPE);
+        } else if (isUnsetArrayParamLeft) { //it is unset array parameter
+          leftArrayElem.setArrayElemBaseType(symbolTable, DEFAULT_TYPE);
+        }
+
+        if (isUnsetParamRight) { //it is an unset identifier parameter
+          rightParam.setType(DEFAULT_TYPE);
+        } else if (isUnsetArrayParamRight) { //it is unset array parameter
+          rightArrayElem.setArrayElemBaseType(symbolTable, DEFAULT_TYPE);
+        }
+        firstCheck = true;
       }
+    } else { /*IF we can infer a type from at least one of the lhs or rhs, set it to the other
+                in case it is an implicit parameter. */
+
+      if (isUnsetParamLeft) {
+        leftParam.setType(rightType);
+      } else if (isUnsetArrayParamLeft) {
+        leftArrayElem.setArrayElemBaseType(symbolTable, rightType);
+      }
+
+      if (isUnsetParamRight) {
+        rightParam.setType(leftType);
+      } else if (isUnsetArrayParamRight) {
+        rightArrayElem.setArrayElemBaseType(symbolTable, leftType);
+      }
+
     }
-
-    if (isUnsetParamLeft) {
-      leftParam.setType(rightType);
-    }else if (left instanceof ArrayElemNode) {
-      ArrayElemNode leftArrayElem = (ArrayElemNode) left;
-      leftArrayElem.setArrayElemBaseType(symbolTable, rightType);
-    }
-
-    if (isUnsetParamRight) {
-      rightParam.setType(leftType);
-    }else if (right instanceof ArrayElemNode) {
-      ArrayElemNode rightArrayElem = (ArrayElemNode) right;
-      rightArrayElem.setArrayElemBaseType(symbolTable, leftType);
-    }
-
-
 
      leftType = left.getType(symbolTable);
      rightType = right.getType(symbolTable);

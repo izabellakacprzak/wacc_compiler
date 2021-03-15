@@ -6,9 +6,9 @@
 # Program:
 
 begin
-  int f(x) is
-    int y = x + 2 ;
-    print y ;
+  int f(x, a) is
+  bool c = false;
+  a[1] = c;
     return 0 
   end
   println 0

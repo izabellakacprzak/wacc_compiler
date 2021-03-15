@@ -6,8 +6,9 @@
 # Program:
 
 begin
-  int f(x) is
-    int a = len x ;
+  int f(x, a) is
+  bool c = false;
+  a = x ;
     return 0 
   end
   println 0

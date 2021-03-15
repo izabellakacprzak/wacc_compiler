@@ -7,12 +7,10 @@
 
 begin
   int f(x) is
-    if x
-    then
-      println 0
-    else
-      println 1
-    fi ;
+    while x do
+      x = false 
+    done ;
+    return 0
   end
   println 0
 end

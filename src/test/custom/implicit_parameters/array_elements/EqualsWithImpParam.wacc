@@ -1,0 +1,14 @@
+# a simple function definition and call
+
+# Output:
+# 0
+
+# Program:
+
+begin
+  int f(a, b) is
+    bool x =  b[6][7] == a[5];
+    return 0 
+  end
+  println 0
+end

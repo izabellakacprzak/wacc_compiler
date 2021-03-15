@@ -3,6 +3,7 @@ package AbstractSyntaxTree.statement;
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.assignment.ArrayLiterNode;
 import AbstractSyntaxTree.assignment.AssignLHSNode;
+import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
@@ -33,22 +34,49 @@ public class ReadStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
-    if (assignment.isUnsetParamId(symbolTable)) {
-      ParameterId exprParam = assignment.getParamId(symbolTable);
+    DataTypeId assignmentType = assignment.getType(symbolTable);
+    boolean isUnsetParam = assignment.isUnsetParamId(symbolTable);
+    ParameterId param = assignment.getParamId(symbolTable);
+
+    boolean isUnsetArrayParam = false;
+    ParameterId arrayParam = null;
+    ArrayElemNode arrayElem = null;
+
+
+    if (assignment instanceof ArrayElemNode) {
+      arrayElem = (ArrayElemNode) assignment;
+      isUnsetArrayParam = arrayElem.isUnsetParameterIdArrayElem(symbolTable);
+      arrayParam = arrayElem.getUnsetParameterIdArrayElem(symbolTable);
+    }
+
+
+    if (isUnsetParam || isUnsetArrayParam) {
 
       if (firstCheck) {
         List<DataTypeId> expecteds = new ArrayList<>();
         expecteds.add(new BaseType(BaseType.Type.INT));
         expecteds.add(new BaseType(BaseType.Type.CHAR));
-        exprParam.addToExpectedTypes(expecteds);
 
-        if (exprParam.getType() == null) {
+        if (isUnsetParam) {
+          param.addToExpectedTypes(expecteds);
+        } else if (isUnsetArrayParam) {
+          arrayParam.addToExpectedTypes(expecteds);
+        }
+
+        boolean paramTypeIsStillNull = (isUnsetParam) ? param.getType() == null
+                                           : arrayElem.getType(symbolTable) == null;
+        if (paramTypeIsStillNull) {
           uncheckedNodes.add(this);
           return;
         }
 
       } else {
-        exprParam.setType(DEFAULT_TYPE);
+        if (isUnsetParam) {
+          param.setType(DEFAULT_TYPE);
+        } else if (isUnsetArrayParam) {
+          arrayParam.setBaseElemType(DEFAULT_TYPE);
+        }
+
         firstCheck = true;
       }
     }
@@ -57,7 +85,7 @@ public class ReadStatementNode extends StatementNode {
     assignment.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check that the type of assignment is an INT or a CHAR */
-    DataTypeId assignmentType = assignment.getType(symbolTable);
+     assignmentType = assignment.getType(symbolTable);
 
     if (assignmentType == null) {
       errorMessages.add(new SemanticError(assignment.getLine(), assignment.getCharPositionInLine(),

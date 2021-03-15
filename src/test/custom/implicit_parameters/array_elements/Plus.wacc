@@ -6,8 +6,8 @@
 # Program:
 
 begin
-  int f(x) is
-    int a = ord x ;
+  int f(a, b) is
+   int x = a + b;
     return 0 
   end
   println 0

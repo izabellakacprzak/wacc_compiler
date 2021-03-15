@@ -1,14 +1,18 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
+
+import static SemanticAnalysis.DataTypes.BaseType.Type.BOOL;
 
 public class WhileStatementNode extends StatementNode {
 
@@ -27,11 +31,34 @@ public class WhileStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+    DataTypeId conditionType = condition.getType(symbolTable);
+
+    boolean isUnsetParam = condition.isUnsetParamId(symbolTable);
+    ParameterId param = condition.getParamId(symbolTable);
+
+    boolean isUnsetArrayParam = false;
+    ParameterId arrayParam = null;
+    ArrayElemNode arrayElem = null;
+
+
+    if (condition instanceof ArrayElemNode) {
+      arrayElem = (ArrayElemNode) condition;
+      isUnsetArrayParam = arrayElem.isUnsetParameterIdArrayElem(symbolTable);
+      arrayParam = arrayElem.getUnsetParameterIdArrayElem(symbolTable);
+    }
+
+
+    if (isUnsetParam) {
+      param.setType(new BaseType(BOOL));
+    } else if (isUnsetArrayParam) {
+      arrayParam.setBaseElemType(new BaseType(BOOL));
+    }
+
     /* Recursively call semanticAnalysis on condition node */
     condition.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check that the type of the condition expression is of type BOOL */
-    DataTypeId conditionType = condition.getType(symbolTable);
+     conditionType = condition.getType(symbolTable);
 
     if (conditionType == null) {
       errorMessages.add(new SemanticError(condition.getLine(), condition.getCharPositionInLine(),
