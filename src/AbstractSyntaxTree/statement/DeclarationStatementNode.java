@@ -2,6 +2,7 @@ package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import AbstractSyntaxTree.assignment.FuncCallNode;
+import AbstractSyntaxTree.assignment.MethodCallNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.TypeNode;
 import InternalRepresentation.InternalState;
@@ -65,6 +66,10 @@ public class DeclarationStatementNode extends StatementNode {
           break;
         }
       }
+      //else if (assignment instanceof MethodCallNode
+      //    && ((MethodCallNode) assignment).getIdentifier(symbolTable) instanceof OverloadFuncId) {
+
+      //}
 
       if(assignedType == null) {
         errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()

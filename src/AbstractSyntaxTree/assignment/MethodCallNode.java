@@ -2,7 +2,6 @@ package AbstractSyntaxTree.assignment;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
-import AbstractSyntaxTree.type.ClassNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ClassType;
@@ -24,9 +23,33 @@ public class MethodCallNode extends CallNode{
     this.arguments = arguments;
   }
 
+  public Identifier getIdentifier(SymbolTable symbolTable) {
+    return symbolTable.lookup("*" + methodName.getIdentifier());
+  }
+
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
-    return null;
+    Identifier functionId = symbolTable.lookup("*" + methodName.getIdentifier());
+    FunctionId function = (FunctionId) functionId;
+
+    if (function == null) {
+      return null;
+    }
+
+    return function.getType();
+  }
+
+  public List<DataTypeId> getOverloadType(SymbolTable symbolTable) {
+    Identifier functionId = symbolTable.lookupAll("*" + methodName.getIdentifier());
+    List<DataTypeId> returnTypes;
+
+    List<DataTypeId> argTypes = new ArrayList<>();
+    for (ExpressionNode arg : arguments) {
+      argTypes.add(arg.getType(symbolTable));
+    }
+    returnTypes = ((OverloadFuncId) functionId).findReturnTypes(argTypes);
+
+    return returnTypes;
   }
 
   @Override
@@ -53,7 +76,7 @@ public class MethodCallNode extends CallNode{
                 + " Actual: " + classType);
       } else {
         SymbolTable classTable = ((ClassType) classType).getFields().get(0).getCurrSymTable();
-        Identifier functionId = symbolTable.lookup("*" + methodName.getIdentifier());
+        Identifier functionId = classTable.lookup("*" + methodName.getIdentifier());
 
         /* Check if method has been declared in the appropriate class */
         if (functionId == null) {

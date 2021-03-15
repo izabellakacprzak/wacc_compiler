@@ -2,6 +2,7 @@ package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import AbstractSyntaxTree.type.TypeNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ClassType;
@@ -26,15 +27,16 @@ public class ObjectDeclStatementNode extends StatementNode {
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
 
     /* Check if className is a valid class name */
-    DataTypeId classType = className.getType(symbolTable);
+    Identifier classId = symbolTable.lookupAll("class_" + className.getIdentifier());
     ObjectId newObject = null;
-    if (!(classType instanceof ClassType)) {
+
+    if (!(classId instanceof ClassType)) {
       errorMessages.add(objectName.getLine() + ":" + objectName.getCharPositionInLine() +
               "Cannot declare object." + " Expected: CLASS TYPE "
-              + " Actual: " + classType);
+              + " Actual: " + classId);
     } else {
       /* Try to find matching constructor for these parameter types */
-      List<ConstructorId> constructors = ((ClassType) classType).getConstructors();
+      List<ConstructorId> constructors = ((ClassType) classId).getConstructors();
 
       /* Get types of all expressions */
       List<DataTypeId> exprTypes = expressions.stream().
@@ -53,7 +55,7 @@ public class ObjectDeclStatementNode extends StatementNode {
           }
 
           if (i == parameters.size()) {
-            newObject = new ObjectId(objectName, classType, constructor);
+            newObject = new ObjectId(objectName, (ClassType) classId, constructor);
             break;
           }
         }

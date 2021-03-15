@@ -139,14 +139,7 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
 
   @Override
   public ASTNode visitAttributeExpr(AttributeExprContext ctx) {
-    int line = ctx.getStart().getLine();
-    int charPositionInLine = ctx.getStart().getCharPositionInLine();
-    IdentifierNode objectName = new IdentifierNode(line, charPositionInLine,
-        ctx.IDENT(0).getText());
-    IdentifierNode attributeName = new IdentifierNode(line, charPositionInLine,
-        ctx.IDENT(1).getText());
-
-    return new AttributeExprNode(line, charPositionInLine, objectName, attributeName);
+    return visit(ctx.attrexpr());
   }
 
   @Override
@@ -168,8 +161,8 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   public ASTNode visitObjectDeclStat(ObjectDeclStatContext ctx) {
     int line = ctx.getStart().getLine();
     int charPositionInLine = ctx.getStart().getCharPositionInLine();
-    IdentifierNode className = new IdentifierNode(line, charPositionInLine, ctx.IDENT(0).getText());
-    IdentifierNode objectName = new IdentifierNode(line, charPositionInLine, ctx.IDENT(1).getText());
+    IdentifierNode objectName = new IdentifierNode(line, charPositionInLine, ctx.IDENT(0).getText());
+    IdentifierNode className = new IdentifierNode(line, charPositionInLine, ctx.IDENT(1).getText());
     List<ExpressionNode> expressions = new ArrayList<>();
 
     for(int i = 0; i < ctx.expr().size(); i++) {
@@ -177,6 +170,21 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     }
 
     return new ObjectDeclStatementNode(className, objectName, expressions);
+  }
+
+  @Override
+  public ASTNode visitAttributeLHS(AttributeLHSContext ctx) {
+    return visit(ctx.attrexpr());
+  }
+
+  @Override
+  public ASTNode visitAttrexpr(AttrexprContext ctx) {
+    int line = ctx.getStart().getLine();
+    int charPositionInLine = ctx.getStart().getCharPositionInLine();
+    IdentifierNode objId = new IdentifierNode(line, charPositionInLine, ctx.IDENT(0).getText());
+    IdentifierNode attrId = new IdentifierNode(line, charPositionInLine, ctx.IDENT(1).getText());
+
+    return new AttributeExprNode(line, charPositionInLine, objId, attrId);
   }
 
   /* RHS ASSIGNMENT NODES */

@@ -23,7 +23,9 @@ func: type IDENT OPEN_PARENTHESES (param_list)? CLOSE_PARENTHESES IS stat END ;
 param_list: type IDENT (COMMA type IDENT)* ;
 
 // class
-classdecl: CLASS IDENT OPEN_PARENTHESES CLOSE_PARENTHESES BEGIN (attribute)* (constructor)+ (func)* END ;
+classdecl: CLASS IDENT OPEN_PARENTHESES CLOSE_PARENTHESES IS (attribute SEMICOLON)* (constructor)+ (func)* END ;
+
+attrexpr: IDENT DOT IDENT ;
 
 attribute: type IDENT             #AttrNoAssign
 | type IDENT ASSIGN assign_rhs    #AttrAssign
@@ -45,7 +47,7 @@ stat: SKP                                       #SkipStat
 | WHILE expr DO stat DONE                       #WhileStat
 | BEGIN stat END                                #ScopeStat
 | stat SEMICOLON stat                           #StatsListStat
-| IDENT IDENT ASSIGN NEW IDENT OPEN_PARENTHESES
+| IDENT ASSIGN NEW IDENT OPEN_PARENTHESES
 (expr (COMMA expr)*)? CLOSE_PARENTHESES         #ObjectDeclStat
 ;
 
@@ -54,6 +56,7 @@ stat: SKP                                       #SkipStat
 assign_lhs: IDENT  #IdentLHS
 | array_elem       #ArrayElemLHS
 | pair_elem        #PairElemLHS
+| attrexpr         #AttributeLHS
 ;
 
 assign_rhs: expr                                                           #ExprRHS
@@ -106,7 +109,7 @@ expr: int_liter {inbounds(_localctx);}            #IntLiterExpr
 | expr op=AND expr                                #BinaryExpr
 | expr op=OR expr                                 #BinaryExpr
 | OPEN_PARENTHESES expr CLOSE_PARENTHESES         #BracketExpr
-| IDENT DOT IDENT                                 #AttributeExpr
+| attrexpr                                        #AttributeExpr
 ;
 
 int_liter: (PLUS | MINUS)? INT_LITER;
