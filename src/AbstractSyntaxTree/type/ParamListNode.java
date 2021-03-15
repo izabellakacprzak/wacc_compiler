@@ -58,9 +58,6 @@ public class ParamListNode implements ASTNode {
     for (TypeNode type : types) {
       type.semanticAnalysis(symbolTable, errorMessages);
     }
-
-    /* Set the current symbol table */
-    currSymTable = symbolTable;
   }
 
   @Override

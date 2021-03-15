@@ -17,10 +17,16 @@ public class ClassId extends Identifier{
         constructors = new ArrayList<>();
     }
 
-    public void addConstructor(ConstructorId constructor) {
-        constructors.add(constructor);
-    }
+    public boolean addConstructor(ConstructorId constructor) {
+        for (ConstructorId constructorId : constructors) {
+          if (constructorId.equals(constructor)) {
+              return false;
+          }
+        }
 
+        constructors.add(constructor);
+        return true;
+    }
 
     public List<ConstructorId> getConstructors() {
         return constructors;

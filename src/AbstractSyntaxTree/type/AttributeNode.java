@@ -43,6 +43,7 @@ public class AttributeNode implements TypeNode {
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     setCurrSymTable(symbolTable);
+
     /* Check if such an attribute has not been defined */
     if (symbolTable.lookup(name.getIdentifier()) != null) {
       errorMessages.add(name.getLine() + ":" + name.getCharPositionInLine() +

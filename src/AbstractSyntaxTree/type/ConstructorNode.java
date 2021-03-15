@@ -3,9 +3,8 @@ package AbstractSyntaxTree.type;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
 import InternalRepresentation.InternalState;
-import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.Identifier;
-import SemanticAnalysis.SymbolTable;
+import SemanticAnalysis.*;
+
 import java.util.List;
 
 public class ConstructorNode implements TypeNode{
@@ -13,6 +12,8 @@ public class ConstructorNode implements TypeNode{
   private final IdentifierNode name;
   private final ParamListNode parameters;
   private final StatementNode bodyStatement;
+
+  private SymbolTable currSymTable = null;
 
   public ConstructorNode(IdentifierNode name, ParamListNode parameters,
       StatementNode bodyStatement) {
@@ -33,10 +34,31 @@ public class ConstructorNode implements TypeNode{
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    setCurrSymTable(symbolTable);
+
+    /* Get class name and search it up in symbol table */
+    String className = "class_" + name.getIdentifier();
+    Identifier classId = symbolTable.lookupAll(className);
+
     /* Check if name matches class name */
     // TODO: WRITE TEST CASE WHICH CHECKS FOR CONSTRUCTOR A IN CLASS B FOR TWO CLASSES DECLARED
-    /* Get class name and search it up in symbol table */
-    /* Check if such constructor already exists, if not add to list of constructors in symbol table */
+    if (classId == null) {
+      errorMessages.add(name.getLine() + ":" + name.getCharPositionInLine() +
+              "Constructor name '" + name.getIdentifier() + "' does not match declared class.");
+    } else if (!(classId instanceof ClassId)) {
+      errorMessages.add(name.getLine() + ":" + name.getCharPositionInLine() +
+              "Constructor '" + name.getIdentifier() + "' can only be declared for a class.");
+    } else {
+      ClassId classIdentifier = (ClassId) classId;
+      ConstructorId constructor = new ConstructorId(name, parameters.getIdentifiers(symbolTable));
+
+      /* Check if such constructor already exists, if not add to list of constructors in symbol table */
+      if (!classIdentifier.addConstructor(constructor)){
+        errorMessages.add(name.getLine() + ":" + name.getCharPositionInLine() +
+                "Constructor '" + constructor.toString() + "' has already been declared.");
+      }
+    }
+
     parameters.semanticAnalysis(symbolTable, errorMessages);
     bodyStatement.semanticAnalysis(symbolTable, errorMessages);
   }
@@ -48,11 +70,11 @@ public class ConstructorNode implements TypeNode{
 
   @Override
   public void setCurrSymTable(SymbolTable currSymTable) {
-
+    this.currSymTable = currSymTable;
   }
 
   @Override
   public SymbolTable getCurrSymTable() {
-    return null;
+    return currSymTable;
   }
 }
