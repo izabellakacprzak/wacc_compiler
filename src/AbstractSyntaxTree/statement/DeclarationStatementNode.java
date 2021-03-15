@@ -66,10 +66,6 @@ public class DeclarationStatementNode extends StatementNode {
           break;
         }
       }
-      //else if (assignment instanceof MethodCallNode
-      //    && ((MethodCallNode) assignment).getIdentifier(symbolTable) instanceof OverloadFuncId) {
-
-      //}
 
       if(assignedType == null) {
         errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
@@ -79,6 +75,28 @@ public class DeclarationStatementNode extends StatementNode {
         return;
       } else {
         ((FuncCallNode) assignment).setReturnType(assignedType);
+      }
+    } else if (assignment instanceof MethodCallNode
+            && ((MethodCallNode) assignment).getIdentifier(symbolTable) instanceof OverloadFuncId) {
+      // TODO: QUITE A LOT OF CODE DUPLICATION PLUS WE MIGHT NEED TO DO THE SAME THING IN ASSIGNMENT NODE
+      returnTypes = ((MethodCallNode) assignment).getOverloadType(symbolTable);
+      for(DataTypeId returnType : returnTypes) {
+        if(returnType == null) {
+          continue;
+        }
+
+        if(returnType.equals(declaredType)) {
+          assignedType = returnType;
+          break;
+        }
+      }
+
+      if(assignedType == null) {
+        errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
+                + " RHS type does not match LHS type for assignment.'"
+                + " Expected: " + declaredType + ". Could not find matching return type"
+                + " in overloaded functions.");
+        return;
       }
     } else {
       assignedType = assignment.getType(symbolTable);
