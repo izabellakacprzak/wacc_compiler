@@ -7,10 +7,12 @@ public class ObjectId extends Identifier {
     /* type: DataTypeId corresponding to the type of
      *       the represented parameter */
     private final DataTypeId type;
+    private final ConstructorId constructor;
 
-    public ObjectId(IdentifierNode node, DataTypeId type) {
+    public ObjectId(IdentifierNode node, DataTypeId type, ConstructorId constructor) {
         super(node);
         this.type = type;
+        this.constructor = constructor;
     }
 
     @Override

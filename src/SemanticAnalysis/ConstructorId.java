@@ -1,7 +1,6 @@
 package SemanticAnalysis;
 
 import AbstractSyntaxTree.expression.IdentifierNode;
-import SemanticAnalysis.DataTypes.BaseType;
 
 import java.util.Comparator;
 import java.util.List;
@@ -16,10 +15,16 @@ public class ConstructorId extends Identifier{
         this.parameters = parameters;
     }
 
-    public List<DataTypeId> getParameterTypes() {
+    public List<DataTypeId> getSortedParameterTypes() {
         return parameters.stream().
                 map(ParameterId::getType).
                 sorted(Comparator.comparing(DataTypeId::hashCode)).
+                collect(Collectors.toList());
+    }
+
+    public List<DataTypeId> getParameterTypes() {
+        return parameters.stream().
+                map(ParameterId::getType).
                 collect(Collectors.toList());
     }
 
@@ -46,8 +51,8 @@ public class ConstructorId extends Identifier{
         }
 
         ConstructorId constructor = (ConstructorId) o;
-        List<DataTypeId> paramTypes = constructor.getParameterTypes();
+        List<DataTypeId> paramTypes = constructor.getSortedParameterTypes();
 
-        return paramTypes.equals(getParameterTypes());
+        return paramTypes.equals(getSortedParameterTypes());
     }
 }

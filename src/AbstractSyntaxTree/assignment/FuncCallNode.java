@@ -13,7 +13,7 @@ import SemanticAnalysis.DataTypes.BaseType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FuncCallNode extends AssignRHSNode {
+public class FuncCallNode extends CallNode {
 
   /* identifier:   IdentifierNode corresponding to the function's name identifier
    * arguments:    List of ExpressionNodes corresponding to the arguments
@@ -39,15 +39,6 @@ public class FuncCallNode extends AssignRHSNode {
 
   public void setReturnType(DataTypeId type) {
     returnType = type;
-  }
-
-  /* Returns true when the declared type is a STRING and assigned type is a CHAR[] */
-  private boolean stringToCharArray(DataTypeId declaredType, DataTypeId assignedType) {
-    if (declaredType.equals(new BaseType(STRING))) {
-      return assignedType.equals(new ArrayType(new BaseType(CHAR)));
-    }
-
-    return false;
   }
 
   @Override
@@ -84,88 +75,10 @@ public class FuncCallNode extends AssignRHSNode {
       return;
     }
 
-    List<DataTypeId> argTypes = new ArrayList<>();
-    for (ExpressionNode arg : arguments) {
-      argTypes.add(arg.getType(symbolTable));
-    }
-
-    /* Check that function has been called with the correct number of arguments */
-    FunctionId function;
-    if (functionId instanceof OverloadFuncId) {
-      function = ((OverloadFuncId) functionId).findFunc(argTypes);
-      if (function == null) {
-        errorMessages.add(
-            super.getLine()
-                + ":"
-                + super.getCharPositionInLine()
-                + " Function call'"
-                + functionId.toString()
-                + "' does not match any of the Overload signatures for function '"
-                + identifier.getIdentifier()
-                + "'");
-        return;
-      }
-    } else {
-      function = (FunctionId) functionId;
-    }
-
-    List<DataTypeId> paramTypes = function.getParamTypes();
-
-    if (paramTypes.size() > arguments.size() || paramTypes.size() < arguments.size()) {
-      errorMessages.add(
-          super.getLine()
-              + ":"
-              + super.getCharPositionInLine()
-              + " Function '"
-              + identifier.getIdentifier()
-              + "' has been called with the incorrect number of parameters."
-              + " Expected: "
-              + paramTypes.size()
-              + " Actual: "
-              + arguments.size());
-      return;
-    }
-
-    /* Check that each parameter's type can be resolved and matches the
-     * corresponding argument type */
-    for (int i = 0; i < arguments.size(); i++) {
-      DataTypeId currArg = arguments.get(i).getType(symbolTable);
-      DataTypeId currParamType = paramTypes.get(i);
-
-      if (currParamType == null) {
-        break;
-      }
-
-      if (currArg == null) {
-        errorMessages.add(
-            super.getLine()
-                + ":"
-                + super.getCharPositionInLine()
-                + " Could not resolve type of parameter "
-                + (i + 1)
-                + " in '"
-                + identifier
-                + "' function."
-                + " Expected: "
-                + currParamType);
-      } else if (!(currArg.equals(currParamType)) && !stringToCharArray(currParamType, currArg)) {
-        errorMessages.add(
-            super.getLine()
-                + ":"
-                + super.getCharPositionInLine()
-                + " Invalid type for parameter "
-                + (i + 1)
-                + " in '"
-                + identifier
-                + "' function."
-                + " Expected: "
-                + currParamType
-                + " Actual: "
-                + currArg);
-      }
-      arguments.get(i).semanticAnalysis(symbolTable, errorMessages);
-    }
+    super.semAnalyseFunctionArgs(symbolTable, errorMessages, identifier, arguments, functionId);
   }
+
+
 
   @Override
   public void generateAssembly(InternalState internalState) {
