@@ -8,6 +8,8 @@ import SemanticAnalysis.DataTypes.BaseType;
 
 import java.util.List;
 
+import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
+
 public class ArrayElemNode extends ExpressionNode {
 
   /* identifier:  IdentifierNode representing the identifier of this node
@@ -71,9 +73,21 @@ public class ArrayElemNode extends ExpressionNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+
+    boolean isUnsetParam = false;
+    boolean isUnsetArrayParam = false;
     for (ExpressionNode expression : expressions) {
-      if (expression.isUnsetParamId(symbolTable)) {
-        expression.getParamId(symbolTable).setType(new BaseType(BaseType.Type.INT));
+
+      isUnsetParam = expression.isUnsetParamId(symbolTable);
+      if (expression instanceof ArrayElemNode) {
+        isUnsetArrayParam = expression.isUnsetParamArray(symbolTable);
+      }
+
+      if (isUnsetParam) {
+        expression.getParamId(symbolTable).setType(new BaseType(INT));
+      }
+      else if (isUnsetArrayParam){
+        ((ArrayElemNode)expression).setArrayElemBaseType(symbolTable, new BaseType(INT));
       }
       expression.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }

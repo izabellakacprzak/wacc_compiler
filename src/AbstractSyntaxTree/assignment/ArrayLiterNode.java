@@ -3,6 +3,7 @@ package AbstractSyntaxTree.assignment;
 import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
 
 import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
@@ -49,7 +50,13 @@ public class ArrayLiterNode extends AssignRHSNode {
 
     if (matchType == null && firstCheck) {
       for (ExpressionNode expr : expressions) {
-        if (expr.isUnsetParamId(symbolTable)) {
+        boolean isUnsetParam = expr.isUnsetParamId(symbolTable);
+        boolean isUnsetArrayParam = false;
+        if (expr instanceof ArrayElemNode) {
+          isUnsetArrayParam = expr.isUnsetParamArray(symbolTable);
+        }
+
+        if (isUnsetParam || isUnsetArrayParam) {
           uncheckedNodes.add(this);
           return;
         }
@@ -58,10 +65,22 @@ public class ArrayLiterNode extends AssignRHSNode {
 
     if (matchType == null) {
       for (ExpressionNode expr : expressions) {
-        if (expr.isUnsetParamId(symbolTable)) {
+
+        boolean isUnsetParam = expr.isUnsetParamId(symbolTable);
+        boolean isUnsetArrayParam = false;
+        if (expr instanceof ArrayElemNode) {
+           isUnsetArrayParam = expr.isUnsetParamArray(symbolTable);
+        }
+
+        if (isUnsetParam) {
           ParameterId currParam = expr.getParamId(symbolTable);
           currParam.setType(DEFAULT_TYPE);
           matchType = DEFAULT_TYPE;
+        }
+        else if (isUnsetArrayParam){
+        ParameterId currArrayParam = ((ArrayElemNode) expr).getUnsetParameterIdArrayElem(symbolTable);
+        currArrayParam.setBaseElemType(DEFAULT_TYPE);
+        matchType = DEFAULT_TYPE;
         }
       }
 
@@ -75,13 +94,23 @@ public class ArrayLiterNode extends AssignRHSNode {
 
     /* Check if the other elements' types can be resolved and match the first element's type */
     for (ExpressionNode currExpr : expressions) {
-      if (currExpr.isUnsetParamId(symbolTable)) {
-        ParameterId currParam = currExpr.getParamId(symbolTable);
-        currParam.setType(matchType);
-        continue;
+      DataTypeId currType = currExpr.getType(symbolTable);
+      boolean isUnsetParam = currExpr.isUnsetParamId(symbolTable);
+      boolean isUnsetArrayParam = false;
+      if (currExpr instanceof ArrayElemNode) {
+        isUnsetArrayParam = ((ArrayElemNode) currExpr).isUnsetParameterIdArrayElem(symbolTable);
       }
 
-      DataTypeId currType = currExpr.getType(symbolTable);
+      if (isUnsetParam) {
+        ParameterId currParam = currExpr.getParamId(symbolTable);
+        currParam.setType(matchType);
+      }
+      else if (isUnsetArrayParam){
+      ParameterId currArrayParam = ((ArrayElemNode) currExpr).getUnsetParameterIdArrayElem(symbolTable);
+      currArrayParam.setBaseElemType(matchType);
+      }
+
+       currType = currExpr.getType(symbolTable);
 
       if (currType == null) {
         errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),

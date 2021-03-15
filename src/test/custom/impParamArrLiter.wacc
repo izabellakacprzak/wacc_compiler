@@ -6,8 +6,8 @@
 # Program:
 
 begin
-  int f(x) is
-    int[] a = [1, x, 3] ;
+  int f(x, b) is
+    char[] a = [b, x] ;
     return 0 
   end
   println 0
