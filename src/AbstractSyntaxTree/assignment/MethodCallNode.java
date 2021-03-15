@@ -29,7 +29,7 @@ public class MethodCallNode extends CallNode{
 
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
-    Identifier functionId = symbolTable.lookup("*" + methodName.getIdentifier());
+    Identifier functionId = symbolTable.lookupAll("*" + methodName.getIdentifier());
     FunctionId function = (FunctionId) functionId;
 
     if (function == null) {
@@ -55,11 +55,24 @@ public class MethodCallNode extends CallNode{
   @Override
   /* TODO: REDO */
   public String toString() {
-    return null;
+    StringBuilder str = new StringBuilder();
+    str.append("call ").append(methodName.getIdentifier()).append('(');
+
+    for (ExpressionNode argument : arguments) {
+      str.append(argument.toString()).append(", ");
+    }
+
+    if (!arguments.isEmpty()) {
+      str.delete(str.length() - 2, str.length() - 1);
+    }
+
+    return str.append(')').toString();
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+    setCurrSymTable(symbolTable);
+    //setCurrSymTable(symbolTable);
     /* Check if object has been declared and is in fact an object */
     objectName.semanticAnalysis(symbolTable, errorMessages);
     Identifier object = symbolTable.lookupAll(objectName.getIdentifier());
