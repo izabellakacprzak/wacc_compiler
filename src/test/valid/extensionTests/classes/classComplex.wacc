@@ -1,0 +1,55 @@
+begin
+  class Berry() is
+    string colour = "red";
+    int size = 4;
+
+    Berry(string c, int s) is
+      colour = c;
+      size = s
+    end
+
+    Berry(string c) is
+      colour = c
+    end
+
+    Berry(int s) is
+      size = s
+    end
+
+    Berry() is
+      skip
+    end
+
+    string getColour() is
+      return colour
+    end
+
+    bool setColour(string c) is
+      colour = c;
+      return true
+    end
+
+    int getSize() is
+      return size
+    end
+
+    bool setSize(int s) is
+      size = s;
+      return true
+    end
+
+  end
+
+  berry = new Berry();
+  raspberry = new Berry("red", 4);
+  blueberry = new Berry("blue");
+  bigBerry = new Berry(20);
+
+  string colour = raspberry.getColour();
+  println colour;
+
+  bool ok = blueberry.setSize(5);
+
+  int size = bigBerry.getSize();
+  println size
+end

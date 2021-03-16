@@ -1,0 +1,34 @@
+begin
+  class Berry() is
+    string colour;
+
+    Berry(string c) is
+      colour = c
+    end
+
+    string getColour() is
+      return colour
+     end
+  end
+
+  class Apple() is
+      string colour;
+
+      Apple(string c) is
+        colour = c
+      end
+
+      string getColour() is
+        return colour
+      end
+  end
+
+  apple = new Apple("red");
+  blueberry = new Berry("blue");
+
+  string appleColour = apple.getColour();
+  string blueberryColour = blueberry.getColour();
+
+  println appleColour;
+  println blueberryColour
+end

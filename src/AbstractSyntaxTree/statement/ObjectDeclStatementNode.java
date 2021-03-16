@@ -49,7 +49,19 @@ public class ObjectDeclStatementNode extends StatementNode {
           int i;
 
           for (i = 0; i < parameters.size(); i++) {
-            if (!exprTypes.get(i).equals(parameters.get(i))) {
+            if(exprTypes.get(i) == null) {
+              errorMessages.add(
+                  expressions.get(i).getLine()
+                      + ":"
+                      + expressions.get(i).getCharPositionInLine()
+                      + " Could not resolve type of parameter "
+                      + (i + 1)
+                      + " in '"
+                      + className.getIdentifier()
+                      + "' function."
+                      + " Expected: "
+                      + parameters.get(i).getType());
+            } else if (!exprTypes.get(i).equals(parameters.get(i))) {
               break;
             }
           }

@@ -131,10 +131,14 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     int line = ctx.getStart().getLine();
     int charPositionInLine = ctx.getStart().getCharPositionInLine();
     IdentifierNode name = new IdentifierNode(line, charPositionInLine, ctx.IDENT().getText());
-    ParamListNode parameters = (ParamListNode) visit(ctx.param_list());
+    ParamListNode params = new ParamListNode(new ArrayList<>(), new ArrayList<>());
+
+    if (ctx.param_list() != null) {
+      params = (ParamListNode) visit(ctx.param_list());
+    }
     StatementNode body = (StatementNode) visit(ctx.stat());
 
-    return new ConstructorNode(name, parameters, body);
+    return new ConstructorNode(name, params, body);
   }
 
   @Override

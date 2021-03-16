@@ -1,0 +1,28 @@
+begin
+  class Berry() is
+    string colour;
+
+    Berry(string c) is
+      colour = c
+    end
+
+    string getColour() is
+      return colour
+     end
+
+    bool setColour(string c) is
+      colour = c;
+      return true
+    end
+  end
+
+  berry = new Berry("blue");
+
+  string berryColour = berry.getColour();
+  println berryColour;
+
+  string newColour = "pink";
+  bool ok = berry.setColour(newColour);
+  berryColour = berry.getColour();
+  println berryColour
+end

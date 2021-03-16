@@ -1,0 +1,33 @@
+begin
+  class Car() is
+    int speed;
+
+    Car(int s) is
+      speed = s
+    end
+
+    int getSpeed() is
+      return speed
+    end
+  end
+
+  class Apple() is
+      string colour;
+
+      Apple(string c) is
+        colour = c
+      end
+
+      string getColour() is
+        return colour
+      end
+  end
+
+  int x = 1;
+  car = new Car(x);
+  fruit = new Apple("red");
+
+  string c = fruit.getColour();
+
+  println c
+end
