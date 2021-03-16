@@ -62,14 +62,14 @@ public class ProgramNode implements ASTNode {
       }
     }
 
-    /* Call semanticAnalysis on the root statement node to analysis the rest of the program */
-    statementNode.semanticAnalysis(topSymbolTable, errorMessages, uncheckedNodes, firstCheck);
-
-
     /* Call semanticAnalysis on each function, even if it has been declared twice */
     for (FunctionNode func : functionNodes) {
       func.semanticAnalysis(func.getCurrSymTable(), errorMessages, uncheckedNodes, firstCheck);
     }
+
+    /* Call semanticAnalysis on the root statement node to analysis the rest of the program */
+    statementNode.semanticAnalysis(topSymbolTable, errorMessages, uncheckedNodes, firstCheck);
+
   }
 
   @Override
