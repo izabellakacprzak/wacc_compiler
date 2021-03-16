@@ -27,9 +27,30 @@ public class MethodCallNode extends CallNode{
     return symbolTable.lookup("*" + methodName.getIdentifier());
   }
 
+  public SymbolTable getClassSymTable(SymbolTable symbolTable) {
+    Identifier object = symbolTable.lookupAll(objectName.getIdentifier());
+    if (!(object instanceof ObjectId)) {
+      return null;
+    }
+
+    ObjectId objectId = (ObjectId) object;
+    DataTypeId classType = objectId.getType();
+    if (!(classType instanceof ClassType)) {
+      return null;
+    }
+
+    return  ((ClassType) classType).getFields().get(0).getCurrSymTable();
+  }
+
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
-    Identifier functionId = symbolTable.lookupAll("*" + methodName.getIdentifier());
+    SymbolTable classTable = getClassSymTable(symbolTable);
+
+    if(classTable == null) {
+      return null;
+    }
+
+    Identifier functionId = classTable.lookupAll("*" + methodName.getIdentifier());
     FunctionId function = (FunctionId) functionId;
 
     if (function == null) {
@@ -40,7 +61,13 @@ public class MethodCallNode extends CallNode{
   }
 
   public List<DataTypeId> getOverloadType(SymbolTable symbolTable) {
-    Identifier functionId = symbolTable.lookupAll("*" + methodName.getIdentifier());
+    SymbolTable classTable = getClassSymTable(symbolTable);
+
+    if(classTable == null) {
+      return null;
+    }
+
+    Identifier functionId = classTable.lookupAll("*" + methodName.getIdentifier());
     List<DataTypeId> returnTypes;
 
     List<DataTypeId> argTypes = new ArrayList<>();
