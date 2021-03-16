@@ -6,7 +6,6 @@ import InternalRepresentation.InternalState;
 import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ClassType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MethodCallNode extends CallNode{
@@ -68,38 +67,21 @@ public class MethodCallNode extends CallNode{
     }
 
     Identifier functionId = classTable.lookupAll("*" + methodName.getIdentifier());
-    List<DataTypeId> returnTypes;
-
-    List<DataTypeId> argTypes = new ArrayList<>();
-    for (ExpressionNode arg : arguments) {
-      argTypes.add(arg.getType(symbolTable));
-    }
-    returnTypes = ((OverloadFuncId) functionId).findReturnTypes(argTypes);
-
-    return returnTypes;
+    return getOverloadDataTypeIds(symbolTable, (OverloadFuncId) functionId, arguments);
   }
 
   @Override
-  /* TODO: REDO */
   public String toString() {
     StringBuilder str = new StringBuilder();
-    str.append("call ").append(methodName.getIdentifier()).append('(');
+    str.append("method: ").append(methodName.getIdentifier()).append('(');
 
-    for (ExpressionNode argument : arguments) {
-      str.append(argument.toString()).append(", ");
-    }
-
-    if (!arguments.isEmpty()) {
-      str.delete(str.length() - 2, str.length() - 1);
-    }
-
-    return str.append(')').toString();
+    return getString(str, arguments);
   }
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
     setCurrSymTable(symbolTable);
-    //setCurrSymTable(symbolTable);
+
     /* Check if object has been declared and is in fact an object */
     objectName.semanticAnalysis(symbolTable, errorMessages);
     Identifier object = symbolTable.lookupAll(objectName.getIdentifier());

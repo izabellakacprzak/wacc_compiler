@@ -1,16 +1,10 @@
 package AbstractSyntaxTree.assignment;
 
-import static SemanticAnalysis.DataTypes.BaseType.Type.CHAR;
-import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
-
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.*;
-import SemanticAnalysis.DataTypes.ArrayType;
-import SemanticAnalysis.DataTypes.BaseType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FuncCallNode extends CallNode {
@@ -87,8 +81,7 @@ public class FuncCallNode extends CallNode {
         .visitFuncCallNode(internalState, identifier, arguments, returnType, getCurrSymTable());
   }
 
-  /* Return the return type of the function
-   * TODO: CHANGE FOR OVERLOAD */
+  /* Return the return type of the function */
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
     Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
@@ -103,15 +96,7 @@ public class FuncCallNode extends CallNode {
 
   public List<DataTypeId> getOverloadType(SymbolTable symbolTable) {
     Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
-    List<DataTypeId> returnTypes;
-
-    List<DataTypeId> argTypes = new ArrayList<>();
-    for (ExpressionNode arg : arguments) {
-      argTypes.add(arg.getType(symbolTable));
-    }
-    returnTypes = ((OverloadFuncId) functionId).findReturnTypes(argTypes);
-
-    return returnTypes;
+    return getOverloadDataTypeIds(symbolTable, (OverloadFuncId) functionId, arguments);
   }
 
   /* Returns a FuncCall in the form: call func_id(arg1, arg2, ..., argN) */
@@ -120,14 +105,6 @@ public class FuncCallNode extends CallNode {
     StringBuilder str = new StringBuilder();
     str.append("call ").append(identifier.getIdentifier()).append('(');
 
-    for (ExpressionNode argument : arguments) {
-      str.append(argument.toString()).append(", ");
-    }
-
-    if (!arguments.isEmpty()) {
-      str.delete(str.length() - 2, str.length() - 1);
-    }
-
-    return str.append(')').toString();
+      return getString(str, arguments);
   }
 }

@@ -49,64 +49,16 @@ public class DeclarationStatementNode extends StatementNode {
     /* Check that the expected (declared) type and the type of assignment
      * can be resolved and match */
     DataTypeId declaredType = type.getType();
-    DataTypeId assignedType = null;
-
-    List<DataTypeId> returnTypes;
-
-    if(assignment instanceof FuncCallNode
-        && ((FuncCallNode) assignment).getIdentifier(symbolTable) instanceof OverloadFuncId) {
-      returnTypes = ((FuncCallNode) assignment).getOverloadType(symbolTable);
-      for(DataTypeId returnType : returnTypes) {
-        if(returnType == null) {
-          continue;
-        }
-
-        if(returnType.equals(declaredType)) {
-          assignedType = returnType;
-          break;
-        }
-      }
-
-      if(assignedType == null) {
-        errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
-            + " RHS type does not match LHS type for assignment.'"
-            + " Expected: " + declaredType + ". Could not find matching return type"
-            + " in overloaded functions.");
-        return;
-      } else {
-        ((FuncCallNode) assignment).setReturnType(assignedType);
-      }
-    } else if (assignment instanceof MethodCallNode
-            && ((MethodCallNode) assignment).getIdentifier(symbolTable) instanceof OverloadFuncId) {
-      // TODO: QUITE A LOT OF CODE DUPLICATION PLUS WE MIGHT NEED TO DO THE SAME THING IN ASSIGNMENT NODE
-      returnTypes = ((MethodCallNode) assignment).getOverloadType(symbolTable);
-      for(DataTypeId returnType : returnTypes) {
-        if(returnType == null) {
-          continue;
-        }
-
-        if(returnType.equals(declaredType)) {
-          assignedType = returnType;
-          break;
-        }
-      }
-
-      if(assignedType == null) {
-        errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
-                + " RHS type does not match LHS type for assignment.'"
-                + " Expected: " + declaredType + ". Could not find matching return type"
-                + " in overloaded functions.");
-        return;
-      }
-    } else {
-      assignedType = assignment.getType(symbolTable);
-    }
 
     if (declaredType == null) {
       errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
           + " Could not resolve type of '" + identifier.getIdentifier() + "'.");
+      return;
+    }
 
-    } else if (assignedType == null) {
+    DataTypeId assignedType = getTypeOfOverloadFunc(symbolTable, errorMessages, declaredType, assignment);
+
+    if (assignedType == null) {
       errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
           + " Could not resolve type of '" + assignment.toString() + "'."
           + " Expected: " + declaredType);

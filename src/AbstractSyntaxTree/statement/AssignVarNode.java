@@ -3,6 +3,7 @@ package AbstractSyntaxTree.statement;
 import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import AbstractSyntaxTree.assignment.FuncCallNode;
+import AbstractSyntaxTree.assignment.MethodCallNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.OverloadFuncId;
@@ -48,7 +49,6 @@ public class AssignVarNode extends StatementNode {
     /* Check that the left assignment type and the right assignment type
      * can be resolved and match */
     DataTypeId leftType = left.getType(symbolTable);
-    DataTypeId rightType = null;
 
     if (leftType == null) {
       if (varHasBeenDeclared(errorMessages, left)) {
@@ -58,34 +58,7 @@ public class AssignVarNode extends StatementNode {
       return;
     }
 
-    List<DataTypeId> returnTypes;
-
-    if(right instanceof FuncCallNode
-        && ((FuncCallNode) right).getIdentifier(symbolTable) instanceof OverloadFuncId) {
-      returnTypes = ((FuncCallNode) right).getOverloadType(symbolTable);
-      for(DataTypeId returnType : returnTypes) {
-        if(returnType == null) {
-          continue;
-        }
-
-        if(returnType.equals(leftType)) {
-          rightType = returnType;
-          break;
-        }
-      }
-
-      if(rightType == null) {
-        errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
-            + " RHS type does not match LHS type for assignment.'"
-            + " Expected: " + leftType + ". Could not find matching return type"
-            + " in overloaded functions.");
-        return;
-      } else {
-        ((FuncCallNode) right).setReturnType(rightType);
-      }
-    } else {
-      rightType = right.getType(symbolTable);
-    }
+    DataTypeId rightType = getTypeOfOverloadFunc(symbolTable, errorMessages, leftType, right);
 
     if (rightType == null) {
       if (varHasBeenDeclared(errorMessages, right)) {

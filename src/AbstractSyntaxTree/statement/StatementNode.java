@@ -4,10 +4,17 @@ import static SemanticAnalysis.DataTypes.BaseType.Type.CHAR;
 import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
 
 import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.assignment.AssignRHSNode;
+import AbstractSyntaxTree.assignment.FuncCallNode;
+import AbstractSyntaxTree.assignment.MethodCallNode;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.OverloadFuncId;
 import SemanticAnalysis.SymbolTable;
+
+import javax.xml.crypto.Data;
+import java.util.List;
 
 public abstract class StatementNode implements ASTNode {
 
@@ -35,7 +42,6 @@ public abstract class StatementNode implements ASTNode {
     return true;
   }
 
-
   /* Returns true when the declared type is a STRING and assigned type is a CHAR[] */
   boolean stringToCharArray(DataTypeId declaredType, DataTypeId assignedType) {
     if (declaredType.equals(new BaseType(STRING))) {
@@ -43,6 +49,61 @@ public abstract class StatementNode implements ASTNode {
     }
 
     return false;
+  }
+
+  DataTypeId getTypeOfOverloadFunc(SymbolTable symbolTable, List<String> errorMessages,
+                                   DataTypeId leftType, AssignRHSNode right) {
+    DataTypeId rightType = null;
+    List<DataTypeId> returnTypes;
+
+    if(right instanceof FuncCallNode
+            && ((FuncCallNode) right).getIdentifier(symbolTable) instanceof OverloadFuncId) {
+      returnTypes = ((FuncCallNode) right).getOverloadType(symbolTable);
+      for(DataTypeId returnType : returnTypes) {
+        if(returnType == null) {
+          continue;
+        }
+
+        if(returnType.equals(leftType)) {
+          rightType = returnType;
+          break;
+        }
+      }
+
+      if(rightType == null) {
+        errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
+                + " RHS type does not match LHS type for statement.'"
+                + " Expected: " + leftType + ". Could not find matching return type"
+                + " in overloaded functions.");
+        return null;
+      } else {
+        ((FuncCallNode) right).setReturnType(rightType);
+      }
+    } else if (right instanceof MethodCallNode
+            && ((MethodCallNode) right).getIdentifier(symbolTable) instanceof OverloadFuncId) {
+      returnTypes = ((MethodCallNode) right).getOverloadType(symbolTable);
+      for(DataTypeId returnType : returnTypes) {
+        if(returnType == null) {
+          continue;
+        }
+
+        if(returnType.equals(leftType)) {
+          rightType = returnType;
+          break;
+        }
+      }
+
+      if(rightType == null) {
+        errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
+                + " RHS type does not match LHS type for statement.'"
+                + " Expected: " + leftType + ". Could not find matching return type"
+                + " in overloaded functions.");
+        return null;
+      }
+    } else {
+      rightType = right.getType(symbolTable);
+    }
+    return rightType;
   }
 
   @Override

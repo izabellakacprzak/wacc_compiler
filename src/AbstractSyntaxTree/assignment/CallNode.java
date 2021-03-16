@@ -12,7 +12,7 @@ import java.util.List;
 import static SemanticAnalysis.DataTypes.BaseType.Type.CHAR;
 import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
 
-public abstract class CallNode extends AssignRHSNode{
+public abstract class CallNode extends AssignRHSNode {
 
     public CallNode(int line, int charPositionInLine) {
         super(line, charPositionInLine);
@@ -28,8 +28,8 @@ public abstract class CallNode extends AssignRHSNode{
     }
 
     public void semAnalyseFunctionArgs(SymbolTable symbolTable, List<String> errorMessages,
-                                              IdentifierNode identifier, List<ExpressionNode> arguments,
-                                              Identifier functionId) {
+                                       IdentifierNode identifier, List<ExpressionNode> arguments,
+                                       Identifier functionId) {
         List<DataTypeId> argTypes = new ArrayList<>();
         for (ExpressionNode arg : arguments) {
             argTypes.add(arg.getType(symbolTable));
@@ -111,5 +111,29 @@ public abstract class CallNode extends AssignRHSNode{
             }
             arguments.get(i).semanticAnalysis(symbolTable, errorMessages);
         }
+    }
+
+    static String getString(StringBuilder str, List<ExpressionNode> arguments) {
+        for (ExpressionNode argument : arguments) {
+            str.append(argument.toString()).append(", ");
+        }
+
+        if (!arguments.isEmpty()) {
+            str.delete(str.length() - 2, str.length() - 1);
+        }
+
+        return str.append(')').toString();
+    }
+
+    static List<DataTypeId> getOverloadDataTypeIds(SymbolTable symbolTable, OverloadFuncId functionId, List<ExpressionNode> arguments) {
+        List<DataTypeId> returnTypes;
+
+        List<DataTypeId> argTypes = new ArrayList<>();
+        for (ExpressionNode arg : arguments) {
+            argTypes.add(arg.getType(symbolTable));
+        }
+        returnTypes = functionId.findReturnTypes(argTypes);
+
+        return returnTypes;
     }
 }
