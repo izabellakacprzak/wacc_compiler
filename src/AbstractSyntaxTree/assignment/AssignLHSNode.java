@@ -56,12 +56,10 @@ public abstract class AssignLHSNode implements ASTNode {
 
   public boolean isUnsetParamId(SymbolTable symbolTable) {
     ParameterId param = getParamId(symbolTable);
-    if ((this instanceof IdentifierNode)) {
-      return !(param == null) && param.getType() == null;
-    } else if (this instanceof ArrayElemNode) {
-      return !(param == null) && ((ArrayType) param.getType()).getElemType() == null;
+    if (!(this instanceof IdentifierNode)) {
+      return false;
     }
-    return false;
+    return !(param == null) && param.getType() == null;
   }
 
   public boolean isUnsetParamArray(SymbolTable symbolTable) {
@@ -71,14 +69,7 @@ public abstract class AssignLHSNode implements ASTNode {
       return false;
     }
 
-    ArrayType arrType;
-    DataTypeId type = param.getType();
-    while (type instanceof ArrayType) {
-      arrType = (ArrayType) type;
-      type = arrType.getElemType();
-    }
-
-    return type == null;
+    return param.isUnsetArray();
   }
 
   @Override

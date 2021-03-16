@@ -1,24 +1,21 @@
 package AbstractSyntaxTree.assignment;
 
-import static SemanticAnalysis.DataTypes.BaseType.Type.CHAR;
-import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
-
 import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.InternalState;
-import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
-import SemanticAnalysis.FunctionId;
-import SemanticAnalysis.Identifier;
-import SemanticAnalysis.SemanticError;
-import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
 
+import static SemanticAnalysis.DataTypes.BaseType.Type.*;
+
 public class FuncCallNode extends AssignRHSNode {
 
+  private static final DataTypeId DEFAULT_TYPE = new BaseType(INT);
   /* identifier:   IdentifierNode corresponding to the function's name identifier
    * arguments:    List of ExpressionNodes corresponding to the arguments
    *                 passed into the function call */
@@ -26,7 +23,7 @@ public class FuncCallNode extends AssignRHSNode {
   private final List<ExpressionNode> arguments;
 
   public FuncCallNode(int line, int charPositionInLine, IdentifierNode identifier,
-      List<ExpressionNode> arguments) {
+                      List<ExpressionNode> arguments) {
     super(line, charPositionInLine);
     this.identifier = identifier;
     this.arguments = arguments;
@@ -43,12 +40,52 @@ public class FuncCallNode extends AssignRHSNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
-      List<ASTNode> uncheckedNodes, boolean firstCheck) {
+                               List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
     /* Check that the function has been previously declared as a FunctionId with its identifier */
     Identifier functionId = symbolTable.lookupAll("*" + identifier.getIdentifier());
+
+    if (functionId instanceof FunctionId) {
+      FunctionId function = (FunctionId) functionId;
+      List<ParameterId> params = function.getParams();
+
+
+      boolean containsUnsetParam = false;
+      for (int i = 0; i < params.size() && i < arguments.size(); i++) {
+        ExpressionNode currArg = arguments.get(i);
+        ParameterId currParam = params.get(i);
+        if ((currParam.getType() == null || currParam.isUnsetArray())
+                && currArg.getType(symbolTable) != null) {
+          currParam.setType(currArg.getType(symbolTable));
+        } else if (currParam.getType() == null || currParam.isUnsetArray()) {
+          containsUnsetParam = true;
+        }
+      }
+
+      if (containsUnsetParam && firstCheck) {
+        uncheckedNodes.add(this);
+        return;
+      } else if (containsUnsetParam) {
+        for (int i = 0; i < params.size() && i < arguments.size(); i++) {
+          ExpressionNode currArg = arguments.get(i);
+          if (currArg.isUnsetParamId(symbolTable)) {
+            ParameterId currParam = currArg.getParamId(symbolTable);
+            currParam.setType(DEFAULT_TYPE);
+            params.get(i).setType(DEFAULT_TYPE);
+            firstCheck = true;
+          } else if (currArg.isUnsetParamArray(symbolTable)) {
+            ParameterId currParam =
+                ((ArrayElemNode) currArg).getUnsetParameterIdArrayElem(symbolTable);
+            currParam.setType(DEFAULT_TYPE);
+            params.get(i).setType(DEFAULT_TYPE);
+            firstCheck = true;
+          }
+        }
+      }
+    }
+
 
     if (functionId == null) {
       errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
@@ -77,6 +114,7 @@ public class FuncCallNode extends AssignRHSNode {
       return;
     }
 
+
     /* Check that each parameter's type can be resolved and matches the
      * corresponding argument type */
     for (int i = 0; i < arguments.size(); i++) {
@@ -104,7 +142,7 @@ public class FuncCallNode extends AssignRHSNode {
   @Override
   public void generateAssembly(InternalState internalState) {
     internalState.getCodeGenVisitor().
-        visitFuncCallNode(internalState, identifier, arguments, getCurrSymTable());
+                                         visitFuncCallNode(internalState, identifier, arguments, getCurrSymTable());
   }
 
   /* Return the return type of the function */

@@ -62,6 +62,20 @@ public class ParameterId extends Identifier {
   }
 
 
+
+  public boolean isUnsetArray() {
+    ArrayType arrType;
+    DataTypeId type = getType();
+    while (type instanceof ArrayType) {
+      arrType = (ArrayType) type;
+      type = arrType.getElemType();
+    }
+
+    return type == null;
+  }
+
+
+
   @Override
   public int getSize() {
     return type.getSize();
