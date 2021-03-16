@@ -1,0 +1,19 @@
+# a simple function definition and call
+
+# Output:
+# 0
+
+# Program:
+
+begin
+  int f(x) is
+    if x
+    then
+      println 0
+    else
+      println 1
+    fi ;
+    return 0
+  end
+  println 0
+end

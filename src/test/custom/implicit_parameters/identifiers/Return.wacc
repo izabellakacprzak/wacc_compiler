@@ -1,0 +1,13 @@
+# a simple function definition and call
+
+# Output:
+# 0
+
+# Program:
+
+begin
+  bool f(x) is
+    return x
+  end
+  println 0
+end

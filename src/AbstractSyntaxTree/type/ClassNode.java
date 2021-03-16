@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.type;
 
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.ProgramNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.InternalState;
@@ -44,18 +45,19 @@ public class ClassNode implements TypeNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     setCurrSymTable(symbolTable);
 
     for (AttributeNode attribute : attributes) {
-      attribute.semanticAnalysis(symbolTable, errorMessages);
+      attribute.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
 
     for (ConstructorNode constructor : constructors) {
-      constructor.semanticAnalysis(symbolTable, errorMessages);
+      constructor.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
 
-    ProgramNode.overloadFunc(symbolTable, errorMessages, methods);
+    ProgramNode.overloadFunc(symbolTable, errorMessages, methods, uncheckedNodes, firstCheck);
   }
 
   @Override

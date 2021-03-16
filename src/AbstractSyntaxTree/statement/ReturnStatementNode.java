@@ -1,11 +1,18 @@
 package AbstractSyntaxTree.statement;
 
+import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.ParameterId;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
+
+import static SemanticAnalysis.DataTypes.BaseType.Type.BOOL;
 
 public class ReturnStatementNode extends StatementNode {
 
@@ -19,33 +26,58 @@ public class ReturnStatementNode extends StatementNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+                               List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+    DataTypeId returnExprType = returnExpr.getType(symbolTable);
+    boolean isUnsetParam = returnExpr.isUnsetParamId(symbolTable);
+    ParameterId param = returnExpr.getParamId(symbolTable);
+
+    boolean isUnsetArrayParam = false;
+    ParameterId arrayParam = null;
+    ArrayElemNode arrayElem = null;
+
+
+    if (returnExpr instanceof ArrayElemNode) {
+      arrayElem = (ArrayElemNode) returnExpr;
+      isUnsetArrayParam = arrayElem.isUnsetParameterIdArrayElem(symbolTable);
+      arrayParam = arrayElem.getUnsetParameterIdArrayElem(symbolTable);
+    }
+
+
+    if (isUnsetParam) {
+      param.setType(returnType);
+    } else if (isUnsetArrayParam) {
+      arrayParam.setBaseElemType(returnType);
+    }
+
+
+    /* Check that the type of returnExpr is the same as the expected returnType */
+     returnExprType = returnExpr.getType(symbolTable);
+
     /* Recursively call semanticAnalysis on expression node */
-    returnExpr.semanticAnalysis(symbolTable, errorMessages);
+    returnExpr.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check to see if the current symbolTable is the top table.
      * Return statements cannot be present in the body of the main function */
     if (symbolTable.isTopSymTable()) {
-      errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
-          + " 'return' statement cannot be present in the body of the main function.");
+      errorMessages.add(new SemanticError(returnExpr.getLine(), returnExpr.getCharPositionInLine(),
+          "'return' statement cannot be present in the body of the main function."));
       return;
     }
 
-    /* Check that the type of returnExpr is the same as the expected returnType */
-    DataTypeId returnExprType = returnExpr.getType(symbolTable);
 
     if (returnExprType == null) {
-      errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
-          + " Could not resolve type for '" + returnExpr + "'.");
+      errorMessages.add(new SemanticError(returnExpr.getLine(), returnExpr.getCharPositionInLine(),
+          "Could not resolve type for '" + returnExpr + "'."));
     } else if (!(returnExprType.equals(returnType)) && !stringToCharArray(returnType,
         returnExprType)) {
 
-      errorMessages.add(returnExpr.getLine() + ":" + returnExpr.getCharPositionInLine()
-          + " Declared return type does not match 'return' statement type."
-          + " Expected: " + returnType + " Actual: " + returnExprType);
+      errorMessages.add(new SemanticError(returnExpr.getLine(), returnExpr.getCharPositionInLine(),
+          "Declared return type does not match 'return' statement type."
+              + " Expected: " + returnType + " Actual: " + returnExprType));
     }
   }
 

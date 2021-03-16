@@ -1,1 +1,13 @@
-src/test/valid
+src/test/valid/advanced
+src/test/valid/array
+src/test/valid/basic
+src/test/valid/expressions
+src/test/valid/function
+src/test/valid/if
+src/test/valid/IO
+src/test/valid/pair
+src/test/valid/runtimeErr
+src/test/valid/scope
+src/test/valid/sequences
+src/test/valid/variables
+src/test/valid/while

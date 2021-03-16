@@ -1,9 +1,16 @@
 package AbstractSyntaxTree.statement;
 
+import static SemanticAnalysis.DataTypes.BaseType.Type.BOOL;
+import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
+
+import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.ParameterId;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
@@ -18,24 +25,46 @@ public class ExitStatementNode extends StatementNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+    boolean isUnsetParam = expression.isUnsetParamId(symbolTable);
+    ParameterId param = expression.getParamId(symbolTable);
+
+    boolean isUnsetArrayParam = false;
+    ParameterId arrayParam = null;
+    ArrayElemNode arrayElem = null;
+
+
+    if (expression instanceof ArrayElemNode) {
+      arrayElem = (ArrayElemNode) expression;
+      isUnsetArrayParam = arrayElem.isUnsetParameterIdArrayElem(symbolTable);
+      arrayParam = arrayElem.getUnsetParameterIdArrayElem(symbolTable);
+    }
+
+
+    if (isUnsetParam) {
+      param.setType(new BaseType(INT));
+    } else if (isUnsetArrayParam) {
+      arrayParam.setBaseElemType(new BaseType(INT));
+    }
+
     /* Recursively call semanticAnalysis on expression node */
-    expression.semanticAnalysis(symbolTable, errorMessages);
+    expression.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check that the type of assignment is an INT */
     DataTypeId exprType = expression.getType(symbolTable);
 
     if (exprType == null) {
-      errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-          + " Could not resolve type for '" + expression + "'."
-          + " Expected: INT");
-    } else if (!exprType.equals(new BaseType(BaseType.Type.INT))) {
-      errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-          + " Incompatible type for 'exit' statement."
-          + " Expected: INT Actual: " + exprType);
+      errorMessages.add(new SemanticError(expression.getLine(), expression.getCharPositionInLine(),
+          "Could not resolve type for '" + expression + "'."
+              + " Expected: INT"));
+    } else if (!exprType.equals(new BaseType(INT))) {
+      errorMessages.add(new SemanticError(expression.getLine(), expression.getCharPositionInLine(),
+          "Incompatible type for 'exit' statement."
+              + " Expected: INT Actual: " + exprType));
     }
   }
 

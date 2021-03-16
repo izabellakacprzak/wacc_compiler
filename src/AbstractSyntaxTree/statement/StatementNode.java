@@ -11,6 +11,7 @@ import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.OverloadFuncId;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import javax.xml.crypto.Data;
@@ -51,7 +52,7 @@ public abstract class StatementNode implements ASTNode {
     return false;
   }
 
-  DataTypeId getTypeOfOverloadFunc(SymbolTable symbolTable, List<String> errorMessages,
+  DataTypeId getTypeOfOverloadFunc(SymbolTable symbolTable, List<SemanticError> errorMessages,
                                    DataTypeId leftType, AssignRHSNode right) {
     DataTypeId rightType = null;
     List<DataTypeId> returnTypes;
@@ -71,10 +72,10 @@ public abstract class StatementNode implements ASTNode {
       }
 
       if(rightType == null) {
-        errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
-                + " RHS type does not match LHS type for statement.'"
+        errorMessages.add(new SemanticError(right.getLine(), right.getCharPositionInLine(),
+                "RHS type does not match LHS type for statement.'"
                 + " Expected: " + leftType + ". Could not find matching return type"
-                + " in overloaded functions.");
+                + " in overloaded functions."));
         return null;
       } else {
         ((FuncCallNode) right).setReturnType(rightType);
@@ -94,10 +95,10 @@ public abstract class StatementNode implements ASTNode {
       }
 
       if(rightType == null) {
-        errorMessages.add(right.getLine() + ":" + right.getCharPositionInLine()
-                + " RHS type does not match LHS type for statement.'"
+        errorMessages.add(new SemanticError(right.getLine(), right.getCharPositionInLine(),
+                "RHS type does not match LHS type for statement.'"
                 + " Expected: " + leftType + ". Could not find matching return type"
-                + " in overloaded functions.");
+                + " in overloaded functions."));
         return null;
       }
     } else {

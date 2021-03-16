@@ -20,7 +20,8 @@ program: BEGIN (func)* (classdecl)* stat END EOF ;
 
 // function and parameters
 func: type IDENT OPEN_PARENTHESES (param_list)? CLOSE_PARENTHESES IS stat END ;
-param_list: type IDENT (COMMA type IDENT)* ;
+param_list: type IDENT (COMMA type IDENT)*  (COMMA  IDENT)*
+| IDENT (COMMA  IDENT)* ;
 
 // class
 classdecl: CLASS IDENT OPEN_PARENTHESES CLOSE_PARENTHESES IS (attribute SEMICOLON)* (constructor)+ (func)* END ;

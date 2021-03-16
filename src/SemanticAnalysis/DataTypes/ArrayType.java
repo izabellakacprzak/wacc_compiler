@@ -2,6 +2,8 @@ package SemanticAnalysis.DataTypes;
 
 import SemanticAnalysis.DataTypeId;
 
+import javax.xml.crypto.Data;
+
 public class ArrayType extends DataTypeId {
 
   /* ARRAY_BYTES_SIZE: size of a reference of an array */
@@ -9,15 +11,24 @@ public class ArrayType extends DataTypeId {
   private static final int HASH_PRIME = 67;
 
   /* elemType:  DataTypeId of the corresponding type of elements the array contains */
-  private final DataTypeId elemType;
+  private DataTypeId elemType;
 
   public ArrayType(DataTypeId elemType) {
     this.elemType = elemType;
   }
 
+  public ArrayType() {
+
+  }
+
   public DataTypeId getElemType() {
     return elemType;
   }
+
+  public void setElemType(DataTypeId elemType) {
+    this.elemType = elemType;
+  }
+
 
   /* ArrayTypes are equal if their element types are equal,
    * or at least one has a null element type */
@@ -33,7 +44,7 @@ public class ArrayType extends DataTypeId {
 
     ArrayType arrayObject = (ArrayType) object;
     return arrayObject.getElemType() == null
-        || arrayObject.getElemType().equals(this.elemType);
+               || arrayObject.getElemType().equals(this.elemType);
   }
 
   @Override

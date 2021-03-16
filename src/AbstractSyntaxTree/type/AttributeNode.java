@@ -1,10 +1,12 @@
 package AbstractSyntaxTree.type;
 
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.Identifier;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 import SemanticAnalysis.VariableId;
 
@@ -41,30 +43,31 @@ public class AttributeNode implements TypeNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     setCurrSymTable(symbolTable);
 
     /* Check if such an attribute has not been defined */
     if (symbolTable.lookup(name.getIdentifier()) != null) {
-      errorMessages.add(name.getLine() + ":" + name.getCharPositionInLine() +
-              " Field '" + name.getIdentifier() + "' has already been declared.");
+      errorMessages.add(new SemanticError(name.getLine(), name.getCharPositionInLine(),
+              "Field '" + name.getIdentifier() + "' has already been declared."));
     }
 
     /* If not, check if there is an assign RHS and if so do type checks */
     if (assignRHS != null) {
-      assignRHS.semanticAnalysis(symbolTable, errorMessages);
+      assignRHS.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
       DataTypeId assignedType = assignRHS.getType(symbolTable);
       if (assignedType == null) {
-        errorMessages.add(assignRHS.getLine() + ":" + assignRHS.getCharPositionInLine() +
-                " RHS type could not be resolved.");
+        errorMessages.add(new SemanticError(assignRHS.getLine(), assignRHS.getCharPositionInLine(),
+                "RHS type could not be resolved."));
       } else if (type.getType() == null) {
-        errorMessages.add(name.getLine() + ":" + name.getCharPositionInLine() +
-                " Field type could not be resolved.");
+        errorMessages.add(new SemanticError(name.getLine(), name.getCharPositionInLine(),
+                "Field type could not be resolved."));
       } else if (!assignedType.equals(type.getType())) {
-        errorMessages.add(name.getLine() + ":" + name.getCharPositionInLine() +
-                " Assignment type does not match declared type for '"
+        errorMessages.add(new SemanticError(name.getLine(), name.getCharPositionInLine(),
+                "Assignment type does not match declared type for '"
                 + name.getIdentifier() + "'."
-                + " Expected: " + type.getType() + " Actual: " + assignedType);
+                + " Expected: " + type.getType() + " Actual: " + assignedType));
         symbolTable.add(name.getIdentifier(), new VariableId(name, type.getType()));
       } else {
         symbolTable.add(name.getIdentifier(), new VariableId(name, type.getType()));

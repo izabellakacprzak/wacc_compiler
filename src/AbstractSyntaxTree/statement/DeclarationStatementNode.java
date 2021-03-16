@@ -1,15 +1,15 @@
 package AbstractSyntaxTree.statement;
 
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
-import AbstractSyntaxTree.assignment.FuncCallNode;
-import AbstractSyntaxTree.assignment.MethodCallNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.TypeNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.OverloadFuncId;
 import SemanticAnalysis.SymbolTable;
 import SemanticAnalysis.VariableId;
+import AbstractSyntaxTree.expression.ArrayElemNode;
+import SemanticAnalysis.*;
 
 import java.util.List;
 
@@ -23,23 +23,41 @@ public class DeclarationStatementNode extends StatementNode {
   private final AssignRHSNode assignment;
 
   public DeclarationStatementNode(TypeNode type, IdentifierNode identifier,
-      AssignRHSNode assignment) {
+                                  AssignRHSNode assignment) {
     this.type = type;
     this.identifier = identifier;
     this.assignment = assignment;
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+                               List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
+
+    DataTypeId declaredType = type.getType();
+    DataTypeId assignedType = assignment.getType(symbolTable);
+
+    if (assignment.isUnsetParamId(symbolTable)) {
+      ParameterId assignParam = assignment.getParamId(symbolTable);
+      assignParam.setType(declaredType);
+    }
+
+    if (assignment instanceof ArrayElemNode) {
+      ArrayElemNode arrElemNode = (ArrayElemNode) assignment;
+      arrElemNode.setArrayElemBaseType(symbolTable, declaredType);
+    }
+
+     declaredType = type.getType();
+     assignedType = assignment.getType(symbolTable);
+
 
     /* Check whether identifier has been previously declared as another variable in the current scope.
      * If not, add a new VariableId to the symbol table under identifier */
     if (symbolTable.lookup(identifier.getIdentifier()) != null) {
-      errorMessages.add(identifier.getLine() + ":" + identifier.getCharPositionInLine()
-          + " Identifier '" + identifier.getIdentifier()
-          + "' has already been declared in the same scope.");
+      errorMessages.add(new SemanticError(identifier.getLine(), identifier.getCharPositionInLine(),
+          "Identifier '" + identifier.getIdentifier()
+              + "' has already been declared in the same scope."));
 
     } else {
       symbolTable.add(identifier.getIdentifier(),
@@ -48,32 +66,33 @@ public class DeclarationStatementNode extends StatementNode {
 
     /* Check that the expected (declared) type and the type of assignment
      * can be resolved and match */
-    DataTypeId declaredType = type.getType();
+
+    declaredType = type.getType();
 
     if (declaredType == null) {
-      errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
-          + " Could not resolve type of '" + identifier.getIdentifier() + "'.");
+      errorMessages.add(new SemanticError(assignment.getLine(),(assignment.getCharPositionInLine()),
+          "Could not resolve type of '" + identifier.getIdentifier() + "'."));
       return;
     }
 
-    DataTypeId assignedType = getTypeOfOverloadFunc(symbolTable, errorMessages, declaredType, assignment);
+    assignedType = getTypeOfOverloadFunc(symbolTable, errorMessages, declaredType, assignment);
 
     if (assignedType == null) {
-      errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
-          + " Could not resolve type of '" + assignment.toString() + "'."
-          + " Expected: " + declaredType);
+      errorMessages.add(new SemanticError(assignment.getLine(), assignment.getCharPositionInLine(),
+          "Could not resolve type of '" + assignment.toString() + "'."
+          + " Expected: " + declaredType));
 
     } else if (!declaredType.equals(assignedType) && !stringToCharArray(declaredType,
         assignedType)) {
-      errorMessages.add(assignment.getLine() + ":" + assignment.getCharPositionInLine()
-          + " Assignment type does not match declared type for '"
-          + identifier.getIdentifier() + "'."
-          + " Expected: " + declaredType + " Actual: " + assignedType);
+      errorMessages.add(new SemanticError(assignment.getLine(), assignment.getCharPositionInLine(),
+          "Assignment type does not match declared type for '"
+              + identifier.getIdentifier() + "'."
+              + " Expected: " + declaredType + " Actual: " + assignedType));
     }
 
     /* Recursively call semanticAnalysis on stored nodes */
-    identifier.semanticAnalysis(symbolTable, errorMessages);
-    assignment.semanticAnalysis(symbolTable, errorMessages);
+    identifier.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
+    assignment.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
   }
 
   @Override

@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.assignment;
 
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.InternalState;
@@ -79,40 +80,42 @@ public class MethodCallNode extends CallNode{
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     setCurrSymTable(symbolTable);
 
     /* Check if object has been declared and is in fact an object */
-    objectName.semanticAnalysis(symbolTable, errorMessages);
+    objectName.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     Identifier object = symbolTable.lookupAll(objectName.getIdentifier());
     if (!(object instanceof ObjectId)) {
-      errorMessages.add(objectName.getLine() + ":" + objectName.getCharPositionInLine() +
-              " Cannot call a method on a non-object."   + " Expected: OBJECT TYPE "
-              + " Actual: " + object);
+      errorMessages.add(new SemanticError(objectName.getLine(), objectName.getCharPositionInLine(),
+              "Cannot call a method on a non-object."   + " Expected: OBJECT TYPE "
+              + " Actual: " + object));
     } else {
       ObjectId objectId = (ObjectId) object;
       DataTypeId classType = objectId.getType();
       if (!(classType instanceof ClassType)) {
-        errorMessages.add(objectName.getLine() + ":" + objectName.getCharPositionInLine() +
-                " Could not properly resolve object type."   + " Expected: CLASS TYPE "
-                + " Actual: " + classType);
+        errorMessages.add(new SemanticError(objectName.getLine(), objectName.getCharPositionInLine(),
+                "Could not properly resolve object type."   + " Expected: CLASS TYPE "
+                + " Actual: " + classType));
       } else {
         SymbolTable classTable = ((ClassType) classType).getFields().get(0).getCurrSymTable();
         Identifier functionId = classTable.lookup("*" + methodName.getIdentifier());
 
         /* Check if method has been declared in the appropriate class */
         if (functionId == null) {
-          errorMessages.add(objectName.getLine() + ":" + objectName.getCharPositionInLine() +
-                  " Could not find method with signature '"  + methodName.getIdentifier() + "' declared in class "
-                  + ((ClassType) classType).getClassName());
+          errorMessages.add(new SemanticError(objectName.getLine(), objectName.getCharPositionInLine(),
+                  "Could not find method with signature '"  + methodName.getIdentifier() + "' declared in class "
+                  + ((ClassType) classType).getClassName()));
         } else {
-          super.semAnalyseFunctionArgs(symbolTable, errorMessages, methodName, arguments, functionId);
+          super.semAnalyseFunctionArgs(symbolTable, errorMessages, methodName, arguments,
+              functionId, uncheckedNodes, firstCheck);
         }
       }
     }
     /* Semantically analyse all arguments */
     for (ExpressionNode arg : arguments) {
-      arg.semanticAnalysis(symbolTable, errorMessages);
+      arg.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
   }
 

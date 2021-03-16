@@ -1,0 +1,16 @@
+# a simple function definition and call
+
+# Output:
+# 0
+
+# Program:
+
+begin
+  int f(x) is
+    while x do
+      x = false 
+    done ;
+    return 0
+  end
+  println 0
+end

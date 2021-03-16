@@ -2,6 +2,8 @@ package AbstractSyntaxTree.expression;
 
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.Identifier;
+import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
 
 public abstract class ExpressionNode extends AssignRHSNode {
@@ -17,5 +19,4 @@ public abstract class ExpressionNode extends AssignRHSNode {
   /* All ExpressionNodes must Override toString for use in error messages */
   @Override
   public abstract String toString();
-
 }

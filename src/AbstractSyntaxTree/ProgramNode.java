@@ -7,6 +7,9 @@ import AbstractSyntaxTree.type.FunctionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ClassType;
+import SemanticAnalysis.FunctionId;
+import SemanticAnalysis.SemanticError;
+import SemanticAnalysis.SymbolTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +45,8 @@ public class ProgramNode implements ASTNode {
     return syntaxErrors;
   }
 
-  public static void overloadFunc(SymbolTable symbolTable, List<String> errorMessages, List<FunctionNode> methods) {
+  public static void overloadFunc(SymbolTable symbolTable, List<SemanticError> errorMessages, List<FunctionNode> methods,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     for (FunctionNode method : methods) {
       /* Create a new SymbolTable for the function's scope */
       method.setCurrSymTable(new SymbolTable(symbolTable));
@@ -61,22 +65,22 @@ public class ProgramNode implements ASTNode {
             symbolTable.add(method.getName(), overloadFunc);
           } else {
             IdentifierNode id = method.getIdentifierNode();
-            errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
-                    + " Cannot overload " + declaredFunc.toString() + "' as a function with the same " +
-                    "signature already exists.");
+            errorMessages.add(new SemanticError(id.getLine(),id.getCharPositionInLine(),
+                    "Cannot overload " + declaredFunc.toString() + "' as a function with the same " +
+                    "signature already exists."));
           }
         } else if (declaredFunc instanceof OverloadFuncId) {
           OverloadFuncId overloadFunc = (OverloadFuncId) declaredFunc;
           if (!overloadFunc.addNewFunc(newIdentifier)) {
             IdentifierNode id = method.getIdentifierNode();
-            errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
-                    + " Cannot overload " + declaredFunc.toString() + "' as a function with the same " +
-                    "signature already exists.");
+            errorMessages.add(new SemanticError(id.getLine(), id.getCharPositionInLine(),
+                "Cannot overload " + declaredFunc.toString() + "' as a function with the same " +
+                    "signature already exists."));
           }
         } else {
           IdentifierNode id = method.getIdentifierNode();
-          errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine()
-                  + " Type of '" + declaredFunc.toString() + "' could not be resolved.");
+          errorMessages.add(new SemanticError(id.getLine(), id.getCharPositionInLine(),
+                  "Type of '" + declaredFunc.toString() + "' could not be resolved."));
         }
       } else {
         symbolTable.add(method.getName(), newIdentifier);
@@ -84,17 +88,18 @@ public class ProgramNode implements ASTNode {
     }
 
     for (FunctionNode method : methods) {
-      method.semanticAnalysis(method.getCurrSymTable(), errorMessages);
+      method.semanticAnalysis(method.getCurrSymTable(), errorMessages, uncheckedNodes, firstCheck);
     }
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable topSymbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable topSymbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     setCurrSymTable(topSymbolTable);
 
     /* Call overloadFunc to do semantic analysis on all declared functions and
      * check if overload is possible */
-    overloadFunc(topSymbolTable, errorMessages, functionNodes);
+    overloadFunc(topSymbolTable, errorMessages, functionNodes, uncheckedNodes, firstCheck);
 
     /* Semantically analyse all classes */
     for (ClassNode classDecl : classNodes) {
@@ -103,8 +108,8 @@ public class ProgramNode implements ASTNode {
       if (topSymbolTable.lookupAll(classDecl.getName()) != null) {
         /* Class with the same name has been declared */
         IdentifierNode id = classDecl.getIdentifierNode();
-        errorMessages.add(id.getLine() + ":" + id.getCharPositionInLine() +
-                "Class '" + id.getIdentifier() + "' has already been defined.");
+        errorMessages.add(new SemanticError(id.getLine(), id.getCharPositionInLine(),
+                "Class '" + id.getIdentifier() + "' has already been defined."));
       } else {
         ClassType classType = (ClassType) classDecl.getIdentifier(classDecl.getCurrSymTable());
         topSymbolTable.add(classDecl.getName(), classType);
@@ -112,11 +117,13 @@ public class ProgramNode implements ASTNode {
     }
 
     for (ClassNode classNode : classNodes) {
-      classNode.semanticAnalysis(classNode.getCurrSymTable(), errorMessages);
+      classNode.semanticAnalysis(classNode.getCurrSymTable(), errorMessages, uncheckedNodes,
+          firstCheck);
     }
 
     /* Call semanticAnalysis on the root statement node to analysis the rest of the program */
-    statementNode.semanticAnalysis(topSymbolTable, errorMessages);
+    statementNode.semanticAnalysis(topSymbolTable, errorMessages, uncheckedNodes, firstCheck);
+
   }
 
   @Override

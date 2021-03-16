@@ -1,13 +1,14 @@
 package AbstractSyntaxTree.expression;
 
+import AbstractSyntaxTree.ASTNode;
 import InternalRepresentation.InternalState;
-import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
-import SemanticAnalysis.Identifier;
-import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
+
+import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
 
 public class ArrayElemNode extends ExpressionNode {
 
@@ -18,7 +19,7 @@ public class ArrayElemNode extends ExpressionNode {
   private final List<ExpressionNode> expressions;
 
   public ArrayElemNode(int line, int charPositionInLine, IdentifierNode identifier,
-      List<ExpressionNode> expressions) {
+                       List<ExpressionNode> expressions) {
     super(line, charPositionInLine);
     this.identifier = identifier;
     this.expressions = expressions;
@@ -32,34 +33,63 @@ public class ArrayElemNode extends ExpressionNode {
     return expressions;
   }
 
+  public void setArrayElemBaseType(SymbolTable symbolTable, DataTypeId type) {
+    if (identifier.isUnsetParamId(symbolTable) || identifier.isUnsetParamArray(symbolTable)) {
+      ParameterId paramId = identifier.getParamId(symbolTable);
+      int size = expressions.size();
+
+      paramId.setNestedType(type, size);
+    }
+  }
+
+  public void addToExpectedTypesArrayElem(SymbolTable symbolTable, List<DataTypeId> type) {
+    if (identifier.isUnsetParamId(symbolTable) || identifier.isUnsetParamArray(symbolTable)) {
+      ParameterId paramId = identifier.getParamId(symbolTable);
+      paramId.addToExpectedTypes(type);
+    }
+  }
+
+  public void addToMatchingParamsArrayElem(SymbolTable symbolTable, ParameterId param) {
+    if (identifier.isUnsetParamId(symbolTable) || identifier.isUnsetParamArray(symbolTable)) {
+      ParameterId paramId = identifier.getParamId(symbolTable);
+      paramId.addToMatchingParams(param);
+    }
+  }
+
+  public ParameterId getUnsetParameterIdArrayElem(SymbolTable symbolTable) {
+    if (identifier.isUnsetParamId(symbolTable) || identifier.isUnsetParamArray(symbolTable)) {
+      return identifier.getParamId(symbolTable);
+    }
+    return null;
+  }
+
+  public boolean isUnsetParameterIdArrayElem(SymbolTable symbolTable) {
+    return (identifier.isUnsetParamId(symbolTable) || identifier.isUnsetParamArray(symbolTable));
+  }
+
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+                               List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
-    /* Recursively call semanticAnalysis on stored nodes */
-    identifier.semanticAnalysis(symbolTable, errorMessages);
 
+    boolean isUnsetParam = false;
+    boolean isUnsetArrayParam = false;
     for (ExpressionNode expression : expressions) {
-      expression.semanticAnalysis(symbolTable, errorMessages);
-    }
 
-    /* Check identifier has been declared and is of an ARRAY type */
-    Identifier idType = symbolTable.lookupAll(identifier.getIdentifier());
+      isUnsetParam = expression.isUnsetParamId(symbolTable);
+      if (expression instanceof ArrayElemNode) {
+        isUnsetArrayParam = expression.isUnsetParamArray(symbolTable);
+      }
 
-    if (idType == null) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " No declaration of '" + identifier.getIdentifier() + "' identifier."
-          + " Expected: ARRAY IDENTIFIER.");
-      return;
-    }
-
-    if (!(identifier.getType(symbolTable) instanceof ArrayType)) {
-      System.out.println(identifier);
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Incompatible type of '" + identifier.getIdentifier() + "' identifier."
-          + " Expected: ARRAY IDENTIFIER Actual: " + idType);
-      return;
+      if (isUnsetParam) {
+        expression.getParamId(symbolTable).setType(new BaseType(INT));
+      }
+      else if (isUnsetArrayParam){
+        ((ArrayElemNode)expression).setArrayElemBaseType(symbolTable, new BaseType(INT));
+      }
+      expression.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
 
     /* Check that each expression is of type INT */
@@ -68,18 +98,54 @@ public class ArrayElemNode extends ExpressionNode {
       thisType = expression.getType(symbolTable);
 
       if (thisType == null) {
-        errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-            + " Could not resolve type of '" + expression + "' in ARRAY ELEM."
-            + " Expected: INT");
+        errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+            "Could not resolve type of '" + expression + "' in ARRAY ELEM."
+                + " Expected: INT"));
         break;
       }
 
       if (!thisType.equals(new BaseType(BaseType.Type.INT))) {
-        errorMessages.add(expression.getLine() + ":" + expression.getCharPositionInLine()
-            + " Incompatible type of '" + expression + "' in ARRAY ELEM."
-            + " Expected: INT Actual: " + thisType);
+        errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+            "Incompatible type of '" + expression + "' in ARRAY ELEM."
+                + " Expected: INT Actual: " + thisType));
       }
     }
+
+
+//TODO: ask Una how to use firstCheck in here
+    if (identifier.isUnsetParamId(symbolTable)) {
+      if (identifier.getType(symbolTable) == null) {
+        ParameterId param = identifier.getParamId(symbolTable);
+        param.setType(new ArrayType());
+        uncheckedNodes.add(identifier);
+        return;
+      }
+    }
+
+
+    /* Recursively call semanticAnalysis on stored nodes */
+    identifier.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
+
+
+    /* Check identifier has been declared and is of an ARRAY type */
+    Identifier idType = symbolTable.lookupAll(identifier.getIdentifier());
+
+    if (idType == null) {
+      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+          "No declaration of '" + identifier.getIdentifier() + "' identifier."
+              + " Expected: ARRAY IDENTIFIER."));
+      return;
+    }
+
+    if (!(identifier.getType(symbolTable) instanceof ArrayType)) {
+      System.out.println(identifier);
+      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+          "Incompatible type of '" + identifier.getIdentifier() + "' identifier."
+              + " Expected: ARRAY IDENTIFIER Actual: " + idType));
+      return;
+    }
+
+
   }
 
   @Override
@@ -88,9 +154,16 @@ public class ArrayElemNode extends ExpressionNode {
   }
 
   /* Return the type of the elements stored in identifier array */
+  /*If when this function is called, the type of the identifier is null, set its type to ArrayType
+  as it reached this node. */
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
     DataTypeId idType = identifier.getType(symbolTable);
+    if (idType == null && identifier.isUnsetParamId(symbolTable)) {
+      ParameterId param = identifier.getParamId(symbolTable);
+      param.setNestedType(null, expressions.size());
+      return identifier.getType(symbolTable);
+    }
     if (!(idType instanceof ArrayType)) {
       return null;
     }

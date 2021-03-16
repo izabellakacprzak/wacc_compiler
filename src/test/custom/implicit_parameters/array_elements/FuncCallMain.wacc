@@ -1,0 +1,19 @@
+# a simple function definition and call
+
+# Output:
+# 0
+
+# Program:
+
+begin
+  int f(x, b) is
+    bool a = x[1][2] == b[2] ;
+    return 0 
+  end
+  char[] a = ['a', 'b', 'c'];
+  char[] b = ['f', 'g', 'h'];
+  char[][] c = [a,b] ;
+  char[] d = ['a', 's'];
+  int x = call f(c, d);
+  println 0
+end

@@ -1,14 +1,23 @@
 package AbstractSyntaxTree.assignment;
 
+import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
+
+import AbstractSyntaxTree.ASTNode;
+import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
+import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.ParameterId;
+import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
 
 public class ArrayLiterNode extends AssignRHSNode {
+
+  private static final DataTypeId DEFAULT_TYPE = new BaseType(INT);
 
   /* expressions:  List of ExpressionNodes corresponding to each element of the ARRAY literal */
   private final List<ExpressionNode> expressions;
@@ -19,7 +28,8 @@ public class ArrayLiterNode extends AssignRHSNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+                               List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -28,41 +38,97 @@ public class ArrayLiterNode extends AssignRHSNode {
       return;
     }
 
-    /* Check if the first expression's type can be resolved */
-    ExpressionNode fstExpr = expressions.get(0);
-    DataTypeId fstType = fstExpr.getType(symbolTable);
+    /* Check if any expression's type can be resolved */
+    DataTypeId matchType = null;
+    for (ExpressionNode expr : expressions) {
+      matchType = expr.getType(symbolTable);
 
-    if (fstType == null) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Could not resolve type of array assignment.");
-      return;
+      if (matchType != null) {
+        break;
+      }
     }
 
-    fstExpr.semanticAnalysis(symbolTable, errorMessages);
+    if (matchType == null && firstCheck) {
+      for (ExpressionNode expr : expressions) {
+        boolean isUnsetParam = expr.isUnsetParamId(symbolTable);
+        boolean isUnsetArrayParam = false;
+        if (expr instanceof ArrayElemNode) {
+          isUnsetArrayParam = expr.isUnsetParamArray(symbolTable);
+        }
+
+        if (isUnsetParam || isUnsetArrayParam) {
+          uncheckedNodes.add(this);
+          return;
+        }
+      }
+    }
+
+    if (matchType == null) {
+      for (ExpressionNode expr : expressions) {
+
+        boolean isUnsetParam = expr.isUnsetParamId(symbolTable);
+        boolean isUnsetArrayParam = false;
+        if (expr instanceof ArrayElemNode) {
+           isUnsetArrayParam = expr.isUnsetParamArray(symbolTable);
+        }
+
+        if (isUnsetParam) {
+          ParameterId currParam = expr.getParamId(symbolTable);
+          currParam.setType(DEFAULT_TYPE);
+          matchType = DEFAULT_TYPE;
+        }
+        else if (isUnsetArrayParam){
+        ParameterId currArrayParam = ((ArrayElemNode) expr).getUnsetParameterIdArrayElem(symbolTable);
+        currArrayParam.setBaseElemType(DEFAULT_TYPE);
+        matchType = DEFAULT_TYPE;
+        }
+      }
+
+      if (matchType == null) {
+        errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+            "Could not resolve type of array assignment."));
+        return;
+
+      }
+    }
 
     /* Check if the other elements' types can be resolved and match the first element's type */
-    for (int i = 1; i < expressions.size(); i++) {
-      ExpressionNode currExpr = expressions.get(i);
+    for (ExpressionNode currExpr : expressions) {
       DataTypeId currType = currExpr.getType(symbolTable);
+      boolean isUnsetParam = currExpr.isUnsetParamId(symbolTable);
+      boolean isUnsetArrayParam = false;
+      if (currExpr instanceof ArrayElemNode) {
+        isUnsetArrayParam = ((ArrayElemNode) currExpr).isUnsetParameterIdArrayElem(symbolTable);
+      }
+
+      if (isUnsetParam) {
+        ParameterId currParam = currExpr.getParamId(symbolTable);
+        currParam.setType(matchType);
+      }
+      else if (isUnsetArrayParam){
+      ParameterId currArrayParam = ((ArrayElemNode) currExpr).getUnsetParameterIdArrayElem(symbolTable);
+      currArrayParam.setBaseElemType(matchType);
+      }
+
+       currType = currExpr.getType(symbolTable);
 
       if (currType == null) {
-        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-            + " Could not resolve element type(s) in array literal."
-            + " Expected: " + fstType);
+        errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+            "Could not resolve element type(s) in array literal."
+                + " Expected: " + matchType));
         break;
       }
 
-      if (!(fstType.equals(currType))) {
-        errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-            + " Incompatible element type(s) in array literal."
-            + " Expected: " + fstType + " Actual: " + currType);
+      if (!(matchType.equals(currType))) {
+        errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+            "Incompatible element type(s) in array literal."
+                + " Expected: " + matchType + " Actual: " + currType));
         break;
       }
 
       /* Recursively call semanticAnalysis on each expression node */
-      currExpr.semanticAnalysis(symbolTable, errorMessages);
+      currExpr.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
-
   }
 
   @Override
@@ -76,6 +142,16 @@ public class ArrayLiterNode extends AssignRHSNode {
       return new ArrayType(null);
     } else {
       return new ArrayType(expressions.get(0).getType(symbolTable));
+    }
+  }
+
+
+  public void setParamTypes(DataTypeId type, SymbolTable symbolTable) {
+    for (ExpressionNode expr : expressions) {
+      if (expr.isUnsetParamId(symbolTable)) {
+        ParameterId param = expr.getParamId(symbolTable);
+        param.setType(type);
+      }
     }
   }
 

@@ -1,7 +1,15 @@
 package AbstractSyntaxTree.expression;
 
+import AbstractSyntaxTree.ASTNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.*;
+import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.FunctionId;
+import SemanticAnalysis.Identifier;
+import SemanticAnalysis.ParameterId;
+import SemanticAnalysis.SemanticError;
+import SemanticAnalysis.SymbolTable;
+import SemanticAnalysis.VariableId;
 
 import java.util.List;
 
@@ -20,7 +28,8 @@ public class IdentifierNode extends ExpressionNode {
   }
 
   @Override
-  public void semanticAnalysis(SymbolTable symbolTable, List<String> errorMessages) {
+  public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -29,13 +38,13 @@ public class IdentifierNode extends ExpressionNode {
     Identifier id = symbolTable.lookupAll(identifier);
 
     if (id == null) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Identifier '" + identifier + "' has not been declared.");
+      errorMessages.add(new SemanticError(super.getLine(),super.getCharPositionInLine(),
+          "Identifier '" + identifier + "' has not been declared."));
     } else if (!(id instanceof VariableId) && !(id instanceof ParameterId)
             && !(id instanceof ObjectId)) {
-      errorMessages.add(super.getLine() + ":" + super.getCharPositionInLine()
-          + " Identifier '" + identifier + "' is referenced incorrectly."
-          + " Expected: VARIABLE IDENTIFIER, PARAMETER IDENTIFIER");
+      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+          "Identifier '" + identifier + "' is referenced incorrectly."
+          + " Expected: VARIABLE IDENTIFIER, PARAMETER IDENTIFIER"));
     }
   }
 
@@ -64,6 +73,7 @@ public class IdentifierNode extends ExpressionNode {
 
     return null;
   }
+
 
   @Override
   public String toString() {

@@ -1,5 +1,6 @@
 package AbstractSyntaxTree.assignment;
 
+import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import SemanticAnalysis.*;
@@ -27,9 +28,9 @@ public abstract class CallNode extends AssignRHSNode {
         return false;
     }
 
-    public void semAnalyseFunctionArgs(SymbolTable symbolTable, List<String> errorMessages,
+    public void semAnalyseFunctionArgs(SymbolTable symbolTable, List<SemanticError> errorMessages,
                                        IdentifierNode identifier, List<ExpressionNode> arguments,
-                                       Identifier functionId) {
+                                       Identifier functionId, List<ASTNode> uncheckedNodes, boolean firstCheck) {
         List<DataTypeId> argTypes = new ArrayList<>();
         for (ExpressionNode arg : arguments) {
             argTypes.add(arg.getType(symbolTable));
@@ -40,15 +41,13 @@ public abstract class CallNode extends AssignRHSNode {
         if (functionId instanceof OverloadFuncId) {
             function = ((OverloadFuncId) functionId).findFunc(argTypes);
             if (function == null) {
-                errorMessages.add(
-                        super.getLine()
-                                + ":"
-                                + super.getCharPositionInLine()
-                                + " Function call'"
+                errorMessages.add(new SemanticError(
+                        super.getLine(), super.getCharPositionInLine(),
+                                "Function call'"
                                 + functionId.toString()
                                 + "' does not match any of the Overload signatures for function '"
                                 + identifier.getIdentifier()
-                                + "'");
+                                + "'"));
                 return;
             }
         } else {
@@ -58,17 +57,14 @@ public abstract class CallNode extends AssignRHSNode {
         List<DataTypeId> paramTypes = function.getParamTypes();
 
         if (paramTypes.size() > arguments.size() || paramTypes.size() < arguments.size()) {
-            errorMessages.add(
-                    super.getLine()
-                            + ":"
-                            + super.getCharPositionInLine()
-                            + " Function '"
+            errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+                            "Function '"
                             + identifier.getIdentifier()
                             + "' has been called with the incorrect number of parameters."
                             + " Expected: "
                             + paramTypes.size()
                             + " Actual: "
-                            + arguments.size());
+                            + arguments.size()));
             return;
         }
 
@@ -83,23 +79,17 @@ public abstract class CallNode extends AssignRHSNode {
             }
 
             if (currArg == null) {
-                errorMessages.add(
-                        super.getLine()
-                                + ":"
-                                + super.getCharPositionInLine()
-                                + " Could not resolve type of parameter "
+                errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+                                "Could not resolve type of parameter "
                                 + (i + 1)
                                 + " in '"
                                 + identifier
                                 + "' function."
                                 + " Expected: "
-                                + currParamType);
+                                + currParamType));
             } else if (!(currArg.equals(currParamType)) && !stringToCharArray(currParamType, currArg)) {
-                errorMessages.add(
-                        super.getLine()
-                                + ":"
-                                + super.getCharPositionInLine()
-                                + " Invalid type for parameter "
+                errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+                                "Invalid type for parameter "
                                 + (i + 1)
                                 + " in '"
                                 + identifier
@@ -107,9 +97,9 @@ public abstract class CallNode extends AssignRHSNode {
                                 + " Expected: "
                                 + currParamType
                                 + " Actual: "
-                                + currArg);
+                                + currArg));
             }
-            arguments.get(i).semanticAnalysis(symbolTable, errorMessages);
+            arguments.get(i).semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
         }
     }
 

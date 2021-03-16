@@ -16,6 +16,18 @@ public class FrontEndCompilerTest {
     }
   }
 
+  @Test
+  public void runCustomTests() {
+    try {
+      String[] cmds = {"./run_tests.sh", "custom valid", "src/test/custom_valid_tests.txt", "0"};
+      Process process = new ProcessBuilder(cmds).inheritIO().start();
+      process.waitFor();
+      int exit = process.exitValue();
+      assert (exit == 0);
+    } catch (IOException | InterruptedException e) {
+      System.out.println("Exception");
+    }
+  }
 
   @Test
   public void runSyntaxErrorTests() {
