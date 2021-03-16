@@ -55,7 +55,7 @@ public class AttributeExprNode extends ExpressionNode {
     DataTypeId objectType = objectName.getType(symbolTable);
     if (!(objectType instanceof ClassType)) {
       errorMessages.add(objectName.getLine() + ":" + objectName.getCharPositionInLine() +
-              "Cannot get attribute of a non-object."   + " Expected: CLASS TYPE "
+              " Cannot get attribute of a non-object."   + " Expected: CLASS TYPE "
               + " Actual: " + objectType);
     } else {
       ClassType classType = (ClassType) objectType;
@@ -64,7 +64,7 @@ public class AttributeExprNode extends ExpressionNode {
       /* Check if such an attribute exists for this class */
       if(classSymbolTable.lookup(attributeName.getIdentifier()) == null) {
         errorMessages.add(objectName.getLine() + ":" + objectName.getCharPositionInLine() +
-                "Attribute with name '" + attributeName.getIdentifier() + "' has not been declared for class '"
+                " Attribute with name '" + attributeName.getIdentifier() + "' has not been declared for class '"
                 + classType.getClassName()
                 + " Expected: [" + classType.getFields().stream().map(Objects::toString).collect(Collectors.toList())
                 + "] Actual: " + attributeName.getIdentifier());

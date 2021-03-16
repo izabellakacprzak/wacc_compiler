@@ -1,0 +1,28 @@
+# Method has to be declared inside of class
+
+begin
+  int f() is
+    return 1
+  end
+
+  class Car() is
+    int speed;
+
+    Car(int s) is
+      speed = s
+    end
+
+    int getSpeed() is
+      return speed
+    end
+  end
+
+  int x = call f();
+  println x;
+
+  car = new Car(x);
+  car.speed = 2;
+  int speed = car.f();
+
+  println speed
+end

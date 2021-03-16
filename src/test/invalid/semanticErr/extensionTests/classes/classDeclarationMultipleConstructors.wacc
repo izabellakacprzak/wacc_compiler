@@ -1,0 +1,27 @@
+# Cannot declare constructors taking in the same parameters (in any order)
+
+begin
+  int f() is
+    return 1
+  end
+
+  class Car() is
+    int speed;
+    string colour;
+
+    Car(int s, string c) is
+      speed = s
+    end
+    
+    Car(string c, int s) is
+      speed = s
+    end
+
+    int getSpeed() is
+      return speed
+    end
+  end
+
+  int x = call f();
+  println x
+end

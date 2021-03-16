@@ -1,0 +1,34 @@
+# Object declaration has to match a constructor
+
+begin
+  int f() is
+    return 1
+  end
+
+  class Car() is
+    int speed;
+    string colour;
+
+    Car(int s) is
+      speed = s
+    end
+    
+    Car(int s, string c) is
+      speed = s;
+      colour = c
+    end
+
+    int getSpeed() is
+      return speed
+    end
+  end
+
+  int x = call f();
+  println x;
+
+  car = new Car(x, x);
+  car.speed = 2;
+  int speed = car.f();
+
+  println speed
+end

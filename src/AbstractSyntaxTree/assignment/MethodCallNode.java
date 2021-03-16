@@ -87,14 +87,14 @@ public class MethodCallNode extends CallNode{
     Identifier object = symbolTable.lookupAll(objectName.getIdentifier());
     if (!(object instanceof ObjectId)) {
       errorMessages.add(objectName.getLine() + ":" + objectName.getCharPositionInLine() +
-              "Cannot call a method on a non-object."   + " Expected: OBJECT TYPE "
+              " Cannot call a method on a non-object."   + " Expected: OBJECT TYPE "
               + " Actual: " + object);
     } else {
       ObjectId objectId = (ObjectId) object;
       DataTypeId classType = objectId.getType();
       if (!(classType instanceof ClassType)) {
         errorMessages.add(objectName.getLine() + ":" + objectName.getCharPositionInLine() +
-                "Could not properly resolve object type."   + " Expected: CLASS TYPE "
+                " Could not properly resolve object type."   + " Expected: CLASS TYPE "
                 + " Actual: " + classType);
       } else {
         SymbolTable classTable = ((ClassType) classType).getFields().get(0).getCurrSymTable();
@@ -103,7 +103,7 @@ public class MethodCallNode extends CallNode{
         /* Check if method has been declared in the appropriate class */
         if (functionId == null) {
           errorMessages.add(objectName.getLine() + ":" + objectName.getCharPositionInLine() +
-                  "Could not find method with signature '"  + methodName.getIdentifier() + "' declared in class "
+                  " Could not find method with signature '"  + methodName.getIdentifier() + "' declared in class "
                   + ((ClassType) classType).getClassName());
         } else {
           super.semAnalyseFunctionArgs(symbolTable, errorMessages, methodName, arguments, functionId);

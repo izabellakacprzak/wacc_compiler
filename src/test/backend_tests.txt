@@ -1,4 +1,4 @@
-src/test/valid/extensionTests
+src/test/valid/extensionTests/functionOverloading
 src/test/valid/array
 src/test/valid/basic
 src/test/valid/expressions

@@ -32,7 +32,7 @@ public class ObjectDeclStatementNode extends StatementNode {
 
     if (!(classId instanceof ClassType)) {
       errorMessages.add(objectName.getLine() + ":" + objectName.getCharPositionInLine() +
-              "Cannot declare object." + " Expected: CLASS TYPE "
+              " Cannot declare object." + " Expected: CLASS TYPE "
               + " Actual: " + classId);
     } else {
       /* Try to find matching constructor for these parameter types */
@@ -75,7 +75,7 @@ public class ObjectDeclStatementNode extends StatementNode {
 
       if (newObject == null) {
         errorMessages.add(objectName.getLine() + ":" + objectName.getCharPositionInLine() +
-                "Could not find matching constructor for object '" + objectName.getIdentifier() + "'.");
+                " Could not find matching constructor for object '" + objectName.getIdentifier() + "'.");
       }
     }
 

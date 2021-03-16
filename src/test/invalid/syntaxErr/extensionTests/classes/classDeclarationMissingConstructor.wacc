@@ -1,0 +1,18 @@
+# A class needs at least one constructor in its declaration
+
+begin
+  int f() is
+    return 1
+  end
+
+  class Car() is
+    int speed;
+
+    int getSpeed() is
+      return speed
+    end
+  end
+
+  int x = call f();
+  println x
+end

@@ -42,13 +42,12 @@ public class ConstructorNode implements TypeNode{
     Identifier classId = symbolTable.lookupAll(className);
 
     /* Check if name matches class name */
-    // TODO: WRITE TEST CASE WHICH CHECKS FOR CONSTRUCTOR A IN CLASS B FOR TWO CLASSES DECLARED
     if (classId == null) {
       errorMessages.add(name.getLine() + ":" + name.getCharPositionInLine() +
-              "Constructor name '" + name.getIdentifier() + "' does not match declared class.");
+              " Constructor name '" + name.getIdentifier() + "' does not match declared class.");
     } else if (!(classId instanceof ClassType)) {
       errorMessages.add(name.getLine() + ":" + name.getCharPositionInLine() +
-              "Constructor '" + name.getIdentifier() + "' can only be declared for a class.");
+              " Constructor '" + name.getIdentifier() + "' can only be declared for a class.");
     } else {
       ClassType classIdentifier = (ClassType) classId;
       ConstructorId constructor = new ConstructorId(name, parameters.getIdentifiers(symbolTable));
@@ -56,7 +55,7 @@ public class ConstructorNode implements TypeNode{
       /* Check if such constructor already exists, if not add to list of constructors in symbol table */
       if (!classIdentifier.addConstructor(constructor)){
         errorMessages.add(name.getLine() + ":" + name.getCharPositionInLine() +
-                "Constructor '" + constructor.toString() + "' has already been declared.");
+                " Constructor '" + constructor.toString() + "' has already been declared.");
       }
     }
 

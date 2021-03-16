@@ -1,0 +1,22 @@
+# Type of attribute is checked upon assignment
+
+begin
+  int f() is
+    return 1
+  end
+
+  class Car() is
+    int speed = 'c';
+
+    Car(int s) is
+      speed = s
+    end
+
+    int getSpeed() is
+      return speed
+    end
+  end
+
+  int x = call f();
+  println x
+end
