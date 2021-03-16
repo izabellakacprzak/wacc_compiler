@@ -41,7 +41,7 @@ public class ConstructorNode implements TypeNode{
 
     /* Get class name and search it up in symbol table */
     String className = "class_" + name.getIdentifier();
-    Identifier classId = symbolTable.lookupAll(className);
+    Identifier classId = symbolTable.lookup(className);
 
     /* Check if name matches class name */
     if (classId == null) {

@@ -1,0 +1,31 @@
+# Constructor name must match class name and be in scope
+
+begin
+  class Car() is
+    int speed;
+
+    Apple(int s) is
+      speed = s
+    end
+
+    int getSpeed() is
+      return speed
+    end
+  end
+
+  class Apple() is
+      string colour;
+
+      Car(string c) is
+        colour = c
+      end
+
+      string getColour() is
+        return colour
+      end
+  end
+
+  int x = 1;
+
+  println x
+end

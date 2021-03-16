@@ -52,7 +52,7 @@ public class AssignVarNode extends StatementNode {
 
     /*Get possible parameters for identifier nodes. */
     DataTypeId leftType = left.getType(symbolTable);
-    DataTypeId rightType = right.getType(symbolTable);
+    DataTypeId rightType = getTypeOfOverloadFunc(symbolTable, errorMessages, leftType, right);
     boolean isUnsetParamLeft = left.isUnsetParamId(symbolTable);
     boolean isUnsetParamRight = right.isUnsetParamId(symbolTable);
     ParameterId leftParam = left.getParamId(symbolTable);

@@ -113,6 +113,7 @@ public class ProgramNode implements ASTNode {
       } else {
         ClassType classType = (ClassType) classDecl.getIdentifier(classDecl.getCurrSymTable());
         topSymbolTable.add(classDecl.getName(), classType);
+        classDecl.getCurrSymTable().add(classDecl.getName(), classType);
       }
     }
 

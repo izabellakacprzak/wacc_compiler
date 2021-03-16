@@ -36,7 +36,7 @@ public class DeclarationStatementNode extends StatementNode {
     setCurrSymTable(symbolTable);
 
     DataTypeId declaredType = type.getType();
-    DataTypeId assignedType = assignment.getType(symbolTable);
+    DataTypeId assignedType;
 
     if (assignment.isUnsetParamId(symbolTable)) {
       ParameterId assignParam = assignment.getParamId(symbolTable);
@@ -47,10 +47,6 @@ public class DeclarationStatementNode extends StatementNode {
       ArrayElemNode arrElemNode = (ArrayElemNode) assignment;
       arrElemNode.setArrayElemBaseType(symbolTable, declaredType);
     }
-
-     declaredType = type.getType();
-     assignedType = assignment.getType(symbolTable);
-
 
     /* Check whether identifier has been previously declared as another variable in the current scope.
      * If not, add a new VariableId to the symbol table under identifier */
@@ -64,16 +60,16 @@ public class DeclarationStatementNode extends StatementNode {
           new VariableId(identifier, type.getType()));
     }
 
-    /* Check that the expected (declared) type and the type of assignment
-     * can be resolved and match */
-
     declaredType = type.getType();
 
     if (declaredType == null) {
       errorMessages.add(new SemanticError(assignment.getLine(),(assignment.getCharPositionInLine()),
-          "Could not resolve type of '" + identifier.getIdentifier() + "'."));
+              "Could not resolve type of '" + identifier.getIdentifier() + "'."));
       return;
     }
+
+    /* Check that the expected (declared) type and the type of assignment
+     * can be resolved and match */
 
     assignedType = getTypeOfOverloadFunc(symbolTable, errorMessages, declaredType, assignment);
 
