@@ -63,7 +63,7 @@ public class MethodCallNode extends CallNode{
       return null;
     }
 
-    return  ((ClassType) classType).getFields().get(0).getCurrSymTable();
+    return  ((ClassType) classType).getAttributes().get(0).getCurrSymTable();
   }
 
   @Override
@@ -123,7 +123,7 @@ public class MethodCallNode extends CallNode{
                 "Could not properly resolve object type."   + " Expected: CLASS TYPE "
                 + " Actual: " + classType));
       } else {
-        SymbolTable classTable = ((ClassType) classType).getFields().get(0).getCurrSymTable();
+        SymbolTable classTable = ((ClassType) classType).getAttributes().get(0).getCurrSymTable();
         Identifier functionId = classTable.lookup("*" + methodName.getIdentifier());
 
         /* Check if method has been declared in the appropriate class */

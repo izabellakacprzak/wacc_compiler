@@ -31,7 +31,7 @@ public class AttributeExprNode extends ExpressionNode {
       return null;
     } else {
       ClassType classType = (ClassType) objectType;
-      SymbolTable classSymbolTable = classType.getFields().get(0).getCurrSymTable();
+      SymbolTable classSymbolTable = classType.getAttributes().get(0).getCurrSymTable();
 
       /* Check if such an attribute exists for this class */
       Identifier attribute = classSymbolTable.lookup(attributeName.getIdentifier());
@@ -60,14 +60,14 @@ public class AttributeExprNode extends ExpressionNode {
               + " Actual: " + objectType));
     } else {
       ClassType classType = (ClassType) objectType;
-      SymbolTable classSymbolTable = classType.getFields().get(0).getCurrSymTable();
+      SymbolTable classSymbolTable = classType.getAttributes().get(0).getCurrSymTable();
 
       /* Check if such an attribute exists for this class */
       if(classSymbolTable.lookup(attributeName.getIdentifier()) == null) {
         errorMessages.add(new SemanticError(objectName.getLine(), objectName.getCharPositionInLine(),
                 "Attribute with name '" + attributeName.getIdentifier() + "' has not been declared for class '"
                 + classType.getClassName()
-                + " Expected: [" + classType.getFields().stream().map(Objects::toString).collect(Collectors.toList())
+                + " Expected: [" + classType.getAttributes().stream().map(Objects::toString).collect(Collectors.toList())
                 + "] Actual: " + attributeName.getIdentifier()));
       }
     }
