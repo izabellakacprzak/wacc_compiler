@@ -1,8 +1,16 @@
 package AbstractSyntaxTree.type;
 
+import static InternalRepresentation.Instructions.DirectiveInstruction.Directive.LTORG;
+import static InternalRepresentation.Utils.Register.LR;
+import static InternalRepresentation.Utils.Register.PC;
+
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
+import InternalRepresentation.Instructions.DirectiveInstruction;
+import InternalRepresentation.Instructions.LabelInstruction;
+import InternalRepresentation.Instructions.PopInstruction;
+import InternalRepresentation.Instructions.PushInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ClassType;
@@ -69,7 +77,32 @@ public class ConstructorNode implements TypeNode{
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    // do what we do for function
+    /* Reset registers to start generating a function */
+    internalState.resetAvailableRegs();
 
+    /* Add function label and push Link Register */
+    String index = "";
+    // get index from classType
+    Identifier classId = currSymTable.lookup("class_" + name.getIdentifier());
+
+    internalState.addInstruction(new LabelInstruction("f_" + classId.toString() + index));
+    internalState.addInstruction(new PushInstruction(LR));
+
+    /* Allocate space for variables in the function's currSymbolTable */
+    internalState.allocateStackSpace(currSymTable);
+
+    /* Visit and generate assembly for the function's ParamListNode */
+    parameters.generateAssembly(internalState);
+
+    /* Visit and generate assembly for the function's StatementNode */
+    bodyStatement.generateAssembly(internalState);
+
+    /* Reset the parameters' offset, pop the PC program counter add the
+     *   .ltorg instruction to finish the function */
+    internalState.resetParamStackOffset();
+    internalState.addInstruction(new PopInstruction(PC));
+    internalState.addInstruction(new DirectiveInstruction(LTORG));
   }
 
   @Override

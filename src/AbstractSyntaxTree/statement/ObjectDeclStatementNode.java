@@ -95,6 +95,9 @@ public class ObjectDeclStatementNode extends StatementNode {
     }
   }
 
+  // allocate space on the heap for this object
+  // set value of each attribute to whatever - if passed to constructor get fromt here otherwise get from class decl
+  // put that on the heap
   @Override
   public void generateAssembly(InternalState internalState) {
 

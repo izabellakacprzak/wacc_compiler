@@ -1,9 +1,24 @@
 package AbstractSyntaxTree.type;
 
+import static InternalRepresentation.Instructions.BranchInstruction.BranchOperation.B;
+import static InternalRepresentation.Instructions.LdrInstruction.LdrType.LDR;
+import static InternalRepresentation.Instructions.StrInstruction.StrType.STRB;
+import static InternalRepresentation.Utils.BuiltInFunction.SystemBuiltIn.MALLOC;
+import static InternalRepresentation.Utils.Register.DEST_REG;
+
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.ProgramNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import InternalRepresentation.Instructions.BranchInstruction;
+import InternalRepresentation.Instructions.LabelInstruction;
+import InternalRepresentation.Instructions.LdrInstruction;
+import InternalRepresentation.Instructions.LdrInstruction.LdrType;
+import InternalRepresentation.Instructions.MovInstruction;
+import InternalRepresentation.Instructions.StrInstruction;
+import InternalRepresentation.Instructions.StrInstruction.StrType;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Utils.ConditionCode;
+import InternalRepresentation.Utils.Register;
 import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ClassType;
 
@@ -11,6 +26,8 @@ import java.util.List;
 
 public class ClassNode implements TypeNode {
 
+  private static final int BYTE_SIZE = 1;
+  private static final int ADDRESS_BYTE_SIZE = 4;
   private final IdentifierNode className;
   private final List<AttributeNode> attributes;
   private final List<ConstructorNode> constructors;
@@ -62,7 +79,60 @@ public class ClassNode implements TypeNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
+    // put the class somewhere (heap)?
+    // for each constructor and method do what we do for FunctionNode
 
+    internalState.addInstruction(new LabelInstruction("class_" + className.getIdentifier()));
+
+    /* Malloc space on the heap for all attributes */
+    int numAttributes = attributes.size();
+    internalState.addInstruction(
+        new LdrInstruction(LdrType.LDR, DEST_REG, numAttributes * ADDRESS_BYTE_SIZE));
+
+    internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, MALLOC.getLabel()));
+
+    Register attributeReg = internalState.popFreeRegister();
+    internalState.addInstruction(new MovInstruction(attributeReg, DEST_REG));
+
+    int offset = 0;
+
+    for (AttributeNode attribute : attributes) {
+      attribute.generateAssembly(internalState);
+      Register exprReg = null;
+      if (attribute.hasAssignRHS()) {
+        exprReg = internalState.popFreeRegister();
+      }
+      /* Load expr type size into DEST_REG */
+      int size = attribute.getType().getSize();
+      internalState.addInstruction(new LdrInstruction(LDR, DEST_REG, size));
+
+      /* Allocate space on the heap */
+      internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, MALLOC.getLabel()));
+
+      if (attribute.hasAssignRHS()) {
+        /* If the expr type size is 1 byte, use STRB, otherwise use STR */
+        StrType strInstr = (size == BYTE_SIZE) ? STRB : StrType.STR;
+        internalState.addInstruction(new StrInstruction(strInstr, exprReg, DEST_REG));
+      }
+
+      /* Store the reference on the stack */
+      internalState.addInstruction(
+          new StrInstruction(StrType.STR, DEST_REG, attributeReg, offset * ADDRESS_BYTE_SIZE));
+
+      internalState.pushFreeRegister(exprReg);
+      offset++;
+
+    }
+
+    /* generate assembly for constructors */
+    for(ConstructorNode constructor : constructors) {
+      constructor.generateAssembly(internalState);
+    }
+
+    /* generate assembly for methods */
+    for(FunctionNode method : methods) {
+      method.generateAssembly(internalState);
+    }
   }
 
   @Override

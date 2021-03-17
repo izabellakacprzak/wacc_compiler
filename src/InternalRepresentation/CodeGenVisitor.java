@@ -808,6 +808,7 @@ public class CodeGenVisitor {
     StrType strInstr = (size == BYTE_SIZE) ? STRB : StrType.STR;
     internalState.addInstruction(new StrInstruction(strInstr, exprReg, DEST_REG));
 
+    /* Store the reference on the stack */
     internalState.addInstruction(
         new StrInstruction(StrType.STR, DEST_REG, pairReg, offset * ADDRESS_BYTE_SIZE));
 

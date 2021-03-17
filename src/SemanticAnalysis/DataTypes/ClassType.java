@@ -13,12 +13,18 @@ public class ClassType extends DataTypeId {
     private final List<AttributeNode> fields;
     private final List<ConstructorId> constructors;
     private final IdentifierNode node;
+    private int attributeSize = 0;
+    private int currOffset = 0;
     private static final int HASH_PRIME = 61;
 
     public ClassType(IdentifierNode node, List<AttributeNode> fields) {
         this.node = node;
         this.fields = fields;
         constructors = new ArrayList<>();
+        this.currOffset = 0;
+        for(AttributeNode attribute : fields) {
+            attributeSize += attribute.getType().getSize();
+        }
     }
 
     public boolean addConstructor(ConstructorId constructor) {
@@ -45,9 +51,13 @@ public class ClassType extends DataTypeId {
         return constructors;
     }
 
+    public int getCurrOffset() {
+        return this.currOffset;
+    }
+
     @Override
     public int getSize() {
-        return 0;
+        return attributeSize;
     }
 
     @Override

@@ -1,9 +1,15 @@
 package AbstractSyntaxTree.type;
 
+import static InternalRepresentation.Instructions.StrInstruction.StrType.STRB;
+import static InternalRepresentation.Utils.Register.SP;
+
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import InternalRepresentation.Instructions.StrInstruction;
+import InternalRepresentation.Instructions.StrInstruction.StrType;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Utils.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SemanticError;
@@ -30,6 +36,10 @@ public class AttributeNode implements TypeNode {
     this.name = name;
     this.type = type;
     this.assignRHS = null;
+  }
+
+  public boolean hasAssignRHS() {
+    return assignRHS != null;
   }
 
   @Override
@@ -80,7 +90,9 @@ public class AttributeNode implements TypeNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
+    if(assignRHS != null) {
+      assignRHS.generateAssembly(internalState);
+    }
   }
 
   @Override
