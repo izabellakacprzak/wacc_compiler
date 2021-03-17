@@ -3,6 +3,7 @@ package AbstractSyntaxTree.assignment;
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import InternalRepresentation.Utils.StandardFunc;
 import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -15,115 +16,112 @@ import static SemanticAnalysis.DataTypes.BaseType.Type.STRING;
 
 public abstract class CallNode extends AssignRHSNode {
 
-    public CallNode(int line, int charPositionInLine) {
-        super(line, charPositionInLine);
+  public CallNode(int line, int charPositionInLine) {
+    super(line, charPositionInLine);
+  }
+
+  static String getString(StringBuilder str, List<ExpressionNode> arguments) {
+    for (ExpressionNode argument : arguments) {
+      str.append(argument.toString()).append(", ");
     }
 
-    /* Returns true when the declared type is a STRING and assigned type is a CHAR[] */
-    private boolean stringToCharArray(DataTypeId declaredType, DataTypeId assignedType) {
-        if (declaredType.equals(new BaseType(STRING))) {
-            return assignedType.equals(new ArrayType(new BaseType(CHAR)));
-        }
-
-        return false;
+    if (!arguments.isEmpty()) {
+      str.delete(str.length() - 2, str.length() - 1);
     }
 
-    public void semAnalyseFunctionArgs(SymbolTable symbolTable, List<SemanticError> errorMessages,
-                                       IdentifierNode identifier, List<ExpressionNode> arguments,
-                                       Identifier functionId, List<ASTNode> uncheckedNodes, boolean firstCheck) {
-        List<DataTypeId> argTypes = new ArrayList<>();
-        for (ExpressionNode arg : arguments) {
-            argTypes.add(arg.getType(symbolTable));
-        }
+    return str.append(')').toString();
+  }
 
-        /* Check that function has been called with the correct number of arguments */
-        FunctionId function;
-        if (functionId instanceof OverloadFuncId) {
-            function = ((OverloadFuncId) functionId).findFunc(argTypes);
-            if (function == null) {
-                errorMessages.add(new SemanticError(
-                        super.getLine(), super.getCharPositionInLine(),
-                                "Function call'"
-                                + functionId.toString()
-                                + "' does not match any of the Overload signatures for function '"
-                                + identifier.getIdentifier()
-                                + "'"));
-                return;
-            }
-        } else {
-            function = (FunctionId) functionId;
-        }
+  static List<DataTypeId> getOverloadDataTypeIds(SymbolTable symbolTable, OverloadFuncId functionId,
+      List<ExpressionNode> arguments) {
+    List<DataTypeId> returnTypes;
 
-        List<DataTypeId> paramTypes = function.getParamTypes();
+    List<DataTypeId> argTypes = new ArrayList<>();
+    for (ExpressionNode arg : arguments) {
+      argTypes.add(arg.getType(symbolTable));
+    }
+    returnTypes = functionId.findReturnTypes(argTypes);
 
-        if (paramTypes.size() > arguments.size() || paramTypes.size() < arguments.size()) {
-            errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
-                            "Function '"
-                            + identifier.getIdentifier()
-                            + "' has been called with the incorrect number of parameters."
-                            + " Expected: "
-                            + paramTypes.size()
-                            + " Actual: "
-                            + arguments.size()));
-            return;
-        }
+    return returnTypes;
+  }
 
-        /* Check that each parameter's type can be resolved and matches the
-         * corresponding argument type */
-        for (int i = 0; i < arguments.size(); i++) {
-            DataTypeId currArg = arguments.get(i).getType(symbolTable);
-            DataTypeId currParamType = paramTypes.get(i);
-
-            if (currParamType == null) {
-                break;
-            }
-
-            if (currArg == null) {
-                errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
-                                "Could not resolve type of parameter "
-                                + (i + 1)
-                                + " in '"
-                                + identifier
-                                + "' function."
-                                + " Expected: "
-                                + currParamType));
-            } else if (!(currArg.equals(currParamType)) && !stringToCharArray(currParamType, currArg)) {
-                errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
-                                "Invalid type for parameter "
-                                + (i + 1)
-                                + " in '"
-                                + identifier
-                                + "' function."
-                                + " Expected: "
-                                + currParamType
-                                + " Actual: "
-                                + currArg));
-            }
-            arguments.get(i).semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
-        }
+  /* Returns true when the declared type is a STRING and assigned type is a CHAR[] */
+  private boolean stringToCharArray(DataTypeId declaredType, DataTypeId assignedType) {
+    if (declaredType.equals(new BaseType(STRING))) {
+      return assignedType.equals(new ArrayType(new BaseType(CHAR)));
     }
 
-    static String getString(StringBuilder str, List<ExpressionNode> arguments) {
-        for (ExpressionNode argument : arguments) {
-            str.append(argument.toString()).append(", ");
-        }
+    return false;
+  }
 
-        if (!arguments.isEmpty()) {
-            str.delete(str.length() - 2, str.length() - 1);
-        }
+  public void semAnalyseFunctionArgs(SymbolTable symbolTable, List<SemanticError> errorMessages,
+      IdentifierNode identifier, List<ExpressionNode> arguments,
+      Identifier functionId, List<ASTNode> uncheckedNodes, boolean firstCheck) {
 
-        return str.append(')').toString();
+    List<DataTypeId> argTypes = new ArrayList<>();
+    for (ExpressionNode arg : arguments) {
+      argTypes.add(arg.getType(symbolTable));
     }
 
-    static List<DataTypeId> getOverloadDataTypeIds(SymbolTable symbolTable, OverloadFuncId functionId, List<ExpressionNode> arguments) {
-        List<DataTypeId> returnTypes;
+    /* Check that function has been called with the correct number of arguments */
+    List<DataTypeId> paramTypes = null;
+    if (functionId instanceof OverloadFuncId) {
+      FunctionId function = ((OverloadFuncId) functionId).findFunc(argTypes);
+      if (function == null) {
+        errorMessages.add(new SemanticError(
+            super.getLine(), super.getCharPositionInLine(),
+            "Function call'" + functionId.toString()
+                + "' does not match any of the Overload signatures for function '"
+                + identifier.getIdentifier() + "'"));
+        return;
+      }
+      paramTypes = function.getParamTypes();
 
-        List<DataTypeId> argTypes = new ArrayList<>();
-        for (ExpressionNode arg : arguments) {
-            argTypes.add(arg.getType(symbolTable));
-        }
-        returnTypes = functionId.findReturnTypes(argTypes);
+    } else if (functionId instanceof FunctionId) {
+      paramTypes = ((FunctionId) functionId).getParamTypes();
 
-        return returnTypes;
+    } else {
+      StandardFunc stdFunc = StandardFunc.valueOfLabel(identifier.getIdentifier());
+
+      if (stdFunc != null) {
+        paramTypes = stdFunc.getArgTypes();
+      }
     }
+
+    if (paramTypes == null) {
+      return;
+    }
+
+    if (paramTypes.size() > arguments.size() || paramTypes.size() < arguments.size()) {
+      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+          "Function '" + identifier.getIdentifier()
+              + "' has been called with the incorrect number of parameters."
+              + " Expected: " + paramTypes.size() + " Actual: " + arguments.size()));
+      return;
+    }
+
+    /* Check that each parameter's type can be resolved and matches the
+     * corresponding argument type */
+    for (int i = 0; i < arguments.size(); i++) {
+      DataTypeId currArg = arguments.get(i).getType(symbolTable);
+      DataTypeId currParamType = paramTypes.get(i);
+
+      if (currParamType == null) {
+        break;
+      }
+
+      if (currArg == null) {
+        errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+            "Could not resolve type of parameter " + (i + 1)
+                + " in '" + identifier + "' function."
+                + " Expected: " + currParamType));
+      } else if (!(currArg.equals(currParamType)) && !stringToCharArray(currParamType, currArg)) {
+        errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
+            "Invalid type for parameter " + (i + 1)
+                + " in '" + identifier + "' function."
+                + " Expected: " + currParamType + " Actual: " + currArg));
+      }
+      arguments.get(i).semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
+    }
+  }
 }

@@ -5,6 +5,7 @@ import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Utils.StandardFunc;
 import SemanticAnalysis.*;
 
 import java.util.List;
@@ -54,7 +55,6 @@ public class FuncCallNode extends CallNode {
       FunctionId function = (FunctionId) functionId;
       List<ParameterId> params = function.getParams();
 
-
       boolean containsUnsetParam = false;
       for (int i = 0; i < params.size() && i < arguments.size(); i++) {
         ExpressionNode currArg = arguments.get(i);
@@ -89,26 +89,26 @@ public class FuncCallNode extends CallNode {
       }
     }
 
+    /* Check to see if the function called is a standard function */
+    StandardFunc stdFunc = StandardFunc.valueOfLabel(identifier.getIdentifier());
+    if (stdFunc != null) {
+      stdFunc.setUsed();
+    }
 
-    if (functionId == null) {
+    if (functionId == null && stdFunc == null) {
       errorMessages.add(new SemanticError(
           super.getLine(), super.getCharPositionInLine(),
-              "No declaration of '"
-              + identifier.getIdentifier()
-              + "' identifier."
+          "No declaration of '" + identifier.getIdentifier() + "' identifier."
               + " Expected: FUNCTION IDENTIFIER"));
       return;
     }
 
-    if (!(functionId instanceof FunctionId) && !(functionId instanceof OverloadFuncId)) {
+    if (!(functionId instanceof FunctionId) && !(functionId instanceof OverloadFuncId)
+        && stdFunc == null) {
       errorMessages.add(new SemanticError(
           super.getLine(), super.getCharPositionInLine(),
-              "Incompatible type of '"
-              + identifier.getIdentifier()
-              + "' identifier."
-              + " Expected: FUNCTION IDENTIFIER"
-              + " Actual: "
-              + identifier.getType(symbolTable)));
+          "Incompatible type of '" + identifier.getIdentifier() + "' identifier."
+              + " Expected: FUNCTION IDENTIFIER Actual: " + identifier.getType(symbolTable)));
       return;
     }
 

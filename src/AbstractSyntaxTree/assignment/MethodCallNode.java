@@ -82,6 +82,7 @@ public class MethodCallNode extends CallNode{
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
       List<ASTNode> uncheckedNodes, boolean firstCheck) {
+    /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
     /* Check if object has been declared and is in fact an object */

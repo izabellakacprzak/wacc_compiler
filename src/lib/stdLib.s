@@ -7,7 +7,7 @@ l_fill_int:
 	LDR r4, =0
 	STR r4, [sp]
 	B L0
-L1:
+STDL1:
 	LDR r4, [sp, #12]
 	ADD r5, sp, #16
 	LDR r6, [sp]
@@ -23,7 +23,7 @@ L1:
 	ADDS r4, r4, r5
 	BLVS p_throw_overflow_error
 	STR r4, [sp]
-L0:
+STDL0:
 	LDR r4, [sp]
 	LDR r5, [sp, #4]
 	CMP r4, r5
@@ -46,7 +46,7 @@ l_fill_char:
 	LDR r4, =0
 	STR r4, [sp]
 	B L2
-L3:
+STDL3:
 	LDRSB r4, [sp, #12]
 	ADD r5, sp, #13
 	LDR r6, [sp]
@@ -62,7 +62,7 @@ L3:
 	ADDS r4, r4, r5
 	BLVS p_throw_overflow_error
 	STR r4, [sp]
-L2:
+STDL2:
 	LDR r4, [sp]
 	LDR r5, [sp, #4]
 	CMP r4, r5
@@ -89,7 +89,7 @@ l_index_of_int:
 	LDR r4, =0
 	STR r4, [sp]
 	B L4
-L5:
+STDL5:
 	LDRSB r4, [sp, #4]
 	MOV r5, #0
 	CMP r4, r5
@@ -116,14 +116,14 @@ L5:
 	MOV r4, #1
 	STRB r4, [sp, #4]
 	B L7
-L6:
-L7:
+STDL6:
+STDL7:
 	LDR r4, [sp]
 	LDR r5, =1
 	ADDS r4, r4, r5
 	BLVS p_throw_overflow_error
 	STR r4, [sp]
-L4:
+STDL4:
 	LDR r4, [sp]
 	LDR r5, [sp, #9]
 	CMP r4, r5
@@ -150,7 +150,7 @@ l_index_of_char:
 	LDR r4, =0
 	STR r4, [sp]
 	B L8
-L9:
+STDL9:
 	LDRSB r4, [sp, #4]
 	MOV r5, #0
 	CMP r4, r5
@@ -177,14 +177,14 @@ L9:
 	MOV r4, #1
 	STRB r4, [sp, #4]
 	B L11
-L10:
-L11:
+STDL10:
+STDL11:
 	LDR r4, [sp]
 	LDR r5, =1
 	ADDS r4, r4, r5
 	BLVS p_throw_overflow_error
 	STR r4, [sp]
-L8:
+STDL8:
 	LDR r4, [sp]
 	LDR r5, [sp, #9]
 	CMP r4, r5
@@ -209,7 +209,7 @@ l_max:
 	LDR r4, =0
 	STR r4, [sp]
 	B L12
-L13:
+STDL13:
 	ADD r4, sp, #16
 	LDR r5, [sp]
 	LDR r4, [r4]
@@ -236,14 +236,14 @@ L13:
 	LDR r4, [r4]
 	STR r4, [sp, #4]
 	B L15
-L14:
-L15:
+STDL14:
+STDL15:
 	LDR r4, [sp]
 	LDR r5, =1
 	ADDS r4, r4, r5
 	BLVS p_throw_overflow_error
 	STR r4, [sp]
-L12:
+STDL12:
 	LDR r4, [sp]
 	LDR r5, [sp, #8]
 	CMP r4, r5
@@ -268,7 +268,7 @@ l_min:
 	LDR r4, =0
 	STR r4, [sp]
 	B L16
-L17:
+STDL17:
 	ADD r4, sp, #16
 	LDR r5, [sp]
 	LDR r4, [r4]
@@ -295,14 +295,14 @@ L17:
 	LDR r4, [r4]
 	STR r4, [sp, #4]
 	B L19
-L18:
-L19:
+STDL18:
+STDL19:
 	LDR r4, [sp]
 	LDR r5, =1
 	ADDS r4, r4, r5
 	BLVS p_throw_overflow_error
 	STR r4, [sp]
-L16:
+STDL16:
 	LDR r4, [sp]
 	LDR r5, [sp, #8]
 	CMP r4, r5
@@ -421,7 +421,7 @@ l_is_sorted:
 	LDR r4, =1
 	STR r4, [sp]
 	B L20
-L21:
+STDL21:
 	ADD r4, sp, #16
 	LDR r5, [sp, #4]
 	LDR r4, [r4]
@@ -450,8 +450,8 @@ L21:
 	ADD sp, sp, #12
 	POP {pc}
 	B L23
-L22:
-L23:
+STDL22:
+STDL23:
 	LDR r4, [sp, #4]
 	LDR r5, =1
 	ADDS r4, r4, r5
@@ -462,7 +462,7 @@ L23:
 	ADDS r4, r4, r5
 	BLVS p_throw_overflow_error
 	STR r4, [sp]
-L20:
+STDL20:
 	LDR r4, [sp]
 	LDR r5, [sp, #8]
 	CMP r4, r5
@@ -489,7 +489,7 @@ l_min_index_from:
 	LDR r4, [sp, #24]
 	STR r4, [sp]
 	B L24
-L25:
+STDL25:
 	ADD r4, sp, #20
 	LDR r5, [sp]
 	LDR r4, [r4]
@@ -518,14 +518,14 @@ L25:
 	LDR r4, [sp]
 	STR r4, [sp, #4]
 	B L27
-L26:
-L27:
+STDL26:
+STDL27:
 	LDR r4, [sp]
 	LDR r5, =1
 	ADDS r4, r4, r5
 	BLVS p_throw_overflow_error
 	STR r4, [sp]
-L24:
+STDL24:
 	LDR r4, [sp]
 	LDR r5, [sp, #12]
 	CMP r4, r5
@@ -550,7 +550,7 @@ l_sort:
 	LDR r4, =-1
 	STR r4, [sp]
 	B L28
-L29:
+STDL29:
 	LDR r4, [sp, #4]
 	STR r4, [sp, #-4]!
 	LDR r4, [sp, #16]
@@ -574,7 +574,7 @@ L29:
 	ADDS r4, r4, r5
 	BLVS p_throw_overflow_error
 	STR r4, [sp, #4]
-L28:
+STDL28:
 	LDR r4, [sp, #4]
 	LDR r5, [sp, #8]
 	CMP r4, r5
