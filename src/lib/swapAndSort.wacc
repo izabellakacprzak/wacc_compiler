@@ -1,0 +1,56 @@
+# 'swap' swaps two positions in an int array
+# 'sort' sorts an int array using bubble sort from min to max
+
+begin
+  int[] swap(int i, int j, int[] arr) is
+    int val = arr[i] ;
+    arr[i] = arr[j] ;
+    arr[j] = val ;
+    return arr
+  end
+  bool checkSorted(int[] arr) is
+    int length = len arr ;
+    int i = 0 ;
+    int j = 1 ;
+    while j < length do
+      if arr[i] > arr[j]
+      then
+        return false
+      else
+        skip
+      fi ;
+      i = i + 1 ;
+      j = j + 1
+    done ;
+    return true
+  end
+  int minIndexFrom(int[] arr, int from) is
+    int length = len arr ;
+    int min = 2147483647 ;
+    int minIndex = -1 ;
+    int i = from ;
+    while i < length do
+      if arr[i] < min
+      then
+        min = arr[i] ;
+        minIndex = i
+      else
+        skip
+      fi ;
+      i = i + 1
+    done ;
+    return min
+  end
+  int[] sort(int[] arr) is
+    int length = len arr ;
+    int sortedTo = 0 ;
+    int minIndex = -1 ;
+    while sortedTo < length do
+      minIndex = call minIndexFrom(arr, sortedTo) ;
+      arr = call swap(sortedTo, minIndex, arr) ;
+      sortedTo = sortedTo + 1 
+    done ;
+    return arr
+  end
+  skip
+end

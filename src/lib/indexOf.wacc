@@ -1,0 +1,41 @@
+# Function to return the index of a value if it occurs in the inputted array
+# Returns the index of the first occurence
+# Returns -1 if there is no occurence
+
+begin
+  int indexOfInt(int val, int[] arr) is
+    int length = len arr ;
+    int index = -1 ;
+    bool found = false ;
+    int i = 0 ;
+    while i < length do
+      if found == false && arr[i] == val
+      then
+        index = i ;
+        found = true
+      else
+        skip
+      fi ;
+      i = i + 1
+    done ;
+    return index
+  end
+  int indexOfChar(char val, char[] arr) is
+    int length = len arr ;
+    int index = -1 ;
+    bool found = false ;
+    int i = 0 ;
+    while i < length do
+      if found == false && arr[i] == val
+      then
+        index = i ;
+        found = true
+      else
+        skip
+      fi ;
+      i = i + 1
+    done ;
+    return index
+  end
+  skip
+end
