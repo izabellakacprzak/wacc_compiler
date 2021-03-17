@@ -108,6 +108,20 @@ public class ObjectDeclStatementNode extends StatementNode {
     }
   }
 
+
+  /*
+  class Car
+    int a
+    int b
+    bool c
+
+   car = Car()
+   a, b, c
+   [3 * ADDR_SIZE] - references
+   [.... a, .... b, . c]
+   symTable:
+    car - offset
+   */
   // allocate space on the heap for this object
   // set value of each attribute to whatever - if passed to constructor get from here otherwise get from class decl
   // put that on the heap
@@ -115,6 +129,9 @@ public class ObjectDeclStatementNode extends StatementNode {
   public void generateAssembly(InternalState internalState) {
 
     ClassType classId = (ClassType) getCurrSymTable().lookupAll("class_" + className.getIdentifier());
+
+    /* Set offset of the object in the current Symbol Table */
+    getCurrSymTable().setVarsOffset(objectName.getIdentifier(), ADDRESS_BYTE_SIZE);
 
     /* Malloc space on the heap for all attributes */
     List<AttributeNode> attributes = classId.getAttributes();
@@ -156,9 +173,5 @@ public class ObjectDeclStatementNode extends StatementNode {
       offset++;
 
     }
-
-
-
-
   }
 }

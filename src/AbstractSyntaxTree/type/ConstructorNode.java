@@ -85,7 +85,7 @@ public class ConstructorNode implements TypeNode{
     ClassType classId = (ClassType) currSymTable.lookup("class_" + name.getIdentifier());
 
     /* Get index of constructor from classType */
-    String index = Integer.toString(classId.findIndex(parameters.getIdentifiers(currSymTable)));
+    String index = Integer.toString(classId.findIndexConstructor(parameters.getIdentifiers(currSymTable)));
 
     internalState.addInstruction(new LabelInstruction("class_constr_" + name.getIdentifier() + index));
     internalState.addInstruction(new PushInstruction(LR));

@@ -4,6 +4,7 @@ import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.AttributeNode;
 import SemanticAnalysis.ConstructorId;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.Identifier;
 import SemanticAnalysis.ParameterId;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class ClassType extends DataTypeId {
         return true;
     }
 
-    public int findIndex(List<ParameterId> params) {
+    public int findIndexConstructor(List<ParameterId> params) {
 
         List<DataTypeId> paramTypes = params.stream().map(ParameterId::getType).collect(Collectors.toList());
         List<DataTypeId> constructorTypes;
@@ -51,6 +52,16 @@ public class ClassType extends DataTypeId {
         }
 
         return ERROR_CODE;
+    }
+
+    public int findIndexAttribute(IdentifierNode attribute) {
+        String attributeName = attribute.getIdentifier();
+        for(int i = 0; i < attributes.size(); i++) {
+            if(attributes.get(i).toString().equals(attributeName)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public String getClassName() {
