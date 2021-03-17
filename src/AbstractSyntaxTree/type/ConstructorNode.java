@@ -82,11 +82,12 @@ public class ConstructorNode implements TypeNode{
     internalState.resetAvailableRegs();
 
     /* Add function label and push Link Register */
-    String index = "";
-    // get index from classType
-    Identifier classId = currSymTable.lookup("class_" + name.getIdentifier());
+    ClassType classId = (ClassType) currSymTable.lookup("class_" + name.getIdentifier());
 
-    internalState.addInstruction(new LabelInstruction("f_" + classId.toString() + index));
+    /* Get index of constructor from classType */
+    String index = Integer.toString(classId.findIndex(parameters.getIdentifiers(currSymTable)));
+
+    internalState.addInstruction(new LabelInstruction("class_constr_" + name.getIdentifier() + index));
     internalState.addInstruction(new PushInstruction(LR));
 
     /* Allocate space for variables in the function's currSymbolTable */

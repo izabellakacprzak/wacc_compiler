@@ -4,9 +4,11 @@ import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.AttributeNode;
 import SemanticAnalysis.ConstructorId;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.ParameterId;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ClassType extends DataTypeId {
 
@@ -15,6 +17,7 @@ public class ClassType extends DataTypeId {
     private final IdentifierNode node;
     private int attributeSize = 0;
     private int currOffset = 0;
+    private static final int ERROR_CODE = -1;
     private static final int HASH_PRIME = 61;
 
     public ClassType(IdentifierNode node, List<AttributeNode> fields) {
@@ -22,20 +25,36 @@ public class ClassType extends DataTypeId {
         this.fields = fields;
         constructors = new ArrayList<>();
         this.currOffset = 0;
-        for(AttributeNode attribute : fields) {
+        for (AttributeNode attribute : fields) {
             attributeSize += attribute.getType().getSize();
         }
     }
 
     public boolean addConstructor(ConstructorId constructor) {
         for (ConstructorId constructorId : constructors) {
-          if (constructorId.equals(constructor)) {
-              return false;
-          }
+            if (constructorId.equals(constructor)) {
+                return false;
+            }
         }
 
         constructors.add(constructor);
         return true;
+    }
+
+    public int findIndex(List<ParameterId> params) {
+
+        List<DataTypeId> paramTypes = params.stream().map(ParameterId::getType).collect(Collectors.toList());
+        List<DataTypeId> constructorTypes;
+
+        for (int i = 0; i < constructors.size(); i++) {
+            constructorTypes = constructors.get(i).getParameterTypes();
+
+            if (paramTypes.equals(constructorTypes)) {
+                return i;
+            }
+        }
+
+        return ERROR_CODE;
     }
 
     public String getClassName() {
@@ -66,7 +85,7 @@ public class ClassType extends DataTypeId {
             return false;
         }
 
-        return  object.hashCode() == this.hashCode();
+        return object.hashCode() == this.hashCode();
     }
 
     @Override

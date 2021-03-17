@@ -3,17 +3,33 @@ package AbstractSyntaxTree.assignment;
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import InternalRepresentation.Instructions.ArithmeticInstruction;
+import InternalRepresentation.Instructions.BranchInstruction;
+import InternalRepresentation.Instructions.MovInstruction;
+import InternalRepresentation.Instructions.StrInstruction;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Utils.ConditionCode;
+import InternalRepresentation.Utils.Operand;
 import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ClassType;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static InternalRepresentation.Instructions.ArithmeticInstruction.ArithmeticOperation.ADD;
+import static InternalRepresentation.Instructions.BranchInstruction.BranchOperation.B;
+import static InternalRepresentation.Instructions.StrInstruction.StrType.STRB;
+import static InternalRepresentation.Utils.Register.DEST_REG;
+import static InternalRepresentation.Utils.Register.SP;
 
 public class MethodCallNode extends CallNode{
 
   private final IdentifierNode objectName;
   private final IdentifierNode methodName;
   private final List<ExpressionNode> arguments;
+  private DataTypeId returnType = null;
+
+  private static final int MAX_DEALLOCATE_SIZE = 1024;
 
   public MethodCallNode(int line, int charPositionInLine, IdentifierNode objectName,
       IdentifierNode methodName, List<ExpressionNode> arguments) {
@@ -25,6 +41,14 @@ public class MethodCallNode extends CallNode{
 
   public Identifier getIdentifier(SymbolTable symbolTable) {
     return symbolTable.lookup("*" + methodName.getIdentifier());
+  }
+
+  public DataTypeId getReturnType() {
+    return returnType;
+  }
+
+  public void setReturnType(DataTypeId type) {
+    returnType = type;
   }
 
   public SymbolTable getClassSymTable(SymbolTable symbolTable) {
@@ -121,6 +145,62 @@ public class MethodCallNode extends CallNode{
 
   @Override
   public void generateAssembly(InternalState internalState) {
+
+    SymbolTable currSymTable = getCurrSymTable();
+    Identifier object = currSymTable.lookupAll(objectName.getIdentifier());
+    String className = ((ClassType) object.getType()).getClassName();
+
+    /* Calculate total arguments size in argsTotalSize */
+    int argsTotalSize = 0;
+
+    /* Arguments are stored in decreasing order they are given in the code */
+    for (int i = arguments.size() - 1; i >= 0; i--) {
+      /* Get argument, calculate size and add it to argsTotalSize */
+      ExpressionNode currArg = arguments.get(i);
+
+      /* Generate assembly code for the current argument */
+      currArg.generateAssembly(internalState);
+
+      int argSize = currArg.getType(currSymTable).getSize();
+
+      StrInstruction.StrType strInstr = (argSize == 1) ? STRB : StrInstruction.StrType.STR;
+
+      /* Store currArg on the stack and decrease stack pointer (stack grows downwards) */
+      internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(),
+              SP, -argSize, true));
+      argsTotalSize += argSize;
+
+      currSymTable.incrementArgsOffset(argSize);
+
+    }
+    currSymTable.resetArgsOffset();
+
+    /* Branch Instruction to the callee label */
+    String index = "";
+    List<DataTypeId> argTypes = arguments.stream().map(e -> e.getType(currSymTable))
+            .collect(Collectors.toList());
+    Identifier functionIdentifier = currSymTable.lookupAll("*" + methodName.getIdentifier());
+    if(functionIdentifier instanceof OverloadFuncId) {
+      OverloadFuncId overloadFuncId = (OverloadFuncId) functionIdentifier;
+      FunctionId functionId = overloadFuncId.findFuncReturnType(argTypes, returnType);
+      index = String.valueOf(overloadFuncId.getIndex(functionId));
+    }
+
+    String functionLabel = "f_" + className + methodName.toString() + index;
+    internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, functionLabel));
+
+    /* De-allocate stack from the function arguments. Max size for one de-allocation is 1024B */
+    while (argsTotalSize > 0) {
+      internalState.addInstruction(
+              new ArithmeticInstruction(ADD, SP, SP,
+                      new Operand(Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE)), false));
+      argsTotalSize -= Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE);
+    }
+
+    /* Move the result stored in DEST_REG in the first free register */
+    internalState
+            .addInstruction(new MovInstruction(internalState.peekFreeRegister(), DEST_REG));
+
 
   }
 }

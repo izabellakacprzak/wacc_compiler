@@ -1,5 +1,7 @@
 package SemanticAnalysis;
 
+import SemanticAnalysis.DataTypes.ClassType;
+
 import java.util.*;
 
 public class SymbolTable {
@@ -31,6 +33,16 @@ public class SymbolTable {
   /* Get an identifier object from the symbol table */
   public Identifier lookup(String name) {
     return dictionary.get(name);
+  }
+
+  public String findClass() {
+    for (String key : dictionary.keySet()) {
+      if (key.contains("class_") && dictionary.get(key) instanceof ClassType) {
+        return key;
+      }
+    }
+
+    return "";
   }
 
   /* Get an identifier object from the symbol table or

@@ -115,13 +115,15 @@ public class CodeGenVisitor {
 
     /* Add function label and push Link Register */
     String index = "";
+    String className = currSymTable.findClass();
+
     Identifier functionIdentifier = currSymTable.lookupAll("*" + identifier.getIdentifier());
     if(functionIdentifier instanceof OverloadFuncId) {
       OverloadFuncId overloadFuncId = (OverloadFuncId) functionIdentifier;
       FunctionId functionId = overloadFuncId.findFuncReturnType(params.getParamTypes(), returnType);
       index = String.valueOf(overloadFuncId.getIndex(functionId));
     }
-    internalState.addInstruction(new LabelInstruction("f_" + identifier.getIdentifier() + index));
+    internalState.addInstruction(new LabelInstruction("f_" + className + identifier.getIdentifier() + index));
     internalState.addInstruction(new PushInstruction(LR));
 
     /* Allocate space for variables in the function's currSymbolTable */
@@ -734,7 +736,7 @@ public class CodeGenVisitor {
 
       /* Store currArg on the stack and decrease stack pointer (stack grows downwards) */
       internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(),
-          SP, -argSize, true));
+              SP, -argSize, true));
       argsTotalSize += argSize;
 
       currSymTable.incrementArgsOffset(argSize);
@@ -745,7 +747,7 @@ public class CodeGenVisitor {
     /* Branch Instruction to the callee label */
     String index = "";
     List<DataTypeId> argTypes = arguments.stream().map(e -> e.getType(currSymTable))
-        .collect(Collectors.toList());
+            .collect(Collectors.toList());
     Identifier functionIdentifier = currSymTable.lookupAll("*" + identifier.getIdentifier());
     if(functionIdentifier instanceof OverloadFuncId) {
       OverloadFuncId overloadFuncId = (OverloadFuncId) functionIdentifier;
@@ -759,14 +761,14 @@ public class CodeGenVisitor {
     /* De-allocate stack from the function arguments. Max size for one de-allocation is 1024B */
     while (argsTotalSize > 0) {
       internalState.addInstruction(
-          new ArithmeticInstruction(ADD, SP, SP,
-              new Operand(Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE)), false));
+              new ArithmeticInstruction(ADD, SP, SP,
+                      new Operand(Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE)), false));
       argsTotalSize -= Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE);
     }
 
     /* Move the result stored in DEST_REG in the first free register */
     internalState
-        .addInstruction(new MovInstruction(internalState.peekFreeRegister(), DEST_REG));
+            .addInstruction(new MovInstruction(internalState.peekFreeRegister(), DEST_REG));
   }
 
   public void visitNewPairNode(InternalState internalState, ExpressionNode fstExpr,
