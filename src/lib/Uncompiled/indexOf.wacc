@@ -3,7 +3,7 @@
 # Returns -1 if there is no occurence
 
 begin
-  int indexOfInt(int val, int[] arr) is
+  int index_of_int(int val, int[] arr) is
     int length = len arr ;
     int index = -1 ;
     bool found = false ;
@@ -20,7 +20,7 @@ begin
     done ;
     return index
   end
-  int indexOfChar(char val, char[] arr) is
+  int index_of_char(char val, char[] arr) is
     int length = len arr ;
     int index = -1 ;
     bool found = false ;

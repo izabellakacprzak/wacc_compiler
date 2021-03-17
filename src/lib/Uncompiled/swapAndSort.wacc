@@ -2,13 +2,19 @@
 # 'sort' sorts an int array using bubble sort from min to max
 
 begin
-  int[] swap(int i, int j, int[] arr) is
+  int[] swap_int(int i, int j, int[] arr) is
     int val = arr[i] ;
     arr[i] = arr[j] ;
     arr[j] = val ;
     return arr
   end
-  bool checkSorted(int[] arr) is
+  char[] swap_char(int i, int j, char[] arr) is
+    char val = arr[i] ;
+    arr[i] = arr[j] ;
+    arr[j] = val ;
+    return arr
+  end
+  bool is_sorted(int[] arr) is
     int length = len arr ;
     int i = 0 ;
     int j = 1 ;
@@ -24,7 +30,7 @@ begin
     done ;
     return true
   end
-  int minIndexFrom(int[] arr, int from) is
+  int min_index_from(int[] arr, int from) is
     int length = len arr ;
     int min = 2147483647 ;
     int minIndex = -1 ;
@@ -46,8 +52,8 @@ begin
     int sortedTo = 0 ;
     int minIndex = -1 ;
     while sortedTo < length do
-      minIndex = call minIndexFrom(arr, sortedTo) ;
-      arr = call swap(sortedTo, minIndex, arr) ;
+      minIndex = call min_index_from(arr, sortedTo) ;
+      arr = call swap_int(sortedTo, minIndex, arr) ;
       sortedTo = sortedTo + 1 
     done ;
     return arr

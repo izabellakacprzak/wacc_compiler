@@ -1,7 +1,7 @@
 # Functions to fill an array with the same inputted value
 
 begin
-  int[] fillInt(int val, int[] arr) is
+  int[] fill_int(int val, int[] arr) is
     int length = len arr ;
     int i = 0 ;
     while i < length do
@@ -10,7 +10,7 @@ begin
     done ;
     return arr
   end
-  char[] fillChar(char val, char[] arr) is
+  char[] fill_char(char val, char[] arr) is
     int length = len arr ;
     int i = 0 ;
     while i < length do
