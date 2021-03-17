@@ -12,22 +12,18 @@ import java.util.stream.Collectors;
 
 public class ClassType extends DataTypeId {
 
-    private final List<AttributeNode> fields;
+    private final List<AttributeNode> attributes;
     private final List<ConstructorId> constructors;
     private final IdentifierNode node;
-    private int attributeSize = 0;
     private int currOffset = 0;
     private static final int ERROR_CODE = -1;
     private static final int HASH_PRIME = 61;
 
     public ClassType(IdentifierNode node, List<AttributeNode> fields) {
         this.node = node;
-        this.fields = fields;
+        this.attributes = fields;
         constructors = new ArrayList<>();
         this.currOffset = 0;
-        for (AttributeNode attribute : fields) {
-            attributeSize += attribute.getType().getSize();
-        }
     }
 
     public boolean addConstructor(ConstructorId constructor) {
@@ -62,8 +58,8 @@ public class ClassType extends DataTypeId {
     }
 
 
-    public List<AttributeNode> getFields() {
-        return fields;
+    public List<AttributeNode> getAttributes() {
+        return attributes;
     }
 
     public List<ConstructorId> getConstructors() {
@@ -76,6 +72,11 @@ public class ClassType extends DataTypeId {
 
     @Override
     public int getSize() {
+        int attributeSize = 0;
+        for (AttributeNode attribute : attributes) {
+            attributeSize += attribute.getType().getSize();
+        }
+
         return attributeSize;
     }
 
@@ -97,7 +98,7 @@ public class ClassType extends DataTypeId {
     public String toString() {
 
         StringBuilder fieldRep = new StringBuilder();
-        for (AttributeNode id : fields) {
+        for (AttributeNode id : attributes) {
             fieldRep.append(id.toString()).append("; ");
         }
 
