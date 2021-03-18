@@ -97,6 +97,7 @@ public class ConstructorNode implements TypeNode{
     internalState.allocateStackSpace(currSymTable);
 
     /* Visit and generate assembly for the function's ParamListNode */
+    parameters.addObject();
     parameters.generateAssembly(internalState);
 
     /* Visit and generate assembly for the function's StatementNode */

@@ -139,6 +139,9 @@ public class CodeGenVisitor {
     internalState.allocateStackSpace(currSymTable);
 
     /* Visit and generate assembly for the function's ParamListNode */
+    if(className == null) {
+      params.addObject();
+    }
     params.generateAssembly(internalState);
 
     /* Allocate space for variables in the function's currSymbolTable */
@@ -155,21 +158,25 @@ public class CodeGenVisitor {
   }
 
   public void visitParamListNode(InternalState internalState,
-                                 List<IdentifierNode> identifiers, SymbolTable currSymTable) {
+                                  List<IdentifierNode> identifiers, SymbolTable currSymTable,
+                                  boolean hasObject) {
 
     /* Initially increment the parameters' stack offset by the size of an address */
     //internalState.incrementParamStackOffset(ADDRESS_BYTE_SIZE);
 
     /* Set the offset of each identifier in the currSymbolTable (for the function scope) */
+
     currSymTable.incrementDeclaredParamsOffset(ADDRESS_BYTE_SIZE);
+
+    if(hasObject) {
+      /* add an offset of the object to the symbol table */
+      currSymTable.setParamsOffset("**object", ADDRESS_BYTE_SIZE);
+    }
+
     int typeSize;
     for (IdentifierNode identifier : identifiers) {
       typeSize = identifier.getType(currSymTable).getSize();
       currSymTable.setParamsOffset(identifier.getIdentifier(), typeSize);
-
-      /* Increment the parameters' stack pointer by the size of each parameter */
-      //int paramSize = identifier.getType(currSymTable).getSize();
-      //internalState.incrementParamStackOffset(paramSize);
     }
 
   }
@@ -185,18 +192,18 @@ public class CodeGenVisitor {
     if (left instanceof IdentifierNode) {
       /* Get the size and offset of the IdentifierNode being reassigned */
       String name = ((IdentifierNode) left).getIdentifier();
-      int offset = currSymTable.getOffset(name);
       Identifier identifier = currSymTable.lookupAll(name);
 
-      /* left os an attribute */
+      /* left is an attribute */
       if (identifier == null) {
-        ObjectId currObject = internalState.getCurrObject();
         Register attributePointer = internalState.peekFreeRegister();
-        int objectOffset = currSymTable.getOffset(currObject.getName());
-        ClassType classType = (ClassType) currObject.getType();
+        String currClass = currSymTable.findClass();
+
+        ClassType classType = (ClassType) currSymTable.lookup(currClass);
+        int offset = currSymTable.getOffset("**object");
         int attributeIndex = classType.findIndexAttribute(((IdentifierNode) left).getIdentifier());
 
-        /* Load the pair pointer from the stack and move it to the DEST_REG before branching
+        /* Load the attribute pointer from the stack and move it to the DEST_REG before branching
          * to the p_check_null_pointer CustomBuiltIn function */
         internalState.addInstruction(new LdrInstruction(LDR, attributePointer, SP, offset));
         internalState.addInstruction(new MovInstruction(DEST_REG, attributePointer));
@@ -214,6 +221,7 @@ public class CodeGenVisitor {
         internalState.addInstruction(new StrInstruction(strType, rightNodeResult, attributePointer));
 
       } else {
+        int offset = currSymTable.getOffset(name);
         int typeSize = left.getType(currSymTable).getSize();
 
         /* Find the type of store instruction based on the size and store
@@ -686,9 +694,8 @@ public class CodeGenVisitor {
         return;
       }
       /* If identifier is an attribute then get object offset and get attribute value from heap */
-      ObjectId objectId = internalState.getCurrObject();
-      int objectOffset = currSymTable.getOffset(objectId.getName());
-      ClassType classType = (ClassType) objectId.getType();
+      int objectOffset = currSymTable.getOffset("**object");
+      ClassType classType = (ClassType) currSymTable.lookupAll(currSymTable.findClass()).getType();
       int attributeIndex = classType.findIndexAttribute(identifier);
       Register reg = internalState.peekFreeRegister();
       LdrType ldrInstr = (type.getSize() == BYTE_SIZE) ? LDRSB : LDR;

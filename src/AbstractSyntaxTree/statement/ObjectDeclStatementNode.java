@@ -112,23 +112,9 @@ public class ObjectDeclStatementNode extends StatementNode {
       expr.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
 
-    /* Object's Instance of Class Symbol Table*/
+    objectName.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
   }
 
-
-  /*
-  class Car
-    int a
-    int b
-    bool c
-
-   car = Car()
-   a, b, c
-   [3 * ADDR_SIZE] - references
-   [.... a, .... b, . c]
-   symTable:
-    car - offset
-   */
   // allocate space on the heap for this object
   // set value of each attribute to whatever - if passed to constructor get from here otherwise get from class decl
   // put that on the heap
@@ -183,13 +169,16 @@ public class ObjectDeclStatementNode extends StatementNode {
     }
 
 
-
-
-
-
-
     /* Calculate total arguments size in argsTotalSize */
     int argsTotalSize = 0;
+
+    /* Store object reference on the stack and decrease stack pointer (stack grows downwards) */
+    objectName.generateAssembly(internalState);
+    internalState.addInstruction(new StrInstruction(StrInstruction.StrType.STR,
+        internalState.peekFreeRegister(), SP, -ADDRESS_BYTE_SIZE, true));
+    argsTotalSize += ADDRESS_BYTE_SIZE;
+
+    getCurrSymTable().incrementArgsOffset(ADDRESS_BYTE_SIZE);
 
     /* Arguments are stored in decreasing order they are given in the code */
     for (int i = expressions.size() - 1; i >= 0; i--) {
@@ -222,9 +211,6 @@ public class ObjectDeclStatementNode extends StatementNode {
 
     String functionLabel = "class_constr_" + className.toString() + index;
     internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, functionLabel));
-
-    /* Set current object to this object */
-    internalState.setCurrObject((ObjectId) getCurrSymTable().lookupAll(objectName.getIdentifier()));
 
     /* De-allocate stack from the function arguments. Max size for one de-allocation is 1024B */
     while (argsTotalSize > 0) {

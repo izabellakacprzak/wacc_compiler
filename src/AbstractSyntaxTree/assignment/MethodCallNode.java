@@ -30,6 +30,7 @@ public class MethodCallNode extends CallNode{
   private DataTypeId returnType = null;
 
   private static final int MAX_DEALLOCATE_SIZE = 1024;
+  private static final int ADDRESS_BYTE_SIZE = 4;
 
   public MethodCallNode(int line, int charPositionInLine, IdentifierNode objectName,
       IdentifierNode methodName, List<ExpressionNode> arguments) {
@@ -146,14 +147,22 @@ public class MethodCallNode extends CallNode{
   @Override
   public void generateAssembly(InternalState internalState) {
 
-    internalState.setCurrObject((ObjectId) getCurrSymTable().lookupAll(objectName.getIdentifier()));
-
     SymbolTable currSymTable = getCurrSymTable();
     Identifier object = currSymTable.lookupAll(objectName.getIdentifier());
     String className = ((ClassType) object.getType()).getClassName();
 
     /* Calculate total arguments size in argsTotalSize */
     int argsTotalSize = 0;
+
+    /* Store a reference to the object on the stack */
+
+    /* Store object reference on the stack and decrease stack pointer (stack grows downwards) */
+    objectName.generateAssembly(internalState);
+    internalState.addInstruction(new StrInstruction(StrInstruction.StrType.STR,
+        internalState.peekFreeRegister(), SP, -ADDRESS_BYTE_SIZE, true));
+    argsTotalSize += ADDRESS_BYTE_SIZE;
+
+    currSymTable.incrementArgsOffset(ADDRESS_BYTE_SIZE);
 
     /* Arguments are stored in decreasing order they are given in the code */
     for (int i = arguments.size() - 1; i >= 0; i--) {

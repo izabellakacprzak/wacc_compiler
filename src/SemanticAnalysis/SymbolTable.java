@@ -42,6 +42,9 @@ public class SymbolTable {
       }
     }
 
+    if (parentSymTable != null) {
+      return parentSymTable.findClass();
+    }
     return "";
   }
 
@@ -85,7 +88,6 @@ public class SymbolTable {
   or it's enclosing symbol tables */
   public int getOffset(String id) {
     if (!offsetPerVar.containsKey(id)) {
-      // TODO check getVarsSize() in this case
       return parentSymTable.getOffset(id) + getVarsSize();
     }
 
