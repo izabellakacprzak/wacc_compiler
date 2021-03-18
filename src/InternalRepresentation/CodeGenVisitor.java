@@ -17,6 +17,7 @@ import InternalRepresentation.Utils.ConditionCode;
 import InternalRepresentation.Utils.Operand;
 import InternalRepresentation.Utils.Register;
 import InternalRepresentation.Utils.Shift;
+import InternalRepresentation.Utils.StandardFunc;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
@@ -715,8 +716,8 @@ public class CodeGenVisitor {
   }
 
   public void visitFuncCallNode(InternalState internalState, IdentifierNode identifier,
-                                List<ExpressionNode> arguments, DataTypeId returnType,
-                                SymbolTable currSymTable) {
+      List<ExpressionNode> arguments, boolean isStdFunction, DataTypeId returnType,
+      SymbolTable currSymTable) {
     /* Calculate total arguments size in argsTotalSize */
     int argsTotalSize = 0;
 
@@ -747,13 +748,19 @@ public class CodeGenVisitor {
     List<DataTypeId> argTypes = arguments.stream().map(e -> e.getType(currSymTable))
         .collect(Collectors.toList());
     Identifier functionIdentifier = currSymTable.lookupAll("*" + identifier.getIdentifier());
-    if(functionIdentifier instanceof OverloadFuncId) {
+    if (functionIdentifier instanceof OverloadFuncId) {
       OverloadFuncId overloadFuncId = (OverloadFuncId) functionIdentifier;
       FunctionId functionId = overloadFuncId.findFuncReturnType(argTypes, returnType);
       index = String.valueOf(overloadFuncId.getIndex(functionId));
     }
 
-    String functionLabel = "f_" + identifier.toString() + index;
+    String functionLabel;
+    if (isStdFunction) {
+      functionLabel = StandardFunc.valueOfLabel(identifier.getIdentifier()).getBranchLabel();
+    } else {
+      functionLabel = "f_" + identifier.toString() + index;
+    }
+
     internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, functionLabel));
 
     /* De-allocate stack from the function arguments. Max size for one de-allocation is 1024B */

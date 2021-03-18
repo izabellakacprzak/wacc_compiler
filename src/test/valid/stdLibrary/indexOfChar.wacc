@@ -1,0 +1,12 @@
+# using the index_of_char function from the standard library
+
+# Output:
+# 2
+
+# Program:
+
+begin
+  char[] arr = ['a', 'b', 'c', 'c', 'd'] ;
+  int index = call index_of_char('c', arr) ;
+  println index
+end

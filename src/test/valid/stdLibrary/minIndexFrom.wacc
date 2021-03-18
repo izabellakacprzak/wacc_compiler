@@ -1,0 +1,12 @@
+# using the min_index_from function from the standard library
+
+# Output:
+# 3
+
+# Program:
+
+begin
+  int[] arr = [1, 5, 4, 2, 6] ;
+  int minimum = call min_index_from(arr, 2) ;
+  println minimum
+end

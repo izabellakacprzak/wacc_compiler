@@ -1,0 +1,12 @@
+# using the max function from the standard library
+
+# Output:
+# 7
+
+# Program:
+
+begin
+  int[] arr = [1, 7, 4, 2] ;
+  int maximum = call max(arr) ;
+  println maximum
+end

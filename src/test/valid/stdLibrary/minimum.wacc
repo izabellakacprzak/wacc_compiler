@@ -1,0 +1,12 @@
+# using the min function from the standard library
+
+# Output:
+# 2
+
+# Program:
+
+begin
+  int[] arr = [7, 3, 4, 2] ;
+  int minimum = call min(arr) ;
+  println minimum
+end

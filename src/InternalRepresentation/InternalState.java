@@ -16,9 +16,11 @@ import InternalRepresentation.Instructions.PushInstruction;
 import InternalRepresentation.Utils.CustomBuiltInGenerator;
 import InternalRepresentation.Utils.Operand;
 import InternalRepresentation.Utils.Register;
+import InternalRepresentation.Utils.StandardFunc;
 import SemanticAnalysis.SymbolTable;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -31,15 +33,22 @@ public class InternalState {
 
   private final List<Instruction> generatedInstructions;
   private final CodeGenVisitor codeGenVisitor;
-  private int varSize = 0;                /* stores the size of variables on the stack */
+  private final int declaredArgStackOffset = 0;
+
+  /* stores the size of variables on the stack */
+  private int varSize = 0;
   private Stack<Register> availableRegs;
+
   /* Global stack offset of declared variables */
   private int stackOffset = 0;
-  private int declaredArgStackOffset = 0;
-  //private int argStackOffset = 0;         /* stack pointer for variables offset calculation */
+
+  // TODO: this line needed?
+  //  private int argStackOffset = 0;         /* stack pointer for variables offset calculation */
   private int labelCount;
-  private SymbolTable funcSymTable;       /* points to the function symbol table in order to deallocate
-                                             the variables off the stack at scope closing */
+
+  /* Points to the function symbol table in order to deallocate
+   *   the variables off the stack at scope closing */
+  private SymbolTable funcSymTable;
 
   /* The internal states stores the generated instructions list, the available registers to use,
    * a reference to a CodeGenVisitor object to generate instructions and a label count for labels generation */
@@ -98,7 +107,13 @@ public class InternalState {
         writer.write(LINE_BREAK);
       }
 
-      /* write the built-in functions assembly instructions to the .s file */
+      /* write the standard functions' assembly instructions to the .s file */
+      List<StandardFunc> usedStdFunctions = StandardFunc.getUsed();
+      for (StandardFunc function : usedStdFunctions) {
+        function.writeAssembly(writer);
+      }
+
+      /* write the built-in functions' assembly instructions to the .s file */
       for (Instruction instruction : instructions) {
         if (!(instruction instanceof LabelInstruction)) {
           writer.write(TAB);

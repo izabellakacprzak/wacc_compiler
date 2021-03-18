@@ -21,6 +21,7 @@ public class FuncCallNode extends CallNode {
    *                 passed into the function call */
   private final IdentifierNode identifier;
   private final List<ExpressionNode> arguments;
+  private boolean isStdFunction = false;
   private DataTypeId returnType = null;
 
   public FuncCallNode(
@@ -44,7 +45,7 @@ public class FuncCallNode extends CallNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
-                               List<ASTNode> uncheckedNodes, boolean firstCheck) {
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -60,7 +61,7 @@ public class FuncCallNode extends CallNode {
         ExpressionNode currArg = arguments.get(i);
         ParameterId currParam = params.get(i);
         if ((currParam.getType() == null || currParam.isUnsetArray())
-                && currArg.getType(symbolTable) != null) {
+            && currArg.getType(symbolTable) != null) {
           currParam.setType(currArg.getType(symbolTable));
         } else if (currParam.getType() == null || currParam.isUnsetArray()) {
           containsUnsetParam = true;
@@ -91,7 +92,10 @@ public class FuncCallNode extends CallNode {
 
     /* Check to see if the function called is a standard function */
     StandardFunc stdFunc = StandardFunc.valueOfLabel(identifier.getIdentifier());
-    if (stdFunc != null) {
+
+    if (functionId == null && stdFunc != null) {
+      returnType = stdFunc.getReturnType();
+      isStdFunction = true;
       stdFunc.setUsed();
     }
 
@@ -116,13 +120,11 @@ public class FuncCallNode extends CallNode {
         uncheckedNodes, firstCheck);
   }
 
-
-
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState
-        .getCodeGenVisitor()
-        .visitFuncCallNode(internalState, identifier, arguments, returnType, getCurrSymTable());
+    internalState.getCodeGenVisitor()
+        .visitFuncCallNode(internalState, identifier, arguments, isStdFunction, returnType,
+            getCurrSymTable());
   }
 
   /* Return the return type of the function */
@@ -132,7 +134,13 @@ public class FuncCallNode extends CallNode {
     FunctionId function = (FunctionId) functionId;
 
     if (function == null) {
-      return null;
+      StandardFunc stdFunc = StandardFunc.valueOfLabel(identifier.getIdentifier());
+
+      if (stdFunc == null) {
+        return null;
+      }
+
+      return stdFunc.getReturnType();
     }
 
     return function.getType();
@@ -149,6 +157,6 @@ public class FuncCallNode extends CallNode {
     StringBuilder str = new StringBuilder();
     str.append("call ").append(identifier.getIdentifier()).append('(');
 
-      return getString(str, arguments);
+    return getString(str, arguments);
   }
 }

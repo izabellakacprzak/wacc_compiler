@@ -1,0 +1,12 @@
+# using the index_of_int function from the standard library
+
+# Output:
+# 2
+
+# Program:
+
+begin
+  int[] arr = [1, 5, 4, 2, 6] ;
+  int index = call index_of_int(4, arr) ;
+  println index
+end

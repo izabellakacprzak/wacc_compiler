@@ -1,13 +1,17 @@
 package InternalRepresentation.Utils;
 
+import static InternalRepresentation.Instructions.DirectiveInstruction.Directive.LTORG;
 import static InternalRepresentation.Utils.BuiltInFunction.CustomBuiltIn.*;
 import static SemanticAnalysis.DataTypes.BaseType.Type.*;
 
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public enum StandardFunc {
@@ -30,13 +34,18 @@ public enum StandardFunc {
   IS_SORTED("sorted", new BaseType(BOOL),
       new ArrayType(new BaseType(INT))),
   MIN_INDEX_FROM("min_index_from", new BaseType(INT),
-      new ArrayType(new BaseType(INT))),
+      new ArrayType(new BaseType(INT)), new BaseType(INT)),
   SORT("sort", new ArrayType(new BaseType(INT)),
-      new ArrayType(new BaseType(INT)));
+      new ArrayType(new BaseType(INT))),
+  // TODO: these don't work because of msg calls in the assembly
+  /* PRINT_INT_ARRAY("print_int_array", new BaseType(BOOL), new ArrayType(new BaseType(INT))),
+  PRINT_CHAR_ARRAY("print_char_array", new BaseType(BOOL), new ArrayType(new BaseType(CHAR)))*/;
+
+  private static final String STD_LIBRARY = "src/lib/stdLib.s";
+  private static final String END_OF_FUNCTION = "." + LTORG.toString().toLowerCase();
 
   private final String label;
   private final DataTypeId returnType;
-  private final int args;
   private final List<DataTypeId> argTypes;
 
   private boolean used = false;
@@ -44,7 +53,6 @@ public enum StandardFunc {
   StandardFunc(String label, DataTypeId returnType, DataTypeId... argTypes) {
     this.label = label;
     this.returnType = returnType;
-    this.args = argTypes.length;
     this.argTypes = List.of(argTypes);
   }
 
@@ -54,10 +62,6 @@ public enum StandardFunc {
 
   public DataTypeId getReturnType() {
     return returnType;
-  }
-
-  public int getArgs() {
-    return args;
   }
 
   public List<DataTypeId> getArgTypes() {
@@ -88,6 +92,14 @@ public enum StandardFunc {
     this.used = true;
 
     switch (this) {
+      // TODO: for if the prints start working
+      /*
+      case PRINT_INT_ARRAY:
+        PRINT_INT.setUsed();
+      case PRINT_CHAR_ARRAY:
+        PRINT_STRING.setUsed();
+        PRINT_LN.setUsed();
+       */
       case FILL_INT:
       case FILL_CHAR:
       case INDEX_OF_INT:
@@ -103,7 +115,39 @@ public enum StandardFunc {
         break;
       case SORT:
         MIN_INDEX_FROM.setUsed();
+        SWAP_INT.setUsed();
         OVERFLOW.setUsed();
+    }
+  }
+
+  public void writeAssembly(FileWriter writer) {
+    File file = new File(STD_LIBRARY);
+
+    try {
+      Scanner scanner = new Scanner(file);
+
+      String line = "";
+      while (scanner.hasNextLine()) {
+        line = scanner.nextLine();
+        if (line.trim().equals(getBranchLabel() + ":")) {
+          break;
+        }
+      }
+
+      writer.write(line);
+      writer.write("\n");
+
+      while (scanner.hasNextLine()) {
+        line = scanner.nextLine();
+        writer.write(line);
+        writer.write("\n");
+        if (line.trim().equals(END_OF_FUNCTION)) {
+          break;
+        }
+      }
+
+    } catch (Exception ignored) {
+      // TODO: any way of handling the exception?
     }
   }
 }

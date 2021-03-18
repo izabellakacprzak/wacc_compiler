@@ -45,7 +45,7 @@ begin
       fi ;
       i = i + 1
     done ;
-    return min
+    return minIndex
   end
   int[] sort(int[] arr) is
     int length = len arr ;
