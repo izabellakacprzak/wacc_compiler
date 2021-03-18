@@ -1,0 +1,13 @@
+# using the min function from the standard library
+
+# Output:
+# -2
+
+# Program:
+
+begin
+  char[] arr1 = ['a', 'c', 'd'] ;
+  char[] arr2 = ['b', 'c', 'd'] ;
+  int cmp = call strcmp(arr1, arr2) ;
+  println cmp
+end

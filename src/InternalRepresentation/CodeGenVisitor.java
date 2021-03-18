@@ -117,7 +117,7 @@ public class CodeGenVisitor {
     /* Add function label and push Link Register */
     String index = "";
     Identifier functionIdentifier = currSymTable.lookupAll("*" + identifier.getIdentifier());
-    if(functionIdentifier instanceof OverloadFuncId) {
+    if (functionIdentifier instanceof OverloadFuncId) {
       OverloadFuncId overloadFuncId = (OverloadFuncId) functionIdentifier;
       FunctionId functionId = overloadFuncId.findFuncReturnType(params.getParamTypes(), returnType);
       index = String.valueOf(overloadFuncId.getIndex(functionId));
@@ -261,7 +261,8 @@ public class CodeGenVisitor {
       /* Add size to find position of element on the stack */
       DataTypeId arrayElemType = ((ArrayType) identifier.getType(currSymTable)).getElemType();
       if (arrayElemType instanceof BaseType
-              && ((BaseType) arrayElemType).getBaseType() == BaseType.Type.CHAR) {
+              && ((BaseType) arrayElemType).getBaseType() == BaseType.Type.CHAR
+              || ((BaseType) arrayElemType).getBaseType() == BaseType.Type.BOOL) {
         internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
             new Operand(exprReg), !SET_BITS));
 
@@ -716,8 +717,8 @@ public class CodeGenVisitor {
   }
 
   public void visitFuncCallNode(InternalState internalState, IdentifierNode identifier,
-      List<ExpressionNode> arguments, boolean isStdFunction, DataTypeId returnType,
-      SymbolTable currSymTable) {
+                                List<ExpressionNode> arguments, boolean isStdFunction, DataTypeId returnType,
+                                SymbolTable currSymTable) {
     /* Calculate total arguments size in argsTotalSize */
     int argsTotalSize = 0;
 
@@ -746,7 +747,7 @@ public class CodeGenVisitor {
     /* Branch Instruction to the callee label */
     String index = "";
     List<DataTypeId> argTypes = arguments.stream().map(e -> e.getType(currSymTable))
-        .collect(Collectors.toList());
+                                    .collect(Collectors.toList());
     Identifier functionIdentifier = currSymTable.lookupAll("*" + identifier.getIdentifier());
     if (functionIdentifier instanceof OverloadFuncId) {
       OverloadFuncId overloadFuncId = (OverloadFuncId) functionIdentifier;

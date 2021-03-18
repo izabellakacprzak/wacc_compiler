@@ -1,0 +1,12 @@
+# using the contains_char function from the standard library
+
+# Output:
+# false
+
+# Program:
+
+begin
+  char[] arr = ['a', 'c', 'd'] ;
+  bool cont = call contains_char('b', arr) ;
+  println cont
+end

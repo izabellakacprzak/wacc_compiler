@@ -1,0 +1,13 @@
+# using the contains_int function from the standard library
+
+# Output:
+# true
+
+# Program:
+
+begin
+  int[] arr = [7, 3, 4, 2] ;
+  int x = 7;
+  bool cont = call contains_int(x, arr) ;
+  println cont
+end

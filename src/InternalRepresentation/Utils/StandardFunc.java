@@ -7,6 +7,7 @@ import static SemanticAnalysis.DataTypes.BaseType.Type.*;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.util.Arrays;
@@ -37,6 +38,16 @@ public enum StandardFunc {
       new ArrayType(new BaseType(INT)), new BaseType(INT)),
   SORT("sort", new ArrayType(new BaseType(INT)),
       new ArrayType(new BaseType(INT))),
+  STRCMP("strcmp", new BaseType(INT),
+      new ArrayType(new BaseType(CHAR)), new ArrayType(new BaseType(CHAR))),
+  CONTAINS_INT("contains_int", new BaseType(BOOL),
+      new BaseType(INT), new ArrayType(new BaseType(INT))),
+  CONTAINS_CHAR("contains_char", new BaseType(BOOL),
+      new BaseType(CHAR), new ArrayType(new BaseType(CHAR))),
+  CONTAINS_BOOL("contains_bool", new BaseType(BOOL),
+      new BaseType(BOOL), new ArrayType(new BaseType(BOOL))),
+
+
   // TODO: these don't work because of msg calls in the assembly
   /* PRINT_INT_ARRAY("print_int_array", new BaseType(BOOL), new ArrayType(new BaseType(INT))),
   PRINT_CHAR_ARRAY("print_char_array", new BaseType(BOOL), new ArrayType(new BaseType(CHAR)))*/;
@@ -56,6 +67,22 @@ public enum StandardFunc {
     this.argTypes = List.of(argTypes);
   }
 
+  /* Returns all library functions used in the program */
+  public static List<StandardFunc> getUsed() {
+    return Arrays.stream(StandardFunc.values()).filter(StandardFunc::isUsed)
+               .collect(Collectors.toList());
+  }
+
+  /* Method for finding a StandardFunc enum from its label */
+  public static StandardFunc valueOfLabel(String label) {
+    for (StandardFunc op : values()) {
+      if (op.label.equals(label)) {
+        return op;
+      }
+    }
+    return null;
+  }
+
   public String getBranchLabel() {
     return "l_" + label;
   }
@@ -70,22 +97,6 @@ public enum StandardFunc {
 
   public boolean isUsed() {
     return used;
-  }
-
-  /* Returns all library functions used in the program */
-  public static List<StandardFunc> getUsed() {
-    return Arrays.stream(StandardFunc.values()).filter(StandardFunc::isUsed)
-        .collect(Collectors.toList());
-  }
-
-  /* Method for finding a StandardFunc enum from its label */
-  public static StandardFunc valueOfLabel(String label) {
-    for (StandardFunc op : values()) {
-      if (op.label.equals(label)) {
-        return op;
-      }
-    }
-    return null;
   }
 
   public void setUsed() {
@@ -108,6 +119,10 @@ public enum StandardFunc {
       case MIN:
       case IS_SORTED:
       case MIN_INDEX_FROM:
+      case STRCMP:
+      case CONTAINS_INT:
+      case CONTAINS_CHAR:
+      case CONTAINS_BOOL:
         OVERFLOW.setUsed();
       case SWAP_INT:
       case SWAP_CHAR:

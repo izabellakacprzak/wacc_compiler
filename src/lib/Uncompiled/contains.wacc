@@ -1,0 +1,43 @@
+begin
+  bool contains_int(int n, int[] arr) is
+    int i = 0;
+    int length = len arr;
+    while i < length do
+      if arr[i] == n then
+        return true
+      else
+        i = i + 1
+      fi    
+    done;
+    return false  
+  end  
+  
+  bool contains_char(char c, char[] arr) is
+    int i = 0;
+    int length = len arr;
+    while i < length do
+      if arr[i] == c then
+        return true
+      else
+        i = i + 1
+      fi    
+    done;
+    return false  
+  end  
+  
+  
+  bool contains_bool(bool b, bool[] arr) is
+    int i = 0;
+    int length = len arr;
+    while i < length do
+      if arr[i] == b then
+        return true
+      else
+        i = i + 1
+      fi    
+    done;
+    return false  
+  end  
+  
+  skip
+end

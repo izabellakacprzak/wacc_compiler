@@ -1,0 +1,12 @@
+# using the contains_bool function from the standard library
+
+# Output:
+# true
+
+# Program:
+
+begin
+  bool[] arr = [true, true, false] ;
+  bool cont = call contains_bool(false, arr) ;
+  println cont
+end

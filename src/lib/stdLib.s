@@ -587,8 +587,274 @@ STDL28:
 	ADD sp, sp, #12
 	POP {pc}
 	POP {pc}
+	.ltorg		
+l_strcmp:
+	PUSH {lr}
+	SUB sp, sp, #16
+	LDR r4, =0
+	STR r4, [sp, #12]
+	LDR r4, =0
+	STR r4, [sp, #8]
+	LDR r4, [sp, #20]
+	LDR r4, [r4]
+	LDR r5, =1
+	SUBS r4, r4, r5
+	BLVS p_throw_overflow_error
+	STR r4, [sp, #4]
+	LDR r4, [sp, #24]
+	LDR r4, [r4]
+	LDR r5, =1
+	SUBS r4, r4, r5
+	BLVS p_throw_overflow_error
+	STR r4, [sp]
+	B STDL33
+STDL34:
+	LDR r4, [sp, #12]
+	LDR r5, =1
+	ADDS r4, r4, r5
+	BLVS p_throw_overflow_error
+	STR r4, [sp, #12]
+	LDR r4, [sp, #8]
+	LDR r5, =1
+	ADDS r4, r4, r5
+	BLVS p_throw_overflow_error
+	STR r4, [sp, #8]
+STDL33:
+	LDR r4, [sp, #12]
+	LDR r5, [sp, #4]
+	CMP r4, r5
+	MOVLT r4, #1
+	MOVGE r4, #0
+	LDR r5, [sp, #8]
+	LDR r6, [sp]
+	CMP r5, r6
+	MOVLT r5, #1
+	MOVGE r5, #0
+	AND r4, r4, r5
+	ADD r5, sp, #20
+	LDR r6, [sp, #12]
+	LDR r5, [r5]
+	MOV r0, r6
+	MOV r1, r5
+	BL p_check_array_bounds
+	ADD r5, r5, #4
+	ADD r5, r5, r6
+	LDRSB r5, [r5]
+	ADD r6, sp, #24
+	LDR r7, [sp, #8]
+	LDR r6, [r6]
+	MOV r0, r7
+	MOV r1, r6
+	BL p_check_array_bounds
+	ADD r6, r6, #4
+	ADD r6, r6, r7
+	LDRSB r6, [r6]
+	CMP r5, r6
+	MOVEQ r5, #1
+	MOVNE r5, #0
+	AND r4, r4, r5
+	CMP r4, #1
+	BEQ STDL34
+	ADD r4, sp, #20
+	LDR r5, [sp, #12]
+	LDR r4, [r4]
+	MOV r0, r5
+	MOV r1, r4
+	BL p_check_array_bounds
+	ADD r4, r4, #4
+	ADD r4, r4, r5
+	LDRSB r4, [r4]
+	ADD r5, sp, #24
+	LDR r6, [sp, #8]
+	LDR r5, [r5]
+	MOV r0, r6
+	MOV r1, r5
+	BL p_check_array_bounds
+	ADD r5, r5, #4
+	ADD r5, r5, r6
+	LDRSB r5, [r5]
+	SUBS r4, r4, r5
+	BLVS p_throw_overflow_error
+	ADD r5, sp, #24
+	LDR r6, [sp, #8]
+	LDR r5, [r5]
+	MOV r0, r6
+	MOV r1, r5
+	BL p_check_array_bounds
+	ADD r5, r5, #4
+	ADD r5, r5, r6
+	LDRSB r5, [r5]
+	ADD r6, sp, #20
+	LDR r7, [sp, #12]
+	LDR r6, [r6]
+	MOV r0, r7
+	MOV r1, r6
+	BL p_check_array_bounds
+	ADD r6, r6, #4
+	ADD r6, r6, r7
+	LDRSB r6, [r6]
+	SUBS r5, r5, r6
+	BLVS p_throw_overflow_error
+	SUBS r4, r4, r5
+	BLVS p_throw_overflow_error
+	MOV r0, r4
+	ADD sp, sp, #16
+	POP {pc}
+	POP {pc}
+	.ltorg	
+l_contains_int:
+	PUSH {lr}
+	SUB sp, sp, #8
+	LDR r4, =0
+	STR r4, [sp, #4]
+	LDR r4, [sp, #16]
+	LDR r4, [r4]
+	STR r4, [sp]
+	B STDL35
+STDL36:
+	ADD r4, sp, #16
+	LDR r5, [sp, #4]
+	LDR r4, [r4]
+	MOV r0, r5
+	MOV r1, r4
+	BL p_check_array_bounds
+	ADD r4, r4, #4
+	ADD r4, r4, r5, LSL #2
+	LDR r4, [r4]
+	LDR r5, [sp, #12]
+	CMP r4, r5
+	MOVEQ r4, #1
+	MOVNE r4, #0
+	CMP r4, #0
+	BEQ STDL37
+	MOV r4, #1
+	MOV r0, r4
+	ADD sp, sp, #8
+	POP {pc}
+	B STDL38
+STDL37:
+	LDR r4, [sp, #4]
+	LDR r5, =1
+	ADDS r4, r4, r5
+	BLVS p_throw_overflow_error
+	STR r4, [sp, #4]
+STDL38:
+STDL35:
+	LDR r4, [sp, #4]
+	LDR r5, [sp]
+	CMP r4, r5
+	MOVLT r4, #1
+	MOVGE r4, #0
+	CMP r4, #1
+	BEQ STDL36
+	MOV r4, #0
+	MOV r0, r4
+	ADD sp, sp, #8
+	POP {pc}
+	POP {pc}
+	.ltorg	
+l_contains_char:
+	PUSH {lr}
+	SUB sp, sp, #8
+	LDR r4, =0
+	STR r4, [sp, #4]
+	LDR r4, [sp, #13]
+	LDR r4, [r4]
+	STR r4, [sp]
+	B STDL39
+STDL40:
+	ADD r4, sp, #13
+	LDR r5, [sp, #4]
+	LDR r4, [r4]
+	MOV r0, r5
+	MOV r1, r4
+	BL p_check_array_bounds
+	ADD r4, r4, #4
+	ADD r4, r4, r5
+	LDRSB r4, [r4]
+	LDRSB r5, [sp, #12]
+	CMP r4, r5
+	MOVEQ r4, #1
+	MOVNE r4, #0
+	CMP r4, #0
+	BEQ STDL41
+	MOV r4, #1
+	MOV r0, r4
+	ADD sp, sp, #8
+	POP {pc}
+	B STDL42
+STDL41:
+	LDR r4, [sp, #4]
+	LDR r5, =1
+	ADDS r4, r4, r5
+	BLVS p_throw_overflow_error
+	STR r4, [sp, #4]
+STDL42:
+STDL39:
+	LDR r4, [sp, #4]
+	LDR r5, [sp]
+	CMP r4, r5
+	MOVLT r4, #1
+	MOVGE r4, #0
+	CMP r4, #1
+	BEQ STDL40
+	MOV r4, #0
+	MOV r0, r4
+	ADD sp, sp, #8
+	POP {pc}
+	POP {pc}
+	.ltorg	
+l_contains_bool:
+	PUSH {lr}
+	SUB sp, sp, #8
+	LDR r4, =0
+	STR r4, [sp, #4]
+	LDR r4, [sp, #13]
+	LDR r4, [r4]
+	STR r4, [sp]
+	B STDL43
+STDL44:
+	ADD r4, sp, #13
+	LDR r5, [sp, #4]
+	LDR r4, [r4]
+	MOV r0, r5
+	MOV r1, r4
+	BL p_check_array_bounds
+	ADD r4, r4, #4
+	ADD r4, r4, r5
+	LDRSB r4, [r4]
+	LDRSB r5, [sp, #12]
+	CMP r4, r5
+	MOVEQ r4, #1
+	MOVNE r4, #0
+	CMP r4, #0
+	BEQ STDL45
+	MOV r4, #1
+	MOV r0, r4
+	ADD sp, sp, #8
+	POP {pc}
+	B STDL46
+STDL45:
+	LDR r4, [sp, #4]
+	LDR r5, =1
+	ADDS r4, r4, r5
+	BLVS p_throw_overflow_error
+	STR r4, [sp, #4]
+STDL46:
+STDL43:
+	LDR r4, [sp, #4]
+	LDR r5, [sp]
+	CMP r4, r5
+	MOVLT r4, #1
+	MOVGE r4, #0
+	CMP r4, #1
+	BEQ STDL44
+	MOV r4, #0
+	MOV r0, r4
+	ADD sp, sp, #8
+	POP {pc}
+	POP {pc}
 	.ltorg
-	
 *******************************************
 * DO NOT WORK BECAUSE OF msg_0 REFERENCES *
 *******************************************
