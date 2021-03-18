@@ -38,8 +38,14 @@ public class IdentifierNode extends ExpressionNode {
     Identifier id = symbolTable.lookupAll(identifier);
 
     if (id == null) {
-      errorMessages.add(new SemanticError(super.getLine(),super.getCharPositionInLine(),
-          "Identifier '" + identifier + "' has not been declared."));
+      id = symbolTable.lookupAll("attr*" + identifier);
+      if (id == null) {
+        errorMessages.add(
+            new SemanticError(
+                super.getLine(),
+                super.getCharPositionInLine(),
+                "Identifier '" + identifier + "' has not been declared."));
+      }
     } else if (!(id instanceof VariableId) && !(id instanceof ParameterId)
             && !(id instanceof ObjectId)) {
       errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
@@ -68,6 +74,12 @@ public class IdentifierNode extends ExpressionNode {
     /* Add '*' to search for a FunctionId */
     id = symbolTable.lookupAll("*" + identifier);
     if (id instanceof FunctionId) {
+      return id.getType();
+    }
+
+    /* Add 'attr*' to search for a FunctionId */
+    id = symbolTable.lookupAll("attr*" + identifier);
+    if (id instanceof VariableId) {
       return id.getType();
     }
 

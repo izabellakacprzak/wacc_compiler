@@ -41,7 +41,7 @@ public class AttributeExprNode extends ExpressionNode {
 
   public int getAttributeIndex(SymbolTable symbolTable) {
       ClassType classType =  (ClassType) objectName.getType(symbolTable);
-      return classType.findIndexAttribute(attributeName);
+      return classType.findIndexAttribute(attributeName.getIdentifier());
   }
 
   @Override
@@ -54,7 +54,7 @@ public class AttributeExprNode extends ExpressionNode {
       SymbolTable classSymbolTable = classType.getAttributes().get(0).getCurrSymTable();
 
       /* Check if such an attribute exists for this class */
-      Identifier attribute = classSymbolTable.lookup(attributeName.getIdentifier());
+      Identifier attribute = classSymbolTable.lookup("attr*" + attributeName.getIdentifier());
       if(attribute == null) {
         return null;
       } else {
@@ -83,7 +83,7 @@ public class AttributeExprNode extends ExpressionNode {
       SymbolTable classSymbolTable = classType.getAttributes().get(0).getCurrSymTable();
 
       /* Check if such an attribute exists for this class */
-      if(classSymbolTable.lookup(attributeName.getIdentifier()) == null) {
+      if(classSymbolTable.lookup("attr*" + attributeName.getIdentifier()) == null) {
         errorMessages.add(new SemanticError(objectName.getLine(), objectName.getCharPositionInLine(),
                 "Attribute with name '" + attributeName.getIdentifier() + "' has not been declared for class '"
                 + classType.getClassName()
@@ -113,7 +113,7 @@ public class AttributeExprNode extends ExpressionNode {
 
     /* Get index of attribute in list of class attributes and load it */
     ClassType classType = (ClassType) this.getType(currSymbolTable);
-    int attributeIndex = classType.findIndexAttribute(attributeName);
+    int attributeIndex = classType.findIndexAttribute(attributeName.getIdentifier());
     internalState.addInstruction(
         new LdrInstruction(LdrType.LDR, objectReg, objectReg, attributeIndex * ADDRESS_BYTE_SIZE));
 

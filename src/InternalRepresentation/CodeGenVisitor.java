@@ -188,7 +188,7 @@ public class CodeGenVisitor {
         Register attributePointer = internalState.peekFreeRegister();
         int objectOffset = currSymTable.getOffset(currObject.getName());
         ClassType classType = (ClassType) currObject.getType();
-        int attributeIndex = classType.findIndexAttribute((IdentifierNode) left);
+        int attributeIndex = classType.findIndexAttribute(((IdentifierNode) left).getIdentifier());
 
         /* Load the pair pointer from the stack and move it to the DEST_REG before branching
          * to the p_check_null_pointer CustomBuiltIn function */
@@ -675,15 +675,26 @@ public class CodeGenVisitor {
     }
     Identifier id = currSymTable.lookupAll(identifier);
     if (id == null) {
-      return;
-    }
-    /* If identifier is an attribute then get object offset and get attribute value from heap */
-    
+      id = currSymTable.lookupAll("attr*" + identifier);
+      if(id == null) {
+        return;
+      }
+      /* If identifier is an attribute then get object offset and get attribute value from heap */
+      ObjectId objectId = internalState.getCurrObject();
+      int objectOffset = currSymTable.getOffset(objectId.getName());
+      ClassType classType = (ClassType) objectId.getType();
+      int attributeIndex = classType.findIndexAttribute(identifier);
+      Register reg = internalState.peekFreeRegister();
+      LdrType ldrInstr = (type.getSize() == BYTE_SIZE) ? LDRSB : LDR;
+      internalState.addInstruction(new LdrInstruction(ldrInstr, reg, SP,
+          objectOffset + attributeIndex * ADDRESS_BYTE_SIZE));
+    } else {
 
-    int offset = currSymTable.getOffset(identifier);
-    Register reg = internalState.peekFreeRegister();
-    LdrType ldrInstr = (type.getSize() == BYTE_SIZE) ? LDRSB : LDR;
-    internalState.addInstruction(new LdrInstruction(ldrInstr, reg, SP, offset));
+      int offset = currSymTable.getOffset(identifier);
+      Register reg = internalState.peekFreeRegister();
+      LdrType ldrInstr = (type.getSize() == BYTE_SIZE) ? LDRSB : LDR;
+      internalState.addInstruction(new LdrInstruction(ldrInstr, reg, SP, offset));
+    }
   }
 
   public void visitIntLiterExprNode(InternalState internalState, int value) {

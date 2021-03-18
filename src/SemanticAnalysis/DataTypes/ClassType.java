@@ -57,10 +57,9 @@ public class ClassType extends DataTypeId {
         return ERROR_CODE;
     }
 
-    public int findIndexAttribute(IdentifierNode attribute) {
-        String attributeName = attribute.getIdentifier();
+    public int findIndexAttribute(String attribute) {
         for(int i = 0; i < attributes.size(); i++) {
-            if(attributes.get(i).toString().equals(attributeName)) {
+            if(attributes.get(i).toString().equals(attribute)) {
                 return i;
             }
         }

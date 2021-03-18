@@ -224,7 +224,7 @@ public class ObjectDeclStatementNode extends StatementNode {
     internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, functionLabel));
 
     /* Set current object to this object */
-    internalState.setCurrObject(objectName.getIdentifier());
+    internalState.setCurrObject((ObjectId) getCurrSymTable().lookupAll(objectName.getIdentifier()));
 
     /* De-allocate stack from the function arguments. Max size for one de-allocation is 1024B */
     while (argsTotalSize > 0) {
