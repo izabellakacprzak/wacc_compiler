@@ -8,6 +8,7 @@ import AbstractSyntaxTree.expression.AttributeExprNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
+import AbstractSyntaxTree.type.ClassNode;
 import AbstractSyntaxTree.type.FunctionNode;
 import AbstractSyntaxTree.type.ParamListNode;
 import AbstractSyntaxTree.type.TypeNode;
@@ -82,11 +83,16 @@ public class CodeGenVisitor {
    * Other parameters refer to values stored in the visited ASTNode */
 
   public void visitProgramNode(InternalState internalState,
-                               StatementNode statementNode, List<FunctionNode> functionNodes) {
+                               StatementNode statementNode, List<FunctionNode> functionNodes,
+                               List<ClassNode> classNodes) {
 
     /* Visit and generate assembly for each FunctionNode */
     for (FunctionNode functionNode : functionNodes) {
       functionNode.generateAssembly(internalState);
+    }
+
+    for (ClassNode classNode : classNodes) {
+      classNode.generateAssembly(internalState);
     }
 
     /* Add main label and push Link Register */
