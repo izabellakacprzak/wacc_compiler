@@ -40,9 +40,9 @@ public class ObjectDeclStatementNode extends StatementNode {
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
       List<ASTNode> uncheckedNodes, boolean firstCheck) {
-
+    setCurrSymTable(symbolTable);
     /* Check if className is a valid class name */
-    Identifier classId = symbolTable.lookupAll("class_" + className.getIdentifier());
+    Identifier classId = symbolTable.lookupAll("class*" + className.getIdentifier());
     ObjectId newObject = null;
 
     if (!(classId instanceof ClassType)) {
@@ -106,6 +106,8 @@ public class ObjectDeclStatementNode extends StatementNode {
     for(ExpressionNode expr : expressions) {
       expr.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }
+
+    /* Object's Instance of Class Symbol Table*/
   }
 
 
@@ -128,7 +130,7 @@ public class ObjectDeclStatementNode extends StatementNode {
   @Override
   public void generateAssembly(InternalState internalState) {
 
-    ClassType classId = (ClassType) getCurrSymTable().lookupAll("class_" + className.getIdentifier());
+    ClassType classId = (ClassType) getCurrSymTable().lookupAll("class*" + className.getIdentifier());
 
     /* Set offset of the object in the current Symbol Table */
     getCurrSymTable().setVarsOffset(objectName.getIdentifier(), ADDRESS_BYTE_SIZE);
@@ -169,9 +171,10 @@ public class ObjectDeclStatementNode extends StatementNode {
       internalState.addInstruction(
               new StrInstruction(StrInstruction.StrType.STR, DEST_REG, attributeReg, offset * ADDRESS_BYTE_SIZE));
 
-      internalState.pushFreeRegister(exprReg);
+      if (attribute.hasAssignRHS()) {
+        internalState.pushFreeRegister(exprReg);
+      }
       offset++;
-
     }
   }
 }

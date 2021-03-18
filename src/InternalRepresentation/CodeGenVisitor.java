@@ -4,6 +4,7 @@ import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import AbstractSyntaxTree.assignment.PairElemNode;
 import AbstractSyntaxTree.expression.ArrayElemNode;
+import AbstractSyntaxTree.expression.AttributeExprNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
@@ -20,6 +21,7 @@ import InternalRepresentation.Utils.Shift;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.DataTypes.ClassType;
 import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
@@ -175,8 +177,15 @@ public class CodeGenVisitor {
     /* Switch based on the instance of AssignLHSNode */
     if (left instanceof IdentifierNode) {
       /* Get the size and offset of the IdentifierNode being reassigned */
+      String name = ((IdentifierNode) left).getIdentifier();
+      int offset = currSymTable.getOffset(name);
+      Identifier identifier = currSymTable.lookupAll(name);
+
+      if (identifier == null) {
+
+      }
+      
       int typeSize = left.getType(currSymTable).getSize();
-      int offset = currSymTable.getOffset(((IdentifierNode) left).getIdentifier());
 
       /* Find the type of store instruction based on the size and store
        *   rightNodeResult on the stack in the correct position */
@@ -222,6 +231,26 @@ public class CodeGenVisitor {
 
       /* Push arrayReg back to the register stack */
       internalState.pushFreeRegister(arrayReg);
+    } else if (left instanceof AttributeExprNode) {
+      AttributeExprNode attribute = (AttributeExprNode) left;
+      Register attributePointer = internalState.peekFreeRegister();
+      int offset = currSymTable.getOffset(attribute.getObjectName());
+
+      /* Load the attribute pointer from the stack and move it to the DEST_REG before branching
+       * to the p_check_null_pointer CustomBuiltIn function */
+      internalState.addInstruction(new LdrInstruction(LDR, attributePointer, SP, offset));
+      internalState.addInstruction(new MovInstruction(DEST_REG, attributePointer));
+      internalState.addInstruction(new BranchInstruction(BL, NULL_POINTER));
+
+      int position = attribute.getAttributeIndex(currSymTable);
+      internalState.addInstruction(
+              new LdrInstruction(LDR, attributePointer, attributePointer,
+                      position * ADDRESS_BYTE_SIZE));
+
+      /* Find the type of store instruction based on the size and store
+       *   rightNodeResult on the stack in the correct position */
+      StrType strType = attribute.getType(currSymTable).getSize() == BYTE_SIZE ? STRB : StrType.STR;
+      internalState.addInstruction(new StrInstruction(strType, rightNodeResult, attributePointer));
     }
 
     /* Push rightNodeResult back to the register stack */

@@ -48,7 +48,7 @@ public class ConstructorNode implements TypeNode{
     setCurrSymTable(symbolTable);
 
     /* Get class name and search it up in symbol table */
-    String className = "class_" + name.getIdentifier();
+    String className = "class*" + name.getIdentifier();
     Identifier classId = symbolTable.lookup(className);
 
     /* Check if name matches class name */
@@ -82,7 +82,7 @@ public class ConstructorNode implements TypeNode{
     internalState.resetAvailableRegs();
 
     /* Add function label and push Link Register */
-    ClassType classId = (ClassType) currSymTable.lookup("class_" + name.getIdentifier());
+    ClassType classId = (ClassType) currSymTable.lookup("class*" + name.getIdentifier());
 
     /* Get index of constructor from classType */
     String index = Integer.toString(classId.findIndexConstructor(parameters.getIdentifiers(currSymTable)));

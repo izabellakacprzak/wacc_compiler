@@ -43,10 +43,10 @@ public class ClassNode implements TypeNode {
   }
 
   public String getName() {
-    return "class_" + className.getIdentifier();
+    return "class*" + className.getIdentifier();
   }
 
-  /* Returns identifier without extra 'class_' characters */
+  /* Returns identifier without extra 'class*' characters */
   public IdentifierNode getIdentifierNode() {
     return className;
   }
@@ -82,7 +82,7 @@ public class ClassNode implements TypeNode {
     // put the class somewhere (heap)?
     // for each constructor and method do what we do for FunctionNode
 
-    internalState.addInstruction(new LabelInstruction("class_" + className.getIdentifier()));
+    internalState.addInstruction(new LabelInstruction("class*" + className.getIdentifier()));
 
     /* Malloc space on the heap for all attributes */
     int numAttributes = attributes.size();

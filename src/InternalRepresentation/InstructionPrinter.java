@@ -65,7 +65,7 @@ public class InstructionPrinter {
   public String printLDR(Register destReg, ConditionCode conditionCode,
       int immOffset, Register srcReg,
       String constant, LdrInstruction.LdrType type) {
-    String instruction = type.name();
+      String instruction = type.name();
 
     if (conditionCode != null) {
       instruction += conditionCode.getCondName();

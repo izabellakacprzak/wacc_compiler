@@ -35,6 +35,15 @@ public class AttributeExprNode extends ExpressionNode {
     this.attributeName = attributeName;
   }
 
+  public String getObjectName() {
+    return objectName.getIdentifier();
+  }
+
+  public int getAttributeIndex(SymbolTable symbolTable) {
+      ClassType classType =  (ClassType) objectName.getType(symbolTable);
+      return classType.findIndexAttribute(attributeName);
+  }
+
   @Override
   public DataTypeId getType(SymbolTable symbolTable) {
     DataTypeId objectType = objectName.getType(symbolTable);
@@ -45,7 +54,7 @@ public class AttributeExprNode extends ExpressionNode {
       SymbolTable classSymbolTable = classType.getAttributes().get(0).getCurrSymTable();
 
       /* Check if such an attribute exists for this class */
-      Identifier attribute = classSymbolTable.lookup(attributeName.getIdentifier());
+      Identifier attribute = classSymbolTable.lookup("attr*" + attributeName.getIdentifier());
       if(attribute == null) {
         return null;
       } else {

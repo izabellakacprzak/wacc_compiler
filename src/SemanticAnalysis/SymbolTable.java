@@ -37,7 +37,7 @@ public class SymbolTable {
 
   public String findClass() {
     for (String key : dictionary.keySet()) {
-      if (key.contains("class_") && dictionary.get(key) instanceof ClassType) {
+      if (key.contains("class*") && dictionary.get(key) instanceof ClassType) {
         return key;
       }
     }
