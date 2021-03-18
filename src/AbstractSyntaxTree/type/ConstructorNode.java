@@ -16,6 +16,7 @@ import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ClassType;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ConstructorNode implements TypeNode{
 
@@ -85,7 +86,9 @@ public class ConstructorNode implements TypeNode{
     ClassType classId = (ClassType) currSymTable.lookup("class*" + name.getIdentifier());
 
     /* Get index of constructor from classType */
-    String index = Integer.toString(classId.findIndexConstructor(parameters.getIdentifiers(currSymTable)));
+    String index = Integer.toString(classId.findIndexConstructor(parameters
+        .getIdentifiers(currSymTable).stream().map(ParameterId::getType).collect(
+        Collectors.toList())));
 
     internalState.addInstruction(new LabelInstruction("class_constr_" + name.getIdentifier() + index));
     internalState.addInstruction(new PushInstruction(LR));
@@ -102,6 +105,8 @@ public class ConstructorNode implements TypeNode{
     /* Reset the parameters' offset, pop the PC program counter add the
      *   .ltorg instruction to finish the function */
     internalState.resetParamStackOffset();
+
+    internalState.deallocateStackSpace(internalState.getFunctionSymTable());
     internalState.addInstruction(new PopInstruction(PC));
     internalState.addInstruction(new DirectiveInstruction(LTORG));
   }

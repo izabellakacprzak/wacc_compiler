@@ -146,6 +146,8 @@ public class MethodCallNode extends CallNode{
   @Override
   public void generateAssembly(InternalState internalState) {
 
+    internalState.setCurrObject(objectName.getIdentifier());
+
     SymbolTable currSymTable = getCurrSymTable();
     Identifier object = currSymTable.lookupAll(objectName.getIdentifier());
     String className = ((ClassType) object.getType()).getClassName();

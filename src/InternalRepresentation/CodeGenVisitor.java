@@ -25,6 +25,7 @@ import SemanticAnalysis.DataTypes.ClassType;
 import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
+import SemanticAnalysis.ObjectId;
 import SemanticAnalysis.Operator;
 import SemanticAnalysis.OverloadFuncId;
 import SemanticAnalysis.SymbolTable;
@@ -181,16 +182,39 @@ public class CodeGenVisitor {
       int offset = currSymTable.getOffset(name);
       Identifier identifier = currSymTable.lookupAll(name);
 
+      /* left os an attribute */
       if (identifier == null) {
+        ObjectId currObject = internalState.getCurrObject();
+        Register attributePointer = internalState.peekFreeRegister();
+        int objectOffset = currSymTable.getOffset(currObject.getName());
+        ClassType classType = (ClassType) currObject.getType();
+        int attributeIndex = classType.findIndexAttribute((IdentifierNode) left);
 
+        /* Load the pair pointer from the stack and move it to the DEST_REG before branching
+         * to the p_check_null_pointer CustomBuiltIn function */
+        internalState.addInstruction(new LdrInstruction(LDR, attributePointer, SP, offset));
+        internalState.addInstruction(new MovInstruction(DEST_REG, attributePointer));
+        internalState.addInstruction(new BranchInstruction(BL, NULL_POINTER));
+
+        /* Load the pair element to the pairPointer register */
+
+        internalState.addInstruction(
+            new LdrInstruction(LDR, attributePointer, attributePointer,
+                attributeIndex * ADDRESS_BYTE_SIZE));
+
+        /* Find the type of store instruction based on the size and store
+         *   rightNodeResult on the stack in the correct position */
+        StrType strType = classType.getAttributeType(attributeIndex).getSize() == BYTE_SIZE ? STRB : StrType.STR;
+        internalState.addInstruction(new StrInstruction(strType, rightNodeResult, attributePointer));
+
+      } else {
+        int typeSize = left.getType(currSymTable).getSize();
+
+        /* Find the type of store instruction based on the size and store
+         *   rightNodeResult on the stack in the correct position */
+        StrType strType = typeSize == BYTE_SIZE ? STRB : STR;
+        internalState.addInstruction(new StrInstruction(strType, rightNodeResult, SP, offset));
       }
-      
-      int typeSize = left.getType(currSymTable).getSize();
-
-      /* Find the type of store instruction based on the size and store
-       *   rightNodeResult on the stack in the correct position */
-      StrType strType = typeSize == BYTE_SIZE ? STRB : STR;
-      internalState.addInstruction(new StrInstruction(strType, rightNodeResult, SP, offset));
 
     } else if (left instanceof PairElemNode) {
       /* Cast left to PairElemNode, take a free register (to store the pair pointer)
@@ -653,6 +677,8 @@ public class CodeGenVisitor {
     if (id == null) {
       return;
     }
+    /* If identifier is an attribute then get object offset and get attribute value from heap */
+    
 
     int offset = currSymTable.getOffset(identifier);
     Register reg = internalState.peekFreeRegister();

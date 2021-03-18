@@ -38,9 +38,12 @@ public class ClassType extends DataTypeId {
         return true;
     }
 
-    public int findIndexConstructor(List<ParameterId> params) {
+    public DataTypeId getAttributeType(int index) {
+        return attributes.get(index).getType();
+    }
 
-        List<DataTypeId> paramTypes = params.stream().map(ParameterId::getType).collect(Collectors.toList());
+    public int findIndexConstructor(List<DataTypeId> paramTypes) {
+
         List<DataTypeId> constructorTypes;
 
         for (int i = 0; i < constructors.size(); i++) {

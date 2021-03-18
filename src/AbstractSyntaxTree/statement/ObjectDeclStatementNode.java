@@ -6,8 +6,10 @@ import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.AttributeNode;
 import AbstractSyntaxTree.type.TypeNode;
 import InternalRepresentation.Instructions.*;
+import InternalRepresentation.Instructions.StrInstruction.StrType;
 import InternalRepresentation.InternalState;
 import InternalRepresentation.Utils.ConditionCode;
+import InternalRepresentation.Utils.Operand;
 import InternalRepresentation.Utils.Register;
 import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ClassType;
@@ -15,11 +17,13 @@ import SemanticAnalysis.DataTypes.ClassType;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static InternalRepresentation.Instructions.ArithmeticInstruction.ArithmeticOperation.ADD;
 import static InternalRepresentation.Instructions.BranchInstruction.BranchOperation.B;
 import static InternalRepresentation.Instructions.LdrInstruction.LdrType.LDR;
 import static InternalRepresentation.Instructions.StrInstruction.StrType.STRB;
 import static InternalRepresentation.Utils.BuiltInFunction.SystemBuiltIn.MALLOC;
 import static InternalRepresentation.Utils.Register.DEST_REG;
+import static InternalRepresentation.Utils.Register.SP;
 
 public class ObjectDeclStatementNode extends StatementNode {
 
@@ -29,6 +33,7 @@ public class ObjectDeclStatementNode extends StatementNode {
 
   private static final int BYTE_SIZE = 1;
   private static final int ADDRESS_BYTE_SIZE = 4;
+  private static final int MAX_DEALLOCATE_SIZE = 1024;
 
   public ObjectDeclStatementNode(IdentifierNode className, IdentifierNode objectName,
       List<ExpressionNode> expressions) {
@@ -175,6 +180,58 @@ public class ObjectDeclStatementNode extends StatementNode {
         internalState.pushFreeRegister(exprReg);
       }
       offset++;
+    }
+
+
+
+
+
+
+
+    /* Calculate total arguments size in argsTotalSize */
+    int argsTotalSize = 0;
+
+    /* Arguments are stored in decreasing order they are given in the code */
+    for (int i = expressions.size() - 1; i >= 0; i--) {
+      /* Get argument, calculate size and add it to argsTotalSize */
+      ExpressionNode currArg = expressions.get(i);
+
+      /* Generate assembly code for the current argument */
+      currArg.generateAssembly(internalState);
+
+      int argSize = currArg.getType(getCurrSymTable()).getSize();
+
+      StrType strInstr = (argSize == 1) ? STRB : StrType.STR;
+
+      /* Store currArg on the stack and decrease stack pointer (stack grows downwards) */
+      internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(),
+          SP, -argSize, true));
+      argsTotalSize += argSize;
+
+      getCurrSymTable().incrementArgsOffset(argSize);
+
+    }
+    getCurrSymTable().resetArgsOffset();
+
+    /* Branch Instruction to the callee label */
+    List<DataTypeId> argTypes = expressions.stream().map(e -> e.getType(getCurrSymTable()))
+        .collect(Collectors.toList());
+
+    /* Get index of constructor from classType */
+    String index = Integer.toString(classId.findIndexConstructor(argTypes));
+
+    String functionLabel = "class_constr_" + className.toString() + index;
+    internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, functionLabel));
+
+    /* Set current object to this object */
+    internalState.setCurrObject(objectName.getIdentifier());
+
+    /* De-allocate stack from the function arguments. Max size for one de-allocation is 1024B */
+    while (argsTotalSize > 0) {
+      internalState.addInstruction(
+          new ArithmeticInstruction(ADD, SP, SP,
+              new Operand(Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE)), false));
+      argsTotalSize -= Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE);
     }
   }
 }

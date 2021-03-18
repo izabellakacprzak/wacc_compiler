@@ -15,6 +15,10 @@ public class ObjectId extends Identifier {
         this.constructor = constructor;
     }
 
+    public String getName() {
+        return super.getNode().getIdentifier();
+    }
+
     @Override
     public DataTypeId getType() {
         return type;

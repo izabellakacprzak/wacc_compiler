@@ -54,7 +54,7 @@ public class AttributeExprNode extends ExpressionNode {
       SymbolTable classSymbolTable = classType.getAttributes().get(0).getCurrSymTable();
 
       /* Check if such an attribute exists for this class */
-      Identifier attribute = classSymbolTable.lookup("attr*" + attributeName.getIdentifier());
+      Identifier attribute = classSymbolTable.lookup(attributeName.getIdentifier());
       if(attribute == null) {
         return null;
       } else {

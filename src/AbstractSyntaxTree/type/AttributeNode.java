@@ -78,13 +78,13 @@ public class AttributeNode implements TypeNode {
                 "Assignment type does not match declared type for '"
                 + name.getIdentifier() + "'."
                 + " Expected: " + type.getType() + " Actual: " + assignedType));
-        symbolTable.add("attr*" + name.getIdentifier(), new VariableId(name, type.getType()));
+        symbolTable.add(name.getIdentifier(), new VariableId(name, type.getType()));
       } else {
-        symbolTable.add("attr*" + name.getIdentifier(), new VariableId(name, type.getType()));
+        symbolTable.add(name.getIdentifier(), new VariableId(name, type.getType()));
       }
     } else {
       /* Otherwise create identifier and put it in the symbol table */
-      symbolTable.add("attr*" + name.getIdentifier(), new VariableId(name, type.getType()));
+      symbolTable.add(name.getIdentifier(), new VariableId(name, type.getType()));
     }
   }
 

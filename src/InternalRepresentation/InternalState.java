@@ -16,6 +16,7 @@ import InternalRepresentation.Instructions.PushInstruction;
 import InternalRepresentation.Utils.CustomBuiltInGenerator;
 import InternalRepresentation.Utils.Operand;
 import InternalRepresentation.Utils.Register;
+import SemanticAnalysis.ObjectId;
 import SemanticAnalysis.SymbolTable;
 
 import java.io.File;
@@ -40,6 +41,8 @@ public class InternalState {
   private int labelCount;
   private SymbolTable funcSymTable;       /* points to the function symbol table in order to deallocate
                                              the variables off the stack at scope closing */
+  private ObjectId currObject;
+
 
   /* The internal states stores the generated instructions list, the available registers to use,
    * a reference to a CodeGenVisitor object to generate instructions and a label count for labels generation */
@@ -232,6 +235,15 @@ public class InternalState {
   /* sets the current scope */
   public void setFunctionSymTable(SymbolTable funcSymTable) {
     this.funcSymTable = funcSymTable;
+  }
+
+  public ObjectId getCurrObject() {
+    return currObject;
+  }
+
+  /* sets the current scope */
+  public void setCurrObject(ObjectId object) {
+    this.currObject = object;
   }
 
   public int getStackOffset() {
