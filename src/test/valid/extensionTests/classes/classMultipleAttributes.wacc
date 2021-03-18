@@ -25,9 +25,9 @@ begin
   berry = new Berry("blue", 2);
   raspberry = new Berry("red", 4);
 
-  string colour = raspberry.getColour();
-  println colour;
+  string col = raspberry.getColour();
+  println col;
 
-  int size = berry.getSize();
-  println size
+  int s = berry.getSize();
+  println s
 end

@@ -150,6 +150,9 @@ public class MethodCallNode extends CallNode{
     SymbolTable currSymTable = getCurrSymTable();
     Identifier object = currSymTable.lookupAll(objectName.getIdentifier());
     String className = ((ClassType) object.getType()).getClassName();
+    if (!className.equals("")) {
+      className = "class_" + className + "_";
+    }
 
     /* Calculate total arguments size in argsTotalSize */
     int argsTotalSize = 0;

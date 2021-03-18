@@ -81,6 +81,7 @@ public class ConstructorNode implements TypeNode{
     // do what we do for function
     /* Reset registers to start generating a function */
     internalState.resetAvailableRegs();
+    internalState.setFunctionSymTable(currSymTable);
 
     /* Add function label and push Link Register */
     ClassType classId = (ClassType) currSymTable.lookup("class*" + name.getIdentifier());

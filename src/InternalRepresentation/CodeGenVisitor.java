@@ -125,6 +125,14 @@ public class CodeGenVisitor {
     /* Add function label and push Link Register */
     String index = "";
     String className = currSymTable.findClass();
+    className = className.replace('*', '_');
+
+    /* Visit and generate assembly for the function's ParamListNode */
+    if(className.equals("")) {
+      params.addObject();
+    } else {
+      className += "_";
+    }
 
     Identifier functionIdentifier = currSymTable.lookupAll("*" + identifier.getIdentifier());
     if(functionIdentifier instanceof OverloadFuncId) {
@@ -138,10 +146,7 @@ public class CodeGenVisitor {
     /* Allocate space for variables in the function's currSymbolTable */
     internalState.allocateStackSpace(currSymTable);
 
-    /* Visit and generate assembly for the function's ParamListNode */
-    if(className == null) {
-      params.addObject();
-    }
+
     params.generateAssembly(internalState);
 
     /* Allocate space for variables in the function's currSymbolTable */
@@ -199,7 +204,7 @@ public class CodeGenVisitor {
         Register attributePointer = internalState.peekFreeRegister();
         String currClass = currSymTable.findClass();
 
-        ClassType classType = (ClassType) currSymTable.lookup(currClass);
+        ClassType classType = (ClassType) currSymTable.lookupAll(currClass);
         int offset = currSymTable.getOffset("**object");
         int attributeIndex = classType.findIndexAttribute(((IdentifierNode) left).getIdentifier());
 

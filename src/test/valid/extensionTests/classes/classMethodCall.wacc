@@ -20,7 +20,7 @@ begin
 
   car = new Car(x);
   car.speed = 2;
-  int speed = car.getSpeed();
+  int sp = car.getSpeed();
 
-  println speed
+  println sp
 end

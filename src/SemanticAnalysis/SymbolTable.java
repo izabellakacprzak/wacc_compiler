@@ -36,16 +36,17 @@ public class SymbolTable {
   }
 
   public String findClass() {
+    if (parentSymTable == null) {
+      return "";
+    }
+
     for (String key : dictionary.keySet()) {
       if (key.contains("class*") && dictionary.get(key) instanceof ClassType) {
         return key;
       }
     }
 
-    if (parentSymTable != null) {
-      return parentSymTable.findClass();
-    }
-    return "";
+    return parentSymTable.findClass();
   }
 
   /* Get an identifier object from the symbol table or

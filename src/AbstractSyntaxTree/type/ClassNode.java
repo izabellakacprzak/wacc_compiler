@@ -82,7 +82,7 @@ public class ClassNode implements TypeNode {
     // put the class somewhere (heap)?
     // for each constructor and method do what we do for FunctionNode
 
-    internalState.addInstruction(new LabelInstruction("class*" + className.getIdentifier()));
+    internalState.addInstruction(new LabelInstruction("class_" + className.getIdentifier()));
 
     /* Malloc space on the heap for all attributes */
     int numAttributes = attributes.size();
