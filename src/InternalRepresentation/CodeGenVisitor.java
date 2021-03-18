@@ -261,8 +261,8 @@ public class CodeGenVisitor {
       /* Add size to find position of element on the stack */
       DataTypeId arrayElemType = ((ArrayType) identifier.getType(currSymTable)).getElemType();
       if (arrayElemType instanceof BaseType
-              && ((BaseType) arrayElemType).getBaseType() == BaseType.Type.CHAR
-              || ((BaseType) arrayElemType).getBaseType() == BaseType.Type.BOOL) {
+              && (((BaseType) arrayElemType).getBaseType() == BaseType.Type.CHAR
+              || ((BaseType) arrayElemType).getBaseType() == BaseType.Type.BOOL)) {
         internalState.addInstruction(new ArithmeticInstruction(ADD, arrayReg, arrayReg,
             new Operand(exprReg), !SET_BITS));
 
