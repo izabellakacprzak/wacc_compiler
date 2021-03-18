@@ -7,7 +7,7 @@
 
 begin
   int f(x, b) is
-    bool a = x[1][2] == b[2] ;
+    bool a = x[1][2] == b[1] ;
     return 0 
   end
   char[] a = ['a', 'b', 'c'];

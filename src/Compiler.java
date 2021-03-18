@@ -1,6 +1,12 @@
+import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
+
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.ProgramNode;
+import AbstractSyntaxTree.type.FunctionNode;
 import InternalRepresentation.InternalState;
+import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
 import antlr.WACCLexer;
 import antlr.WACCParser;
@@ -15,6 +21,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class Compiler {
 
+  private static final DataTypeId DEFAULT_TYPE = new BaseType(INT);
   private static final boolean FIRST_CHECK = true;
   private static final int SYNTAX_ERROR_CODE = 100;
   private static final int INPUT_FILE_ERROR = 1;
@@ -114,6 +121,21 @@ public class Compiler {
         node.semanticAnalysis(node.getCurrSymTable(), semanticErrorListener.getList(),
             uncheckedNodes, !FIRST_CHECK);
         i++;
+      }
+
+      List<FunctionNode> functionNodes = prog.getFunctionNodes();
+
+      for (FunctionNode function : functionNodes) {
+        List<ParameterId> params = function.getParams().getParameterIds();
+        for (ParameterId param : params) {
+          if (param.getType() == null) {
+            param.setType(DEFAULT_TYPE);
+          }
+
+          if (param.isUnsetArray()) {
+            param.setBaseElemType(DEFAULT_TYPE);
+          }
+        }
       }
 
       /* If the  semantic error listener has been notified of error during semantic checking ,

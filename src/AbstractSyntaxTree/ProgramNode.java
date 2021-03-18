@@ -1,11 +1,14 @@
 package AbstractSyntaxTree;
 
+import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
+
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.type.ClassNode;
 import AbstractSyntaxTree.type.FunctionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.*;
+import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.DataTypes.ClassType;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.SemanticError;
@@ -25,11 +28,16 @@ public class ProgramNode implements ASTNode {
   private final List<String> syntaxErrors;
   private SymbolTable currSymTable;
 
-  public ProgramNode(StatementNode statementNode, List<FunctionNode> functionNodes, List<ClassNode> classNodes) {
+  public ProgramNode(StatementNode statementNode, List<FunctionNode> functionNodes,
+      List<ClassNode> classNodes) {
     this.statementNode = statementNode;
     this.functionNodes = functionNodes;
     this.classNodes = classNodes;
     syntaxErrors = new ArrayList<>();
+  }
+
+  public List<FunctionNode> getFunctionNodes() {
+    return functionNodes;
   }
 
   /* Check to see whether any syntax errors are found in each function nodes of the  program.
@@ -124,7 +132,6 @@ public class ProgramNode implements ASTNode {
 
     /* Call semanticAnalysis on the root statement node to analysis the rest of the program */
     statementNode.semanticAnalysis(topSymbolTable, errorMessages, uncheckedNodes, firstCheck);
-
   }
 
   @Override

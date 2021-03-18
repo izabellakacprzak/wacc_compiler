@@ -4,6 +4,7 @@ import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.Identifier;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
@@ -28,7 +29,7 @@ public class ParamListNode implements ASTNode {
 
   /* Create a new ParameterId for each parameter and add to the symbolTable.
    * Returns the ParameterIds as a list  */
-  List<ParameterId> getIdentifiers(SymbolTable symbolTable) {
+  public List<ParameterId> getIdentifiers(SymbolTable symbolTable) {
     List<ParameterId> paramIds = new ArrayList<>();
 
     for (int i = 0; i < identifiers.size(); i++) {
@@ -40,6 +41,19 @@ public class ParamListNode implements ASTNode {
       }
       paramIds.add(parameter);
       symbolTable.add(identifiers.get(i).getIdentifier(), parameter);
+    }
+
+    return paramIds;
+  }
+
+  public List<ParameterId> getParameterIds() {
+    List<ParameterId> paramIds = new ArrayList<>();
+
+    for (IdentifierNode identifier : identifiers) {
+      Identifier id = currSymTable.lookupAll(identifier.getIdentifier());
+      if (id instanceof ParameterId) {
+        paramIds.add((ParameterId) id);
+      }
     }
 
     return paramIds;

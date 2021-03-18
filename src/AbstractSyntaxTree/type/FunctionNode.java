@@ -48,6 +48,10 @@ public class FunctionNode implements TypeNode {
     return identifier;
   }
 
+  public ParamListNode getParams() {
+    return params;
+  }
+
   /* Check for whether the function has either an exit statement or return statement
    * or if there are statements after a return statement in the function body */
   public String checkSyntaxErrors() {

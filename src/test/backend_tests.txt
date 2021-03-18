@@ -1,4 +1,6 @@
 src/test/valid/extensionTests/functionOverloading
+src/test/valid/extensionTests/implicitParameters
+src/test/valid/extensionTests/stdLibrary
 src/test/valid/array
 src/test/valid/basic
 src/test/valid/expressions
