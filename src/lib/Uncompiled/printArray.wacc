@@ -25,5 +25,18 @@ begin
   println "]" ;
   return true
   end
+  bool l_print_bool_array(bool[] arr) is
+    print "[" ;
+    int i = 0 ;
+    int length = len arr ;
+    while i < (length - 1) do
+      print arr[i] ;
+      print ", " ;
+      i = i + 1
+    done ;
+  print arr[i] ;
+  println "]" ;
+  return true
+  end
   skip
 end

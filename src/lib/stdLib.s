@@ -1,3 +1,30 @@
+std_msg_0:
+	.word 1
+	.ascii "["
+std_msg_1:
+	.word 2
+	.ascii ", "
+std_msg_2:
+	.word 1
+	.ascii "]"
+std_msg_3:
+	.word 1
+	.ascii "["
+std_msg_4:
+	.word 2
+	.ascii ", "
+std_msg_5:
+	.word 1
+	.ascii "]"
+std_msg_6:
+	.word 1
+	.ascii "["
+std_msg_7:
+	.word 2
+	.ascii ", "
+std_msg_8:
+	.word 1
+	.ascii "]"
 l_fill_int:
 	PUSH {lr}
 	SUB sp, sp, #8
@@ -855,13 +882,10 @@ STDL43:
 	POP {pc}
 	POP {pc}
 	.ltorg
-*******************************************
-* DO NOT WORK BECAUSE OF msg_0 REFERENCES *
-*******************************************
 l_print_int_array:
 	PUSH {lr}
 	SUB sp, sp, #8
-	LDR r4, =msg_0
+	LDR r4, =std_msg_0
 	MOV r0, r4
 	BL p_print_string
 	LDR r4, =0
@@ -882,7 +906,7 @@ STDL30:
 	LDR r4, [r4]
 	MOV r0, r4
 	BL p_print_int
-	LDR r4, =msg_1
+	LDR r4, =std_msg_1
 	MOV r0, r4
 	BL p_print_string
 	LDR r4, [sp, #4]
@@ -912,7 +936,7 @@ STDL29:
 	LDR r4, [r4]
 	MOV r0, r4
 	BL p_print_int
-	LDR r4, =msg_2
+	LDR r4, =std_msg_2
 	MOV r0, r4
 	BL p_print_string
 	BL p_print_ln
@@ -925,7 +949,7 @@ STDL29:
 l_print_char_array:
 	PUSH {lr}
 	SUB sp, sp, #8
-	LDR r4, =msg_3
+	LDR r4, =std_msg_3
 	MOV r0, r4
 	BL p_print_string
 	LDR r4, =0
@@ -946,7 +970,7 @@ STDL32:
 	LDRSB r4, [r4]
 	MOV r0, r4
 	BL putchar
-	LDR r4, =msg_4
+	LDR r4, =std_msg_4
 	MOV r0, r4
 	BL p_print_string
 	LDR r4, [sp, #4]
@@ -976,7 +1000,71 @@ STDL31:
 	LDRSB r4, [r4]
 	MOV r0, r4
 	BL putchar
-	LDR r4, =msg_5
+	LDR r4, =std_msg_5
+	MOV r0, r4
+	BL p_print_string
+	BL p_print_ln
+	MOV r4, #1
+	MOV r0, r4
+	ADD sp, sp, #8
+	POP {pc}
+	POP {pc}
+	.ltorg
+l_print_bool_array:
+	PUSH {lr}
+	SUB sp, sp, #8
+	LDR r4, =std_msg_6
+	MOV r0, r4
+	BL p_print_string
+	LDR r4, =0
+	STR r4, [sp, #4]
+	LDR r4, [sp, #12]
+	LDR r4, [r4]
+	STR r4, [sp]
+	B STDL33
+STDL34:
+	ADD r4, sp, #12
+	LDR r5, [sp, #4]
+	LDR r4, [r4]
+	MOV r0, r5
+	MOV r1, r4
+	BL p_check_array_bounds
+	ADD r4, r4, #4
+	ADD r4, r4, r5
+	LDRSB r4, [r4]
+	MOV r0, r4
+	BL p_print_bool
+	LDR r4, =std_msg_7
+	MOV r0, r4
+	BL p_print_string
+	LDR r4, [sp, #4]
+	LDR r5, =1
+	ADDS r4, r4, r5
+	BLVS p_throw_overflow_error
+	STR r4, [sp, #4]
+STDL33:
+	LDR r4, [sp, #4]
+	LDR r5, [sp]
+	LDR r6, =1
+	SUBS r5, r5, r6
+	BLVS p_throw_overflow_error
+	CMP r4, r5
+	MOVLT r4, #1
+	MOVGE r4, #0
+	CMP r4, #1
+	BEQ STDL34
+	ADD r4, sp, #12
+	LDR r5, [sp, #4]
+	LDR r4, [r4]
+	MOV r0, r5
+	MOV r1, r4
+	BL p_check_array_bounds
+	ADD r4, r4, #4
+	ADD r4, r4, r5
+	LDRSB r4, [r4]
+	MOV r0, r4
+	BL p_print_bool
+	LDR r4, =std_msg_8
 	MOV r0, r4
 	BL p_print_string
 	BL p_print_ln

@@ -85,10 +85,14 @@ public class InternalState {
           writer.write(msg.writeInstruction());
           writer.write(LINE_BREAK);
         }
-
-        writer.write(LINE_BREAK);
       }
 
+      List<StandardFunc> usedStdFunctions = StandardFunc.getUsed();
+      for (StandardFunc function : usedStdFunctions) {
+        function.writeMessages(writer);
+      }
+
+      writer.write(LINE_BREAK);
       writer.write(new DirectiveInstruction(TEXT).writeInstruction());
       writer.write(LINE_BREAK);
       writer.write(LINE_BREAK);
@@ -107,7 +111,6 @@ public class InternalState {
       }
 
       /* write the standard functions' assembly instructions to the .s file */
-      List<StandardFunc> usedStdFunctions = StandardFunc.getUsed();
       for (StandardFunc function : usedStdFunctions) {
         function.writeAssembly(writer);
       }
