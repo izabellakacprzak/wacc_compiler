@@ -123,9 +123,6 @@ public class ObjectDeclStatementNode extends StatementNode {
 
     ClassType classId = (ClassType) getCurrSymTable().lookupAll("class*" + className.getIdentifier());
 
-    /* Set offset of the object in the current Symbol Table */
-    getCurrSymTable().setVarsOffset(objectName.getIdentifier(), ADDRESS_BYTE_SIZE);
-
     /* Malloc space on the heap for all attributes */
     List<AttributeNode> attributes = classId.getAttributes();
     int numAttributes = attributes.size();
@@ -167,6 +164,13 @@ public class ObjectDeclStatementNode extends StatementNode {
       }
       offset++;
     }
+
+    /* Set offset of the object in the current Symbol Table */
+    getCurrSymTable().setVarsOffset(objectName.getIdentifier(), ADDRESS_BYTE_SIZE);
+
+    /* Store attributeRef in the correct position on the stack */
+    internalState.addInstruction(new StrInstruction(
+        StrType.STR, attributeReg, SP, getCurrSymTable().getOffset(objectName.getIdentifier())));
 
 
     /* Calculate total arguments size in argsTotalSize */
