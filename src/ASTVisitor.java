@@ -580,7 +580,11 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   public ASTNode visitIfStat(IfStatContext ctx) {
     ExpressionNode condition = (ExpressionNode) visit(ctx.expr());
     StatementNode thenStatement = (StatementNode) visit(ctx.stat(0));
-    StatementNode elseStatement = (StatementNode) visit(ctx.stat(1));
+    StatementNode elseStatement = null;
+    if (ctx.stat(1) != null) {
+      elseStatement = (StatementNode) visit(ctx.stat(1));
+    }
+
     return new IfStatementNode(condition, thenStatement, elseStatement);
   }
 

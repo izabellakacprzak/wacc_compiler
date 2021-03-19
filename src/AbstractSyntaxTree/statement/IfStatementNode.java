@@ -24,7 +24,7 @@ public class IfStatementNode extends StatementNode {
   private final StatementNode elseStatement;
 
   public IfStatementNode(ExpressionNode condition, StatementNode thenStatement,
-                         StatementNode elseStatement) {
+      StatementNode elseStatement) {
     this.condition = condition;
     this.thenStatement = thenStatement;
     this.elseStatement = elseStatement;
@@ -32,7 +32,7 @@ public class IfStatementNode extends StatementNode {
 
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
-                               List<ASTNode> uncheckedNodes, boolean firstCheck) {
+      List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
@@ -45,13 +45,11 @@ public class IfStatementNode extends StatementNode {
     ParameterId arrayParam = null;
     ArrayElemNode arrayElem = null;
 
-
     if (condition instanceof ArrayElemNode) {
       arrayElem = (ArrayElemNode) condition;
       isUnsetArrayParam = arrayElem.isUnsetParameterIdArrayElem(symbolTable);
       arrayParam = arrayElem.getUnsetParameterIdArrayElem(symbolTable);
     }
-
 
     if (isUnsetParam) {
       param.setType(new BaseType(BOOL));
@@ -63,7 +61,7 @@ public class IfStatementNode extends StatementNode {
     condition.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check that the type of the condition expression is of type BOOL */
-     conditionType = condition.getType(symbolTable);
+    conditionType = condition.getType(symbolTable);
 
     if (conditionType == null) {
       errorMessages.add(new SemanticError(condition.getLine(), condition.getCharPositionInLine(),
@@ -79,23 +77,33 @@ public class IfStatementNode extends StatementNode {
     /* Recursively call semanticAnalysis on statement nodes */
     thenStatement
         .semanticAnalysis(new SymbolTable(symbolTable), errorMessages, uncheckedNodes, firstCheck);
-    elseStatement
-        .semanticAnalysis(new SymbolTable(symbolTable), errorMessages, uncheckedNodes, firstCheck);
+
+    if (elseStatement != null) {
+      elseStatement.semanticAnalysis(
+          new SymbolTable(symbolTable), errorMessages, uncheckedNodes, firstCheck);
+    }
   }
 
   /* Recursively call on statement nodes */
   @Override
   public void setReturnType(DataTypeId returnType) {
     thenStatement.setReturnType(returnType);
-    elseStatement.setReturnType(returnType);
+
+    if (elseStatement != null) {
+      elseStatement.setReturnType(returnType);
+    }
   }
 
   /* true if both the then and else statements have either an exit or return statement.
    * Used for syntax error checking. */
   @Override
   public boolean hasReturnStatement() {
+    if (elseStatement == null) {
+      return thenStatement.hasReturnStatement() || thenStatement.hasExitStatement();
+    }
+
     return (thenStatement.hasReturnStatement() || thenStatement.hasExitStatement())
-               && (elseStatement.hasExitStatement() || elseStatement.hasReturnStatement());
+        && (elseStatement.hasExitStatement() || elseStatement.hasReturnStatement());
   }
 
   @Override
@@ -105,7 +113,7 @@ public class IfStatementNode extends StatementNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().
-                                         visitIfStatementNode(internalState, condition, thenStatement, elseStatement);
+    internalState.getCodeGenVisitor()
+        .visitIfStatementNode(internalState, condition, thenStatement, elseStatement);
   }
 }

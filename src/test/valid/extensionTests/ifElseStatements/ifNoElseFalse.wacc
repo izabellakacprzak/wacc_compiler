@@ -1,0 +1,15 @@
+# Simple conditional statement with no else
+
+# Output:
+# end
+
+# Program:
+
+begin
+  int a = 13;	
+  if a != 13 
+  then 
+    println "correct"
+  fi ;
+  println "end"
+end

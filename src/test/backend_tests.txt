@@ -2,6 +2,7 @@ src/test/valid/extensionTests/functionOverloading
 src/test/valid/extensionTests/implicitParameters
 src/test/valid/extensionTests/overloadingWithImplicitParamters
 src/test/valid/extensionTests/stdLibrary
+src/test/valid/extensionTests/ifElseStatements
 src/test/valid/array
 src/test/valid/basic
 src/test/valid/expressions

@@ -410,7 +410,7 @@ public class CodeGenVisitor {
     /* Visit and generate assembly for the function's ParamListNode */
     thenStatement.generateAssembly(internalState);
 
-    /* Dellocate stack space for the thenStatement scope */
+    /* Deallocate stack space for the thenStatement scope */
     internalState.deallocateStackSpace(thenStatement.getCurrSymTable());
 
     /* Generate elseStatement with condition instructions */
@@ -443,14 +443,16 @@ public class CodeGenVisitor {
     /* Add label for the beginning of statement */
     internalState.addInstruction(new LabelInstruction(statementLabel));
 
-    /* Allocate stack space for the new statement scope */
-    internalState.allocateStackSpace(statement.getCurrSymTable());
+    if (statement != null) {
+      /* Allocate stack space for the new statement scope */
+      internalState.allocateStackSpace(statement.getCurrSymTable());
 
-    /* Visit and generate assembly for the function's ParamListNode */
-    statement.generateAssembly(internalState);
+      /* Visit and generate assembly for the function's ParamListNode */
+      statement.generateAssembly(internalState);
 
-    /* Deallocate stack space for the statement scope */
-    internalState.deallocateStackSpace(statement.getCurrSymTable());
+      /* Deallocate stack space for the statement scope */
+      internalState.deallocateStackSpace(statement.getCurrSymTable());
+    }
 
     /* Add label for the beginning of the condition */
     internalState.addInstruction(new LabelInstruction(condLabel));

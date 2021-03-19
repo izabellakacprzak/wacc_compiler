@@ -45,6 +45,7 @@ stat: SKP                                       #SkipStat
 | PRINT expr                                    #PrintStat
 | PRINTLN expr                                  #PrintlnStat
 | IF expr THEN stat ELSE stat FI                #IfStat
+| IF expr THEN stat FI                          #IfStat
 | WHILE expr DO stat DONE                       #WhileStat
 | BEGIN stat END                                #ScopeStat
 | stat SEMICOLON stat                           #StatsListStat
