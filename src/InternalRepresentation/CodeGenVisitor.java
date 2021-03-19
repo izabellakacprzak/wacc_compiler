@@ -119,8 +119,7 @@ public class CodeGenVisitor {
     Identifier functionIdentifier = currSymTable.lookupAll("*" + identifier.getIdentifier());
     if (functionIdentifier instanceof OverloadFuncId) {
       OverloadFuncId overloadFuncId = (OverloadFuncId) functionIdentifier;
-      FunctionId functionId = overloadFuncId.findFuncReturnType(params.getParamTypes(), returnType);
-      index = String.valueOf(overloadFuncId.getIndex(functionId));
+      index = String.valueOf(overloadFuncId.getNewIndex());
     }
     internalState.addInstruction(new LabelInstruction("f_" + identifier.getIdentifier() + index));
     internalState.addInstruction(new PushInstruction(LR));

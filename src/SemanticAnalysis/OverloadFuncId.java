@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 public class OverloadFuncId extends Identifier {
 
   private final List<FunctionId> functions = new ArrayList<>();
+  private static final int ERROR_CODE = -1;
 
   public OverloadFuncId(FunctionId function) {
     super();
@@ -19,6 +20,10 @@ public class OverloadFuncId extends Identifier {
 
     functions.add(function);
     return true;
+  }
+
+  public List<FunctionId> getFunctions() {
+    return functions;
   }
 
   public FunctionId findFunc(List<DataTypeId> paramTypes) {
@@ -45,6 +50,16 @@ public class OverloadFuncId extends Identifier {
     return functions.indexOf(functionId);
   }
 
+  public int getNewIndex() {
+    for(FunctionId function : functions) {
+     if (!function.isGenerated()) {
+       function.setGenerated();
+       return functions.indexOf(function);
+     }
+    }
+    return ERROR_CODE;
+  }
+
   public List<DataTypeId> findReturnTypes(List<DataTypeId> paramTypes) {
     List<DataTypeId> returnTypes = new ArrayList<>();
     for (FunctionId function : functions) {
@@ -62,6 +77,10 @@ public class OverloadFuncId extends Identifier {
             sorted(Comparator.comparing(DataTypeId::hashCode)).collect(Collectors.toList());
 
     boolean canOverload = true;
+
+    if (params.stream().anyMatch(Objects::isNull)){
+      return true;
+    }
 
     for (FunctionId declaredFunc : functions) {
 
