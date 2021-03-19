@@ -1,0 +1,11 @@
+# using the print_bool_array function from the standard library
+
+# Output:
+# [true, false, true, true]
+
+# Program:
+
+begin
+  bool[] arr = [true, false, true, true] ;
+  bool b = call print_bool_array(arr)
+end

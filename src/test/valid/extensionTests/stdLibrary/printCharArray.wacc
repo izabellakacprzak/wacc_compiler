@@ -1,0 +1,11 @@
+# using the print_char_array function from the standard library
+
+# Output:
+# [a, b, c, d]
+
+# Program:
+
+begin
+  char[] arr = ['a', 'b', 'c', 'd'] ;
+  bool b = call print_char_array(arr)
+end
