@@ -36,7 +36,7 @@ constructor: IDENT OPEN_PARENTHESES (param_list)? CLOSE_PARENTHESES IS stat END 
 
 // statement
 stat: SKP                                       #SkipStat
-| type IDENT ASSIGN assign_rhs                  #DeclStat
+| decl_stat                                      #DeclStat
 | assign_lhs ASSIGN assign_rhs                  #AssignStat
 | READ assign_lhs                               #ReadStat
 | FREE expr                                     #FreeStat
@@ -46,12 +46,15 @@ stat: SKP                                       #SkipStat
 | PRINTLN expr                                  #PrintlnStat
 | IF expr THEN stat ELSE stat FI                #IfStat
 | WHILE expr DO stat DONE                       #WhileStat
+| FOR OPEN_PARENTHESES decl_stat SEMICOLON expr
+SEMICOLON stat CLOSE_PARENTHESES DO stat DONE   #ForStat
 | BEGIN stat END                                #ScopeStat
 | stat SEMICOLON stat                           #StatsListStat
 | IDENT ASSIGN NEW IDENT OPEN_PARENTHESES
 (expr (COMMA expr)*)? CLOSE_PARENTHESES         #ObjectDeclStat
 ;
 
+decl_stat: type IDENT ASSIGN assign_rhs ;
 
 // assignments
 assign_lhs: IDENT  #IdentLHS

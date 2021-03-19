@@ -1,0 +1,15 @@
+# Use a character as a loop condition. Enter the loop once only, then exit the loop.
+
+# Output:
+# Change c
+# Should print "Change c" once before.
+
+# Program:
+
+begin
+	char c = '\0' ;
+	for(char a = c; a == '\0'; a = 'a') do
+		println "Change c"
+	done ;
+	println "Should print \"Change c\" once before."
+end
