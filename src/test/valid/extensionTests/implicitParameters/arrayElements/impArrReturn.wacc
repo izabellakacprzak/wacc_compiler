@@ -1,7 +1,7 @@
 # a simple function definition and call
 
 # Output:
-# 0
+# false
 
 # Program:
 
@@ -9,5 +9,7 @@ begin
   bool f(x) is
     return x[3] 
   end
-  println 0
+  bool[] arr = [true, false, true, false];
+  bool b = call f(arr);
+  println b
 end

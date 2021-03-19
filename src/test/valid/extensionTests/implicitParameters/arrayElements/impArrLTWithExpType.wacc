@@ -6,9 +6,11 @@
 # Program:
 
 begin
-  int f(x, y) is
+  bool f(x, y) is
     bool a = x[2] < 'y' ;
-    return 0 
+    return a
   end
-  println 0
+  char[] x = ['a', 'b', 'c'];
+  bool b = call f(x, 5);
+  println b
 end

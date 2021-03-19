@@ -12,5 +12,6 @@ begin
     done ;
     return 0
   end
-  println 0
+  int x = call f(true);
+  println x
 end

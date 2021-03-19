@@ -7,8 +7,12 @@
 
 begin
   int f(a) is
-    int x = len a[1][2] ;
-    return 0 
+    int x = len a[1] ;
+    return x 
   end
-  println 0
+  int[] arr1 = [1, 2, 3];
+  int[] arr2 = [4, 5, 6];
+  int[][] arr = [arr1, arr2];
+  int length = call f(arr);
+  println length
 end

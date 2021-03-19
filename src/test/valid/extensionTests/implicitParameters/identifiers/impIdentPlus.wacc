@@ -7,8 +7,9 @@
 
 begin
   int f(a, b) is
-    int x = a + b;
-    return 0 
+   int x = a + b;
+    return x
   end
-  println 0
+  int res = call f(4, 5);
+  println res
 end

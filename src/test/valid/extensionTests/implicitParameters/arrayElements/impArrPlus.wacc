@@ -1,14 +1,17 @@
 # a simple function definition and call
 
 # Output:
-# 0
+# 9
 
 # Program:
 
 begin
   int f(a, b) is
-   int x = a + b;
-    return 0 
+   int x = a[0] + b[1];
+    return x
   end
-  println 0
+  int[] a = [4, 3, 2, 1];
+  int[] b = [4, 5, 6];
+  int res = call f(a, b);
+  println res
 end

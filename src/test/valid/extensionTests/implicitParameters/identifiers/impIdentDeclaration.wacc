@@ -1,14 +1,15 @@
 # a simple function definition and call
 
 # Output:
-# 0
+# false
 
 # Program:
 
 begin
-  int f(a) is
+  bool f(a) is
     bool i = a ;
-    return 0 
+    return i
   end
-  println 0
+  bool b = call f(false);
+  println b
 end

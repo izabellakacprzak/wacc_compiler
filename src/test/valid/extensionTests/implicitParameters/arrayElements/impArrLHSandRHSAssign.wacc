@@ -7,7 +7,6 @@
 
 begin
   int f(x, a) is
-  bool c = false;
   a[1] = x[5][5] ;
     return 0 
   end

@@ -1,14 +1,15 @@
 # a simple function definition and call
 
 # Output:
-# 0
+# true
 
 # Program:
 
 begin
-  int f(x, y) is
+  bool f(x, y) is
     bool a = x < y ;
-    return 0 
+    return a
   end
-  println 0
+  bool b = call f('f', 'g');
+  println b
 end

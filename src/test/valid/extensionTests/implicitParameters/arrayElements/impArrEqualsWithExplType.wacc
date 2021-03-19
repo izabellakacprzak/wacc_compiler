@@ -1,14 +1,16 @@
 # a simple function definition and call
 
 # Output:
-# 0
+# true
 
 # Program:
 
 begin
-  int f(a, b) is
-    bool x =  b[6][7] == 'c';
-    return 0 
+  bool f(a, b) is
+    bool x =  b[2] == 'c';
+    return x 
   end
-  println 0
+  char[] chars = ['a', 'b', 'c', 'd' ];
+  bool b = call f(8, chars);
+  println b
 end

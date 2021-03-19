@@ -15,5 +15,6 @@ begin
     fi ;
     return 0
   end
+  int n = call f(false);
   println 0
 end

@@ -6,9 +6,13 @@
 # Program:
 
 begin
-  int f(a) is
-    bool i = a[1][2] ;
-    return 0 
+  bool f(a) is
+    bool b = a[0][1] ;
+    return b
   end
-  println 0
+  bool[] arr1 = [false, false];
+  bool[] arr2 = [true, false];
+  bool[][] arr = [arr1, arr2];
+  bool res = call f(arr);
+  println res
 end
