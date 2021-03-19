@@ -4,32 +4,66 @@ import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.AttributeNode;
 import SemanticAnalysis.ConstructorId;
 import SemanticAnalysis.DataTypeId;
+import SemanticAnalysis.Identifier;
+import SemanticAnalysis.ParameterId;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ClassType extends DataTypeId {
 
-    private final List<AttributeNode> fields;
+    private final List<AttributeNode> attributes;
     private final List<ConstructorId> constructors;
     private final IdentifierNode node;
+    private int currOffset = 0;
+    private static final int ERROR_CODE = -1;
     private static final int HASH_PRIME = 61;
 
     public ClassType(IdentifierNode node, List<AttributeNode> fields) {
         this.node = node;
-        this.fields = fields;
+        this.attributes = fields;
         constructors = new ArrayList<>();
+        this.currOffset = 0;
     }
 
     public boolean addConstructor(ConstructorId constructor) {
         for (ConstructorId constructorId : constructors) {
-          if (constructorId.equals(constructor)) {
-              return false;
-          }
+            if (constructorId.equals(constructor)) {
+                return false;
+            }
         }
 
         constructors.add(constructor);
         return true;
+    }
+
+    public DataTypeId getAttributeType(int index) {
+        return attributes.get(index).getType();
+    }
+
+    public int findIndexConstructor(List<DataTypeId> paramTypes) {
+
+        List<DataTypeId> constructorTypes;
+
+        for (int i = 0; i < constructors.size(); i++) {
+            constructorTypes = constructors.get(i).getParameterTypes();
+
+            if (paramTypes.equals(constructorTypes)) {
+                return i;
+            }
+        }
+
+        return ERROR_CODE;
+    }
+
+    public int findIndexAttribute(String attribute) {
+        for(int i = 0; i < attributes.size(); i++) {
+            if(attributes.get(i).toString().equals(attribute)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public String getClassName() {
@@ -37,17 +71,26 @@ public class ClassType extends DataTypeId {
     }
 
 
-    public List<AttributeNode> getFields() {
-        return fields;
+    public List<AttributeNode> getAttributes() {
+        return attributes;
     }
 
     public List<ConstructorId> getConstructors() {
         return constructors;
     }
 
+    public int getCurrOffset() {
+        return this.currOffset;
+    }
+
     @Override
     public int getSize() {
-        return 0;
+        int attributeSize = 0;
+        for (AttributeNode attribute : attributes) {
+            attributeSize += attribute.getType().getSize();
+        }
+
+        return attributeSize;
     }
 
     @Override
@@ -56,7 +99,7 @@ public class ClassType extends DataTypeId {
             return false;
         }
 
-        return  object.hashCode() == this.hashCode();
+        return object.hashCode() == this.hashCode();
     }
 
     @Override
@@ -68,7 +111,7 @@ public class ClassType extends DataTypeId {
     public String toString() {
 
         StringBuilder fieldRep = new StringBuilder();
-        for (AttributeNode id : fields) {
+        for (AttributeNode id : attributes) {
             fieldRep.append(id.toString()).append("; ");
         }
 

@@ -4,9 +4,11 @@ import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import AbstractSyntaxTree.assignment.PairElemNode;
 import AbstractSyntaxTree.expression.ArrayElemNode;
+import AbstractSyntaxTree.expression.AttributeExprNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
+import AbstractSyntaxTree.type.ClassNode;
 import AbstractSyntaxTree.type.FunctionNode;
 import AbstractSyntaxTree.type.ParamListNode;
 import AbstractSyntaxTree.type.TypeNode;
@@ -21,9 +23,11 @@ import InternalRepresentation.Utils.StandardFunc;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
+import SemanticAnalysis.DataTypes.ClassType;
 import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.Identifier;
+import SemanticAnalysis.ObjectId;
 import SemanticAnalysis.Operator;
 import SemanticAnalysis.OverloadFuncId;
 import SemanticAnalysis.SymbolTable;
@@ -80,11 +84,16 @@ public class CodeGenVisitor {
    * Other parameters refer to values stored in the visited ASTNode */
 
   public void visitProgramNode(InternalState internalState,
-                               StatementNode statementNode, List<FunctionNode> functionNodes) {
+                               StatementNode statementNode, List<FunctionNode> functionNodes,
+                               List<ClassNode> classNodes) {
 
     /* Visit and generate assembly for each FunctionNode */
     for (FunctionNode functionNode : functionNodes) {
       functionNode.generateAssembly(internalState);
+    }
+
+    for (ClassNode classNode : classNodes) {
+      classNode.generateAssembly(internalState);
     }
 
     /* Add main label and push Link Register */
@@ -93,6 +102,12 @@ public class CodeGenVisitor {
 
     /* Allocate space for variables in the program StatementNode's currSymbolTable */
     internalState.allocateStackSpace(statementNode.getCurrSymTable());
+
+    /* Branch to all class labels to put them on the stack */
+    for(ClassNode classNode : classNodes) {
+      String functionLabel = classNode.getName().replace('*', '_');
+      internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, functionLabel));
+    }
 
     /* Visit and generate assembly for the program StatementNode */
     statementNode.generateAssembly(internalState);
@@ -116,18 +131,27 @@ public class CodeGenVisitor {
 
     /* Add function label and push Link Register */
     String index = "";
+    String className = currSymTable.findClass();
+    className = className.replace('*', '_');
+
+    /* Visit and generate assembly for the function's ParamListNode */
+    if(!className.equals("")) {
+      params.addObject();
+      className += "_";
+    }
+
     Identifier functionIdentifier = currSymTable.lookupAll("*" + identifier.getIdentifier());
     if (functionIdentifier instanceof OverloadFuncId) {
       OverloadFuncId overloadFuncId = (OverloadFuncId) functionIdentifier;
       index = String.valueOf(overloadFuncId.getNewIndex());
     }
-    internalState.addInstruction(new LabelInstruction("f_" + identifier.getIdentifier() + index));
+    internalState.addInstruction(new LabelInstruction("f_" + className + identifier.getIdentifier() + index));
     internalState.addInstruction(new PushInstruction(LR));
 
     /* Allocate space for variables in the function's currSymbolTable */
     internalState.allocateStackSpace(currSymTable);
 
-    /* Visit and generate assembly for the function's ParamListNode */
+
     params.generateAssembly(internalState);
 
     /* Allocate space for variables in the function's currSymbolTable */
@@ -144,21 +168,25 @@ public class CodeGenVisitor {
   }
 
   public void visitParamListNode(InternalState internalState,
-                                 List<IdentifierNode> identifiers, SymbolTable currSymTable) {
+                                  List<IdentifierNode> identifiers, SymbolTable currSymTable,
+                                  boolean hasObject) {
 
     /* Initially increment the parameters' stack offset by the size of an address */
     //internalState.incrementParamStackOffset(ADDRESS_BYTE_SIZE);
 
     /* Set the offset of each identifier in the currSymbolTable (for the function scope) */
+
     currSymTable.incrementDeclaredParamsOffset(ADDRESS_BYTE_SIZE);
+
+    if(hasObject) {
+      /* add an offset of the object to the symbol table */
+      currSymTable.setParamsOffset("**object", ADDRESS_BYTE_SIZE);
+    }
+
     int typeSize;
     for (IdentifierNode identifier : identifiers) {
       typeSize = identifier.getType(currSymTable).getSize();
       currSymTable.setParamsOffset(identifier.getIdentifier(), typeSize);
-
-      /* Increment the parameters' stack pointer by the size of each parameter */
-      //int paramSize = identifier.getType(currSymTable).getSize();
-      //internalState.incrementParamStackOffset(paramSize);
     }
 
   }
@@ -173,13 +201,43 @@ public class CodeGenVisitor {
     /* Switch based on the instance of AssignLHSNode */
     if (left instanceof IdentifierNode) {
       /* Get the size and offset of the IdentifierNode being reassigned */
-      int typeSize = left.getType(currSymTable).getSize();
-      int offset = currSymTable.getOffset(((IdentifierNode) left).getIdentifier());
+      String name = ((IdentifierNode) left).getIdentifier();
+      Identifier identifier = currSymTable.lookupAll(name);
 
-      /* Find the type of store instruction based on the size and store
-       *   rightNodeResult on the stack in the correct position */
-      StrType strType = typeSize == BYTE_SIZE ? STRB : STR;
-      internalState.addInstruction(new StrInstruction(strType, rightNodeResult, SP, offset));
+      /* left is an attribute */
+      if (identifier == null) {
+        Register attributePointer = internalState.peekFreeRegister();
+        String currClass = currSymTable.findClass();
+
+        ClassType classType = (ClassType) currSymTable.lookupAll(currClass);
+        int offset = currSymTable.getOffset("**object");
+        int attributeIndex = classType.findIndexAttribute(((IdentifierNode) left).getIdentifier());
+
+        /* Load the attribute pointer from the stack and move it to the DEST_REG before branching
+         * to the p_check_null_pointer CustomBuiltIn function */
+        internalState.addInstruction(new LdrInstruction(LDR, attributePointer, SP, offset));
+        internalState.addInstruction(new MovInstruction(DEST_REG, attributePointer));
+        internalState.addInstruction(new BranchInstruction(BL, NULL_POINTER));
+
+        /* Load the attribute element to the attributePointer register */
+        internalState.addInstruction(
+            new LdrInstruction(LDR, attributePointer, attributePointer,
+                attributeIndex * ADDRESS_BYTE_SIZE));
+
+        /* Find the type of store instruction based on the size and store
+         *   rightNodeResult on the stack in the correct position */
+        StrType strType = classType.getAttributeType(attributeIndex).getSize() == BYTE_SIZE ? STRB : StrType.STR;
+        internalState.addInstruction(new StrInstruction(strType, rightNodeResult, attributePointer));
+
+      } else {
+        int offset = currSymTable.getOffset(name);
+        int typeSize = left.getType(currSymTable).getSize();
+
+        /* Find the type of store instruction based on the size and store
+         *   rightNodeResult on the stack in the correct position */
+        StrType strType = typeSize == BYTE_SIZE ? STRB : STR;
+        internalState.addInstruction(new StrInstruction(strType, rightNodeResult, SP, offset));
+      }
 
     } else if (left instanceof PairElemNode) {
       /* Cast left to PairElemNode, take a free register (to store the pair pointer)
@@ -220,6 +278,26 @@ public class CodeGenVisitor {
 
       /* Push arrayReg back to the register stack */
       internalState.pushFreeRegister(arrayReg);
+    } else if (left instanceof AttributeExprNode) {
+      AttributeExprNode attribute = (AttributeExprNode) left;
+      Register attributePointer = internalState.peekFreeRegister();
+      int offset = currSymTable.getOffset(attribute.getObjectName());
+
+      /* Load the attribute pointer from the stack and move it to the DEST_REG before branching
+       * to the p_check_null_pointer CustomBuiltIn function */
+      internalState.addInstruction(new LdrInstruction(LDR, attributePointer, SP, offset));
+      internalState.addInstruction(new MovInstruction(DEST_REG, attributePointer));
+      internalState.addInstruction(new BranchInstruction(BL, NULL_POINTER));
+
+      int position = attribute.getAttributeIndex(currSymTable);
+      internalState.addInstruction(
+              new LdrInstruction(LDR, attributePointer, attributePointer,
+                      position * ADDRESS_BYTE_SIZE));
+
+      /* Find the type of store instruction based on the size and store
+       *   rightNodeResult on the stack in the correct position */
+      StrType strType = attribute.getType(currSymTable).getSize() == BYTE_SIZE ? STRB : StrType.STR;
+      internalState.addInstruction(new StrInstruction(strType, rightNodeResult, attributePointer));
     }
 
     /* Push rightNodeResult back to the register stack */
@@ -621,13 +699,25 @@ public class CodeGenVisitor {
     }
     Identifier id = currSymTable.lookupAll(identifier);
     if (id == null) {
-      return;
-    }
+      id = currSymTable.lookupAll("attr*" + identifier);
+      if(id == null) {
+        return;
+      }
+      /* If identifier is an attribute then get object offset and get attribute value from heap */
+      int objectOffset = currSymTable.getOffset("**object");
+      ClassType classType = (ClassType) currSymTable.lookupAll(currSymTable.findClass()).getType();
+      int attributeIndex = classType.findIndexAttribute(identifier);
+      Register reg = internalState.peekFreeRegister();
+      LdrType ldrInstr = (type.getSize() == BYTE_SIZE) ? LDRSB : LDR;
+      internalState.addInstruction(new LdrInstruction(ldrInstr, reg, SP,
+          objectOffset + attributeIndex * ADDRESS_BYTE_SIZE));
+    } else {
 
-    int offset = currSymTable.getOffset(identifier);
-    Register reg = internalState.peekFreeRegister();
-    LdrType ldrInstr = (type.getSize() == BYTE_SIZE) ? LDRSB : LDR;
-    internalState.addInstruction(new LdrInstruction(ldrInstr, reg, SP, offset));
+      int offset = currSymTable.getOffset(identifier);
+      Register reg = internalState.peekFreeRegister();
+      LdrType ldrInstr = (type.getSize() == BYTE_SIZE) ? LDRSB : LDR;
+      internalState.addInstruction(new LdrInstruction(ldrInstr, reg, SP, offset));
+    }
   }
 
   public void visitIntLiterExprNode(InternalState internalState, int value) {
@@ -735,7 +825,7 @@ public class CodeGenVisitor {
 
       /* Store currArg on the stack and decrease stack pointer (stack grows downwards) */
       internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(),
-          SP, -argSize, true));
+              SP, -argSize, true));
       argsTotalSize += argSize;
 
       currSymTable.incrementArgsOffset(argSize);
@@ -746,7 +836,7 @@ public class CodeGenVisitor {
     /* Branch Instruction to the callee label */
     String index = "";
     List<DataTypeId> argTypes = arguments.stream().map(e -> e.getType(currSymTable))
-                                    .collect(Collectors.toList());
+            .collect(Collectors.toList());
     Identifier functionIdentifier = currSymTable.lookupAll("*" + identifier.getIdentifier());
     if (functionIdentifier instanceof OverloadFuncId) {
       OverloadFuncId overloadFuncId = (OverloadFuncId) functionIdentifier;
@@ -766,14 +856,14 @@ public class CodeGenVisitor {
     /* De-allocate stack from the function arguments. Max size for one de-allocation is 1024B */
     while (argsTotalSize > 0) {
       internalState.addInstruction(
-          new ArithmeticInstruction(ADD, SP, SP,
-              new Operand(Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE)), false));
+              new ArithmeticInstruction(ADD, SP, SP,
+                      new Operand(Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE)), false));
       argsTotalSize -= Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE);
     }
 
     /* Move the result stored in DEST_REG in the first free register */
     internalState
-        .addInstruction(new MovInstruction(internalState.peekFreeRegister(), DEST_REG));
+            .addInstruction(new MovInstruction(internalState.peekFreeRegister(), DEST_REG));
   }
 
   public void visitNewPairNode(InternalState internalState, ExpressionNode fstExpr,
@@ -815,6 +905,7 @@ public class CodeGenVisitor {
     StrType strInstr = (size == BYTE_SIZE) ? STRB : StrType.STR;
     internalState.addInstruction(new StrInstruction(strInstr, exprReg, DEST_REG));
 
+    /* Store the reference on the stack */
     internalState.addInstruction(
         new StrInstruction(StrType.STR, DEST_REG, pairReg, offset * ADDRESS_BYTE_SIZE));
 

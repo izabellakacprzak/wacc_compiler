@@ -1,9 +1,15 @@
 package AbstractSyntaxTree.type;
 
+import static InternalRepresentation.Instructions.StrInstruction.StrType.STRB;
+import static InternalRepresentation.Utils.Register.SP;
+
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import InternalRepresentation.Instructions.StrInstruction;
+import InternalRepresentation.Instructions.StrInstruction.StrType;
 import InternalRepresentation.InternalState;
+import InternalRepresentation.Utils.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SemanticError;
@@ -32,6 +38,10 @@ public class AttributeNode implements TypeNode {
     this.assignRHS = null;
   }
 
+  public boolean hasAssignRHS() {
+    return assignRHS != null;
+  }
+
   @Override
   public Identifier getIdentifier(SymbolTable symbolTable) {
     return null;
@@ -39,7 +49,7 @@ public class AttributeNode implements TypeNode {
 
   @Override
   public DataTypeId getType() {
-    return null;
+    return type.getType();
   }
 
   @Override
@@ -68,19 +78,21 @@ public class AttributeNode implements TypeNode {
                 "Assignment type does not match declared type for '"
                 + name.getIdentifier() + "'."
                 + " Expected: " + type.getType() + " Actual: " + assignedType));
-        symbolTable.add(name.getIdentifier(), new VariableId(name, type.getType()));
+        symbolTable.add("attr*" + name.getIdentifier(), new VariableId(name, type.getType()));
       } else {
-        symbolTable.add(name.getIdentifier(), new VariableId(name, type.getType()));
+        symbolTable.add("attr*" + name.getIdentifier(), new VariableId(name, type.getType()));
       }
     } else {
       /* Otherwise create identifier and put it in the symbol table */
-      symbolTable.add(name.getIdentifier(), new VariableId(name, type.getType()));
+      symbolTable.add("attr*" + name.getIdentifier(), new VariableId(name, type.getType()));
     }
   }
 
   @Override
   public void generateAssembly(InternalState internalState) {
-
+    if(assignRHS != null) {
+      assignRHS.generateAssembly(internalState);
+    }
   }
 
   @Override

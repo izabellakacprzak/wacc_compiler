@@ -100,6 +100,8 @@ public abstract class StatementNode implements ASTNode {
                 + " Expected: " + leftType + ". Could not find matching return type"
                 + " in overloaded functions."));
         return null;
+      } else {
+        ((MethodCallNode) right).setReturnType(rightType);
       }
     } else {
       rightType = right.getType(symbolTable);

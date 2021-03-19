@@ -45,11 +45,11 @@ begin
   blueberry = new Berry("blue");
   bigBerry = new Berry(20);
 
-  string colour = raspberry.getColour();
-  println colour;
+  string col = raspberry.getColour();
+  println col;
 
   bool ok = blueberry.setSize(5);
 
-  int size = bigBerry.getSize();
-  println size
+  int s = bigBerry.getSize();
+  println s
 end

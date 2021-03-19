@@ -21,10 +21,12 @@ public class ParamListNode implements ASTNode {
   private final List<IdentifierNode> identifiers;
   private final List<TypeNode> types;
   private SymbolTable currSymTable = null;
+  private boolean hasObject;
 
   public ParamListNode(List<IdentifierNode> identifiers, List<TypeNode> types) {
     this.identifiers = identifiers;
     this.types = types;
+    this.hasObject = false;
   }
 
   /* Create a new ParameterId for each parameter and add to the symbolTable.
@@ -46,6 +48,7 @@ public class ParamListNode implements ASTNode {
     return paramIds;
   }
 
+
   public List<ParameterId> getParameterIds() {
     List<ParameterId> paramIds = new ArrayList<>();
 
@@ -57,6 +60,10 @@ public class ParamListNode implements ASTNode {
     }
 
     return paramIds;
+  }
+
+  public void addObject() {
+    this.hasObject = true;
   }
 
   public List<DataTypeId> getParamTypes() {
@@ -83,7 +90,8 @@ public class ParamListNode implements ASTNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().visitParamListNode(internalState, identifiers, currSymTable);
+    internalState.getCodeGenVisitor().visitParamListNode(internalState, identifiers, currSymTable,
+        hasObject);
   }
 
   @Override

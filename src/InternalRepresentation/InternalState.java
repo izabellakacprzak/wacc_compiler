@@ -18,9 +18,7 @@ import InternalRepresentation.Utils.Operand;
 import InternalRepresentation.Utils.Register;
 import InternalRepresentation.Utils.StandardFunc;
 import SemanticAnalysis.SymbolTable;
-
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -49,6 +47,7 @@ public class InternalState {
   /* Points to the function symbol table in order to deallocate
    *   the variables off the stack at scope closing */
   private SymbolTable funcSymTable;
+
 
   /* The internal states stores the generated instructions list, the available registers to use,
    * a reference to a CodeGenVisitor object to generate instructions and a label count for labels generation */

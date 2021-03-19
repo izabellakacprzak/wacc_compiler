@@ -131,10 +131,18 @@ public class ArrayElemNode extends ExpressionNode {
     Identifier idType = symbolTable.lookupAll(identifier.getIdentifier());
 
     if (idType == null) {
-      errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),
-          "No declaration of '" + identifier.getIdentifier() + "' identifier."
-              + " Expected: ARRAY IDENTIFIER."));
-      return;
+      idType = symbolTable.lookupAll("attr*" + identifier.getIdentifier());
+      if (idType == null) {
+        errorMessages.add(
+            new SemanticError(
+                super.getLine(),
+                super.getCharPositionInLine(),
+                "No declaration of '"
+                    + identifier.getIdentifier()
+                    + "' identifier."
+                    + " Expected: ARRAY IDENTIFIER."));
+        return;
+      }
     }
 
     if (!(identifier.getType(symbolTable) instanceof ArrayType)) {

@@ -27,8 +27,8 @@ begin
   end
 
   numbers = new Numbers();
-  int[] nums = numbers.getNums();
-  println nums;
-  nums = numbers.resetRange(5, 2);
-  println nums
+  int[] numArr = numbers.getNums();
+  println numArr;
+  numArr = numbers.resetRange(5, 2);
+  println numArr
 end

@@ -1,8 +1,12 @@
 package SemanticAnalysis;
 
+import SemanticAnalysis.DataTypes.ClassType;
+
 import java.util.*;
 
 public class SymbolTable {
+
+  private static final int ADDRESS_BYTE_SIZE = 4;
 
   private final SymbolTable parentSymTable;
   private final Map<String, Identifier> dictionary = new HashMap<>();
@@ -31,6 +35,20 @@ public class SymbolTable {
   /* Get an identifier object from the symbol table */
   public Identifier lookup(String name) {
     return dictionary.get(name);
+  }
+
+  public String findClass() {
+    if (parentSymTable == null) {
+      return "";
+    }
+
+    for (String key : dictionary.keySet()) {
+      if (key.contains("class*") && dictionary.get(key) instanceof ClassType) {
+        return key;
+      }
+    }
+
+    return parentSymTable.findClass();
   }
 
   /* Get an identifier object from the symbol table or
@@ -73,7 +91,6 @@ public class SymbolTable {
   or it's enclosing symbol tables */
   public int getOffset(String id) {
     if (!offsetPerVar.containsKey(id)) {
-      // TODO check getVarsSize() in this case
       return parentSymTable.getOffset(id) + getVarsSize();
     }
 
@@ -84,8 +101,11 @@ public class SymbolTable {
   public int getVarsSize() {
     int size = 0;
     for (Identifier id : dictionary.values()) {
-      if (id instanceof VariableId) {
+      if (id instanceof VariableId || id instanceof ObjectId) {
         size += id.getSize();
+      }
+      if(id instanceof ClassType) {
+        size += ADDRESS_BYTE_SIZE;
       }
     }
     return size;
