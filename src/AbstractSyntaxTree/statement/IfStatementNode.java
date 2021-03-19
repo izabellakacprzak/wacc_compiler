@@ -36,6 +36,7 @@ public class IfStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+    /* If the condition's type needs to be inferred, set the type to BOOL */
     DataTypeId conditionType = condition.getType(symbolTable);
 
     boolean isUnsetParam = condition.isUnsetParamId(symbolTable);
@@ -43,7 +44,7 @@ public class IfStatementNode extends StatementNode {
 
     boolean isUnsetArrayParam = false;
     ParameterId arrayParam = null;
-    ArrayElemNode arrayElem = null;
+    ArrayElemNode arrayElem;
 
     if (condition instanceof ArrayElemNode) {
       arrayElem = (ArrayElemNode) condition;

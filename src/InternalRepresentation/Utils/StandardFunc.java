@@ -53,9 +53,18 @@ public enum StandardFunc {
   PRINT_BOOL_ARRAY("print_bool_array", true, 6, 8, new BaseType(BOOL),
       new ArrayType(new BaseType(BOOL)));
 
+  /* STD_LIBRARY:      Filepath of the standard library
+   * END_OF_FUNCTION:  String indicating the last line of a function */
   private static final String STD_LIBRARY = "src/lib/stdLib.s";
   private static final String END_OF_FUNCTION = "." + LTORG.toString().toLowerCase();
 
+  /* label:            Label used to call the function
+   * containsMessages: True if the function needs to print messages
+   * msgFrom:          Location of the first message used
+   * msgTo:            Location of the last message used
+   * returnType:       Return type of the function
+   * argTypes:         Argument types of the function
+   * used:             Whether the function is used in the program being compiled */
   private final String label;
   private final boolean containsMessages;
   private final int msgFrom;
@@ -76,24 +85,9 @@ public enum StandardFunc {
     this.argTypes = List.of(argTypes);
   }
 
+  /* Constructor for when no messages need to be printed */
   StandardFunc(String label, DataTypeId returnType, DataTypeId... argTypes) {
     this(label, false, 0, 0, returnType, argTypes);
-  }
-
-  /* Returns all library functions used in the program */
-  public static List<StandardFunc> getUsed() {
-    return Arrays.stream(StandardFunc.values()).filter(StandardFunc::isUsed)
-        .collect(Collectors.toList());
-  }
-
-  /* Method for finding a StandardFunc enum from its label */
-  public static StandardFunc valueOfLabel(String label) {
-    for (StandardFunc op : values()) {
-      if (op.label.equals(label)) {
-        return op;
-      }
-    }
-    return null;
   }
 
   public String getBranchLabel() {
@@ -120,6 +114,23 @@ public enum StandardFunc {
     return used;
   }
 
+  /* Returns all library functions used in the program */
+  public static List<StandardFunc> getUsed() {
+    return Arrays.stream(StandardFunc.values()).filter(StandardFunc::isUsed)
+        .collect(Collectors.toList());
+  }
+
+  /* Method for finding a StandardFunc enum from its label */
+  public static StandardFunc valueOfLabel(String label) {
+    for (StandardFunc op : values()) {
+      if (op.label.equals(label)) {
+        return op;
+      }
+    }
+    return null;
+  }
+
+  /* Sets this to used and all functions it depends on to used */
   public void setUsed() {
     this.used = true;
 
@@ -160,6 +171,7 @@ public enum StandardFunc {
     }
   }
 
+  /* Writes messages from the STD_LIBRARY to the given writer */
   public void writeMessages(FileWriter writer) {
     if (!containsMessages) {
       return;
@@ -197,6 +209,7 @@ public enum StandardFunc {
     }
   }
 
+  /* Writes the function assembly from the STD_LIBRARY to the given writer */
   public void writeAssembly(FileWriter writer) {
     File file = new File(STD_LIBRARY);
 

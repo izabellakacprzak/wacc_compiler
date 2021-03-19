@@ -4,20 +4,15 @@ import AbstractSyntaxTree.ASTNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ArrayType;
-import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.Operator.UnOp;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
 
 public class UnaryOpExprNode extends ExpressionNode {
 
-  private static final DataTypeId DEFAULT_TYPE = new BaseType(INT);
   /* operand:  ExpressionNode corresponding to the expression the operator was called with
    * operator: UnOp enum representing the operator corresponding to this node */
   private final ExpressionNode operand;
@@ -44,7 +39,6 @@ public class UnaryOpExprNode extends ExpressionNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
-
     /* Check that the operand type can be resolved and matches with one of the
      * operator's expected argument types */
     List<DataTypeId> argTypes = operator.getArgTypes();
@@ -57,7 +51,6 @@ public class UnaryOpExprNode extends ExpressionNode {
     ParameterId arrayParam = null;
     ArrayElemNode arrayElem = null;
 
-
     if (operand instanceof ArrayElemNode) {
       arrayElem = (ArrayElemNode) operand;
       isUnsetArrayParam = arrayElem.isUnsetParameterIdArrayElem(symbolTable);
@@ -66,9 +59,9 @@ public class UnaryOpExprNode extends ExpressionNode {
 
     if (isUnsetParam || isUnsetArrayParam) {
 
-      /* UnaryOps for [getArgsType.size() == 1]: -, !, ord, chr.
-      * CASE 1: can deduce type from unary operator. */
+      /* UnaryOps for [getArgsType.size() == 1]: -, !, ord, chr. */
       if (operator.getArgTypes().size() == 1) {
+        /* CASE 1: type can be deduced from the unary operator's argument types. */
         DataTypeId type = operator.getArgTypes().get(0);
 
         if (isUnsetParam) {
@@ -76,13 +69,15 @@ public class UnaryOpExprNode extends ExpressionNode {
         } else if (isUnsetArrayParam) {
           arrayParam.setBaseElemType(type);
         }
-      } else /*CASE 2: len on arrays. */ {
+      } else {
+        /*CASE 2: the operator's argument type is an array. */
         if (firstCheck) {
-       /* 1st AST traversal, halt semantic analysis on this node if cannot infer the type. */
+          /* If this is the first AST traversal, halt semantic analysis on this node if the type cannot
+           *   be inferred. */
           uncheckedNodes.add(this);
           return;
         } else {
-        /* 2nd AST traversal, set INT as default type for the array. */
+          /* If this is the second AST traversal, set INT as default type for the array. */
           if (isUnsetParam) {
             param.setType(new ArrayType(DEFAULT_TYPE));
           } else if (isUnsetArrayParam) {
@@ -93,12 +88,10 @@ public class UnaryOpExprNode extends ExpressionNode {
       }
     }
 
-
     opType = operand.getType(symbolTable);
 
     /* Recursively call semanticAnalysis on operand node */
     operand.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
-
 
     if (opType == null) {
       errorMessages.add(new SemanticError(super.getLine(), super.getCharPositionInLine(),

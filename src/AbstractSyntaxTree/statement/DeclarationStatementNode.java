@@ -39,6 +39,7 @@ public class DeclarationStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+    /* If the assignment's type needs to be inferred, set the type to the declared type */
     DataTypeId declaredType = type.getType();
     DataTypeId assignedType;
 
@@ -74,7 +75,6 @@ public class DeclarationStatementNode extends StatementNode {
 
     /* Check that the expected (declared) type and the type of assignment
      * can be resolved and match */
-
     assignedType = getTypeOfOverloadFunc(symbolTable, errorMessages, declaredType, assignment);
 
     if (assignedType == null) {

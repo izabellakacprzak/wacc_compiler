@@ -5,14 +5,11 @@ import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
-
-import static SemanticAnalysis.DataTypes.BaseType.Type.BOOL;
 
 public class ReturnStatementNode extends StatementNode {
 
@@ -31,6 +28,8 @@ public class ReturnStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+    /* If the expression's type needs to be inferred, set the type to the return type of the
+     *   function */
     DataTypeId returnExprType = returnExpr.getType(symbolTable);
     boolean isUnsetParam = returnExpr.isUnsetParamId(symbolTable);
     ParameterId param = returnExpr.getParamId(symbolTable);
@@ -39,20 +38,17 @@ public class ReturnStatementNode extends StatementNode {
     ParameterId arrayParam = null;
     ArrayElemNode arrayElem = null;
 
-
     if (returnExpr instanceof ArrayElemNode) {
       arrayElem = (ArrayElemNode) returnExpr;
       isUnsetArrayParam = arrayElem.isUnsetParameterIdArrayElem(symbolTable);
       arrayParam = arrayElem.getUnsetParameterIdArrayElem(symbolTable);
     }
 
-
     if (isUnsetParam) {
       param.setType(returnType);
     } else if (isUnsetArrayParam) {
       arrayParam.setBaseElemType(returnType);
     }
-
 
     /* Check that the type of returnExpr is the same as the expected returnType */
      returnExprType = returnExpr.getType(symbolTable);

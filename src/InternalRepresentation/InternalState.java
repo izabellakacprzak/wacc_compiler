@@ -80,6 +80,7 @@ public class InternalState {
         }
       }
 
+      /* Print out any messages needed by standard functions */
       List<StandardFunc> usedStdFunctions = StandardFunc.getUsed();
       for (StandardFunc function : usedStdFunctions) {
         function.writeMessages(writer);

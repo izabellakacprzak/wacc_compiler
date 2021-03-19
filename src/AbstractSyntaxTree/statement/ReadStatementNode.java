@@ -1,15 +1,11 @@
 package AbstractSyntaxTree.statement;
 
 import AbstractSyntaxTree.ASTNode;
-import AbstractSyntaxTree.assignment.ArrayLiterNode;
 import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.expression.ArrayElemNode;
-import AbstractSyntaxTree.expression.ExpressionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.DataTypes.ArrayType;
 import SemanticAnalysis.DataTypes.BaseType;
-import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
@@ -19,7 +15,6 @@ import java.util.List;
 
 public class ReadStatementNode extends StatementNode {
 
-  private static final DataTypeId DEFAULT_TYPE = new BaseType(BaseType.Type.INT);
   /* assignment:   AssignLHSNode corresponding to the IdentifierNode, ArrayElemNode
    *                 or PairElemNode 'read' was called with */
   private final AssignLHSNode assignment;
@@ -34,6 +29,7 @@ public class ReadStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+    /* If the assignment's type needs to be inferred, set the type to INT or CHAR */
     DataTypeId assignmentType = assignment.getType(symbolTable);
     boolean isUnsetParam = assignment.isUnsetParamId(symbolTable);
     ParameterId param = assignment.getParamId(symbolTable);
@@ -41,7 +37,6 @@ public class ReadStatementNode extends StatementNode {
     boolean isUnsetArrayParam = false;
     ParameterId arrayParam = null;
     ArrayElemNode arrayElem = null;
-
 
     if (assignment instanceof ArrayElemNode) {
       arrayElem = (ArrayElemNode) assignment;
@@ -59,12 +54,14 @@ public class ReadStatementNode extends StatementNode {
 
         if (isUnsetParam) {
           param.addToExpectedTypes(expecteds);
-        } else if (isUnsetArrayParam) {
+        }
+
+        if (isUnsetArrayParam) {
           arrayParam.addToExpectedTypes(expecteds);
         }
 
         boolean paramTypeIsStillNull = (isUnsetParam) ? param.getType() == null
-                                           : arrayElem.getType(symbolTable) == null;
+            : arrayElem.getType(symbolTable) == null;
         if (paramTypeIsStillNull) {
           uncheckedNodes.add(this);
           return;
