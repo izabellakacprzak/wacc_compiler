@@ -1,0 +1,5 @@
+begin
+  for(int i = 0; i; i = i+1)
+    println i
+  done
+end

@@ -29,6 +29,10 @@ public class DeclarationStatementNode extends StatementNode {
     this.assignment = assignment;
   }
 
+  public VariableId getIdentifierVar() {
+    return new VariableId(identifier, type.getType());
+  }
+
   @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
                                List<ASTNode> uncheckedNodes, boolean firstCheck) {

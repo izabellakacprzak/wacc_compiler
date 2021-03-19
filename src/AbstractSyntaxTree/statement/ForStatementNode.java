@@ -36,6 +36,8 @@ public class ForStatementNode extends StatementNode {
       List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
+    DataTypeId conditionType = condition.getType(symbolTable);
+
 
     /* Call semanticAnalysis on the declaration statement */
     declaration.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
@@ -64,7 +66,7 @@ public class ForStatementNode extends StatementNode {
     condition.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check that the type of the condition expression is of type BOOL */
-    DataTypeId conditionType = condition.getType(symbolTable);
+    conditionType = condition.getType(symbolTable);
 
     if (conditionType == null) {
       errorMessages.add(new SemanticError(condition.getLine(), condition.getCharPositionInLine(),
@@ -77,13 +79,15 @@ public class ForStatementNode extends StatementNode {
               + " Expected: BOOL Actual: " + conditionType));
     }
 
+    SymbolTable innerScope = new SymbolTable(symbolTable);
+    innerScope.add(declaration.getIdentifierVar().getNode().getIdentifier(), declaration.getIdentifierVar());
     /* Call semanticAnalysis on condition statement node */
     condStatement
-        .semanticAnalysis(new SymbolTable(symbolTable), errorMessages, uncheckedNodes, firstCheck);
+        .semanticAnalysis(innerScope, errorMessages, uncheckedNodes, firstCheck);
 
     /* Recursively call semanticAnalysis on statement node */
     bodyStatement
-        .semanticAnalysis(new SymbolTable(symbolTable), errorMessages, uncheckedNodes, firstCheck);
+        .semanticAnalysis(innerScope, errorMessages, uncheckedNodes, firstCheck);
   }
 
   @Override

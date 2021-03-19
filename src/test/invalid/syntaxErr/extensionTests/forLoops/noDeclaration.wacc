@@ -1,0 +1,7 @@
+begin 
+  int i = 0;	
+  for(i = 0; i < 3; i = i+1) do
+    int j = 5;	
+    println i
+  done
+end

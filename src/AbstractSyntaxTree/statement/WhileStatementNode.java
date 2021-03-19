@@ -31,6 +31,8 @@ public class WhileStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+    DataTypeId conditionType = condition.getType(symbolTable);
+
     boolean isUnsetParam = condition.isUnsetParamId(symbolTable);
     ParameterId param = condition.getParamId(symbolTable);
 
@@ -56,7 +58,7 @@ public class WhileStatementNode extends StatementNode {
     condition.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check that the type of the condition expression is of type BOOL */
-     DataTypeId conditionType = condition.getType(symbolTable);
+     conditionType = condition.getType(symbolTable);
 
     if (conditionType == null) {
       errorMessages.add(new SemanticError(condition.getLine(), condition.getCharPositionInLine(),
