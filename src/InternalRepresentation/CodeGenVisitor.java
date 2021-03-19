@@ -134,9 +134,8 @@ public class CodeGenVisitor {
     className = className.replace('*', '_');
 
     /* Visit and generate assembly for the function's ParamListNode */
-    if(className.equals("")) {
+    if(!className.equals("")) {
       params.addObject();
-    } else {
       className += "_";
     }
 
