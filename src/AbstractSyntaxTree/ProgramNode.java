@@ -26,6 +26,7 @@ public class ProgramNode implements ASTNode {
   private final List<FunctionNode> functionNodes;
   private final List<ClassNode> classNodes;
   private final List<String> syntaxErrors;
+  private final static List<OverloadFuncId> overloadedFunctions = new ArrayList<>();
   private SymbolTable currSymTable;
 
   public ProgramNode(StatementNode statementNode, List<FunctionNode> functionNodes,
@@ -71,6 +72,7 @@ public class ProgramNode implements ASTNode {
             /* Replace function ID with new Overload function ID*/
             symbolTable.remove(method.getName());
             symbolTable.add(method.getName(), overloadFunc);
+            overloadedFunctions.add(overloadFunc);
           } else {
             IdentifierNode id = method.getIdentifierNode();
             errorMessages.add(new SemanticError(id.getLine(),id.getCharPositionInLine(),
@@ -98,7 +100,30 @@ public class ProgramNode implements ASTNode {
     for (FunctionNode method : methods) {
       method.semanticAnalysis(method.getCurrSymTable(), errorMessages, uncheckedNodes, firstCheck);
     }
-  }
+
+/*
+    */
+/* Check if there are overloaded functions with matching signatures after type inference *//*
+
+    for (OverloadFuncId overloadFunc : overloadedFunctions) {
+      int funcNum = 0;
+      List<FunctionId> functions = overloadFunc.getFunctions();
+      int listSize = functions.size();
+
+      for (int pos = 1; pos < listSize; pos++) {
+        if (functions.get(funcNum).equals(functions.get(pos))) {
+          IdentifierNode node = functions.get(pos).getNode();
+          errorMessages.add(new SemanticError(node.getLine(), node.getCharPositionInLine(),
+                  "Cannot overload " + functions.get(pos).toString() + "' as a function with the same " +
+                  "signature already exists."));
+          functions.remove(pos);
+          listSize--;
+        }
+      }
+*/
+
+
+    }
 
   @Override
   public void semanticAnalysis(SymbolTable topSymbolTable, List<SemanticError> errorMessages,

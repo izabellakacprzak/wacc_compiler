@@ -38,8 +38,19 @@ public class FunctionId extends Identifier {
     }
     return paramTypes;
   }
+/*
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof FunctionId)) {
+      return false;
+    }
 
+    FunctionId constructor = (FunctionId) o;
+    List<DataTypeId> paramTypes = ;
 
+    return false;
+
+  }*/
 
   @Override
   public String toString() {

@@ -21,6 +21,10 @@ public class OverloadFuncId extends Identifier {
     return true;
   }
 
+  public List<FunctionId> getFunctions() {
+    return functions;
+  }
+
   public FunctionId findFunc(List<DataTypeId> paramTypes) {
     for (FunctionId function : functions) {
       List<DataTypeId> funcParams = function.getParamTypes();
@@ -62,6 +66,10 @@ public class OverloadFuncId extends Identifier {
             sorted(Comparator.comparing(DataTypeId::hashCode)).collect(Collectors.toList());
 
     boolean canOverload = true;
+
+    if (params.stream().anyMatch(Objects::isNull)){
+      return true;
+    }
 
     for (FunctionId declaredFunc : functions) {
 
