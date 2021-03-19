@@ -1,7 +1,6 @@
 ===========================================================
 This program calculates the nth fibonacci number iteratively.
-Please enter n (should not be too large): 12
-The input n is 12
+Please enter n (should not be too large): The input n is 12
 The nth fibonacci number is 144
 ===========================================================
 The exit code is 0.

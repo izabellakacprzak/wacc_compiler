@@ -18,8 +18,7 @@ begin
   println x ;
   for(int i = y; i > 0; i = i - 1) do
     print "(+)" ;
-    x = x + 1 ;
-    i = i - 1
+    x = x + 1 
   done ;
   println "" ;
   print "final value of x: " ;

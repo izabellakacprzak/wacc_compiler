@@ -1,6 +1,6 @@
 ===========================================================
-Enter the first number: 43 Enter the second number: 23 Initial value of x: 43
-
+Enter the first number: Enter the second number: Initial value of x: 43
+(+)(+)(+)(+)(+)(+)(+)(+)(+)(+)(+)(+)(+)(+)(+)(+)(+)(+)(+)(+)(+)(+)(+)
 final value of x: 66
 ===========================================================
 The exit code is 0.

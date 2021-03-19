@@ -1,14 +1,5 @@
-# while loop flips bool to terminate
-
-# Output:
-# flip b!
-# end of loop
-
-# Program:
-
-begin
-  for(bool b = true; b; b = false) do
-    println "flip b!"
-  done ;
-  println "end of loop"
-end
+===========================================================
+flip b!
+end of loop
+===========================================================
+The exit code is 0.

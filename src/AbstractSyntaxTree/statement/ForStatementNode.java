@@ -91,14 +91,4 @@ public class ForStatementNode extends StatementNode {
     internalState.getCodeGenVisitor().visitForStatementNode(internalState, declaration, condition,
         bodyStatement, condStatement);
   }
-
-  @Override
-  public void setCurrSymTable(SymbolTable currSymTable) {
-
-  }
-
-  @Override
-  public SymbolTable getCurrSymTable() {
-    return null;
-  }
 }

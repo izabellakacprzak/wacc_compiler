@@ -18,7 +18,6 @@
 begin
   println "Can you count to 10?" ;
   for(int j = 1; j <= 10; j = j+1) do
-    println j ;
-    j = j + 1
+    println j
   done
 end
