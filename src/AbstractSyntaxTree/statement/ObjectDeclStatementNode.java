@@ -212,12 +212,12 @@ public class ObjectDeclStatementNode extends StatementNode {
     String functionLabel = "class_constr_" + className.toString() + index;
     internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, functionLabel));
 
-    /* De-allocate stack from the function arguments. Max size for one de-allocation is 1024B */
-    while (argsTotalSize > 0) {
-      internalState.addInstruction(
-          new ArithmeticInstruction(ADD, SP, SP,
-              new Operand(Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE)), false));
-      argsTotalSize -= Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE);
-    }
+//    /* De-allocate stack from the function arguments. Max size for one de-allocation is 1024B */
+//    while (argsTotalSize > 0) {
+//      internalState.addInstruction(
+//          new ArithmeticInstruction(ADD, SP, SP,
+//              new Operand(Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE)), false));
+//      argsTotalSize -= Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE);
+//    }
   }
 }

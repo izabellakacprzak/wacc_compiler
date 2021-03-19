@@ -6,6 +6,8 @@ import java.util.*;
 
 public class SymbolTable {
 
+  private static final int ADDRESS_BYTE_SIZE = 4;
+
   private final SymbolTable parentSymTable;
   private final Map<String, Identifier> dictionary = new HashMap<>();
   private SortedMap<String, Integer> offsetPerVar = new TreeMap<>();
@@ -99,8 +101,11 @@ public class SymbolTable {
   public int getVarsSize() {
     int size = 0;
     for (Identifier id : dictionary.values()) {
-      if (id instanceof VariableId) {
+      if (id instanceof VariableId || id instanceof ObjectId) {
         size += id.getSize();
+      }
+      if(id instanceof ClassType) {
+        size += ADDRESS_BYTE_SIZE;
       }
     }
     return size;

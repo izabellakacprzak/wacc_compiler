@@ -102,6 +102,12 @@ public class CodeGenVisitor {
     /* Allocate space for variables in the program StatementNode's currSymbolTable */
     internalState.allocateStackSpace(statementNode.getCurrSymTable());
 
+    /* Branch to all class labels to put them on the stack */
+    for(ClassNode classNode : classNodes) {
+      String functionLabel = classNode.getName().replace('*', '_');
+      internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, functionLabel));
+    }
+
     /* Visit and generate assembly for the program StatementNode */
     statementNode.generateAssembly(internalState);
 

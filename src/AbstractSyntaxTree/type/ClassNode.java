@@ -1,6 +1,7 @@
 package AbstractSyntaxTree.type;
 
 import static InternalRepresentation.Instructions.BranchInstruction.BranchOperation.B;
+import static InternalRepresentation.Instructions.DirectiveInstruction.Directive.LTORG;
 import static InternalRepresentation.Instructions.LdrInstruction.LdrType.LDR;
 import static InternalRepresentation.Instructions.StrInstruction.StrType.STRB;
 import static InternalRepresentation.Utils.BuiltInFunction.SystemBuiltIn.MALLOC;
@@ -10,6 +11,7 @@ import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.ProgramNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import InternalRepresentation.Instructions.BranchInstruction;
+import InternalRepresentation.Instructions.DirectiveInstruction;
 import InternalRepresentation.Instructions.LabelInstruction;
 import InternalRepresentation.Instructions.LdrInstruction;
 import InternalRepresentation.Instructions.LdrInstruction.LdrType;
@@ -123,6 +125,8 @@ public class ClassNode implements TypeNode {
       offset++;
 
     }
+
+    internalState.addInstruction(new DirectiveInstruction(LTORG));
 
     /* generate assembly for constructors */
     for(ConstructorNode constructor : constructors) {
