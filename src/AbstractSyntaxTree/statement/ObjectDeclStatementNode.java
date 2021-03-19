@@ -172,14 +172,6 @@ public class ObjectDeclStatementNode extends StatementNode {
     /* Calculate total arguments size in argsTotalSize */
     int argsTotalSize = 0;
 
-    /* Store object reference on the stack and decrease stack pointer (stack grows downwards) */
-    objectName.generateAssembly(internalState);
-    internalState.addInstruction(new StrInstruction(StrInstruction.StrType.STR,
-        internalState.peekFreeRegister(), SP, -ADDRESS_BYTE_SIZE, true));
-    argsTotalSize += ADDRESS_BYTE_SIZE;
-
-    getCurrSymTable().incrementArgsOffset(ADDRESS_BYTE_SIZE);
-
     /* Arguments are stored in decreasing order they are given in the code */
     for (int i = expressions.size() - 1; i >= 0; i--) {
       /* Get argument, calculate size and add it to argsTotalSize */
@@ -200,6 +192,14 @@ public class ObjectDeclStatementNode extends StatementNode {
       getCurrSymTable().incrementArgsOffset(argSize);
 
     }
+    /* Store object reference on the stack and decrease stack pointer (stack grows downwards) */
+    objectName.generateAssembly(internalState);
+    internalState.addInstruction(new StrInstruction(StrInstruction.StrType.STR,
+        internalState.peekFreeRegister(), SP, -ADDRESS_BYTE_SIZE, true));
+    argsTotalSize += ADDRESS_BYTE_SIZE;
+
+    getCurrSymTable().incrementArgsOffset(ADDRESS_BYTE_SIZE);
+
     getCurrSymTable().resetArgsOffset();
 
     /* Branch Instruction to the callee label */

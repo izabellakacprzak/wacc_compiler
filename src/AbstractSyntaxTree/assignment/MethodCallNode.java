@@ -157,16 +157,6 @@ public class MethodCallNode extends CallNode{
     /* Calculate total arguments size in argsTotalSize */
     int argsTotalSize = 0;
 
-    /* Store a reference to the object on the stack */
-
-    /* Store object reference on the stack and decrease stack pointer (stack grows downwards) */
-    objectName.generateAssembly(internalState);
-    internalState.addInstruction(new StrInstruction(StrInstruction.StrType.STR,
-        internalState.peekFreeRegister(), SP, -ADDRESS_BYTE_SIZE, true));
-    argsTotalSize += ADDRESS_BYTE_SIZE;
-
-    currSymTable.incrementArgsOffset(ADDRESS_BYTE_SIZE);
-
     /* Arguments are stored in decreasing order they are given in the code */
     for (int i = arguments.size() - 1; i >= 0; i--) {
       /* Get argument, calculate size and add it to argsTotalSize */
@@ -187,6 +177,15 @@ public class MethodCallNode extends CallNode{
       currSymTable.incrementArgsOffset(argSize);
 
     }
+
+    /* Store object reference on the stack and decrease stack pointer (stack grows downwards) */
+    objectName.generateAssembly(internalState);
+    internalState.addInstruction(new StrInstruction(StrInstruction.StrType.STR,
+        internalState.peekFreeRegister(), SP, -ADDRESS_BYTE_SIZE, true));
+    argsTotalSize += ADDRESS_BYTE_SIZE;
+
+    currSymTable.incrementArgsOffset(ADDRESS_BYTE_SIZE);
+
     currSymTable.resetArgsOffset();
 
     /* Branch Instruction to the callee label */

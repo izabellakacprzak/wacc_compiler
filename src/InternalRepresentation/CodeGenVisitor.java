@@ -220,8 +220,7 @@ public class CodeGenVisitor {
         internalState.addInstruction(new MovInstruction(DEST_REG, attributePointer));
         internalState.addInstruction(new BranchInstruction(BL, NULL_POINTER));
 
-        /* Load the pair element to the pairPointer register */
-
+        /* Load the attribute element to the attributePointer register */
         internalState.addInstruction(
             new LdrInstruction(LDR, attributePointer, attributePointer,
                 attributeIndex * ADDRESS_BYTE_SIZE));
