@@ -1,14 +1,11 @@
 package AbstractSyntaxTree.statement;
 
-import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
-
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.assignment.AssignLHSNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
 import AbstractSyntaxTree.expression.ArrayElemNode;
-import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
@@ -16,8 +13,6 @@ import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 public class AssignVarNode extends StatementNode {
-
-  private static final DataTypeId DEFAULT_TYPE = new BaseType(INT);
 
   /* left:         AssignLHSNode corresponding to what being assigned to
    * right:        AssignRHSNode corresponding to the assignment for the AssignLHSNode */
@@ -50,7 +45,8 @@ public class AssignVarNode extends StatementNode {
     setCurrSymTable(symbolTable);
 
 
-    /*Get possible parameters for identifier nodes. */
+    /* Get possible parameters for identifier nodes needed if an identifier corresponds to
+     *   an unset parameter identifier */
     DataTypeId leftType = left.getType(symbolTable);
     DataTypeId rightType = getTypeOfOverloadFunc(symbolTable, errorMessages, leftType, right);
     boolean isUnsetParamLeft = left.isUnsetParamId(symbolTable);
@@ -58,8 +54,8 @@ public class AssignVarNode extends StatementNode {
     ParameterId leftParam = left.getParamId(symbolTable);
     ParameterId rightParam = right.getParamId(symbolTable);
 
-
-    /*Get possible parameters for array nodes. */
+    /* Get possible parameters for array nodes needed if an array element's identifier
+     *   corresponds to an unset parameter identifier */
     boolean isUnsetArrayParamLeft = false;
     boolean isUnsetArrayParamRight = false;
     ParameterId leftArrayParam = null;
@@ -79,49 +75,52 @@ public class AssignVarNode extends StatementNode {
       rightArrayParam = rightArrayElem.getUnsetParameterIdArrayElem(symbolTable);
     }
 
-
-    /* IF both operands are unset type parameters. */
+    /* If both operands are unset type parameters. */
     if ((isUnsetParamLeft || isUnsetArrayParamLeft)
             && (isUnsetParamRight || isUnsetArrayParamRight)) {
 
-    /*CASE 1: implicit param = implicit param & 1st AST traversal. */
       if (firstCheck) {
+        /* CASE 1: this is the first AST traversal and both left and right haven't been inferred */
         uncheckedNodes.add(this);
 
+        /* Add each to each other's matching params list */
         ParameterId leftParamToAdd = isUnsetParamLeft ? leftParam : leftArrayParam;
         ParameterId rightParamToAdd = isUnsetParamRight ? rightParam : rightArrayParam;
 
-        if (isUnsetParamLeft) { //it is an unset identifier parameter
+        if (isUnsetParamLeft) {                   //it is an unset identifier parameter
           leftParam.addToMatchingParams(rightParamToAdd);
-        } else if (isUnsetArrayParamLeft) { //it is unset array parameter
+        } else if (isUnsetArrayParamLeft) {       //it is unset array parameter
           leftArrayElem.addToMatchingParamsArrayElem(symbolTable,
               rightParamToAdd);
         }
 
-        if (isUnsetParamRight) { //it is an  unset identifier parameter
+        if (isUnsetParamRight) {                  //it is an  unset identifier parameter
           rightParam.addToMatchingParams(leftParamToAdd);
-        } else if (isUnsetArrayParamRight) { //it is unset array parameter
+        } else if (isUnsetArrayParamRight) {      //it is unset array parameter
           rightArrayElem.addToMatchingParamsArrayElem(symbolTable,
               leftParamToAdd);
         }
+
         return;
 
-      } else {     /*CASE 2: implicit param = implicit param & 2nd AST traversal. */
-        if (isUnsetParamLeft) { //it is an unset identifier parameter
+      } else {
+        /*CASE 2: this is the second AST traversal and both left and right haven't been inferred */
+        if (isUnsetParamLeft) {                   //it is an unset identifier parameter
           leftParam.setType(DEFAULT_TYPE);
-        } else if (isUnsetArrayParamLeft) { //it is unset array parameter
+        } else if (isUnsetArrayParamLeft) {       //it is unset array parameter
           leftArrayElem.setArrayElemBaseType(symbolTable, DEFAULT_TYPE);
         }
 
-        if (isUnsetParamRight) { //it is an unset identifier parameter
+        if (isUnsetParamRight) {                  //it is an unset identifier parameter
           rightParam.setType(DEFAULT_TYPE);
-        } else if (isUnsetArrayParamRight) { //it is unset array parameter
+        } else if (isUnsetArrayParamRight) {      //it is unset array parameter
           rightArrayElem.setArrayElemBaseType(symbolTable, DEFAULT_TYPE);
         }
         firstCheck = true;
       }
-    } else { /*IF we can infer a type from at least one of the lhs or rhs, set it to the other
-                in case it is an implicit parameter. */
+    } else {
+      /* If we can infer a type from at least one of the lhs or rhs, set it to the other
+       *   in case it is an implicit parameter. */
 
       if (isUnsetParamLeft) {
         leftParam.setType(rightType);
@@ -134,7 +133,6 @@ public class AssignVarNode extends StatementNode {
       } else if (isUnsetArrayParamRight) {
         rightArrayElem.setArrayElemBaseType(symbolTable, leftType);
       }
-
     }
 
     /* Recursively call semanticAnalysis on LHS node */
@@ -143,7 +141,6 @@ public class AssignVarNode extends StatementNode {
 
     /* Check that the left assignment type and the right assignment type
      * can be resolved and match */
-
     leftType = left.getType(symbolTable);
 
     if (leftType == null) {

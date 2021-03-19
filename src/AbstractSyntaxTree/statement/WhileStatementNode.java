@@ -31,6 +31,7 @@ public class WhileStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+    /* If the condition's type needs to be inferred, set the type to BOOL */
     DataTypeId conditionType = condition.getType(symbolTable);
 
     boolean isUnsetParam = condition.isUnsetParamId(symbolTable);
@@ -40,13 +41,11 @@ public class WhileStatementNode extends StatementNode {
     ParameterId arrayParam = null;
     ArrayElemNode arrayElem = null;
 
-
     if (condition instanceof ArrayElemNode) {
       arrayElem = (ArrayElemNode) condition;
       isUnsetArrayParam = arrayElem.isUnsetParameterIdArrayElem(symbolTable);
       arrayParam = arrayElem.getUnsetParameterIdArrayElem(symbolTable);
     }
-
 
     if (isUnsetParam) {
       param.setType(new BaseType(BOOL));

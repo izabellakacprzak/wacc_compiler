@@ -15,7 +15,6 @@ import static SemanticAnalysis.DataTypes.BaseType.Type.*;
 
 public class FuncCallNode extends CallNode {
 
-  private static final DataTypeId DEFAULT_TYPE = new BaseType(INT);
   /* identifier:   IdentifierNode corresponding to the function's name identifier
    * arguments:    List of ExpressionNodes corresponding to the arguments
    *                 passed into the function call */

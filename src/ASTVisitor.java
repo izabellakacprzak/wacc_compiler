@@ -5,7 +5,6 @@ import AbstractSyntaxTree.expression.*;
 import AbstractSyntaxTree.statement.*;
 import AbstractSyntaxTree.type.*;
 import SemanticAnalysis.DataTypes.BaseType.Type;
-import SemanticAnalysis.Identifier;
 import SemanticAnalysis.Operator;
 import SemanticAnalysis.Operator.*;
 import antlr.WACCParser;

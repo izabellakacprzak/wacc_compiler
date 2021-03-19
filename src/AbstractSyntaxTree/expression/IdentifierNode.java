@@ -41,9 +41,7 @@ public class IdentifierNode extends ExpressionNode {
       id = symbolTable.lookupAll("attr*" + identifier);
       if (id == null) {
         errorMessages.add(
-            new SemanticError(
-                super.getLine(),
-                super.getCharPositionInLine(),
+            new SemanticError(super.getLine(), super.getCharPositionInLine(),
                 "Identifier '" + identifier + "' has not been declared."));
       }
     } else if (!(id instanceof VariableId) && !(id instanceof ParameterId)

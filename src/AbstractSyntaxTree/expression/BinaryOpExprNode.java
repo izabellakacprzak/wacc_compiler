@@ -1,11 +1,8 @@
 package AbstractSyntaxTree.expression;
 
-import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
-
 import AbstractSyntaxTree.ASTNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.Operator.BinOp;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
@@ -14,8 +11,6 @@ import SemanticAnalysis.SymbolTable;
 import java.util.List;
 
 public class BinaryOpExprNode extends ExpressionNode {
-
-  private static final DataTypeId DEFAULT_TYPE = new BaseType(INT);
 
   /* left:     ExpressionNode corresponding to the left expression the operator was called with
    * right:    ExpressionNode corresponding to the right expression the operator was called with
@@ -54,6 +49,8 @@ public class BinaryOpExprNode extends ExpressionNode {
     DataTypeId lhsType = left.getType(symbolTable);
     DataTypeId rhsType = right.getType(symbolTable);
 
+    /* Check if either the left or right expressions need to have their types inferred */
+    /* Set all needed booleans and variables for checking unset parameters */
     boolean isUnsetParamLeft = left.isUnsetParamId(symbolTable);
     boolean isUnsetParamRight = right.isUnsetParamId(symbolTable);
     ParameterId leftParam = left.getParamId(symbolTable);
@@ -78,98 +75,105 @@ public class BinaryOpExprNode extends ExpressionNode {
       rightArrayParam = rightArrayElem.getUnsetParameterIdArrayElem(symbolTable);
     }
 
-
-    /* IF both operands are unset type parameters. */
+    /* If both operands are unset type parameters. */
     if ((isUnsetParamLeft || isUnsetArrayParamLeft)
             && (isUnsetParamRight || isUnsetArrayParamRight)) {
 
-      /* CASE 1: can deduce the operands types directly from the operator. */
+      /* CASE 1: the operands' types can be deduced directly from the operator. */
       if (argTypes.size() == 1) {
-        if (isUnsetParamLeft) { //it is an unset identifier parameter
+        if (isUnsetParamLeft) {                   //it is an unset identifier parameter
           leftParam.setType(argTypes.get(0));
-        } else if (isUnsetArrayParamLeft) { //it is unset array parameter
+
+        } else if (isUnsetArrayParamLeft) {       //it is unset array parameter
           leftArrayElem.setArrayElemBaseType(symbolTable, argTypes.get(0));
         }
-        if (isUnsetParamRight) { //it is an unset identifier parameter
+
+        if (isUnsetParamRight) {                  //it is an unset identifier parameter
           rightParam.setType(argTypes.get(0));
-        } else if (isUnsetArrayParamRight) { //it is unset array parameter
+
+        } else if (isUnsetArrayParamRight) {      //it is unset array parameter
           rightArrayElem.setArrayElemBaseType(symbolTable, argTypes.get(0));
         }
 
-        /* CASE 2: cannot deduce the operands types directly from the operator
-         * - if first AST traversal, add left and right to each other's matchingParams lists
-         *   and add the expected types from the operator */
+        /* CASE 2: the operands' types cannot be deduced directly from the operator
+         * - if it is the first AST traversal, add left and right to each other's
+         *     matchingParams lists and add the expected types from the operator */
       } else if (firstCheck) {
-
         ParameterId leftParamToAdd = isUnsetParamLeft ? leftParam : leftArrayParam;
         ParameterId rightParamToAdd = isUnsetParamRight ? rightParam : rightArrayParam;
 
-        if (isUnsetParamLeft) { //it is an unset identifier parameter
+        if (isUnsetParamLeft) {                   //it is an unset identifier parameter
           leftParam.addToMatchingParams(rightParamToAdd);
           leftParam.addToExpectedTypes(argTypes);
-        } else if (isUnsetArrayParamLeft) { //it is unset array parameter
+
+        } else if (isUnsetArrayParamLeft) {       //it is unset array parameter
           leftArrayElem.addToMatchingParamsArrayElem(symbolTable,
               rightParamToAdd);
           leftArrayElem.addToExpectedTypesArrayElem(symbolTable, argTypes);
         }
 
-        if (isUnsetParamRight) { //it is an  unset identifier parameter
+        if (isUnsetParamRight) {                  //it is an  unset identifier parameter
           rightParam.addToMatchingParams(leftParamToAdd);
           rightParam.addToExpectedTypes(argTypes);
-        } else if (isUnsetArrayParamRight) { //it is unset array parameter
+
+        } else if (isUnsetArrayParamRight) {      //it is unset array parameter
           rightArrayElem.addToMatchingParamsArrayElem(symbolTable,
               leftParamToAdd);
           rightArrayElem.addToExpectedTypesArrayElem(symbolTable, argTypes);
         }
 
         boolean leftTypeIsNull = isUnsetParamLeft ? leftParam.getType() == null
-                                     : leftArrayElem.getType(symbolTable) == null;
+            : leftArrayElem.getType(symbolTable) == null;
         boolean rightTypeIsNull = isUnsetParamRight ? rightParam.getType() == null
-                                      : rightArrayElem.getType(symbolTable) == null;
+            : rightArrayElem.getType(symbolTable) == null;
 
-        /*IF the types of any cannot still be deduced, add this node to the unchecked Semantic
-         * Analysis nodes and stop the semantic analysis execution */
-        //TODO: do we still need to check that they are null??
+        /* If the types of any still cannot be deduced, add this node to the unchecked Semantic
+         *   Analysis nodes and stop the semantic analysis execution */
         if (leftTypeIsNull && rightTypeIsNull) {
           uncheckedNodes.add(this);
           return;
         }
 
-        /* IF second traversal of the AST and we cannot infer anything from the operator,
-        set the types by default to INT. */
+        /* If this is the second traversal of the AST and we cannot infer anything from the
+         *   operator, set the types to the DEFAULT_TYPE. */
       } else if (argTypes.isEmpty()) {
-        if (isUnsetParamLeft) { //it is an unset identifier parameter
+        if (isUnsetParamLeft) {                    //it is an unset identifier parameter
           leftParam.setType(DEFAULT_TYPE);
-        } else if (isUnsetArrayParamLeft) { //it is unset array parameter
+        } else if (isUnsetArrayParamLeft) {        //it is unset array parameter
           leftArrayElem.setArrayElemBaseType(symbolTable, DEFAULT_TYPE);
         }
 
-        if (isUnsetParamRight) { //it is an unset identifier parameter
+        if (isUnsetParamRight) {                   //it is an unset identifier parameter
           rightParam.setType(DEFAULT_TYPE);
-        } else if (isUnsetArrayParamRight) { //it is unset array parameter
+        } else if (isUnsetArrayParamRight) {       //it is unset array parameter
           rightArrayElem.setArrayElemBaseType(symbolTable, DEFAULT_TYPE);
         }
+
         firstCheck = true;
 
-        /* IF second traversal of the AST and we can infer multiple types from the operator,
-        set the types to the first one in the argTypes list. */
       } else {
-        if (isUnsetParamLeft) { //it is an unset identifier parameter
-          leftParam.setType(argTypes.get(0));
-        } else if (isUnsetArrayParamLeft) { //it is unset array parameter
-          leftArrayElem.setArrayElemBaseType(symbolTable, argTypes.get(0));
+        /* If this is the second traversal of the AST and we can infer multiple types
+         *   from the operator take the first expected argument type of the operator */
+        DataTypeId type = argTypes.get(0);
+
+        if (isUnsetParamLeft) {                    //it is an unset identifier parameter
+          leftParam.setType(type);
+        } else if (isUnsetArrayParamLeft) {        //it is unset array parameter
+          leftArrayElem.setArrayElemBaseType(symbolTable, type);
         }
 
-        if (isUnsetParamRight) { //it is an unset identifier parameter
-          rightParam.setType(argTypes.get(0));
-        } else if (isUnsetArrayParamRight) { //it is unset array parameter
-          rightArrayElem.setArrayElemBaseType(symbolTable, argTypes.get(0));
+        if (isUnsetParamRight) {                   //it is an unset identifier parameter
+          rightParam.setType(type);
+        } else if (isUnsetArrayParamRight) {       //it is unset array parameter
+          rightArrayElem.setArrayElemBaseType(symbolTable, type);
         }
+
         firstCheck = true;
       }
 
-    } else {  /*IF we can infer a type from at least one of the lhs or rhs, set it to the other
-                in case it is an implicit parameter. */
+    } else {
+      /* If we can infer a type from at least one of the lhs or rhs, set it to the other
+       *   in the case it is an implicit parameter. */
 
       if (isUnsetParamLeft) {
         leftParam.setType(rhsType);
@@ -249,15 +253,6 @@ public class BinaryOpExprNode extends ExpressionNode {
           "RHS type does not match LHS type for '" + operator.getLabel() + "' operator. "
               + "Expected: " + lhsType + " Actual: " + rhsType));
     }
-  }
-
-
-  private void setParamType(boolean unsetParameter, DataTypeId type, ParameterId param) {
-    if (type != null || param == null) {
-      return;
-    }
-
-    param.setType(operator.getArgTypes().get(0));
   }
 
   @Override

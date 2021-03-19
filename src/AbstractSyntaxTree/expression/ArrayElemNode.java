@@ -73,11 +73,11 @@ public class ArrayElemNode extends ExpressionNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
-
-    boolean isUnsetParam = false;
+    /* If any expression is an unset parameter or an array element of a parameter without a
+     *   base type, the type can be inferred to be INT*/
+    boolean isUnsetParam;
     boolean isUnsetArrayParam = false;
     for (ExpressionNode expression : expressions) {
-
       isUnsetParam = expression.isUnsetParamId(symbolTable);
       if (expression instanceof ArrayElemNode) {
         isUnsetArrayParam = expression.isUnsetParamArray(symbolTable);
@@ -85,9 +85,8 @@ public class ArrayElemNode extends ExpressionNode {
 
       if (isUnsetParam) {
         expression.getParamId(symbolTable).setType(new BaseType(INT));
-      }
-      else if (isUnsetArrayParam){
-        ((ArrayElemNode)expression).setArrayElemBaseType(symbolTable, new BaseType(INT));
+      } else if (isUnsetArrayParam && expression instanceof ArrayElemNode) {
+        ((ArrayElemNode) expression).setArrayElemBaseType(symbolTable, new BaseType(INT));
       }
       expression.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
     }

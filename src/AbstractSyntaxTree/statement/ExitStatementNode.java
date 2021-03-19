@@ -30,20 +30,19 @@ public class ExitStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+    /* If the expression's type needs to be inferred, set the type to INT */
     boolean isUnsetParam = expression.isUnsetParamId(symbolTable);
     ParameterId param = expression.getParamId(symbolTable);
 
     boolean isUnsetArrayParam = false;
     ParameterId arrayParam = null;
-    ArrayElemNode arrayElem = null;
-
+    ArrayElemNode arrayElem;
 
     if (expression instanceof ArrayElemNode) {
       arrayElem = (ArrayElemNode) expression;
       isUnsetArrayParam = arrayElem.isUnsetParameterIdArrayElem(symbolTable);
       arrayParam = arrayElem.getUnsetParameterIdArrayElem(symbolTable);
     }
-
 
     if (isUnsetParam) {
       param.setType(new BaseType(INT));

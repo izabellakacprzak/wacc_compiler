@@ -34,6 +34,7 @@ public class FreeStatementNode extends StatementNode {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
 
+    /* If the expression's type needs to be inferred, set the type to either PAIR or ARRAY */
     DataTypeId exprType = expression.getType(symbolTable);
 
     boolean isUnsetParam = expression.isUnsetParamId(symbolTable);
@@ -43,16 +44,13 @@ public class FreeStatementNode extends StatementNode {
     ParameterId arrayParam = null;
     ArrayElemNode arrayElem = null;
 
-
     if (expression instanceof ArrayElemNode) {
       arrayElem = (ArrayElemNode) expression;
       isUnsetArrayParam = arrayElem.isUnsetParameterIdArrayElem(symbolTable);
       arrayParam = arrayElem.getUnsetParameterIdArrayElem(symbolTable);
     }
 
-
     if (isUnsetParam || isUnsetArrayParam) {
-
       if (firstCheck) {
         List<DataTypeId> expecteds = new ArrayList<>();
         expecteds.add(new ArrayType(null));
@@ -81,7 +79,6 @@ public class FreeStatementNode extends StatementNode {
         firstCheck = true;
       }
     }
-
 
     /* Recursively call semanticAnalysis on expression node */
     expression.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);

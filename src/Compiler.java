@@ -1,3 +1,4 @@
+import static AbstractSyntaxTree.ASTNode.DEFAULT_TYPE;
 import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
 
 import AbstractSyntaxTree.ASTNode;
@@ -21,7 +22,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class Compiler {
 
-  private static final DataTypeId DEFAULT_TYPE = new BaseType(INT);
   private static final boolean FIRST_CHECK = true;
   private static final int SYNTAX_ERROR_CODE = 100;
   private static final int INPUT_FILE_ERROR = 1;
