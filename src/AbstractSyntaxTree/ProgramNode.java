@@ -63,7 +63,7 @@ public class ProgramNode implements ASTNode {
       Identifier declaredFunc = symbolTable.lookupAll(method.getName());
       FunctionId newIdentifier = (FunctionId) method.getIdentifier(method.getCurrSymTable());
 
-      if ( declaredFunc != null) {
+      if (declaredFunc != null) {
         /* A function with the same name has already been declared
          * Extension: check if function can be overloaded */
         if (declaredFunc instanceof FunctionId) {
@@ -75,17 +75,17 @@ public class ProgramNode implements ASTNode {
             overloadedFunctions.add(overloadFunc);
           } else {
             IdentifierNode id = method.getIdentifierNode();
-            errorMessages.add(new SemanticError(id.getLine(),id.getCharPositionInLine(),
+            errorMessages.add(new SemanticError(id.getLine(), id.getCharPositionInLine(),
                     "Cannot overload " + declaredFunc.toString() + "' as a function with the same " +
-                    "signature already exists."));
+                            "signature already exists."));
           }
         } else if (declaredFunc instanceof OverloadFuncId) {
           OverloadFuncId overloadFunc = (OverloadFuncId) declaredFunc;
           if (!overloadFunc.addNewFunc(newIdentifier)) {
             IdentifierNode id = method.getIdentifierNode();
             errorMessages.add(new SemanticError(id.getLine(), id.getCharPositionInLine(),
-                "Cannot overload " + declaredFunc.toString() + "' as a function with the same " +
-                    "signature already exists."));
+                    "Cannot overload " + declaredFunc.toString() + "' as a function with the same " +
+                            "signature already exists."));
           }
         } else {
           IdentifierNode id = method.getIdentifierNode();
@@ -101,29 +101,27 @@ public class ProgramNode implements ASTNode {
       method.semanticAnalysis(method.getCurrSymTable(), errorMessages, uncheckedNodes, firstCheck);
     }
 
-/*
-    */
-/* Check if there are overloaded functions with matching signatures after type inference *//*
-
+    /* Check if there are overloaded functions with matching signatures after type inference */
     for (OverloadFuncId overloadFunc : overloadedFunctions) {
-      int funcNum = 0;
+      int funcNum;
       List<FunctionId> functions = overloadFunc.getFunctions();
       int listSize = functions.size();
-
-      for (int pos = 1; pos < listSize; pos++) {
-        if (functions.get(funcNum).equals(functions.get(pos))) {
-          IdentifierNode node = functions.get(pos).getNode();
-          errorMessages.add(new SemanticError(node.getLine(), node.getCharPositionInLine(),
-                  "Cannot overload " + functions.get(pos).toString() + "' as a function with the same " +
-                  "signature already exists."));
-          functions.remove(pos);
-          listSize--;
+      for (funcNum = 0; funcNum < listSize; funcNum++) {
+        for (int pos = funcNum + 1; pos < listSize; pos++) {
+          if (functions.get(funcNum).equals(functions.get(pos))) {
+            IdentifierNode node = functions.get(pos).getNode();
+            errorMessages.add(new SemanticError(node.getLine(), node.getCharPositionInLine(),
+                    "Cannot overload " + functions.get(pos).toString() + "' as a function with the same " +
+                            "signature already exists."));
+            functions.remove(pos);
+            listSize--;
+          }
         }
       }
-*/
 
 
     }
+  }
 
   @Override
   public void semanticAnalysis(SymbolTable topSymbolTable, List<SemanticError> errorMessages,

@@ -11,11 +11,23 @@ public class FunctionId extends Identifier {
   private final DataTypeId returnType;
   private final List<ParameterId> params;
 
+  private boolean isGenerated = false;
+
   public FunctionId(IdentifierNode node, DataTypeId returnType, List<ParameterId> params) {
     super(node);
     this.returnType = returnType;
     this.params = params;
   }
+
+  public boolean isGenerated() {
+    return isGenerated;
+  }
+
+
+  public void setGenerated() {
+    isGenerated = true;
+  }
+
 
   public List<ParameterId> getParams() {
     return params;
@@ -38,19 +50,18 @@ public class FunctionId extends Identifier {
     }
     return paramTypes;
   }
-/*
+
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof FunctionId)) {
       return false;
     }
 
-    FunctionId constructor = (FunctionId) o;
-    List<DataTypeId> paramTypes = ;
+    FunctionId function = (FunctionId) o;
+    return getParamTypes().equals(function.getParamTypes()) &&
+            returnType.equals(function.getType());
 
-    return false;
-
-  }*/
+  }
 
   @Override
   public String toString() {

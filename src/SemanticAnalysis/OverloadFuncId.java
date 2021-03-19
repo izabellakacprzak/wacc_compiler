@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 public class OverloadFuncId extends Identifier {
 
   private final List<FunctionId> functions = new ArrayList<>();
+  private static final int ERROR_CODE = -1;
 
   public OverloadFuncId(FunctionId function) {
     super();
@@ -47,6 +48,16 @@ public class OverloadFuncId extends Identifier {
 
   public int getIndex(FunctionId functionId) {
     return functions.indexOf(functionId);
+  }
+
+  public int getNewIndex() {
+    for(FunctionId function : functions) {
+     if (!function.isGenerated()) {
+       function.setGenerated();
+       return functions.indexOf(function);
+     }
+    }
+    return ERROR_CODE;
   }
 
   public List<DataTypeId> findReturnTypes(List<DataTypeId> paramTypes) {

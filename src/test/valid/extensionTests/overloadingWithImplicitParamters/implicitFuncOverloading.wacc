@@ -1,0 +1,22 @@
+# a simple function definition and call
+
+# Output:
+# 0
+
+# Program:
+
+begin
+  int f(a) is
+  int c = 3;
+  a = c;
+    return a 	
+  end 
+
+  int f(a) is
+  bool c = false;
+  a = c;
+    return 0 
+  end
+  int x = call f(4);
+  println x
+end

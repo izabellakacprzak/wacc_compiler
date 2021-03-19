@@ -7,13 +7,13 @@
 
 begin
   int f(a) is
-  bool c = false;
+  int c = 3;
   a = c;
     return 0 	
   end 
 
   int f(a) is
-  bool c = false;
+  int c = 4;
   a = c;
     return 0 
   end

@@ -1,0 +1,46 @@
+# Program:
+
+begin
+  int f(int n) is
+    int i = 0;
+    while i < n do
+      i = i + 1
+    done;
+    return i 
+  end
+  
+  int f(b) is
+    bool neg = !b;
+    int i = 1;
+    if neg 
+    then
+    	i = 2
+    else
+    	i = 3
+    fi;
+    return i
+  end  
+  
+int loop(n) is
+    int i = 0;
+    while i < n do
+      i = i + 1
+    done;
+    return i
+  end
+  
+int loop(b) is
+    int i = 0;
+    while b do
+      i = i + 1;
+      b = !b
+    done;
+    return i
+  end    
+
+
+int x = call f(5);
+int b = call f(false);
+println x;
+println b
+end
