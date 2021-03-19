@@ -499,6 +499,11 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
      corresponding to the value being assigned */
   @Override
   public ASTNode visitDeclStat(DeclStatContext ctx) {
+    return visit(ctx.decl_stat());
+  }
+
+  @Override
+  public ASTNode visitDecl_stat(Decl_statContext ctx) {
     int line = ctx.getStart().getLine();
     int charPositionInLine = ctx.getStart().getCharPositionInLine();
     TypeNode type = (TypeNode) visit(ctx.type());
@@ -511,8 +516,8 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
   }
 
   /* Visits the assignment statement rule
-     Returns a AssignVarNode with a visited AssignLHSNode corresponding to the value on the LHS
-     and a visited AssignRHSNode corresponding to the value on the RHS */
+         Returns a AssignVarNode with a visited AssignLHSNode corresponding to the value on the LHS
+         and a visited AssignRHSNode corresponding to the value on the RHS */
   @Override
   public ASTNode visitAssignStat(AssignStatContext ctx) {
     AssignLHSNode lhs = (AssignLHSNode) visit(ctx.assign_lhs());
@@ -598,8 +603,17 @@ public class ASTVisitor extends WACCParserBaseVisitor<ASTNode> {
     return new WhileStatementNode(condition, statement);
   }
 
+  @Override
+  public ASTNode visitForStat(ForStatContext ctx) {
+    DeclarationStatementNode declaration = (DeclarationStatementNode) visit(ctx.decl_stat());
+    ExpressionNode condition = (ExpressionNode) visit(ctx.expr());
+    StatementNode condStatement = (StatementNode) visit(ctx.stat(0));
+    StatementNode bodyStatement = (StatementNode) visit(ctx.stat(1));
+    return new ForStatementNode(declaration, condition, condStatement, bodyStatement);
+  }
+
   /* Visits the scope statement rule
-     Returns a NewScopeStatementNode with a visited body statement StatementNode */
+         Returns a NewScopeStatementNode with a visited body statement StatementNode */
   @Override
   public ASTNode visitScopeStat(ScopeStatContext ctx) {
     StatementNode statement = (StatementNode) visit(ctx.stat());

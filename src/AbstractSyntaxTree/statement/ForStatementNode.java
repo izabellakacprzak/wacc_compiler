@@ -1,5 +1,7 @@
 package AbstractSyntaxTree.statement;
 
+import static SemanticAnalysis.DataTypes.BaseType.Type.BOOL;
+
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
@@ -9,29 +11,36 @@ import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
-
 import java.util.List;
 
-import static SemanticAnalysis.DataTypes.BaseType.Type.BOOL;
+public class ForStatementNode extends StatementNode {
 
-public class WhileStatementNode extends StatementNode {
-
-  /* condition: ExpressionNode representing the condition of the while loop
-   * statement: StatementNode representing the body of the while loop */
+  /* condition: ExpressionNode representing the condition of the for loop
+   * statement: StatementNode representing the body of the for loop */
+  private final DeclarationStatementNode declaration;
   private final ExpressionNode condition;
-  private final StatementNode statement;
+  private final StatementNode condStatement;
+  private final StatementNode bodyStatement;
 
-  public WhileStatementNode(ExpressionNode condition, StatementNode statement) {
+
+  public ForStatementNode(DeclarationStatementNode declaration, ExpressionNode condition,
+      StatementNode condStatement, StatementNode bodyStatement) {
+    this.declaration = declaration;
     this.condition = condition;
-    this.statement = statement;
+    this.condStatement = condStatement;
+    this.bodyStatement = bodyStatement;
   }
 
+  @Override
   public void semanticAnalysis(SymbolTable symbolTable, List<SemanticError> errorMessages,
       List<ASTNode> uncheckedNodes, boolean firstCheck) {
     /* Set the symbol table for this node's scope */
     setCurrSymTable(symbolTable);
-
     DataTypeId conditionType = condition.getType(symbolTable);
+
+
+    /* Call semanticAnalysis on the declaration statement */
+    declaration.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     boolean isUnsetParam = condition.isUnsetParamId(symbolTable);
     ParameterId param = condition.getParamId(symbolTable);
@@ -47,7 +56,6 @@ public class WhileStatementNode extends StatementNode {
       arrayParam = arrayElem.getUnsetParameterIdArrayElem(symbolTable);
     }
 
-
     if (isUnsetParam) {
       param.setType(new BaseType(BOOL));
     } else if (isUnsetArrayParam) {
@@ -58,7 +66,7 @@ public class WhileStatementNode extends StatementNode {
     condition.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
     /* Check that the type of the condition expression is of type BOOL */
-     conditionType = condition.getType(symbolTable);
+    conditionType = condition.getType(symbolTable);
 
     if (conditionType == null) {
       errorMessages.add(new SemanticError(condition.getLine(), condition.getCharPositionInLine(),
@@ -67,39 +75,24 @@ public class WhileStatementNode extends StatementNode {
 
     } else if (!conditionType.equals(new BaseType(BaseType.Type.BOOL))) {
       errorMessages.add(new SemanticError(condition.getLine(), condition.getCharPositionInLine(),
-          "Incompatible type for 'While' condition."
+          "Incompatible type for 'For' condition."
               + " Expected: BOOL Actual: " + conditionType));
     }
 
+    SymbolTable innerScope = new SymbolTable(symbolTable);
+    innerScope.add(declaration.getIdentifierVar().getNode().getIdentifier(), declaration.getIdentifierVar());
+    /* Call semanticAnalysis on condition statement node */
+    condStatement
+        .semanticAnalysis(innerScope, errorMessages, uncheckedNodes, firstCheck);
+
     /* Recursively call semanticAnalysis on statement node */
-    statement
-        .semanticAnalysis(new SymbolTable(symbolTable), errorMessages, uncheckedNodes, firstCheck);
-  }
-
-  /* Recursively traverses the AST and sets the function expected return type in the ReturnNode
-   * that it reaches. */
-  @Override
-  public void setReturnType(DataTypeId returnType) {
-    statement.setReturnType(returnType);
-  }
-
-  /* Checks that the statement has a child return statement by recursively traversing the AST.
-   * Used for syntax error checking. */
-  @Override
-  public boolean hasReturnStatement() {
-    return statement.hasReturnStatement();
-  }
-
-
-  /* Checks that the statement has a child exit statement by recursively traversing the AST.
-   * Used for syntax error checking. */
-  @Override
-  public boolean hasExitStatement() {
-    return statement.hasExitStatement();
+    bodyStatement
+        .semanticAnalysis(innerScope, errorMessages, uncheckedNodes, firstCheck);
   }
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    internalState.getCodeGenVisitor().visitWhileStatementNode(internalState, condition, statement);
+    internalState.getCodeGenVisitor().visitForStatementNode(internalState, declaration, condition,
+        bodyStatement, condStatement);
   }
 }

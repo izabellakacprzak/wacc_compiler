@@ -7,6 +7,7 @@ import AbstractSyntaxTree.expression.ArrayElemNode;
 import AbstractSyntaxTree.expression.AttributeExprNode;
 import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
+import AbstractSyntaxTree.statement.DeclarationStatementNode;
 import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.type.ClassNode;
 import AbstractSyntaxTree.type.FunctionNode;
@@ -414,7 +415,7 @@ public class CodeGenVisitor {
     internalState.deallocateStackSpace(thenStatement.getCurrSymTable());
 
     /* Generate elseStatement with condition instructions */
-    generateCondInstruction(internalState, elseStatement, endIfLabel, elseLabel);
+    generateCondInstruction(internalState, elseStatement, endIfLabel, elseLabel, null);
   }
 
   public void visitWhileStatementNode(InternalState internalState, ExpressionNode condition,
@@ -424,7 +425,28 @@ public class CodeGenVisitor {
     String statementLabel = internalState.generateNewLabel();
 
     /* Generate statement with condition instructions */
-    generateCondInstruction(internalState, statement, condLabel, statementLabel);
+    generateCondInstruction(internalState, statement, condLabel, statementLabel, null);
+
+    /* Visit and generate assembly for the condition expression */
+    condition.generateAssembly(internalState);
+
+    /* Branch to the statement if the condition is true */
+    internalState.addInstruction(
+        new CompareInstruction(internalState.peekFreeRegister(), new Operand(TRUE)));
+    internalState.addInstruction(new BranchInstruction(EQ, B, statementLabel));
+  }
+
+  public void visitForStatementNode(InternalState internalState, DeclarationStatementNode declaration,
+      ExpressionNode condition, StatementNode bodyStatement, StatementNode condStatement) {
+    /* Generate labels for cond and statement */
+    String condLabel = internalState.generateNewLabel();
+    String statementLabel = internalState.generateNewLabel();
+
+    /* Generate declaration before entering the loop condition and body */
+    declaration.generateAssembly(internalState);
+
+    /* Generate statement with condition instructions */
+    generateCondInstruction(internalState, bodyStatement, condLabel, statementLabel, condStatement);
 
     /* Visit and generate assembly for the condition expression */
     condition.generateAssembly(internalState);
@@ -436,7 +458,8 @@ public class CodeGenVisitor {
   }
 
   private void generateCondInstruction(InternalState internalState, StatementNode statement,
-                                       String condLabel, String statementLabel) {
+                                       String condLabel, String statementLabel,
+                                        StatementNode forStatement) {
     /* Add branch to condition label */
     internalState.addInstruction(new BranchInstruction(B, condLabel));
 
@@ -449,6 +472,11 @@ public class CodeGenVisitor {
 
       /* Visit and generate assembly for the function's ParamListNode */
       statement.generateAssembly(internalState);
+
+      /* Add for loop condition statement */
+      if (forStatement != null) {
+        forStatement.generateAssembly(internalState);
+      }
 
       /* Deallocate stack space for the statement scope */
       internalState.deallocateStackSpace(statement.getCurrSymTable());

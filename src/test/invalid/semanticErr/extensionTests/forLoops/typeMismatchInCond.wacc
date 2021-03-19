@@ -1,0 +1,5 @@
+begin 
+  for(bool i = true; i < 3; i = i+1) do
+    println i
+  done
+end

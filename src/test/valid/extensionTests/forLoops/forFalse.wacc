@@ -1,0 +1,13 @@
+# simple unentered for loop
+
+# Output:
+# end of loop
+
+# Program:
+
+begin
+  for(bool i = false; i; i = true) do
+    println "looping..."
+  done ;
+  println "end of loop"
+end

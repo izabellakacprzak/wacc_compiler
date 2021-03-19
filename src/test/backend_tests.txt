@@ -1,3 +1,4 @@
+src/test/valid/extensionTests/forLoops
 src/test/valid/extensionTests/functionOverloading
 src/test/valid/extensionTests/implicitParameters
 src/test/valid/extensionTests/overloadingWithImplicitParamters
