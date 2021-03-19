@@ -1,15 +1,9 @@
 package AbstractSyntaxTree.type;
 
-import static InternalRepresentation.Instructions.StrInstruction.StrType.STRB;
-import static InternalRepresentation.Utils.Register.SP;
-
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.assignment.AssignRHSNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
-import InternalRepresentation.Instructions.StrInstruction;
-import InternalRepresentation.Instructions.StrInstruction.StrType;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Utils.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SemanticError;
@@ -20,18 +14,24 @@ import java.util.List;
 
 public class AttributeNode implements TypeNode {
 
+  /* name:          name of the attribute
+   * type:          type of the attribute
+   * assignRHS:     optional default value assigned to the attribute
+   * currSymTable:  current symbol table */
   private final IdentifierNode name;
   private final TypeNode type;
   private final AssignRHSNode assignRHS;
   private SymbolTable currSymTable = null;
 
 
+  /* ATTRIBUTE WITH DEFAULT RHS */
   public AttributeNode(IdentifierNode name, TypeNode type, AssignRHSNode assignRHS) {
     this.name = name;
     this.type = type;
     this.assignRHS = assignRHS;
   }
 
+  /* ATTRIBUTE WITHOUT DEFAULT RHS */
   public AttributeNode(IdentifierNode name, TypeNode type) {
     this.name = name;
     this.type = type;
@@ -90,9 +90,7 @@ public class AttributeNode implements TypeNode {
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    if(assignRHS != null) {
-      assignRHS.generateAssembly(internalState);
-    }
+    internalState.getCodeGenVisitor().visitAttributeNode(internalState, assignRHS);
   }
 
   @Override

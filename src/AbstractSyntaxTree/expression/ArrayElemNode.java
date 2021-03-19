@@ -111,8 +111,6 @@ public class ArrayElemNode extends ExpressionNode {
       }
     }
 
-
-//TODO: ask Una how to use firstCheck in here
     if (identifier.isUnsetParamId(symbolTable)) {
       if (identifier.getType(symbolTable) == null) {
         ParameterId param = identifier.getParamId(symbolTable);

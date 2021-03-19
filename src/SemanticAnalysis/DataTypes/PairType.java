@@ -6,6 +6,7 @@ public class PairType extends DataTypeId {
 
   /* PAIR_ELEM_BYTES_SIZE: size of a one pair elem */
   private static final int PAIR_ELEM_BYTES_SIZE = 4;
+  /* HASH_PRIME: prime number used for hashCode generation */
   private static final int HASH_PRIME = 83;
 
   /* fstType:  DataTypeId of the first element in the pair's type

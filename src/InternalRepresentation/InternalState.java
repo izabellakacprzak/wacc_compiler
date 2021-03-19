@@ -31,17 +31,10 @@ public class InternalState {
 
   private final List<Instruction> generatedInstructions;
   private final CodeGenVisitor codeGenVisitor;
-  private final int declaredArgStackOffset = 0;
-
-  /* stores the size of variables on the stack */
-  private int varSize = 0;
   private Stack<Register> availableRegs;
 
   /* Global stack offset of declared variables */
   private int stackOffset = 0;
-
-  // TODO: this line needed?
-  //  private int argStackOffset = 0;         /* stack pointer for variables offset calculation */
   private int labelCount;
 
   /* Points to the function symbol table in order to deallocate
@@ -79,7 +72,7 @@ public class InternalState {
         writer.write(new DirectiveInstruction(DATA).writeInstruction());
         writer.write(LINE_BREAK);
         writer.write(LINE_BREAK);
-        // add all generated messages
+        /* add all generated messages */
         for (MsgInstruction msg : MsgInstruction.getMessages()) {
           writer.write(msg.toString() + ":\n\t");
           writer.write(msg.writeInstruction());
@@ -137,7 +130,7 @@ public class InternalState {
     return codeGenVisitor;
   }
 
-  /* return the first available register to use without removing it from the available
+  /* Return the first available register to use without removing it from the available
    * registers stack */
   public Register peekFreeRegister() {
     Register nextReg = availableRegs.peek();
@@ -151,12 +144,12 @@ public class InternalState {
     return nextReg;
   }
 
-  /* add a register to be used back on the available registers stack */
+  /* Add a register to be used back on the available registers stack */
   public void pushFreeRegister(Register reg) {
     availableRegs.push(reg);
   }
 
-  /* return the first available register to use and remove it from the available
+  /* Return the first available register to use and remove it from the available
    * registers stack */
   public Register popFreeRegister() {
     if (availableRegs.size() <= NUM_STACK_REGS) {
@@ -174,12 +167,12 @@ public class InternalState {
     return popReg;
   }
 
-  /*adds instruction to the list of generated instructions*/
+  /* Adds instruction to the list of generated instructions */
   public void addInstruction(Instruction instruction) {
     generatedInstructions.add(instruction);
   }
 
-  /*makes all registers to be used available*/
+  /* Makes all registers to be used available */
   public void resetAvailableRegs() {
     Stack<Register> registers = new Stack<>();
     List<Register> paramRegs = getParamRegs();
@@ -198,7 +191,7 @@ public class InternalState {
     return newLabel;
   }
 
-  /*calculates the variables sizes in the symbol table and allocates stack space for them,
+  /* Calculates the variables sizes in the symbol table and allocates stack space for them,
    increases the varSize variable */
   public void allocateStackSpace(SymbolTable symbolTable) {
     int size = symbolTable.getVarsSize();
@@ -213,7 +206,7 @@ public class InternalState {
     }
   }
 
-  /*calculates the variables sizes in the symbol table and de-allocates stack space from them */
+  /* Calculates the variables sizes in the symbol table and de-allocates stack space from them */
   public void deallocateStackSpace(SymbolTable symbolTable) {
     int size = symbolTable.getVarsSize();
     stackOffset -= size;
@@ -225,49 +218,17 @@ public class InternalState {
     }
   }
 
-  public void decrementStackOffset(int argSize, int offset) {
-    //funcSymTable.updateOffsetPerVar(argSize, offset);
-    stackOffset -= argSize;
-  }
-
-  public void incrementStackOffset(int argSize) {
-    stackOffset += argSize;
-  }
-
-//  public int getArgStackOffset() {
-//    return argStackOffset;
-//  }
-//
-//  public void resetArgStackOffset(int argStackOffset) {
-//    this.argStackOffset = argStackOffset;
-//  }
-
   public SymbolTable getFunctionSymTable() {
     return funcSymTable;
   }
 
-  /* sets the current scope */
+  /* Sets the current scope */
   public void setFunctionSymTable(SymbolTable funcSymTable) {
     this.funcSymTable = funcSymTable;
   }
 
-  public int getStackOffset() {
-    return stackOffset;
-  }
-
+  /* Resets the paramStackOffset after a function call */
   public void resetParamStackOffset() {
     stackOffset = 0;
-  }
-
-  public void resetParamStackOffset(int size) {
-    stackOffset = size;
-  }
-
-  public int getVarSize() {
-    return varSize;
-  }
-
-  public void incrementVarSize(int size) {
-    varSize += size;
   }
 }

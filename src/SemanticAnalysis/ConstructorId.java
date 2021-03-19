@@ -40,7 +40,6 @@ public class ConstructorId extends Identifier{
 
     @Override
     public String toString() {
-        // TODO: EDIT FOR CLEARER REPRESENTATION
         return super.getNode().toString() + "(" + parameters.toString() + ")";
     }
 

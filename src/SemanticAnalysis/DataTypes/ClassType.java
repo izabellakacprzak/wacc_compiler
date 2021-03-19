@@ -4,27 +4,29 @@ import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.type.AttributeNode;
 import SemanticAnalysis.ConstructorId;
 import SemanticAnalysis.DataTypeId;
-import SemanticAnalysis.Identifier;
-import SemanticAnalysis.ParameterId;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ClassType extends DataTypeId {
 
+    /* ERROR_CODE: returned in findIndexConstructor when no matching constructor can be found */
+    private static final int ERROR_CODE = -1;
+    /* HASH_PRIME: prime number used for hashCode generation */
+    private static final int HASH_PRIME = 61;
+
+    /* attributes:      list of AttributeNodes representing the attributes of that class
+     * constructors:    list of ConstructorIds of constructors of this class
+     * node:            IdentifierNode representing this class */
     private final List<AttributeNode> attributes;
     private final List<ConstructorId> constructors;
     private final IdentifierNode node;
-    private int currOffset = 0;
-    private static final int ERROR_CODE = -1;
-    private static final int HASH_PRIME = 61;
+
 
     public ClassType(IdentifierNode node, List<AttributeNode> fields) {
         this.node = node;
         this.attributes = fields;
         constructors = new ArrayList<>();
-        this.currOffset = 0;
     }
 
     public boolean addConstructor(ConstructorId constructor) {
@@ -54,6 +56,7 @@ public class ClassType extends DataTypeId {
             }
         }
 
+        /* Could not found a matching constructor, return ERROR_CODE */
         return ERROR_CODE;
     }
 
@@ -77,10 +80,6 @@ public class ClassType extends DataTypeId {
 
     public List<ConstructorId> getConstructors() {
         return constructors;
-    }
-
-    public int getCurrOffset() {
-        return this.currOffset;
     }
 
     @Override

@@ -9,7 +9,9 @@ import AbstractSyntaxTree.expression.ExpressionNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.DeclarationStatementNode;
 import AbstractSyntaxTree.statement.StatementNode;
+import AbstractSyntaxTree.type.AttributeNode;
 import AbstractSyntaxTree.type.ClassNode;
+import AbstractSyntaxTree.type.ConstructorNode;
 import AbstractSyntaxTree.type.FunctionNode;
 import AbstractSyntaxTree.type.ParamListNode;
 import AbstractSyntaxTree.type.TypeNode;
@@ -31,6 +33,7 @@ import SemanticAnalysis.Identifier;
 import SemanticAnalysis.ObjectId;
 import SemanticAnalysis.Operator;
 import SemanticAnalysis.OverloadFuncId;
+import SemanticAnalysis.ParameterId;
 import SemanticAnalysis.SymbolTable;
 
 import java.util.List;
@@ -171,10 +174,6 @@ public class CodeGenVisitor {
   public void visitParamListNode(InternalState internalState,
                                   List<IdentifierNode> identifiers, SymbolTable currSymTable,
                                   boolean hasObject) {
-
-    /* Initially increment the parameters' stack offset by the size of an address */
-    //internalState.incrementParamStackOffset(ADDRESS_BYTE_SIZE);
-
     /* Set the offset of each identifier in the currSymbolTable (for the function scope) */
 
     currSymTable.incrementDeclaredParamsOffset(ADDRESS_BYTE_SIZE);
@@ -190,6 +189,107 @@ public class CodeGenVisitor {
       currSymTable.setParamsOffset(identifier.getIdentifier(), typeSize);
     }
 
+  }
+
+  public void visitClassNode(InternalState internalState, IdentifierNode className,
+      List<AttributeNode> attributes, List<ConstructorNode> constructors,
+      List<FunctionNode> methods) {
+    /* Add new label for class initialization code */
+    internalState.addInstruction(new LabelInstruction("class_" + className.getIdentifier()));
+
+    /* Malloc space on the heap for all attributes */
+    int numAttributes = attributes.size();
+    internalState.addInstruction(
+        new LdrInstruction(LdrType.LDR, DEST_REG, numAttributes * ADDRESS_BYTE_SIZE));
+
+    internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, MALLOC.getLabel()));
+
+    Register attributeReg = internalState.popFreeRegister();
+    internalState.addInstruction(new MovInstruction(attributeReg, DEST_REG));
+
+    int offset = 0;
+
+    for (AttributeNode attribute : attributes) {
+      attribute.generateAssembly(internalState);
+      Register exprReg = null;
+      if (attribute.hasAssignRHS()) {
+        exprReg = internalState.popFreeRegister();
+      }
+      /* Load expr type size into DEST_REG */
+      int size = attribute.getType().getSize();
+      internalState.addInstruction(new LdrInstruction(LDR, DEST_REG, size));
+
+      /* Allocate space on the heap */
+      internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, MALLOC.getLabel()));
+
+      if (attribute.hasAssignRHS()) {
+        /* If the expr type size is 1 byte, use STRB, otherwise use STR */
+        StrType strInstr = (size == BYTE_SIZE) ? STRB : StrType.STR;
+        internalState.addInstruction(new StrInstruction(strInstr, exprReg, DEST_REG));
+      }
+
+      /* Store the reference on the stack */
+      internalState.addInstruction(
+          new StrInstruction(StrType.STR, DEST_REG, attributeReg, offset * ADDRESS_BYTE_SIZE));
+
+      internalState.pushFreeRegister(exprReg);
+      offset++;
+
+    }
+
+    internalState.addInstruction(new DirectiveInstruction(LTORG));
+
+    /* generate assembly for constructors */
+    for(ConstructorNode constructor : constructors) {
+      constructor.generateAssembly(internalState);
+    }
+
+    /* generate assembly for methods */
+    for(FunctionNode method : methods) {
+      method.generateAssembly(internalState);
+    }
+  }
+
+  public void visitConstructorNode(InternalState internalState, SymbolTable currSymTable,
+      IdentifierNode name, ParamListNode parameters, StatementNode bodyStatement) {
+    /* Reset registers to start generating a function */
+    internalState.resetAvailableRegs();
+    internalState.setFunctionSymTable(currSymTable);
+
+    /* Add function label and push Link Register */
+    ClassType classId = (ClassType) currSymTable.lookup("class*" + name.getIdentifier());
+
+    /* Get index of constructor from classType */
+    String index = Integer.toString(classId.findIndexConstructor(parameters
+        .getIdentifiers(currSymTable).stream().map(ParameterId::getType).collect(
+            Collectors.toList())));
+
+    internalState.addInstruction(new LabelInstruction("class_constr_" + name.getIdentifier() + index));
+    internalState.addInstruction(new PushInstruction(LR));
+
+    /* Allocate space for variables in the function's currSymbolTable */
+    internalState.allocateStackSpace(currSymTable);
+
+    /* Visit and generate assembly for the function's ParamListNode */
+    parameters.addObject();
+    parameters.generateAssembly(internalState);
+
+    /* Visit and generate assembly for the function's StatementNode */
+    bodyStatement.generateAssembly(internalState);
+
+    /* Reset the parameters' offset, pop the PC program counter add the
+     *   .ltorg instruction to finish the function */
+    internalState.resetParamStackOffset();
+
+    internalState.deallocateStackSpace(internalState.getFunctionSymTable());
+    internalState.addInstruction(new PopInstruction(PC));
+    internalState.addInstruction(new DirectiveInstruction(LTORG));
+  }
+
+  public void visitAttributeNode(InternalState internalState, AssignRHSNode assignRHS) {
+    if(assignRHS != null) {
+      assignRHS.generateAssembly(internalState);
+    }
   }
 
   public void visitAssignVarNode(InternalState internalState, AssignLHSNode left,
@@ -360,7 +460,6 @@ public class CodeGenVisitor {
 
     /* Set the offset of the declaration identifier based on the size of the AssignRHSNode */
     int typeSize = type.getType().getSize();
-    //internalState.decrementArgStackOffset(typeSize);
     currSymTable.setVarsOffset(identifier.getIdentifier(), typeSize);
 
     /* Find the correct store instruction type based on the size and store destReg in the
@@ -609,6 +708,104 @@ public class CodeGenVisitor {
     internalState.pushFreeRegister(arrayReg);
   }
 
+  public void visitObjectDeclStatementNode(InternalState internalState, SymbolTable currSymbolTable,
+      IdentifierNode className, IdentifierNode objectName, List<ExpressionNode> expressions) {
+    ClassType classId = (ClassType) currSymbolTable.lookupAll("class*" + className.getIdentifier());
+
+    /* Malloc space on the heap for all attributes */
+    List<AttributeNode> attributes = classId.getAttributes();
+    int numAttributes = attributes.size();
+    internalState.addInstruction(
+        new LdrInstruction(LdrInstruction.LdrType.LDR, DEST_REG, numAttributes * ADDRESS_BYTE_SIZE));
+
+    internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, MALLOC.getLabel()));
+
+    Register attributeReg = internalState.popFreeRegister();
+    internalState.addInstruction(new MovInstruction(attributeReg, DEST_REG));
+
+    int offset = 0;
+
+    for (AttributeNode attribute : attributes) {
+      attribute.generateAssembly(internalState);
+      Register exprReg = null;
+      if (attribute.hasAssignRHS()) {
+        exprReg = internalState.popFreeRegister();
+      }
+      /* Load expr type size into DEST_REG */
+      int size = attribute.getType().getSize();
+      internalState.addInstruction(new LdrInstruction(LDR, DEST_REG, size));
+
+      /* Allocate space on the heap */
+      internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, MALLOC.getLabel()));
+
+      if (attribute.hasAssignRHS()) {
+        /* If the expr type size is 1 byte, use STRB, otherwise use STR */
+        StrInstruction.StrType strInstr = (size == BYTE_SIZE) ? STRB : StrInstruction.StrType.STR;
+        internalState.addInstruction(new StrInstruction(strInstr, exprReg, DEST_REG));
+      }
+
+      /* Store the reference on the stack */
+      internalState.addInstruction(
+          new StrInstruction(StrInstruction.StrType.STR, DEST_REG, attributeReg, offset * ADDRESS_BYTE_SIZE));
+
+      if (attribute.hasAssignRHS()) {
+        internalState.pushFreeRegister(exprReg);
+      }
+      offset++;
+    }
+
+    /* Set offset of the object in the current Symbol Table */
+    currSymbolTable.setVarsOffset(objectName.getIdentifier(), ADDRESS_BYTE_SIZE);
+
+    /* Store attributeRef in the correct position on the stack */
+    internalState.addInstruction(new StrInstruction(
+        StrType.STR, attributeReg, SP, currSymbolTable.getOffset(objectName.getIdentifier())));
+
+
+    /* Calculate total arguments size in argsTotalSize */
+    int argsTotalSize = 0;
+
+    /* Arguments are stored in decreasing order they are given in the code */
+    for (int i = expressions.size() - 1; i >= 0; i--) {
+      /* Get argument, calculate size and add it to argsTotalSize */
+      ExpressionNode currArg = expressions.get(i);
+
+      /* Generate assembly code for the current argument */
+      currArg.generateAssembly(internalState);
+
+      int argSize = currArg.getType(currSymbolTable).getSize();
+
+      StrType strInstr = (argSize == 1) ? STRB : StrType.STR;
+
+      /* Store currArg on the stack and decrease stack pointer (stack grows downwards) */
+      internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(),
+          SP, -argSize, true));
+      argsTotalSize += argSize;
+
+      currSymbolTable.incrementArgsOffset(argSize);
+
+    }
+    /* Store object reference on the stack and decrease stack pointer (stack grows downwards) */
+    objectName.generateAssembly(internalState);
+    internalState.addInstruction(new StrInstruction(StrInstruction.StrType.STR,
+        internalState.peekFreeRegister(), SP, -ADDRESS_BYTE_SIZE, true));
+    argsTotalSize += ADDRESS_BYTE_SIZE;
+
+    currSymbolTable.incrementArgsOffset(ADDRESS_BYTE_SIZE);
+
+    currSymbolTable.resetArgsOffset();
+
+    /* Branch Instruction to the callee label */
+    List<DataTypeId> argTypes = expressions.stream().map(e -> e.getType(currSymbolTable))
+        .collect(Collectors.toList());
+
+    /* Get index of constructor from classType */
+    String index = Integer.toString(classId.findIndexConstructor(argTypes));
+
+    String functionLabel = "class_constr_" + className.toString() + index;
+    internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, functionLabel));
+  }
+
 
   public void visitBinaryOpExprNode(InternalState internalState, ExpressionNode left,
                                     ExpressionNode right,
@@ -796,6 +993,34 @@ public class CodeGenVisitor {
     internalState.pushFreeRegister(operandResult);
   }
 
+  public void visitAttributeExprNode(InternalState internalState, SymbolTable currSymbolTable,
+      IdentifierNode objectName, DataTypeId attributeType, IdentifierNode attributeName) {
+
+    /* Visit and generate assembly code for the attribute identifier */
+    objectName.generateAssembly(internalState);
+
+    /* Get register where offset of object will be stored */
+    Register objectReg = internalState.peekFreeRegister();
+
+    internalState.addInstruction(new MovInstruction(DEST_REG, objectReg));
+
+    /* Check for null pointer exception */
+    internalState.addInstruction(new BranchInstruction(BL, NULL_POINTER));
+
+    /* Get index of attribute in list of class attributes and load it */
+    ClassType classType = (ClassType) attributeType;
+    int attributeIndex = classType.findIndexAttribute(attributeName.getIdentifier());
+    internalState.addInstruction(
+        new LdrInstruction(LdrType.LDR, objectReg, objectReg, attributeIndex * ADDRESS_BYTE_SIZE));
+
+    /* Calculate type of Ldr instruction based on the size of the attribute */
+    DataTypeId type = attributeName.getType(currSymbolTable);
+    int elemSize = type.getSize();
+    LdrType ldrInstr = (elemSize == 1) ? LdrType.LDRSB : LdrType.LDR;
+
+    internalState.addInstruction(new LdrInstruction(ldrInstr, objectReg, objectReg));
+  }
+
   public void visitArrayLiterNode(InternalState internalState, List<ExpressionNode> expressions,
                                   AssignRHSNode node) {
     SymbolTable currSymTable = node.getCurrSymTable();
@@ -963,5 +1188,76 @@ public class CodeGenVisitor {
     LdrType ldrInstr = (elemSize == 1) ? LdrType.LDRSB : LdrType.LDR;
 
     internalState.addInstruction(new LdrInstruction(ldrInstr, reg, reg));
+  }
+
+  public void visitMethodCallNode(InternalState internalState, SymbolTable currSymbolTable,
+      IdentifierNode objectName, List<ExpressionNode> arguments, IdentifierNode methodName,
+      DataTypeId returnType) {
+    SymbolTable currSymTable = currSymbolTable;
+    Identifier object = currSymTable.lookupAll(objectName.getIdentifier());
+    String className = ((ClassType) object.getType()).getClassName();
+    if (!className.equals("")) {
+      className = "class_" + className + "_";
+    }
+
+    /* Calculate total arguments size in argsTotalSize */
+    int argsTotalSize = 0;
+
+    /* Arguments are stored in decreasing order they are given in the code */
+    for (int i = arguments.size() - 1; i >= 0; i--) {
+      /* Get argument, calculate size and add it to argsTotalSize */
+      ExpressionNode currArg = arguments.get(i);
+
+      /* Generate assembly code for the current argument */
+      currArg.generateAssembly(internalState);
+
+      int argSize = currArg.getType(currSymTable).getSize();
+
+      StrInstruction.StrType strInstr = (argSize == 1) ? STRB : StrInstruction.StrType.STR;
+
+      /* Store currArg on the stack and decrease stack pointer (stack grows downwards) */
+      internalState.addInstruction(new StrInstruction(strInstr, internalState.peekFreeRegister(),
+          SP, -argSize, true));
+      argsTotalSize += argSize;
+
+      currSymTable.incrementArgsOffset(argSize);
+
+    }
+
+    /* Store object reference on the stack and decrease stack pointer (stack grows downwards) */
+    objectName.generateAssembly(internalState);
+    internalState.addInstruction(new StrInstruction(StrInstruction.StrType.STR,
+        internalState.peekFreeRegister(), SP, -ADDRESS_BYTE_SIZE, true));
+    argsTotalSize += ADDRESS_BYTE_SIZE;
+
+    currSymTable.incrementArgsOffset(ADDRESS_BYTE_SIZE);
+
+    currSymTable.resetArgsOffset();
+
+    /* Branch Instruction to the callee label */
+    String index = "";
+    List<DataTypeId> argTypes = arguments.stream().map(e -> e.getType(currSymTable))
+        .collect(Collectors.toList());
+    Identifier functionIdentifier = currSymTable.lookupAll("*" + methodName.getIdentifier());
+    if(functionIdentifier instanceof OverloadFuncId) {
+      OverloadFuncId overloadFuncId = (OverloadFuncId) functionIdentifier;
+      FunctionId functionId = overloadFuncId.findFuncReturnType(argTypes, returnType);
+      index = String.valueOf(overloadFuncId.getIndex(functionId));
+    }
+
+    String functionLabel = "f_" + className + methodName.toString() + index;
+    internalState.addInstruction(new BranchInstruction(ConditionCode.L, B, functionLabel));
+
+    /* De-allocate stack from the function arguments. Max size for one de-allocation is 1024B */
+    while (argsTotalSize > 0) {
+      internalState.addInstruction(
+          new ArithmeticInstruction(ADD, SP, SP,
+              new Operand(Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE)), false));
+      argsTotalSize -= Math.min(argsTotalSize, MAX_DEALLOCATE_SIZE);
+    }
+
+    /* Move the result stored in DEST_REG in the first free register */
+    internalState
+        .addInstruction(new MovInstruction(internalState.peekFreeRegister(), DEST_REG));
   }
 }

@@ -126,14 +126,4 @@ public class SymbolTable {
   public void resetArgsOffset() {
     this.argsOffset = 0;
   }
-
-  //  /* Get offset of each variable stored in the symbol table */
-  //  public Map<String, Integer> saveOffsetPerVar() {
-  //    return new HashMap<>(offsetPerVar);
-  //  }
-  //
-  //  /* Set offset of each variable stored in the symbol table */
-  //  public void setOffsetPerVar(Map<String, Integer> offsetPerVar) {
-  //    this.offsetPerVar = offsetPerVar;
-  //  }
 }

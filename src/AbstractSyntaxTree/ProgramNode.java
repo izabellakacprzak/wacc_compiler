@@ -1,14 +1,11 @@
 package AbstractSyntaxTree;
 
-import static SemanticAnalysis.DataTypes.BaseType.Type.INT;
-
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
 import AbstractSyntaxTree.type.ClassNode;
 import AbstractSyntaxTree.type.FunctionNode;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.*;
-import SemanticAnalysis.DataTypes.BaseType;
 import SemanticAnalysis.DataTypes.ClassType;
 import SemanticAnalysis.FunctionId;
 import SemanticAnalysis.SemanticError;
@@ -19,9 +16,12 @@ import java.util.List;
 
 public class ProgramNode implements ASTNode {
 
-  /* statementNode: Root node of program's statements
-   * functionNode:  List of all function declaration nodes
-   * syntaxErrors:  List to add any syntax error messages for syntax errors */
+  /* statementNode:       Root node of program's statements
+   * functionNodes:       List of all function declaration nodes
+   * classNodes:          List of all class nodes
+   * syntaxErrors:        List to add any syntax error messages for syntax errors
+   * overloadedFunctions: List of all overloaded functions id's
+   * currSymTable:        Current symbol table */
   private final StatementNode statementNode;
   private final List<FunctionNode> functionNodes;
   private final List<ClassNode> classNodes;

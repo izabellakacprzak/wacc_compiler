@@ -4,8 +4,8 @@ import AbstractSyntaxTree.expression.IdentifierNode;
 
 public class ObjectId extends Identifier {
 
-    /* type: DataTypeId corresponding to the type of
-     *       the represented parameter */
+    /* type:        DataTypeId corresponding to the type of the represented parameter
+     * constructor: ConstructorId of the constructor used for creating this object */
     private final DataTypeId type;
     private final ConstructorId constructor;
 

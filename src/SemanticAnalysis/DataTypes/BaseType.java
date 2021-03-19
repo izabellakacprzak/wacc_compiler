@@ -4,9 +4,13 @@ import SemanticAnalysis.DataTypeId;
 
 public class BaseType extends DataTypeId {
 
+  /* INT_BYTES_SIZE: size of an in in bytes */
   private static final int INT_BYTES_SIZE = 4;
+  /* BOOL_BYTES_SIZE: size of a bool in bytes */
   private static final int BOOL_BYTES_SIZE = 1;
+  /* CHAR_BYTES_SIZE: size of a char in bytes */
   private static final int CHAR_BYTES_SIZE = 1;
+  /* ADDRESS_BYTES_SIZE: size of an address in bytes */
   private static final int ADDRESS_BYTES_SIZE = 4;
 
   /* type: BaseType.Type enum corresponding to the base type this represents */

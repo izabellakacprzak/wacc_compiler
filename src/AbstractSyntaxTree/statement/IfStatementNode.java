@@ -18,7 +18,7 @@ public class IfStatementNode extends StatementNode {
 
   /* condition:     ExpressionNode representing the condition of the if statement
    * thenStatement: StatementNode representing the 'then' body of the if statement
-   * elseStatement: StatementNode representing the 'else' body of the if statement */
+   * elseStatement: optional StatementNode representing the 'else' body of the if statement */
   private final ExpressionNode condition;
   private final StatementNode thenStatement;
   private final StatementNode elseStatement;
@@ -78,6 +78,7 @@ public class IfStatementNode extends StatementNode {
     thenStatement
         .semanticAnalysis(new SymbolTable(symbolTable), errorMessages, uncheckedNodes, firstCheck);
 
+    /* If there is an else statement call semanticAnalysis on it */
     if (elseStatement != null) {
       elseStatement.semanticAnalysis(
           new SymbolTable(symbolTable), errorMessages, uncheckedNodes, firstCheck);

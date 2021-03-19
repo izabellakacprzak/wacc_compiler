@@ -1,19 +1,9 @@
 package AbstractSyntaxTree.expression;
 
-import static InternalRepresentation.Instructions.BranchInstruction.BranchOperation.BL;
-import static InternalRepresentation.Utils.BuiltInFunction.CustomBuiltIn.NULL_POINTER;
-import static InternalRepresentation.Utils.Register.DEST_REG;
-
 import AbstractSyntaxTree.ASTNode;
-import InternalRepresentation.Instructions.BranchInstruction;
-import InternalRepresentation.Instructions.LdrInstruction;
-import InternalRepresentation.Instructions.LdrInstruction.LdrType;
-import InternalRepresentation.Instructions.MovInstruction;
 import InternalRepresentation.InternalState;
-import InternalRepresentation.Utils.Register;
 import SemanticAnalysis.DataTypeId;
 import SemanticAnalysis.DataTypes.ClassType;
-import SemanticAnalysis.DataTypes.PairType;
 import SemanticAnalysis.Identifier;
 import SemanticAnalysis.SemanticError;
 import SemanticAnalysis.SymbolTable;
@@ -24,7 +14,8 @@ import java.util.stream.Collectors;
 
 public class AttributeExprNode extends ExpressionNode {
 
-  private static final int ADDRESS_BYTE_SIZE = 4;
+  /* objectName:    identifier of the object to which the attribute belongs
+   * attributeName: name of the attribute */
   private final IdentifierNode objectName;
   private final IdentifierNode attributeName;
 
@@ -66,7 +57,7 @@ public class AttributeExprNode extends ExpressionNode {
 
   @Override
   public String toString() {
-    return null;
+    return objectName.toString() + "." + attributeName.toString();
   }
 
   @Override
@@ -93,35 +84,9 @@ public class AttributeExprNode extends ExpressionNode {
     }
   }
 
-
-  // get offset of object from symbolTable add to that index of attriburw from attribute list of class
-  // load from that offset + index * ADDRESS_SIZE
   @Override
   public void generateAssembly(InternalState internalState) {
-    SymbolTable currSymbolTable = getCurrSymTable();
-
-    /* Visit and generate assembly code for the attribute identifier */
-    objectName.generateAssembly(internalState);
-
-    /* Get register where offset of object will be stored */
-    Register objectReg = internalState.peekFreeRegister();
-
-    internalState.addInstruction(new MovInstruction(DEST_REG, objectReg));
-
-    /* Check for null pointer exception */
-    internalState.addInstruction(new BranchInstruction(BL, NULL_POINTER));
-
-    /* Get index of attribute in list of class attributes and load it */
-    ClassType classType = (ClassType) this.getType(currSymbolTable);
-    int attributeIndex = classType.findIndexAttribute(attributeName.getIdentifier());
-    internalState.addInstruction(
-        new LdrInstruction(LdrType.LDR, objectReg, objectReg, attributeIndex * ADDRESS_BYTE_SIZE));
-
-    /* Calculate type of Ldr instruction based on the size of the attribute */
-    DataTypeId type = attributeName.getType(currSymbolTable);
-    int elemSize = type.getSize();
-    LdrType ldrInstr = (elemSize == 1) ? LdrType.LDRSB : LdrType.LDR;
-
-    internalState.addInstruction(new LdrInstruction(ldrInstr, objectReg, objectReg));
+    internalState.getCodeGenVisitor().visitAttributeExprNode(internalState, getCurrSymTable(),
+        objectName, this.getType(getCurrSymTable()), attributeName);
   }
 }

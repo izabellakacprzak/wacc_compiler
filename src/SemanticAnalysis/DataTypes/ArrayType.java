@@ -8,6 +8,7 @@ public class ArrayType extends DataTypeId {
 
   /* ARRAY_BYTES_SIZE: size of a reference of an array */
   private static final int ARRAY_BYTES_SIZE = 4;
+  /* HASH_PRIME: prime number used for hashCode generation */
   private static final int HASH_PRIME = 67;
 
   /* elemType:  DataTypeId of the corresponding type of elements the array contains */

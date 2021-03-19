@@ -15,13 +15,14 @@ import java.util.List;
 
 public class ForStatementNode extends StatementNode {
 
-  /* condition: ExpressionNode representing the condition of the for loop
-   * statement: StatementNode representing the body of the for loop */
+  /* declaration:   DeclarationStatementNode of the loop variant
+   * condition:     ExpressionNode representing the condition of the for loop
+   * condStatement: StatementNode representing the statement which modifies the loop variant
+   * bodyStatement: StatementNode representing the body of the for loop */
   private final DeclarationStatementNode declaration;
   private final ExpressionNode condition;
   private final StatementNode condStatement;
   private final StatementNode bodyStatement;
-
 
   public ForStatementNode(DeclarationStatementNode declaration, ExpressionNode condition,
       StatementNode condStatement, StatementNode bodyStatement) {
@@ -65,7 +66,7 @@ public class ForStatementNode extends StatementNode {
     /* Recursively call semanticAnalysis on condition node */
     condition.semanticAnalysis(symbolTable, errorMessages, uncheckedNodes, firstCheck);
 
-    /* Check that the type of the condition expression is of type BOOL */
+    /* Check that the type of the condition expression is BOOL */
     conditionType = condition.getType(symbolTable);
 
     if (conditionType == null) {

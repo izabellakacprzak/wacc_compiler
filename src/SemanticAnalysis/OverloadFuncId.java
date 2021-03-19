@@ -5,8 +5,11 @@ import java.util.stream.Collectors;
 
 public class OverloadFuncId extends Identifier {
 
-  private final List<FunctionId> functions = new ArrayList<>();
+  /* ERROR_CODE: error code used in getNewIndex */
   private static final int ERROR_CODE = -1;
+
+  /* functions: list of overloaded functions with the same name */
+  private final List<FunctionId> functions = new ArrayList<>();
 
   public OverloadFuncId(FunctionId function) {
     super();
@@ -71,6 +74,7 @@ public class OverloadFuncId extends Identifier {
     return returnTypes;
   }
 
+  /* Returns true if a function with the same set of parameter and return types doesn't yet exist */
   private boolean canOverload(FunctionId function) {
     DataTypeId returnType = function.getType();
     List<DataTypeId> params = function.getParamTypes().stream().

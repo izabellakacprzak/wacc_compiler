@@ -129,7 +129,6 @@ public class BinaryOpExprNode extends ExpressionNode {
 
         /*IF the types of any cannot still be deduced, add this node to the unchecked Semantic
          * Analysis nodes and stop the semantic analysis execution */
-        //TODO: do we still need to check that they are null??
         if (leftTypeIsNull && rightTypeIsNull) {
           uncheckedNodes.add(this);
           return;

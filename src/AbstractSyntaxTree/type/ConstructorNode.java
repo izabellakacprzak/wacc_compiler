@@ -1,25 +1,19 @@
 package AbstractSyntaxTree.type;
 
-import static InternalRepresentation.Instructions.DirectiveInstruction.Directive.LTORG;
-import static InternalRepresentation.Utils.Register.LR;
-import static InternalRepresentation.Utils.Register.PC;
-
 import AbstractSyntaxTree.ASTNode;
 import AbstractSyntaxTree.expression.IdentifierNode;
 import AbstractSyntaxTree.statement.StatementNode;
-import InternalRepresentation.Instructions.DirectiveInstruction;
-import InternalRepresentation.Instructions.LabelInstruction;
-import InternalRepresentation.Instructions.PopInstruction;
-import InternalRepresentation.Instructions.PushInstruction;
 import InternalRepresentation.InternalState;
 import SemanticAnalysis.*;
 import SemanticAnalysis.DataTypes.ClassType;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ConstructorNode implements TypeNode{
 
+  /* name: name of the class this constructor belongs to
+   * parameters: ParamListNode representing the parameters passed to the constructor
+   * bodyStatement: the body statement of the constructor */
   private final IdentifierNode name;
   private final ParamListNode parameters;
   private final StatementNode bodyStatement;
@@ -78,39 +72,8 @@ public class ConstructorNode implements TypeNode{
 
   @Override
   public void generateAssembly(InternalState internalState) {
-    // do what we do for function
-    /* Reset registers to start generating a function */
-    internalState.resetAvailableRegs();
-    internalState.setFunctionSymTable(currSymTable);
-
-    /* Add function label and push Link Register */
-    ClassType classId = (ClassType) currSymTable.lookup("class*" + name.getIdentifier());
-
-    /* Get index of constructor from classType */
-    String index = Integer.toString(classId.findIndexConstructor(parameters
-        .getIdentifiers(currSymTable).stream().map(ParameterId::getType).collect(
-        Collectors.toList())));
-
-    internalState.addInstruction(new LabelInstruction("class_constr_" + name.getIdentifier() + index));
-    internalState.addInstruction(new PushInstruction(LR));
-
-    /* Allocate space for variables in the function's currSymbolTable */
-    internalState.allocateStackSpace(currSymTable);
-
-    /* Visit and generate assembly for the function's ParamListNode */
-    parameters.addObject();
-    parameters.generateAssembly(internalState);
-
-    /* Visit and generate assembly for the function's StatementNode */
-    bodyStatement.generateAssembly(internalState);
-
-    /* Reset the parameters' offset, pop the PC program counter add the
-     *   .ltorg instruction to finish the function */
-    internalState.resetParamStackOffset();
-
-    internalState.deallocateStackSpace(internalState.getFunctionSymTable());
-    internalState.addInstruction(new PopInstruction(PC));
-    internalState.addInstruction(new DirectiveInstruction(LTORG));
+    internalState.getCodeGenVisitor().visitConstructorNode(internalState, currSymTable, name,
+        parameters, bodyStatement);
   }
 
   @Override
